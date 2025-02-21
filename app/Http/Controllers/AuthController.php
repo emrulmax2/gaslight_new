@@ -24,9 +24,13 @@ class AuthController extends Controller
      */
     public function loginView()
     {
+        // Fetch users data
+        $users = User::all();
+
         $env= env('APP_ENV');
-        return view('pages/login', [
+        return view('app.auth.login', [
             'env' => $env,
+            'users' => $users,
             'opt' => Option::where('category', 'SITE_SETTINGS')->pluck('value', 'name')->toArray()
         ]);
     }
@@ -67,7 +71,7 @@ class AuthController extends Controller
 
     public function register(): View
     {
-        return view('pages/register');
+        return view('app.auth.register');
     }
 
 

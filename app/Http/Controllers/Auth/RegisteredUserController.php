@@ -20,7 +20,11 @@ class RegisteredUserController extends Controller
 
     public function index(): View
     {
-        return view('pages/register');
+        // Fetch users data
+        $users = User::all();
+        return view('app.auth.register', [
+            'users' => $users,
+        ]);
     }
     /**
      * Handle a registration request for the application.

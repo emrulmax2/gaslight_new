@@ -5,6 +5,15 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\LayoutController;
 
+use App\Http\Controllers\AuthController;
+use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\loggedin;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Dashboard;
+use App\Http\Controllers\FileUploadController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,9 +48,6 @@ Route::post('/email/resend', function (Request $request) {
 
 Route::controller(AuthController::class)->middleware(loggedin::class)->group(function() {
     Route::get('login', 'loginView')->name('login');
-
-    Route::get('register', 'register')->name('register');
-    Route::post('register', 'registerPost')->name('register');
     
     Route::post('login', 'login')->name('login.check');
     
@@ -113,8 +119,8 @@ Route::controller(PageController::class)->group(function () {
     Route::get('faq-layout-1-page', 'faqLayout1')->name('faq-layout-1');
     Route::get('faq-layout-2-page', 'faqLayout2')->name('faq-layout-2');
     Route::get('faq-layout-3-page', 'faqLayout3')->name('faq-layout-3');
-    Route::get('login-page', 'login')->name('login');
-    Route::get('register-page', 'register')->name('register');
+    //Route::get('login-page', 'login')->name('login');
+    //Route::get('register-page', 'register')->name('register');
     Route::get('error-page-page', 'errorPage')->name('error-page');
     Route::get('update-profile-page', 'updateProfile')->name('update-profile');
     Route::get('change-password-page', 'changePassword')->name('change-password');

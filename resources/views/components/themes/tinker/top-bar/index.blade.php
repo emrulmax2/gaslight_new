@@ -218,7 +218,7 @@
                 /> Help
             </x-base.menu.item>
             <x-base.menu.divider class="bg-white/[0.08]" />
-            <x-base.menu.item class="hover:bg-white/5">
+            <x-base.menu.item class="hover:bg-white/5" href="{{ route('logout') }}">
                 <x-base.lucide
                     class="mr-2 h-4 w-4"
                     icon="ToggleRight"

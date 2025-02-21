@@ -30,7 +30,7 @@ class FileUploadController extends Controller
             ]);
 
             
-            $fileUrl = Storage::disk('public')->temporaryUrl('companies/'.$request->pid.'/images/'.$filename, now()->addMinutes(15));
+            $fileUrl = Storage::disk('public')->url('companies/'.$request->pid.'/images/'.$filename);
             return response()->json([
                 'success' => $filename, 
                 'filePath' => $fileUrl,
