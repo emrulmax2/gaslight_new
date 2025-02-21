@@ -19,8 +19,61 @@ use App\Http\Controllers\LayoutController;
 Route::get('theme-switcher/{activeTheme}', [ThemeController::class, 'switch'])->name('theme-switcher');
 Route::get('layout-switcher/{activeLayout}', [LayoutController::class, 'switch'])->name('layout-switcher');
 
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/');
+})->middleware(['auth','signed'])->name('verification.verify');
+
+Route::post('/email/resend', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
+
+
+Route::controller(AuthController::class)->middleware(loggedin::class)->group(function() {
+    Route::get('login', 'loginView')->name('login');
+
+    Route::get('register', 'register')->name('register');
+    Route::post('register', 'registerPost')->name('register');
+    
+    Route::post('login', 'login')->name('login.check');
+    
+});
+
+Route::controller(RegisteredUserController::class)->middleware(loggedin::class)->group(function() {
+
+    Route::get('register', 'index')->name('register');
+    Route::post('register', 'store')->name('register');
+});
+
+Route::middleware(Authenticate::class)->group(function() {
+    Route::controller(Dashboard::class)->group(function () {
+        Route::get('/', 'index')->name('company.dashboard');
+    });
+
+    Route::resource('company', CompanyController::class);
+    Route::controller(CompanyController::class)->group(function() {
+        Route::get('company-list', 'list')->name('company.list'); 
+        Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
+    });
+
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+Route::controller(FileUploadController::class)->group(function() {
+    Route::post('/file-upload', 'upload')->name('file.upload');
+    Route::delete('/file-delete/{id}', 'delete')->name('file.delete');
+});
+
 Route::controller(PageController::class)->group(function () {
-    Route::get('/', 'dashboardOverview1')->name('dashboard-overview-1');
+    Route::get('dashboard-overview-1', 'dashboardOverview1')->name('dashboard-overview-1');
     Route::get('dashboard-overview-2-page', 'dashboardOverview2')->name('dashboard-overview-2');
     Route::get('dashboard-overview-3-page', 'dashboardOverview3')->name('dashboard-overview-3');
     Route::get('dashboard-overview-4-page', 'dashboardOverview4')->name('dashboard-overview-4');
