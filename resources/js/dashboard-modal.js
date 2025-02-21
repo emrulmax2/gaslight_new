@@ -94,7 +94,7 @@
             
             //implode the array of local storage
             uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
-            console.log(uploadedFiles);
+            
             // Set the value of the input field to the uploaded files
             $.each(uploadedFiles, function (index, value) {
                 // check if the first index input field is empty
@@ -233,7 +233,7 @@
         removeElement.addEventListener("click", function () {
             // Remove the image from the DOM
             uploadedContainer.removeChild(uploadedImageBox);
-            previewContainer.removeChild(imageBox);
+            //previewContainer.removeChild(imageBox);
             if (dropzoneFile) {
                 myDropzone.removeFile(dropzoneFile);
             }
@@ -262,7 +262,7 @@
         removeElement2.addEventListener("click", function () {
             // Remove the image from the DOM
             uploadedContainer.removeChild(uploadedImageBox);
-            previewContainer.removeChild(imageBox);
+            //previewContainer.removeChild(imageBox);
             if (dropzoneFile) {
                 myDropzone.removeFile(dropzoneFile);
             }
