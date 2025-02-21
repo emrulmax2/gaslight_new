@@ -34,9 +34,9 @@ License: You must have a valid license purchased only from themeforest(the above
     >
     <meta
         name="author"
-        content="LEFT4CODE"
+        content="LCC Team"
     >
-
+    
     @yield('head')
 
     <!-- BEGIN: CSS Assets-->
@@ -44,6 +44,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- END: CSS Assets-->
 
     @vite('resources/css/app.css')
+    @routes
 </head>
 <!-- END: Head -->
 
