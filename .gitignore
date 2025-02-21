@@ -18,4 +18,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/.zed
+composer.lock
+pnpm-lock.yaml
