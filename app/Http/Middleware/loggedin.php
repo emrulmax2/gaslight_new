@@ -4,9 +4,10 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class Authenticate
+class loggedin
 {
     /**
      * Handle an incoming request.
@@ -16,13 +17,19 @@ class Authenticate
     public function handle(Request $request, Closure $next): Response
     {
         if (!is_null(request()->user())) {
-            return $next($request);
+            
+            return redirect('/');
         // }else if (!is_null(Auth::guard('client')->user())) {
             
         //     return redirect()->route('client.login');
 
+        // }else if (!is_null(Auth::guard('admin')->user())) {
+            
+        //     return redirect()->route('admin.login');
+
         }  else {
-            return redirect('login');
+            return $next($request);
         }
+        
     }
 }
