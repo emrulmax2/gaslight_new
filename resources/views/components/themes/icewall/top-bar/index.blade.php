@@ -159,7 +159,7 @@
                 />
             </x-base.popover.button>
             <x-base.popover.panel class="mt-2 w-[280px] p-5 sm:w-[350px]">
-                <div class="mb-5 font-medium">Notifications</div>
+                <div class="mb-5 font-medium">Settings</div>
                 @foreach (array_slice($fakers, 0, 5) as $fakerKey => $faker)
                     <div @class([
                         'cursor-pointer relative flex items-center',
@@ -197,6 +197,12 @@
         </x-base.popover>
         <!-- END: Notifications -->
         <!-- BEGIN: Account Menu -->
+        <a href="{{ route('user.settings') }}" class="intro-x mr-4 sm:mr-6">
+            <x-base.lucide
+                class="h-5 w-5 text-white/70"
+                icon="settings"
+            />
+        </a>
         <x-base.menu>
             <x-base.menu.button
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"

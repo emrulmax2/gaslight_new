@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\User;
 
+use App\Fakers\Countries;
 class CompanyController extends Controller
 {
     /**
@@ -14,7 +15,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        //
+        return view('app.company.index',[
+            'countries' => Countries::fakeCountries(),
+        ]);
     }
     public function list()
     {

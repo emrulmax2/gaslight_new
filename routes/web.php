@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\UserSettings;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 /*
@@ -64,6 +65,10 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('/', 'index')->name('company.dashboard');
     });
 
+    Route::controller(UserSettings::class)->group(function () {
+        Route::get('/settings', 'index')->name('user.settings');
+    });
+
     Route::resource('company', CompanyController::class);
     Route::controller(CompanyController::class)->group(function() {
         Route::get('company-list', 'list')->name('company.list'); 
@@ -77,6 +82,7 @@ Route::controller(FileUploadController::class)->group(function() {
     Route::post('/file-upload', 'upload')->name('file.upload');
     Route::delete('/file-delete/{id}', 'delete')->name('file.delete');
 });
+
 
 Route::controller(PageController::class)->group(function () {
     Route::get('dashboard-overview-1', 'dashboardOverview1')->name('dashboard-overview-1');
