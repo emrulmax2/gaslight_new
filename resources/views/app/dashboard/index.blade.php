@@ -1049,7 +1049,7 @@
 @pushOnce('styles')
     @vite('resources/css/vendors/toastify.css')
     @vite('resources/css/vendors/dropzone.css')
-    @vite('resources/css/vendors/lucide.css')
+    
 
 @endPushOnce
 

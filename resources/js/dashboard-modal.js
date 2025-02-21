@@ -91,9 +91,10 @@
             displayUploadedFile(filePath, fileId, file);
         },
         complete: function (file) {
-            console.log(file);
+            
             //implode the array of local storage
             uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+            console.log(uploadedFiles);
             // Set the value of the input field to the uploaded files
             $.each(uploadedFiles, function (index, value) {
                 // check if the first index input field is empty
@@ -119,29 +120,8 @@
     // Function to display uploaded file
     function displayUploadedFile(filePath, fileId, dropzoneFile) {
 
-        // // Create the preview container
-        // let previewContainer = document.getElementById("featuer-view");
-        // // Clear the preview container
-        // previewContainer.innerHTML = "";
-        // // Create the image box
-        // let imageBox = document.createElement("div");
-        // // Add classes to the image box
-        // imageBox.classList.add(
-        //     "show-feature-image",
-        //     "image-fit",
-        //     "zoom-in",
-        //     "relative",
-        //     "mb-5",
-        //     "mr-5",
-        //     "h-80",
-        //     "w-full",
-        //     "cursor-pointer"
-        // );
-        // // Set the data-id attribute
-        // imageBox.setAttribute("data-id", fileId);
-        // // Append the image to the image box
-        // previewContainer.appendChild(imageBox);
-        // //End of preview container
+
+        
 
 
         // Create the image element
@@ -386,7 +366,8 @@
     }
     // Function to handle the display of company_register_no based on company_type value
     function handleCompanyTypeChange() {
-        const companyType = document.querySelector('input[name="business_type"]:checked').value;
+        const selectedBusinessType = document.querySelector('input[name="business_type"]:checked');
+        const companyType = selectedBusinessType ? selectedBusinessType.value : null;
         const companyRegisterNo = document.getElementById("company_register_no");
 
         if (companyType === "Company") {
