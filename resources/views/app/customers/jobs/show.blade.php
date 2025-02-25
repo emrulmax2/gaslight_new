@@ -125,14 +125,14 @@
     <div class="intro-y box mt-5">
         <x-base.tab.group>
             <x-base.tab.list variant="tabs" class="flex items-start justify-start border-b border-slate-200/60 p-5 py-3 dark:border-darkmode-400 sm:flex-row">
-                <x-base.tab id="job-history-tab" class="flex-none ml-2" selected >
+                <x-base.tab id="job-history-tab" class="flex-none mr-2" selected >
                     <x-base.tab.button class="w-full py-2 border-0 rounded-md font-medium bg-slate-100 text-primary inline-flex justify-center items-center [&.active]:bg-primary [&.active]:text-white" as="button" >
                         <x-base.lucide class="mr-2 h-4 w-4" icon="list" />
                         History
                     </x-base.tab.button>
                 </x-base.tab>
                 @if($job->documents->count() > 0)
-                <x-base.tab id="job-document-tab" class="flex-none ml-2">
+                <x-base.tab id="job-document-tab" class="flex-none mr-2">
                     <x-base.tab.button class="w-full py-2 border-0 rounded-md font-medium bg-slate-100 text-primary inline-flex justify-center items-center [&.active]:bg-primary [&.active]:text-white" as="button" >
                         <x-base.lucide class="mr-2 h-4 w-4" icon="file" />
                         Documents
