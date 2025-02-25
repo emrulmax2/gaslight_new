@@ -11,6 +11,7 @@ use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
+use App\Http\Controllers\EngineerController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Customers\CustomerController;
@@ -78,6 +79,12 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(CompanyController::class)->group(function() {
         Route::get('company-list', 'list')->name('company.list'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
+    });
+
+    Route::resource('engineer', EngineerController::class);
+    Route::controller(EngineerController::class)->group(function() {
+        Route::get('engineer-list', 'list')->name('engineer.list'); 
+        Route::post('engineer-restore/{id}', 'restore')->name('engineer.restore'); 
     });
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
