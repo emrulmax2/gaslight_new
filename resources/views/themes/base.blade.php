@@ -44,6 +44,8 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- END: CSS Assets-->
 
     @vite('resources/css/app.css')
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_API', 'YOUR_API_KEY') }}&libraries=places"></script>
+    
     @routes
 </head>
 <!-- END: Head -->

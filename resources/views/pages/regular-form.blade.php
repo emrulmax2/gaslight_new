@@ -12,18 +12,11 @@
         <div class="intro-y col-span-12 lg:col-span-6">
             <!-- BEGIN: Input -->
             <x-base.preview-component class="intro-y box">
-                <div
-                    class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
+                <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                     <h2 class="mr-auto text-base font-medium">Input</h2>
                     <x-base.form-switch class="mt-3 w-full sm:ml-auto sm:mt-0 sm:w-auto">
-                        <x-base.form-switch.label for="show-example-1">
-                            Show example code
-                        </x-base.form-switch.label>
-                        <x-base.form-switch.input
-                            class="ml-3 mr-0"
-                            id="show-example-1"
-                            type="checkbox"
-                        />
+                        <x-base.form-switch.label for="show-example-1"> Show example code </x-base.form-switch.label>
+                        <x-base.form-switch.input class="ml-3 mr-0" id="show-example-1" type="checkbox" />
                     </x-base.form-switch>
                 </div>
                 <div class="p-5">
