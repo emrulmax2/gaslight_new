@@ -142,7 +142,7 @@
                             </x-base.form-switch>
                         </div>
                         <div class="col-span-12 sm:col-span-6 text-right">
-                            <x-base.button as="a" href="{{ route('customers.show', $customer->id) }}" class="shadow-md" variant="danger">
+                            <x-base.button as="a" href="{{ route('customers.jobs', $customer->id) }}" class="shadow-md" variant="danger">
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
                                 Cancel
                             </x-base.button>

@@ -27,6 +27,12 @@ var customerListTable = (function () {
                     width: "80",
                 },
                 {
+                    title: 'Company',
+                    field: 'company_name',
+                    headerHozAlign: "left",
+                    vertAlign: 'middle',
+                },
+                {
                     title: "Name",
                     field: "first_name",
                     headerHozAlign: "left",
@@ -40,24 +46,30 @@ var customerListTable = (function () {
                     }
                 },
                 {
+                    title: 'Address',
+                    field: 'address_line_1',
+                    headerHozAlign: "left",
+                    vertAlign: 'middle',
+                    formatter(cell, formatterParams) { 
+                        let address = '';
+                        address += (cell.getData().address_line_1 != '' ? cell.getData().address_line_1+' ' : '');
+                        address += (cell.getData().address_line_2 != '' ? cell.getData().address_line_2+', ' : '');
+                        address += (cell.getData().city != '' ? cell.getData().city+', ' : '');
+                        address += (cell.getData().state != '' ? cell.getData().state+', ' : '');
+                        address += (cell.getData().postal_code != '' ? cell.getData().postal_code : '');
+                        var html = '<div class="block whitespace-normal">';
+                                html += (address != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+address+'</div>' : '');
+                            html += '</div>';
+                        return html;
+                    }
+                },
+                {
                     title: 'Email',
                     field: 'email',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                 },
-                {
-                    title: 'Company',
-                    field: 'company_name',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                },
-                {
-                    title: 'VAT No',
-                    field: 'vat_no',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                },
-                {
+                /*{
                     title: "Actions",
                     field: "id",
                     headerSort: false,
@@ -69,7 +81,7 @@ var customerListTable = (function () {
                     formatter(cell, formatterParams) {                        
                         var btns = "";
                         if (cell.getData().deleted_at == null) {
-                            btns += '<a href="'+route('customers.show', cell.getData().id)+'" class="rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Eye" class="w-4 h-4"></i></a>';
+                            btns += '<a href="'+route('customers.jobs', cell.getData().id)+'" class="rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Eye" class="w-4 h-4"></i></a>';
                             btns += '<button data-id="' +cell.getData().id +'" class="delete_btn rounded-full bg-danger text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
                         }  else {
                             btns += '<button data-id="' +cell.getData().id +'"  class="restore_btn rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
@@ -77,9 +89,9 @@ var customerListTable = (function () {
                         
                         return btns;
                     },
-                },
+                },*/
             ],
-            ajaxResponse:function(url, params, response){
+            ajaxResponse: function(url, params, response){
                 return response.data;
             },
             renderComplete() {
@@ -89,6 +101,10 @@ var customerListTable = (function () {
                     nameAttr: "data-lucide",
                 });
             },
+        });
+
+        tableContent.on("rowClick", (e, row) => {
+            window.open(route('customers.jobs', row.getData().id), '_blank');
         });
 
         tableContent.on("renderComplete", () => {

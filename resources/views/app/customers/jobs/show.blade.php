@@ -105,7 +105,7 @@
                     <x-base.button type="button" class="mb-3 w-full text-white" variant="primary" >
                         <x-base.lucide class="mr-2 h-4 w-4" icon="calendar-plus" />Add Appointment
                     </x-base.button>
-                    <x-base.button type="button" class="mb-3 w-full text-white" variant="twitter" >
+                    <x-base.button type="button" class="mb-3 w-full text-white" variant="twitter" data-tw-toggle="modal" data-tw-target="#jobActionsListModal">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />Create
                     </x-base.button>
                     <x-base.button type="button" class="w-full text-white" variant="linkedin" data-tw-toggle="modal" data-tw-target="#jobUploadDocModal">
@@ -147,7 +147,7 @@
                 </x-base.tab.panel>
                 @if($job->documents->count() > 0)
                 <x-base.tab.panel class="p-5 leading-relaxed" id="job-document" >
-                    Documents.....
+                    @include('app.customers.jobs.tabs.documents')
                 </x-base.tab.panel>
                 @endif
             </x-base.tab.panels>
@@ -170,6 +170,7 @@
     </div>
 
     @include('app.customers.jobs.show-modals')
+    @include('app.customers.jobs.tabs.documents-modal')
     @include('app.action-modals')
 @endsection
 

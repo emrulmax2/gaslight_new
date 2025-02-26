@@ -34,8 +34,8 @@ var customerJobListTable = (function () {
                     width: "180",
                 },
                 {
-                    title: "Customer",
-                    field: "full_name",
+                    title: "Address",
+                    field: "address_line_1",
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     formatter(cell, formatterParams) { 
@@ -44,22 +44,39 @@ var customerJobListTable = (function () {
                         address += (cell.getData().address_line_2 != '' ? cell.getData().address_line_2+', ' : '');
                         address += (cell.getData().city != '' ? cell.getData().city+', ' : '');
                         address += (cell.getData().postal_code != '' ? cell.getData().postal_code : '');
+                        return (address != '' ? '<div class="text-slate-500 text-xs whitespace-normal">'+address+'</div>' : '');
+                    }
+                },
+                {
+                    title: "Customer",
+                    field: "full_name",
+                    headerHozAlign: "left",
+                    vertAlign: 'middle',
+                    formatter(cell, formatterParams) { 
                         var html = '<a href="'+route('customers.jobs.show', [cell.getData().customer_id, cell.getData().id])+'" class="block">';
                                 html += '<div class="font-medium whitespace-nowrap">'+cell.getData().full_name+'</div>';
-                                html += (address != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+address+'</div>' : '');
                             html += '</a>';
                         return html;
                     }
                 },
                 {
-                    title: 'Due Date',
-                    field: 'due_date',
+                    title: 'Priority',
+                    field: 'priority',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                 },
                 {
-                    title: 'Priority',
-                    field: 'priority',
+                    title: 'Description',
+                    field: 'description',
+                    headerHozAlign: "left",
+                    vertAlign: 'middle',
+                    formatter(cell, formatterParams) { 
+                        return '<div class="text-slate-500 text-xs whitespace-normal">'+cell.getData().description+'</div>';
+                    }
+                },
+                {
+                    title: 'Due Date',
+                    field: 'due_date',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                 },
@@ -75,7 +92,7 @@ var customerJobListTable = (function () {
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                 },
-                {
+                /*{
                     title: "Actions",
                     field: "id",
                     headerSort: false,
@@ -94,7 +111,7 @@ var customerJobListTable = (function () {
                         
                         return btns;
                     },
-                },
+                },*/
             ],
             ajaxResponse:function(url, params, response){
                 return response.data;
@@ -106,6 +123,10 @@ var customerJobListTable = (function () {
                     nameAttr: "data-lucide",
                 });
             },
+        });
+
+        tableContent.on("rowClick", (e, row) => {
+            window.open(route('customers.jobs.show', [row.getData().customer_id, row.getData().id]), '_blank');
         });
 
         tableContent.on("renderComplete", () => {

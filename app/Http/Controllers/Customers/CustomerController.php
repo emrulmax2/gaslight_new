@@ -73,6 +73,11 @@ class CustomerController extends Controller
                     'vat_no' => $list->vat_no,
                     'email' => (isset($list->contact->email) && !empty($list->contact->email) ? $list->contact->email : ''),
                     'mobile' => (isset($list->contact->mobile) && !empty($list->contact->mobile) ? $list->contact->mobile : ''),
+                    'address_line_1' => $list->address_line_1,
+                    'address_line_2' => $list->address_line_2,
+                    'city' => $list->city,
+                    'state' => $list->state,
+                    'postal_code' => $list->postal_code,
                     'deleted_at' => $list->deleted_at
                 ];
                 $i++;
@@ -126,21 +131,6 @@ class CustomerController extends Controller
         endif;
     }
 
-    public function show(Customer $customer){
-        $customer->load(['title', 'contact']);
-        return view('app.customers.show', [
-            'title' => 'Customers - Gas Certificate APP',
-            'breadcrumbs' => [
-                ['label' => 'Customers', 'href' => 'javascript:void(0);'],
-                ['label' => 'Show', 'href' => 'javascript:void(0);'],
-            ],
-            'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
-            'customer' => $customer,
-            'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
-            'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
-        ]);
-    }
-
     public function edit(Customer $customer){
         $customer->load(['title', 'contact']);
         return view('app.customers.edit', [
@@ -182,7 +172,7 @@ class CustomerController extends Controller
             'other_email' => (!empty($request->other_email) ? $request->other_email : null),
             'updated_by' => auth()->user()->id
         ]);
-        return response()->json(['msg' => 'Customer successfully updated.', 'red' => route('customers.show', $customer_id)], 200);
+        return response()->json(['msg' => 'Customer successfully updated.', 'red' => route('customers.jobs', $customer_id)], 200);
     }
 
     public function destroy($customer_id){

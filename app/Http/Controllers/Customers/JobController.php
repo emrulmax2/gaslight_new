@@ -8,11 +8,27 @@ use App\Models\Customer;
 use App\Models\CustomerJob;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
+use App\Models\Title;
 use Illuminate\Http\Request;
 use Illuminate\Support\Number;
 
 class JobController extends Controller
 {
+    public function index(Customer $customer){
+        $customer->load(['title', 'contact']);
+        return view('app.customers.jobs.index', [
+            'title' => 'Customers - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Customers', 'href' => route('customers')],
+                ['label' => 'Jobs', 'href' => 'javascript:void(0);'],
+            ],
+            'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
+            'customer' => $customer,
+            'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
+            'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
+        ]);
+    }
+
     public function list(Request $request){
         $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
         $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
@@ -56,6 +72,7 @@ class JobController extends Controller
                     'id' => $list->id,
                     'sl' => $i,
                     'customer_id' => $list->customer_id,
+                    'description' => $list->description,
                     'full_name' => (isset($list->customer->full_name) ? $list->customer->full_name : ''),
                     'address_line_1' => (isset($list->property->address_line_1) && !empty($list->property->address_line_1) ? $list->property->address_line_1 : ''),
                     'address_line_2' => (isset($list->property->address_line_2) && !empty($list->property->address_line_2) ? $list->property->address_line_2 : ''),
@@ -106,7 +123,7 @@ class JobController extends Controller
             'title' => 'Jobs - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Customer', 'href' => route('customers')],
-                ['label' => 'Jobs', 'href' => route('customers.show', $customer->id)],
+                ['label' => 'Jobs', 'href' => route('customers.jobs', $customer->id)],
                 ['label' => 'Details', 'href' => 'javascript:void(0);'],
             ],
             'customers' => Customer::where('created_by', auth()->user()->id)->orderBy('last_name', 'ASC')->get(),

@@ -66,7 +66,7 @@
     </div>
     <!-- END: HTML Table Data -->
 
-    @include('app.customers.show-modals')
+    @include('app.customers/jobs.index-modals')
     @include('app.action-modals')
 @endsection
 
@@ -83,7 +83,6 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/customers-show.js')
     @vite('resources/js/app/jobs.js')
     @vite('resources/js/app/jobs-create.js')
 @endPushOnce

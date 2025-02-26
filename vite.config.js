@@ -156,9 +156,9 @@ export default defineConfig({
                 // APP JS
                 "resources/js/app/customers.js",
                 "resources/js/app/customers-create.js",
-                "resources/js/app/customers-show.js",
 
                 "resources/js/app/jobs.js",
+                "resources/js/app/properties.js",
                 "resources/js/app/jobs-create.js",
                 "resources/js/app/jobs-show.js",
                 "resources/js/app/customers-edit.js",

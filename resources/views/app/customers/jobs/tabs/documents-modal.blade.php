@@ -1,6 +1,6 @@
 
-<!-- BEGIN: Job Action List Modal Content -->
-<x-base.dialog id="jobActionsListModal" staticBackdrop size="lg">
+<!-- BEGIN: Modal Content -->
+<x-base.dialog id="jobUploadDocModal" staticBackdrop size="lg">
     <x-base.dialog.panel>
         <x-base.dialog.title>
             <h2 class="mr-auto text-base font-medium">Upload Documents</h2>
