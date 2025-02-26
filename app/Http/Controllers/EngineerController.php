@@ -10,6 +10,8 @@ use Creagia\LaravelSignPad\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Random\Engine;
 
 class EngineerController extends Controller
 {
@@ -32,16 +34,25 @@ class EngineerController extends Controller
     }
 
 
-    public function store(StoreEngineerRequest $request)
+    public function store(Request $request)
     {
-        
+        $user_id = auth()->user()->id;
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:engineers',
             'password' => 'required|string|min:8',
             'sign' => 'required',
         ]);
-        $user = Engineer::create($validatedData);
+
+        $user = Engineer::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')), 
+        ]);
+
+        $user->users()->attach($user_id);
+
+
         $signatureData = str_replace('data:image/png;base64,', '', $validatedData['sign']);
         $signatureData = base64_decode($signatureData);
         $imageName = 'signatures/' . Str::uuid() . '.png';
@@ -56,7 +67,7 @@ class EngineerController extends Controller
         $signature->from_ips = json_encode([request()->ip()]);
         $signature->save();
         // Redirect back with success message.
-        return redirect()->back()->with('success', 'Employment Agreement submited successfully!');
+        return redirect()->back()->with('success', 'Engineer added successfully !');
     }
 
     /**
@@ -124,7 +135,7 @@ class EngineerController extends Controller
         endif;
         $query->whereHas('users', function($query) use ($user) {
 
-            $query->where('id',"=",$user->id);  
+            $query->where('users.id',"=",$user->id);  
 
         });
         
@@ -153,7 +164,7 @@ class EngineerController extends Controller
                         'sl' => $i,
                         "name" => $list->first_name." ".$list->last_name,
                         'email' =>$list->email,
-                        'status' => isset($list->active) ? 'Active' : 'Inactive',
+                        'status' => isset($list->status) ? 'Active' : 'Inactive',
                         'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
                         'delete_url' => route('engineer.destroy', $list->id),
                         'restore_url' => route('engineer.restore', $list->id),

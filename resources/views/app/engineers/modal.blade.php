@@ -28,11 +28,13 @@ staticBackdrop
             <form method="POST" action="{{ route('engineer.store') }}" id="addEngineerForm" enctype="multipart/form-data">
                 @csrf
             <div>
+                
                 <x-base.form-label>Email*</x-base.form-label>
                         <x-base.form-input id="email"
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5 login__input"
                             type="text"
                             placeholder="x@y.Z"
+                            name="email"
                         />
                         <div id="error-email" class="login__input-error text-danger mt-2 dark:text-orange-400 "></div>        
                         <x-base.form-label class="mt-4">Full Name*</x-base.form-label>
@@ -40,9 +42,19 @@ staticBackdrop
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
                             type="text"
                             placeholder="John Doe"
+                            name="name"
 
                         />
                         <div id="error-name" class="login__input-error text-danger mt-2 dark:text-orange-400"></div>
+       
+                        <x-base.form-label class="mt-4">Password*</x-base.form-label>
+                        <x-base.form-input id="password"
+                            class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
+                            type="password"
+                            placeholder="password"
+                            name="password"
+                        />
+                        <div id="error-password" class="login__input-error text-danger mt-2 dark:text-orange-400"></div>
 
                         <div class="mb-4">
                             <x-base.form-label class="mt-4">Signature*</x-base.form-label>

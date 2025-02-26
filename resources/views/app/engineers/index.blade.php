@@ -20,6 +20,63 @@
             </x-base.button>
         </div>
     </div>
+    @if ($message = Session::get('success'))
+        <x-base.alert
+        class="my-7 flex items-center rounded-[0.6rem] border-primary/20 bg-primary/5 px-4 py-3 leading-[1.7]"
+        variant="outline-primary"
+    >
+        <div class="">
+            <x-base.lucide
+                class="mr-2 h-7 w-7 fill-primary/10 stroke-[0.8]"
+                icon="Lightbulb"
+            />
+        </div>
+        <div class="ml-1 mr-8">
+            <span class="font-medium">{{ $message }}</span>
+        </div>
+        <x-base.alert.dismiss-button class="btn-close text-primary">
+            <x-base.lucide
+                class="w-5 h-5"
+                icon="X"
+            />
+        </x-base.alert.dismiss-button>
+    </x-base.alert>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+
+        <x-base.alert
+        class="my-7 flex items-center rounded-[0.6rem] border-danger/20 bg-danger/5 px-4 py-3 leading-[1.7]"
+        variant="outline-danger"
+    >
+        <div class="">
+            <x-base.lucide
+                class="mr-2 h-7 w-7 fill-danger/10 stroke-[0.8]"
+                icon="circle-x"
+            />
+        </div>
+        <div class="ml-1 mr-8">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        <x-base.alert.dismiss-button class="btn-close text-primary">
+            <x-base.lucide
+                class="w-5 h-5"
+                icon="X"
+            />
+        </x-base.alert.dismiss-button>
+    </x-base.alert>
+    @endif
     <!-- BEGIN: HTML Table Data -->
     <div class="intro-y box mt-5 p-5">
         <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
@@ -153,6 +210,7 @@
             ></div>
         </div>
     </div>
+    
     <!-- END: HTML Table Data -->
     @include('app.engineers.modal')
 @endsection
