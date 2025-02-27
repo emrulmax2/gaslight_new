@@ -42,6 +42,8 @@ export default defineConfig({
                 // CSS Components
                 "resources/css/components/mobile-menu.css",
 
+                "resources/css/custom/signature.css",
+
                 // CSS General
                 "resources/css/app.css",
 
@@ -152,6 +154,7 @@ export default defineConfig({
 
                 // JS General
                 "resources/js/app.js",
+                "resources/js/dashboard-modal.js",
 
                 // APP JS
                 "resources/js/app/customers.js",
