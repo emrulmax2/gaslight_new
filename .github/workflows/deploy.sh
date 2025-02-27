@@ -10,9 +10,9 @@ composer install --no-interaction
 
 export PATH=/opt/cpanel/ea-nodejs16/bin/:$PATH
 # Install NPM dependencies and build assets
-npm install
-npm run build
-rm -rf node_modules
+# npm install
+# npm run build
+# rm -rf node_modules
 
 # Run database migrations
 php artisan migrate --force
