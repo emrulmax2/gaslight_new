@@ -208,42 +208,7 @@
                 </div>
                 <div class="mt-10 flex flex-col gap-3 xl:flex-row xl:items-center">
                     <div class="flex items-center">
-                        <div class="image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
-                            <x-base.tippy
-                                class="rounded-full border-[3px] border-white/50"
-                                src=""
-                                alt="Tailwise - Admin Dashboard Template"
-                                as="img"
-                                content="{{ $users[0]['name'] }}"
-                            />
-                        </div>
-                        <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
-                            <x-base.tippy
-                                class="rounded-full border-[3px] border-white/50"
-                                src=""
-                                alt="Tailwise - Admin Dashboard Template"
-                                as="img"
-                                content="{{ $users[1]['name'] }}"
-                            />
-                        </div>
-                        <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
-                            <x-base.tippy
-                                class="rounded-full border-[3px] border-white/50"
-                                src=""
-                                alt="Tailwise - Admin Dashboard Template"
-                                as="img"
-                                content="{{ $users[2]['name'] }}"
-                            />
-                        </div>
-                        <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
-                            <x-base.tippy
-                                class="rounded-full border-[3px] border-white/50"
-                                src=""
-                                alt="Tailwise - Admin Dashboard Template"
-                                as="img"
-                                content="{{ $users[0]['name'] }}"
-                            />
-                        </div>
+                        
                     </div>
                     <div class="text-base text-white/70 xl:ml-2 2xl:ml-3">
                         Over 7k+ strong and growing! Your journey begins here.
