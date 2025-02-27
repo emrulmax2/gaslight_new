@@ -622,30 +622,40 @@
                             <h2 class="mr-5 truncate text-lg font-medium">Recent Jobs</h2>
                         </div>
                         <div class="mt-5">
-                            @foreach (array_slice($fakers, 0, 5) as $faker)
-                                <div class="intro-x">
-                                    <div class="box zoom-in mb-3 flex items-center px-5 py-3">
-                                        <div class="image-fit h-10 w-10 flex-none overflow-hidden rounded-full">
-                                            <img
-                                                src="{{ Vite::asset($faker['photos'][0]) }}"
-                                                alt="Midone - Tailwind Admin Dashboard Template"
-                                            />
-                                        </div>
-                                        <div class="ml-4 mr-auto">
-                                            <div class="font-medium">{{ $faker['users'][0]['name'] }}</div>
-                                            <div class="mt-0.5 text-xs text-slate-500">
-                                                {{ $faker['dates'][0] }}
+                            @if($recent_jobs->count() > 0)
+                                @foreach($recent_jobs as $job)
+                                
+                                    @php 
+                                        $address = '';
+                                        $address .= $job->property->address_line_1.' '.$job->property->address_line_2.', ';
+                                        $address .= ( !empty($job->property->city) ? $job->property->city.', ' : '');
+                                        $address .= (!empty($job->property->state) ? $job->property->state.', ' : '');
+                                        $address .= (!empty($job->property->postal_code) ? $job->property->postal_code.', ' : '');
+                                        $address .= (!empty($job->property->country) ? $job->property->country : '');
+                                    @endphp
+                                    <div class="intro-x">
+                                        <div class="box zoom-in mb-3 flex items-start px-5 py-3">
+                                            <div class="h-10 w-10 flex-none overflow-hidden rounded-full items-center justify-center bg-slate-100 border rounded-full inline-flex">
+                                                <x-base.lucide class="h-4 w-4 text-success" icon="flame" />
+                                            </div>
+                                            <div class="ml-4 mr-auto">
+                                                <div class="font-medium ">{{ $address }}</div>
+                                                <div class="mt-0.5 text-xs font-medium text-slate-500">
+                                                    {{ (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : 'Unknown Customer') }}
+                                                </div>
+                                                @if(!empty($job->description))
+                                                <div class="mt-0.5 text-xs text-slate-500">
+                                                    {{ (strlen($job->description) > 45 ? substr($job->description, 0, 45).'...' : $job->description) }}
+                                                </div>
+                                                @endif
+                                            </div>
+                                            <div class="pl-5 text-success font-medium">
+                                                {{ ($job->estimated_amount > 0 ? Number::currency($job->estimated_amount, in: 'GBP') : Number::currency(0, in: 'GBP')) }}
                                             </div>
                                         </div>
-                                        <div @class([
-                                            'text-success' => $faker['true_false'][0],
-                                            'text-danger' => !$faker['true_false'][0],
-                                        ])>
-                                            {{ $faker['true_false'][0] ? '+' : '-' }}${{ $faker['totals'][0] }}
-                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            @endif
                             <a
                                 class="intro-x block w-full rounded-md border border-dotted border-slate-400 py-3 text-center text-slate-500 dark:border-darkmode-300"
                                 href=""

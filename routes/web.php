@@ -19,6 +19,8 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
 use App\Http\Controllers\Customers\JobDocumentController;
+use App\Http\Controllers\UserSettings\NumberingController;
+use App\Http\Controllers\UserSettings\ReminderEmailTemplateController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 /*
@@ -150,6 +152,17 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('customers/{customer}/job-addresses/restore/{property_id}', 'restore')->name('customers.job-addresses.restore');
 
         Route::post('job-addresses/search', 'search')->name('properties.search');
+    });
+
+    Route::controller(NumberingController::class)->group(function() {
+        Route::get('settings/numbering', 'index')->name('user.settings.numbering'); 
+        Route::post('settings/numbering/store', 'store')->name('user.settings.numbering.store'); 
+    });
+
+    Route::controller(ReminderEmailTemplateController::class)->group(function() {
+        Route::get('settings/reminder-email-templates', 'index')->name('user.settings.reminder.templates'); 
+        Route::get('settings/reminder-email-templates/create/{form}', 'create')->name('user.settings.reminder.templates.create'); 
+        //Route::post('settings/numbering/store', 'store')->name('user.settings.numbering.store'); 
     });
 });
 

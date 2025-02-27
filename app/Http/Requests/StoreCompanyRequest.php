@@ -30,7 +30,7 @@ class StoreCompanyRequest extends FormRequest
             'company_state' => ['required', 'string', 'max:255'],
             'company_city' => ['required', 'string', 'max:255'],
             'company_country' => ['required', 'string', 'max:255'],
-            'company_registration' => ['required_if:business_type,Company', 'string', 'max:255'],
+            'company_registration' => ['required_if:business_type,Company'],//, 'string', 'max:255'
             'business_type' => ['required', 'string', 'max:255'],
         ];
     }

@@ -57,9 +57,9 @@
                             placeholder="{{ $users[0]['email'] }}"
                             name="email"
                         />
-                        
                         <div id="error-email" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
-                        <x-base.form-label class="mt-5">Role*</x-base.form-label>
+
+                        {{--<x-base.form-label class="mt-5">Role*</x-base.form-label>
                         <x-base.tom-select
                             class="block rounded-[1rem] border-slate-300/80 px-2 py-1.5"
                             data-placeholder="Please Select your Role"
@@ -69,8 +69,8 @@
                             <option value="admin">Admin</option>
                             <option value="engineer">Engineer</option>
                         </x-base.tom-select>
-                        
-                        <div id="error-role" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
+                        <div id="error-role" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>--}}
+
                         <x-base.form-label class="mt-5">Password*</x-base.form-label>
                         <div class="relative">
                         <x-base.form-input
@@ -163,7 +163,6 @@
                             />
                         </x-base.alert.dismiss-button>
                     </x-base.alert>
-
                         <div class="mt-5 text-center xl:mt-8 xl:text-left">
                             <x-base.button
                                 id="btn-register"
@@ -208,7 +207,42 @@
                 </div>
                 <div class="mt-10 flex flex-col gap-3 xl:flex-row xl:items-center">
                     <div class="flex items-center">
-                        
+                        {{--<div class="image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
+                            <x-base.tippy
+                                class="rounded-full border-[3px] border-white/50"
+                                src="{{ Vite::asset($users[0]['photo']) }}"
+                                alt="Tailwise - Admin Dashboard Template"
+                                as="img"
+                                content="{{ $users[0]['name'] }}"
+                            />
+                        </div>
+                        <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
+                            <x-base.tippy
+                                class="rounded-full border-[3px] border-white/50"
+                                src="{{ Vite::asset($users[1]['photo']) }}"
+                                alt="Tailwise - Admin Dashboard Template"
+                                as="img"
+                                content="{{ $users[1]['name'] }}"
+                            />
+                        </div>
+                        <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
+                            <x-base.tippy
+                                class="rounded-full border-[3px] border-white/50"
+                                src="{{ Vite::asset($users[2]['photo']) }}"
+                                alt="Tailwise - Admin Dashboard Template"
+                                as="img"
+                                content="{{ $users[2]['name'] }}"
+                            />
+                        </div>
+                        <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
+                            <x-base.tippy
+                                class="rounded-full border-[3px] border-white/50"
+                                src="{{ Vite::asset($users[0]['photo']) }}"
+                                alt="Tailwise - Admin Dashboard Template"
+                                as="img"
+                                content="{{ $users[0]['name'] }}"
+                            />
+                        </div>--}}
                     </div>
                     <div class="text-base text-white/70 xl:ml-2 2xl:ml-3">
                         Over 7k+ strong and growing! Your journey begins here.

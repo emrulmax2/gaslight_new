@@ -89,13 +89,8 @@
                             <div class="mt-0.5 px-8 text-center text-slate-500">
                                 Modify the information displayed on your invoices and control your certificate numbering.
                             </div>
-                            <x-base.button
-                                class="w-full mt-7"
-                                type="button"
-                                rounded
-                                variant="primary"
-                            >
-                            Manage
+                            <x-base.button class="w-full mt-7" type="button" rounded variant="primary" as="a" href="{{ route('user.settings.numbering') }}" >
+                                Manage
                             </x-base.button>
                         </div>
                     </div>
@@ -124,6 +119,8 @@
                                 type="button"
                                 rounded
                                 variant="primary"
+                                as="a"
+                                href="{{ route('user.settings.reminder.templates') }}"
                             >
                             Manage
                             </x-base.button>

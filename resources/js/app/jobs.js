@@ -25,6 +25,7 @@ var customerJobListTable = (function () {
                     field: "id",
                     vertAlign: 'middle',
                     width: "80",
+                    widthGrow:5
                 },
                 {
                     title: 'Ref No',

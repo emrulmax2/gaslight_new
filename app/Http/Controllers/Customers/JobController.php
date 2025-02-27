@@ -109,7 +109,7 @@ class JobController extends Controller
         $job = CustomerJob::create($data);
 
         if($job->id):
-            return response()->json(['msg' => 'Job successfully created.', 'red' => route('customers.show', $request->customer_id)], 200);
+            return response()->json(['msg' => 'Job successfully created.', 'red' => route('customers.jobs', $request->customer_id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
