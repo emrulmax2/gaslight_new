@@ -1,6 +1,6 @@
 #!/bin/sh
 # Change to the project directory
-cd /home/domgascertificat/gas_certificate_app
+cd /home/domgascertificat/gaslight_new
 
 # Pull the latest changes from the git repository
 git pull origin main
