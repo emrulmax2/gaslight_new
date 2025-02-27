@@ -211,7 +211,7 @@
                         <div class="image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[0]['photo']) }}"
+                                src=""
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ $users[0]['name'] }}"
@@ -220,7 +220,7 @@
                         <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[1]['photo']) }}"
+                                src=""
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ $users[1]['name'] }}"
@@ -229,7 +229,7 @@
                         <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[2]['photo']) }}"
+                                src=""
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ $users[2]['name'] }}"
@@ -238,7 +238,7 @@
                         <div class="image-fit zoom-in -ml-3 h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[0]['photo']) }}"
+                                src=""
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ $users[0]['name'] }}"
