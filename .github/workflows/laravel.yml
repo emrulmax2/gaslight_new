@@ -29,4 +29,4 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh rentlccac@${{ secrets.SERVER_IP }} 'bash -s' < ${{ github.workspace }}/.github/workflows/deploy.sh
+          ssh domgascertificat@${{ secrets.SERVER_IP }} 'bash -s' < ${{ github.workspace }}/.github/workflows/deploy.sh
