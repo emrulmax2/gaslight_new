@@ -7,7 +7,7 @@
             <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
         </x-base.dialog.title>
         <x-base.dialog.description class="modal-body">
-            <form id="jobUploadDocForm" method="post" enctype="multipart/form-data" action="{{ route('customers.jobs.document.store', [$customer->id, $job->id]) }}" class="dropzone [&.dropzone]:border-2 [&.dropzone]:border-dashed [&.dropzone]:border-darkmode-200/60 [&.dropzone]:dark:bg-darkmode-600 [&.dropzone]:dark:border-white/5 dropzone dropzone">
+            <form id="jobUploadDocForm" method="post" enctype="multipart/form-data" action="{{ route('customers.jobs.document.store', [$customer->id, $job->id]) }}" class="[&.dropzone]:border-2 [&.dropzone]:border-dashed dropzone [&.dropzone]:border-darkmode-200/60 [&.dropzone]:dark:bg-darkmode-600 [&.dropzone]:dark:border-white/5 dz-clickable">
                 @csrf
                 <div class="fallback">
                     <input name="documents[]" multiple type="file" />

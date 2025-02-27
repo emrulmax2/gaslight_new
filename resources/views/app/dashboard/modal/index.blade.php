@@ -195,167 +195,160 @@ staticBackdrop
                         <div id="error-company_registration" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                     </div>
                 </div>
-                <div
-                    class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
-                    <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
-                        <div class="text-left">
-                            <div class="flex items-center">
-                                <div class="font-medium">Address Line 1</div>
-                                <div
-                                    class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
-                                    Required
+
+                <div class="mt-5 pt-5 theAddressWrap" id="customerAddressWrap">
+                    <div class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
+                        <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
+                            <div class="text-left">
+                                <div class="flex items-center">
+                                    <div class="font-medium">Address Lookup</div>
                                 </div>
                             </div>
-                            {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
-                                Enter the primary line of your physical address,
-                                typically including your house or building number and
-                                street name.
-                            </div> --}}
+                        </div>
+                        <div class="mt-3 w-full flex-1 xl:mt-0">
+                            <x-base.form-input class="theAddressLookup" type="text" placeholder="Search address here..." id="user_fl_address_lookup" name="address_lookup" />
+                            <div id="error-company_address_line_1" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                         </div>
                     </div>
-                    <div class="mt-3 w-full flex-1 xl:mt-0">
-                        <x-base.form-input
-                            type="text"
-                            placeholder="123 Main Street"
-                            name="company_address_line_1"
-                        />
-                        
-                        <div id="error-company_address_line_1" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
-                    </div>
-                </div>
-                <div
-                    class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
-                    <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
-                        <div class="text-left">
-                            <div class="flex items-center">
-                                <div class="font-medium">Address Line 2</div>
-                            </div>
-                            {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
-                                This field is optional and can be used to provide any
-                                additional address details, such as apartment number,
-                                suite, floor, or any other relevant information.
-                            </div> --}}
-                        </div>
-                    </div>
-                    <div class="mt-3 w-full flex-1 xl:mt-0">
-                        <x-base.form-input
-                            type="text"
-                            placeholder="Apartment 123"
-                            name="company_address_line_2"
-                        />
-                    </div>
-                </div>
-                <div
-                    class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
-                    <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
-                        <div class="text-left">
-                            <div class="flex items-center">
-                                <div class="font-medium">Town</div>
-                                <div
-                                    class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
-                                    Required
+                
+                    <div class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
+                        <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
+                            <div class="text-left">
+                                <div class="flex items-center">
+                                    <div class="font-medium">Address Line 1</div>
+                                    <div
+                                        class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
+                                        Required
+                                    </div>
                                 </div>
+                                {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
+                                    Enter the primary line of your physical address,
+                                    typically including your house or building number and
+                                    street name.
+                                </div> --}}
                             </div>
-                            {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
-                                Enter the name of the city or locality where your
-                                address is located.
-                            </div> --}}
+                        </div>
+                        <div class="mt-3 w-full flex-1 xl:mt-0">
+                            <x-base.form-input
+                                type="text"
+                                placeholder="123 Main Street"
+                                name="company_address_line_1"
+                                class="address_line_1"
+                            />
+                            
+                            <div id="error-company_address_line_1" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                         </div>
                     </div>
-                    <div class="mt-3 w-full flex-1 xl:mt-0">
-                        <x-base.form-input
-                            type="text"
-                            placeholder="London"
-                            name="company_city"
-                        />
-                        <div id="error-company_city" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
-                    </div>
-                </div>
-                <div
-                    class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
-                    <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
-                        <div class="text-left">
-                            <div class="flex items-center">
-                                <div class="font-medium">County</div>
-                                <div
-                                    class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
-                                    Required
+                    <div
+                        class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
+                        <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
+                            <div class="text-left">
+                                <div class="flex items-center">
+                                    <div class="font-medium">Address Line 2</div>
                                 </div>
+                                {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
+                                    This field is optional and can be used to provide any
+                                    additional address details, such as apartment number,
+                                    suite, floor, or any other relevant information.
+                                </div> --}}
                             </div>
-                            {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
-                                Please select your state or province from the provided
-                                list.
-                            </div> --}}
+                        </div>
+                        <div class="mt-3 w-full flex-1 xl:mt-0">
+                            <x-base.form-input
+                                type="text"
+                                placeholder="Apartment 123"
+                                name="company_address_line_2"
+                                class="address_line_2"
+                            />
                         </div>
                     </div>
-                    <div class="mt-3 w-full flex-1 xl:mt-0">
-                        <x-base.form-input
-                            type="text"
-                            placeholder="London"
-                            name="company_state"
-                        />
-                        <div id="error-company_state" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
-                    </div>
-                </div>
-                <div
-                    class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
-                    <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
-                        <div class="text-left">
-                            <div class="flex items-center">
-                                <div class="font-medium">Post Code</div>
-                                <div
-                                    class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
-                                    Required
+                    <div
+                        class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
+                        <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
+                            <div class="text-left">
+                                <div class="flex items-center">
+                                    <div class="font-medium">Town</div>
+                                    <div
+                                        class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
+                                        Required
+                                    </div>
                                 </div>
+                                {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
+                                    Enter the name of the city or locality where your
+                                    address is located.
+                                </div> --}}
                             </div>
-                            {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
-                                Enter the postal code or ZIP code associated with your
-                                address.
-                            </div> --}}
+                        </div>
+                        <div class="mt-3 w-full flex-1 xl:mt-0">
+                            <x-base.form-input
+                                type="text"
+                                placeholder="London"
+                                name="company_city"
+                                class="city"
+                            />
+                            <div id="error-company_city" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                         </div>
                     </div>
-                    <div class="mt-3 w-full flex-1 xl:mt-0">
-                        <x-base.form-input
-                            type="text"
-                            placeholder="SW1W 0NY"
-                            name="company_postal_code"
-                        />
-                        <div id="error-company_postal_code" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
-                    </div>
-                </div>
-                <div
-                    class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
-                    <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
-                        <div class="text-left">
-                            <div class="flex items-center">
-                                <div class="font-medium">Country</div>
-                                <div
-                                    class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
-                                    Required
+                    <div
+                        class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
+                        <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
+                            <div class="text-left">
+                                <div class="flex items-center">
+                                    <div class="font-medium">County</div>
+                                    <div
+                                        class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
+                                        Required
+                                    </div>
                                 </div>
+                                {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
+                                    Please select your state or province from the provided
+                                    list.
+                                </div> --}}
                             </div>
-                            {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
-                                Please specify the country you are currently residing
-                                in.
-                            </div> --}}
+                        </div>
+                        <div class="mt-3 w-full flex-1 xl:mt-0">
+                            <x-base.form-input
+                                type="text"
+                                placeholder="London"
+                                name="company_state"
+                                class="state"
+                            />
+                            <div id="error-company_state" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                         </div>
                     </div>
-                    <div class="mt-3 w-full flex-1 xl:mt-0">
-                        <x-base.tom-select
-                            class="w-full"
-                            data-placeholder="Select your country"
-                            name="company_country"
-                        >
-                                <option value="">Please select</option>
-                                @foreach ($countries as $fakerKey => $faker)
-                                    <option @if($faker['name'] == "United Kingdom") selected @endif value="{{ $fakerKey }}">
-                                        {{ $faker['name'] }}
-                                    </option>
-                                @endforeach
-                        </x-base.tom-select>
-                        <div id="error-company_country" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
+                    <div
+                        class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
+                        <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">
+                            <div class="text-left">
+                                <div class="flex items-center">
+                                    <div class="font-medium">Post Code</div>
+                                    <div
+                                        class="ml-2.5 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-darkmode-300 dark:text-slate-400">
+                                        Required
+                                    </div>
+                                </div>
+                                {{-- <div class="mt-1.5 text-xs leading-relaxed text-slate-500/80 xl:mt-3">
+                                    Enter the postal code or ZIP code associated with your
+                                    address.
+                                </div> --}}
+                            </div>
+                        </div>
+                        <div class="mt-3 w-full flex-1 xl:mt-0">
+                            <x-base.form-input
+                                type="text"
+                                placeholder="SW1W 0NY"
+                                name="company_postal_code"
+                                class="postal_code"
+                            />
+                            <div id="error-company_postal_code" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
+                        </div>
                     </div>
+
+                    <x-base.form-input name="company_country" id="country" class="w-full country" type="hidden" value="" />
+                    <x-base.form-input name="latitude" id="latitude" class="w-full latitude" type="hidden" value="" />
+                    <x-base.form-input name="longitude" id="longitude" class="w-full longitude" type="hidden" value="" />
                 </div>
+                
                 <div
                     class="mt-5 block flex-col pt-5 first:mt-0 first:pt-0 sm:flex xl:flex-row xl:items-center">
                     <div class="mb-2 inline-block sm:mb-0 sm:mr-5 sm:text-right xl:mr-14 xl:w-60">

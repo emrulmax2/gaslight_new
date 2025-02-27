@@ -19,6 +19,7 @@ var customerListTable = (function () {
             layout: "fitColumns",
             responsiveLayout: "collapse",
             placeholder: "No matching records found",
+
             columns: [
                 {
                     title: "#ID",
