@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('customer_jobs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->index()->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('customer_property_id')->nullable();
+            $table->foreignId('customer_property_id')->index()->constrained()->cascadeOnDelete();
             $table->text('description')->nullable();
             $table->text('details')->nullable();
             $table->foreignId('customer_job_priority_id')->nullable()->index()->constrained()->cascadeOnDelete();
