@@ -55,13 +55,11 @@ Route::post('/email/resend', function (Request $request) {
 
 Route::controller(AuthController::class)->middleware(loggedin::class)->group(function() {
     Route::get('login', 'loginView')->name('login');
-    
     Route::post('login', 'login')->name('login.check');
     
 });
 
 Route::controller(RegisteredUserController::class)->middleware(loggedin::class)->group(function() {
-
     Route::get('register', 'index')->name('register');
     Route::post('register', 'store')->name('register');
 });
@@ -72,19 +70,24 @@ Route::middleware(Authenticate::class)->group(function() {
     });
 
     Route::controller(UserSettings::class)->group(function () {
+
         Route::get('/settings', 'index')->name('user.settings');
     });
 
     Route::resource('company', CompanyController::class);
     Route::controller(CompanyController::class)->group(function() {
+
         Route::get('company-list', 'list')->name('company.list'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
+
     });
 
     Route::resource('engineer', EngineerController::class);
     Route::controller(EngineerController::class)->group(function() {
+
         Route::get('engineer-list', 'list')->name('engineer.list'); 
         Route::post('engineer-restore/{id}', 'restore')->name('engineer.restore'); 
+        
     });
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
