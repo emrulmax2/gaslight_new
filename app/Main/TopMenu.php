@@ -36,6 +36,11 @@ class TopMenu
                     ]
                 ]
             ],
+            'customers' => [
+                'icon' => 'users',
+                'route_name' => 'customers',
+                'title' => 'Customers'
+            ],
             'apps' => [
                 'icon' => 'activity',
                 'title' => 'Apps',

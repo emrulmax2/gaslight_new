@@ -1,0 +1,30 @@
+.sign-pad-button-submit {
+    margin-top: 20px;
+    background-color: rgb(21 78 99 / 90%);
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 0.2rem;
+    transition: background-color 0.3s ease;
+  }
+  .sign-pad-button-submit:hover {
+    background-color: rgba(26, 96, 121, 0.9);
+  }
+  .sign-pad-button-clear {
+    margin-top: 20px;
+    background-color: rgb(241 245 249 / 90%);
+    color: #475569;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 0.2rem;
+    transition: background-color 0.3s ease;
+  }
+  .sign-pad-button-clear:hover {
+    background-color: rgb(241 245 249 / 90%);
+  }
+  
+  .e-signed canvas
+    {
+        border: 2px dashed #ccc;
+        border-radius: 0.2rem;
+    }

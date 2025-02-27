@@ -12,10 +12,7 @@
                 <div class="col-span-12 mt-8">
                     <div class="intro-y flex h-10 items-center">
                         <h2 class="mr-5 truncate text-lg font-medium">General Report</h2>
-                        <a
-                            class="ml-auto flex items-center text-primary"
-                            href=""
-                        >
+                        <a class="ml-auto flex items-center text-primary" href="" >
                             <x-base.lucide
                                 class="mr-3 h-4 w-4"
                                 icon="RefreshCcw"
@@ -23,7 +20,7 @@
                         </a>
                     </div>
                     <div class="mt-5 grid grid-cols-12 gap-6">
-                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                        <a href="{{ route('customers') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
                                 "before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']",
@@ -32,7 +29,7 @@
                                     <div class="flex">
                                         <x-base.lucide
                                             class="h-[28px] w-[28px] text-primary"
-                                            icon="ShoppingCart"
+                                            icon="User"
                                         />
                                         <div class="ml-auto">
                                             <x-base.tippy
@@ -48,11 +45,11 @@
                                             </x-base.tippy>
                                         </div>
                                     </div>
-                                    <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
-                                    <div class="mt-1 text-base text-slate-500">Item Sales</div>
+                                    <div class="mt-6 text-2xl font-medium leading-8">Customers</div>
+                                    <div class="mt-1 text-base text-success font-medium">4.5K</div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -62,7 +59,7 @@
                                     <div class="flex">
                                         <x-base.lucide
                                             class="h-[28px] w-[28px] text-pending"
-                                            icon="CreditCard"
+                                            icon="flame"
                                         />
                                         <div class="ml-auto">
                                             <x-base.tippy
@@ -79,7 +76,7 @@
                                         </div>
                                     </div>
                                     <div class="mt-6 text-3xl font-medium leading-8">3.721</div>
-                                    <div class="mt-1 text-base text-slate-500">New Orders</div>
+                                    <div class="mt-1 text-base text-slate-500">Jobs</div>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +89,7 @@
                                     <div class="flex">
                                         <x-base.lucide
                                             class="h-[28px] w-[28px] text-warning"
-                                            icon="Monitor"
+                                            icon="book-text"
                                         />
                                         <div class="ml-auto">
                                             <x-base.tippy
@@ -110,7 +107,7 @@
                                     </div>
                                     <div class="mt-6 text-3xl font-medium leading-8">2.149</div>
                                     <div class="mt-1 text-base text-slate-500">
-                                        Total Products
+                                        Invoices
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +121,7 @@
                                     <div class="flex">
                                         <x-base.lucide
                                             class="h-[28px] w-[28px] text-success"
-                                            icon="User"
+                                            icon="book-dashed"
                                         />
                                         <div class="ml-auto">
                                             <x-base.tippy
@@ -142,7 +139,7 @@
                                     </div>
                                     <div class="mt-6 text-3xl font-medium leading-8">152.040</div>
                                     <div class="mt-1 text-base text-slate-500">
-                                        Unique Visitor
+                                        Quote
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +147,7 @@
                     </div>
                 </div>
                 <!-- END: General Report -->
-                <!-- BEGIN: Sales Report -->
+                {{--<!-- BEGIN: Sales Report -->
                 <div class="col-span-12 mt-8 lg:col-span-6">
                     <div class="intro-y block h-10 items-center sm:flex">
                         <h2 class="mr-5 truncate text-lg font-medium">Sales Report</h2>
@@ -613,7 +610,7 @@
                         </x-base.form-select>
                     </div>
                 </div>
-                <!-- END: Weekly Top Products -->
+                <!-- END: Weekly Top Products -->--}}
             </div>
         </div>
         <div class="col-span-12 2xl:col-span-3">
@@ -622,7 +619,7 @@
                     <!-- BEGIN: Transactions -->
                     <div class="col-span-12 mt-3 md:col-span-6 xl:col-span-4 2xl:col-span-12 2xl:mt-8">
                         <div class="intro-x flex h-10 items-center">
-                            <h2 class="mr-5 truncate text-lg font-medium">Transactions</h2>
+                            <h2 class="mr-5 truncate text-lg font-medium">Recent Jobs</h2>
                         </div>
                         <div class="mt-5">
                             @foreach (array_slice($fakers, 0, 5) as $faker)
@@ -658,7 +655,7 @@
                         </div>
                     </div>
                     <!-- END: Transactions -->
-                    <!-- BEGIN: Recent Activities -->
+                    {{--<!-- BEGIN: Recent Activities -->
                     <div class="col-span-12 mt-3 md:col-span-6 xl:col-span-4 2xl:col-span-12">
                         <div class="intro-x flex h-10 items-center">
                             <h2 class="mr-5 truncate text-lg font-medium">
@@ -1038,7 +1035,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- END: Schedules -->
+                    <!-- END: Schedules -->--}}
                 </div>
             </div>
         </div>

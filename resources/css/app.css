@@ -28,6 +28,9 @@
 @import "./components/base/_zoom-in.css";
 @import "./components/base/_intro.css";
 
+
+@import "./custom.css";
+
 /*
  |--------------------------------------------------------------------------
  | TailwindCSS Directives

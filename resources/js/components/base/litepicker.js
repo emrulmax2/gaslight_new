@@ -9,7 +9,7 @@
             numberOfColumns: 2,
             numberOfMonths: 2,
             showWeekNumbers: true,
-            format: "D MMM, YYYY",
+            format: "DD-MM-YYYY",
             dropdowns: {
                 minYear: 1990,
                 maxYear: null,
@@ -28,13 +28,13 @@
             options.format = $(this).data("format");
         }
 
-        if (!$(this).val()) {
+        /*if (!$(this).val()) {
             let date = dayjs().format(options.format);
             date += !options.singleMode
                 ? " - " + dayjs().add(1, "month").format(options.format)
                 : "";
             $(this).val(date);
-        }
+        }*/
 
         new Litepicker({
             element: this,
