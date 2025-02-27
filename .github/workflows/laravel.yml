@@ -1,4 +1,4 @@
-name: Deploy Laravel Application
+name: Deploy Gas Certificate App 
 
 on:
   push:
