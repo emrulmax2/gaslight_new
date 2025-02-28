@@ -60,6 +60,7 @@
                     </div>
                     <div class="p-5 theAddressWrap" id="customerAddressWrap">
                         <div class="mb-3">
+                            <x-base.form-label for="customer_address_lookup">Address Lookup</x-base.form-label>
                             <x-base.form-input name="address_lookup" id="customer_address_lookup" class="w-full theAddressLookup" type="text" placeholder="Search address here..." />
                         </div>
                         <div class="mb-3">

@@ -28,7 +28,7 @@ class CustomerJob extends Model
     protected $dates = ['deleted_at'];
 
     public function setDueDateAttribute($value) {  
-        $this->attributes['due_date'] =  (!empty($value) ? date('Y-m-d', strtotime($value)) : '');
+        $this->attributes['due_date'] =  (!empty($value) ? date('Y-m-d', strtotime($value)) : null);
     }
 
     public function getDueDateAttribute($value) {

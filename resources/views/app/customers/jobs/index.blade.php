@@ -66,7 +66,7 @@
     </div>
     <!-- END: HTML Table Data -->
 
-    @include('app.customers/jobs.index-modals')
+    @include('app.customers.jobs.index-modals')
     @include('app.action-modals')
 @endsection
 

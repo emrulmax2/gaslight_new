@@ -1,36 +1,50 @@
 <!-- BEGIN: Top Bar -->
 <div
-    class="top-bar-boxed relative z-[51] -mx-5 mb-12 mt-12 h-[70px] border-b border-white/[0.08] px-3 sm:-mx-8 sm:px-8 md:-mt-5 md:pt-0">
+    class="top-bar-boxed relative z-[51] -mx-5 mb-6 max-sm:pb-3 sm:mb-12 mt-0 sm:mt-12 h-[45px] sm:h-[70px] border-b border-white/[0.08] px-3 sm:-mx-8 sm:px-8 md:-mt-5 md:pt-0">
     <div class="flex h-full items-center">
         <!-- BEGIN: Logo -->
         <a
-            class="-intro-x hidden md:flex"
-            href=""
+            class="-intro-x flex"
+            href="{{ route('company.dashboard') }}"
         >
             <img
                 class="w-6"
                 src="{{ Vite::asset('resources/images/logo.svg') }}"
                 alt="Icewall Tailwind Admin Dashboard Template"
             />
-            <span class="ml-3 text-lg text-white"> Icewall </span>
+            <span class="ml-3 text-lg text-white max-sm:hidden"> Icewall </span>
         </a>
         <!-- END: Logo -->
-        <!-- BEGIN: Breadcrumb -->
+        <!-- BEGIN: Breadcrumb --> 
         <x-base.breadcrumb
-            class="-intro-x mr-auto h-full border-white/[0.08] md:ml-10 md:border-l md:pl-10"
+            class="-intro-x mr-auto h-full border-white/[0.08] md:ml-10 md:border-l md:pl-10 max-sm:hidden"
             light
         >
             <x-base.breadcrumb.link :index="0">Application</x-base.breadcrumb.link>
             <x-base.breadcrumb.link
-                :index="1"
-                :active="true"
+                :index="1" 
+                active="{{ (!isset($breadcrumbs) || (isset($breadcrumbs) && empty($breadcrumbs)) ? 'true' : 'false') }}" 
+                href="{{ route('company.dashboard') }}"
             >
                 Dashboard
             </x-base.breadcrumb.link>
+            @if(isset($breadcrumbs) && !empty($breadcrumbs))
+                @php $i = 1; @endphp
+                @foreach($breadcrumbs as $crumbs)
+                    <x-base.breadcrumb.link 
+                        index="{{ ($i + 1) }}" 
+                        active="{{ ($i == count($breadcrumbs) ? 'true' : 'false') }}" 
+                        href="{{ $crumbs['href'] }}" 
+                    >
+                        {{ $crumbs['label'] }}
+                    </x-base.breadcrumb.link>
+                    @php $i++; @endphp
+                @endforeach
+            @endif
         </x-base.breadcrumb>
         <!-- END: Breadcrumb -->
         <!-- BEGIN: Search -->
-        <div class="intro-x relative mr-3 sm:mr-6">
+        <div class="intro-x relative mr-3 sm:mr-6 max-sm:ml-auto">
             <div class="search hidden sm:block">
                 <x-base.form-input
                     class="w-56 rounded-full border-transparent bg-slate-200 pr-8 shadow-none transition-[width] duration-300 ease-in-out focus:w-72 focus:border-transparent dark:bg-darkmode-400/70"
@@ -203,7 +217,7 @@
                 icon="settings"
             />
         </a>
-        <x-base.menu>
+        <x-base.menu class="max-sm:mr-[45px]">
             <x-base.menu.button
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"
             >
@@ -255,6 +269,7 @@
                 </x-base.menu.item>
             </x-base.menu.items>
         </x-base.menu>
+
         <!-- END: Account Menu -->
     </div>
 </div>

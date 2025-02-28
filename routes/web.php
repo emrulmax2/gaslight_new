@@ -162,7 +162,9 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(ReminderEmailTemplateController::class)->group(function() {
         Route::get('settings/reminder-email-templates', 'index')->name('user.settings.reminder.templates'); 
         Route::get('settings/reminder-email-templates/create/{form}', 'create')->name('user.settings.reminder.templates.create'); 
-        //Route::post('settings/numbering/store', 'store')->name('user.settings.numbering.store'); 
+        Route::post('settings/reminder-email-templates/store', 'store')->name('user.settings.reminder.templates.store');
+
+        Route::delete('settings/reminder-email-templates/destroy-attachment/{attachment_id}', 'destroyAttachment')->name('user.settings.reminder.templates.destroy.attachment'); 
     });
 });
 
