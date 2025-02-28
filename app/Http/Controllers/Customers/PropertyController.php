@@ -103,10 +103,9 @@ class PropertyController extends Controller
     }
 
     public function store(CustomerPropertyStoreRequerst $request){
-      
         $customer_id = $request->customer_id;
         $customer = Customer::find($customer_id);
-        // $address_lookup = $request->address_lookup;
+        $address_lookup = $request->address_lookup;
         $data = [
             'customer_id' => $request->customer_id,
             'address_line_1' => $request->address_line_1,
@@ -127,7 +126,7 @@ class PropertyController extends Controller
         ];
         $address = CustomerProperty::create($data);
         if($address->id):
-            return response()->json(['msg' => 'Customer Job Addresses successfully created.', 'red' => '', 'id' => $address->id], 200);
+            return response()->json(['msg' => 'Customer Job Addresses successfully created.', 'red' => '', 'address' => $address_lookup, 'id' => $address->id], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
@@ -146,49 +145,48 @@ class PropertyController extends Controller
         return response()->json(['row' => $property], 200);
     }
 
-    public function update(CustomerPropertyStoreRequerst $request)
-{
-    $customer_id = $request->customer_id;
-    $property_id = $request->property_id;
+    public function update(CustomerPropertyStoreRequerst $request){
+        $customer_id = $request->customer_id;
+        $property_id = $request->property_id;
 
-    $customer = Customer::find($customer_id);
+        $customer = Customer::find($customer_id);
 
-    $data = [
-        'customer_id' => $request->customer_id,
-        'address_line_1' => $request->address_line_1,
-        'address_line_2' => !empty($request->address_line_2) ? $request->address_line_2 : null,
-        'postal_code' => $request->postal_code,
-        'state' => !empty($request->state) ? $request->state : null,
-        'city' => $request->city,
-        'country' => !empty($request->country) ? $request->country : null,
-        'latitude' => !empty($request->latitude) ? $request->latitude : null,
-        'longitude' => !empty($request->longitude) ? $request->longitude : null,
-        'note' => !empty($request->note) ? $request->note : null,
-        'occupant_name' => !empty($request->occupant_name) ? $request->occupant_name : null,
-        'occupant_email' => !empty($request->occupant_email) ? $request->occupant_email : null,
-        'occupant_phone' => !empty($request->occupant_phone) ? $request->occupant_phone : null,
-        'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
-        'updated_by' => auth()->user()->id,
-        'updated_at' => Carbon::now(), 
-    ];
+        $data = [
+            'customer_id' => $request->customer_id,
+            'address_line_1' => $request->address_line_1,
+            'address_line_2' => !empty($request->address_line_2) ? $request->address_line_2 : null,
+            'postal_code' => $request->postal_code,
+            'state' => !empty($request->state) ? $request->state : null,
+            'city' => $request->city,
+            'country' => !empty($request->country) ? $request->country : null,
+            'latitude' => !empty($request->latitude) ? $request->latitude : null,
+            'longitude' => !empty($request->longitude) ? $request->longitude : null,
+            'note' => !empty($request->note) ? $request->note : null,
+            'occupant_name' => !empty($request->occupant_name) ? $request->occupant_name : null,
+            'occupant_email' => !empty($request->occupant_email) ? $request->occupant_email : null,
+            'occupant_phone' => !empty($request->occupant_phone) ? $request->occupant_phone : null,
+            'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+            'updated_by' => auth()->user()->id,
+            'updated_at' => Carbon::now(), 
+        ];
 
-    $updatedRows = CustomerProperty::where('id', $property_id)->update($data);
+        $updatedRows = CustomerProperty::where('id', $property_id)->update($data);
 
-    if ($updatedRows) {
-        $updatedProperty = CustomerProperty::findOrFail($property_id);
+        if ($updatedRows) {
+            $updatedProperty = CustomerProperty::findOrFail($property_id);
 
-        return response()->json([
-            'msg' => 'Customer Job Addresses Updated successfully.',
-            'red' => '',
-            'id' => $updatedProperty->id  
-        ], 200);
-    } else {
-        return response()->json([
-            'msg' => 'Something went wrong. Please try again later or contact the administrator.',
-            'red' => ''
-        ], 304);
+            return response()->json([
+                'msg' => 'Customer Job Addresses Updated successfully.',
+                'red' => '',
+                'id' => $updatedProperty->id  
+            ], 200);
+        } else {
+            return response()->json([
+                'msg' => 'Something went wrong. Please try again later or contact the administrator.',
+                'red' => ''
+            ], 304);
+        }
     }
-}
 
     public function search(Request $request){
         $queryStr = (isset($request->the_search_query) && !empty($request->the_search_query) ? $request->the_search_query : '');

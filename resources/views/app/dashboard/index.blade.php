@@ -9,8 +9,8 @@
         <div class="col-span-12 2xl:col-span-9">
             <div class="grid grid-cols-12 gap-6">
                 <!-- BEGIN: General Report -->
-                <div class="col-span-12 mt-8">
-                    <div class="intro-y flex h-10 items-center">
+                <div class="col-span-12 mt-4 sm:mt-8">
+                    <div class="intro-y flex h-auto sm:h-10 items-center">
                         <h2 class="mr-5 truncate text-lg font-medium">General Report</h2>
                         <a class="ml-auto flex items-center text-primary" href="" >
                             <x-base.lucide
@@ -19,131 +19,189 @@
                             /> Reload Data
                         </a>
                     </div>
-                    <div class="mt-5 grid grid-cols-12 gap-6">
+                    <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
+                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-success"
+                                            icon="file-plus"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Record</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
+                                            icon="file-text"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Quote Or Invoice</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
+                                            icon="calendar"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Calendar</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </div>
                         <a href="{{ route('customers') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
-                                "before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']",
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
                             ])>
-                                <div class="box p-5">
-                                    <div class="flex">
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                    <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-[28px] w-[28px] text-primary"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="User"
                                         />
-                                        <div class="ml-auto">
-                                            <x-base.tippy
-                                                class="flex cursor-pointer items-center rounded-full bg-success py-[3px] pl-2 pr-1 text-xs font-medium text-white"
-                                                as="div"
-                                                content="33% Higher than last month"
-                                            >
-                                                33%
-                                                <x-base.lucide
-                                                    class="ml-0.5 h-4 w-4"
-                                                    icon="ChevronUp"
-                                                />
-                                            </x-base.tippy>
-                                        </div>
                                     </div>
-                                    <div class="mt-6 text-2xl font-medium leading-8">Customers</div>
-                                    <div class="mt-1 text-base text-success font-medium">4.5K</div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Customers</div>
+                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                        <span class="ml-1 sm:hidden">(</span>4.5K<span class="sm:hidden">)</span>
+                                    </div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </a>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
-                                "before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']",
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
                             ])>
-                                <div class="box p-5">
-                                    <div class="flex">
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                    <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-[28px] w-[28px] text-pending"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
                                             icon="flame"
                                         />
-                                        <div class="ml-auto">
-                                            <x-base.tippy
-                                                class="flex cursor-pointer items-center rounded-full bg-danger py-[3px] pl-2 pr-1 text-xs font-medium text-white"
-                                                as="div"
-                                                content="2% Lower than last month"
-                                            >
-                                                2%
-                                                <x-base.lucide
-                                                    class="ml-0.5 h-4 w-4"
-                                                    icon="ChevronDown"
-                                                />
-                                            </x-base.tippy>
-                                        </div>
                                     </div>
-                                    <div class="mt-6 text-3xl font-medium leading-8">3.721</div>
-                                    <div class="mt-1 text-base text-slate-500">Jobs</div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Jobs</div>
+                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                        <span class="ml-1 sm:hidden">(</span>3.721<span class="sm:hidden">)</span>
+                                    </div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </div>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
-                                "before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']",
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
                             ])>
-                                <div class="box p-5">
-                                    <div class="flex">
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                    <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-[28px] w-[28px] text-warning"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
                                             icon="book-text"
                                         />
-                                        <div class="ml-auto">
-                                            <x-base.tippy
-                                                class="flex cursor-pointer items-center rounded-full bg-success py-[3px] pl-2 pr-1 text-xs font-medium text-white"
-                                                as="div"
-                                                content="12% Higher than last month"
-                                            >
-                                                12%
-                                                <x-base.lucide
-                                                    class="ml-0.5 h-4 w-4"
-                                                    icon="ChevronUp"
-                                                />
-                                            </x-base.tippy>
-                                        </div>
                                     </div>
-                                    <div class="mt-6 text-3xl font-medium leading-8">2.149</div>
-                                    <div class="mt-1 text-base text-slate-500">
-                                        Invoices
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Invoices</div>
+                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                        <span class="ml-1 sm:hidden">(</span>2.149<span class="sm:hidden">)</span>
                                     </div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </div>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
-                                "before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']",
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
                             ])>
-                                <div class="box p-5">
-                                    <div class="flex">
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                    <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-[28px] w-[28px] text-success"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-success"
                                             icon="book-dashed"
                                         />
-                                        <div class="ml-auto">
-                                            <x-base.tippy
-                                                class="flex cursor-pointer items-center rounded-full bg-success py-[3px] pl-2 pr-1 text-xs font-medium text-white"
-                                                as="div"
-                                                content="22% Higher than last month"
-                                            >
-                                                22%
-                                                <x-base.lucide
-                                                    class="ml-0.5 h-4 w-4"
-                                                    icon="ChevronUp"
-                                                />
-                                            </x-base.tippy>
-                                        </div>
                                     </div>
-                                    <div class="mt-6 text-3xl font-medium leading-8">152.040</div>
-                                    <div class="mt-1 text-base text-slate-500">
-                                        Quote
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Quotes</div>
+                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                        <span class="ml-1 sm:hidden">(</span>458<span class="sm:hidden">)</span>
                                     </div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </div>
+                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
+                                            icon="at-sign"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Gas Rate Calculator</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                            icon="layers"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Existing Records & Drafts</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ route('user.settings') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-danger"
+                                            icon="settings"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Settings</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <!-- END: General Report -->
@@ -613,7 +671,7 @@
                 <!-- END: Weekly Top Products -->--}}
             </div>
         </div>
-        <div class="col-span-12 2xl:col-span-3">
+        <div class="col-span-12 2xl:col-span-3 max-sm:hidden">
             <div class="-mb-10 pb-10 2xl:border-l">
                 <div class="grid grid-cols-12 gap-x-6 gap-y-6 2xl:gap-x-0 2xl:pl-6">
                     <!-- BEGIN: Transactions -->

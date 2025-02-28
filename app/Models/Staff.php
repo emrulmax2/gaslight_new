@@ -11,9 +11,9 @@ use Creagia\LaravelSignPad\Concerns\RequiresSignature;
 use Creagia\LaravelSignPad\Contracts\CanBeSigned;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Engineer extends Authenticatable implements CanBeSigned
+class Staff extends Authenticatable implements CanBeSigned
 {
-    /** @use HasFactory<\Database\Factories\EngineerFactory> */
+    /** @use HasFactory<\Database\Factories\StaffFactory> */
     use HasFactory, Notifiable, RequiresSignature, SoftDeletes;
     protected $guarded = ['id'];
 
@@ -30,8 +30,8 @@ class Engineer extends Authenticatable implements CanBeSigned
         ];
     }
 
-    public function users()
+    public function company()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(Company::class);
     }
 }

@@ -163,6 +163,7 @@ import INTAddressLookUps from '../address_lookup.js';
         e.preventDefault();
         const form = document.getElementById('addJobAddressForm');
         const $theForm = $(this);
+        let customer_id = $theForm.find('[name="customer_id"]').val();
         
         $('#addressSaveBtn', $theForm).attr('disabled', 'disabled');
         $("#addressSaveBtn .theLoader").fadeIn();
@@ -170,7 +171,7 @@ import INTAddressLookUps from '../address_lookup.js';
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('properties.store'),
+            url: route('customers.job-addresses.store', customer_id),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {

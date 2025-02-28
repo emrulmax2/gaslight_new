@@ -51,8 +51,11 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function engineers()
+    //company relationship
+    public function company()
     {
-        return $this->belongsToMany(Engineer::class);
+        return $this->hasOne(Company::class);
     }
+
+    
 }

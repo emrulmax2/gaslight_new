@@ -6,7 +6,7 @@
 
 @section('content')
     <div @class([
-        'icewall px-5 sm:px-8 py-5 relative',
+        'icewall px-5 sm:px-8 py-5 relative max-sm:pt-3',
         "after:content-[''] after:bg-gradient-to-b after:from-theme-1 after:to-theme-2 dark:after:from-darkmode-800 dark:after:to-darkmode-800 after:fixed after:inset-0 after:z-[-2]",
     ])>
         <x-mobile-menu />
@@ -97,7 +97,7 @@
             ])>
                 <!-- BEGIN: Content -->
                 <div
-                    class="md:max-w-auto min-h-screen min-w-0 max-w-full flex-1 rounded-[1.3rem] bg-slate-100 px-4 pb-10 shadow-sm before:block before:h-px before:w-full before:content-[''] dark:bg-darkmode-700 md:px-[22px]">
+                    class="md:max-w-auto sm:min-h-screen min-w-0 max-w-full flex-1 rounded-[1.3rem] bg-slate-100 px-4 pb-4 sm:pb-10 shadow-sm before:block before:h-px before:w-full before:content-[''] dark:bg-darkmode-700 md:px-[22px]">
                     @yield('subcontent')
                 </div>
                 <!-- END: Content -->

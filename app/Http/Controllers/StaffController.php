@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Engineer;
-use App\Http\Requests\StoreEngineerRequest;
-use App\Http\Requests\UpdateEngineerRequest;
+use App\Models\Staff;
+use App\Http\Requests\StoreStaffRequest;
+use App\Http\Requests\UpdateStaffRequest;
 use App\Models\User;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Http\Request;
@@ -13,15 +13,15 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Random\Engine;
 
-class EngineerController extends Controller
+class StaffController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('app.engineers.index', [
-            'engineers' => Engineer::all(),
+        return view('app.staffs.index', [
+            'staffs' => Staff::all(),
         ]);
     }
 
@@ -30,7 +30,7 @@ class EngineerController extends Controller
      */
     public function create()
     {
-        return view('app.engineers.create');
+        return view('app.staffs.create');
     }
 
 
@@ -39,18 +39,23 @@ class EngineerController extends Controller
         $user_id = auth()->user()->id;
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:engineers',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'sign' => 'required',
         ]);
-
-        $user = Engineer::create([
+        $hashPassword = Hash::make($request->input('password'));
+        $staff = Staff::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')), 
+            'password' => $hashPassword, 
         ]);
 
-        $user->users()->attach($user_id);
+        $user = User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => $hashPassword,
+            'status' => 1,
+        ]);
 
 
         $signatureData = str_replace('data:image/png;base64,', '', $validatedData['sign']);
@@ -58,8 +63,8 @@ class EngineerController extends Controller
         $imageName = 'signatures/' . Str::uuid() . '.png';
         Storage::disk('public')->put($imageName, $signatureData);
         $signature = new Signature();
-        $signature->model_type = Engineer::class;
-        $signature->model_id = $user->id;
+        $signature->model_type = Staff::class;
+        $signature->model_id = $staff->id;
         $signature->uuid = Str::uuid();
         $signature->filename = $imageName;
         $signature->document_filename = null;
@@ -67,41 +72,41 @@ class EngineerController extends Controller
         $signature->from_ips = json_encode([request()->ip()]);
         $signature->save();
         // Redirect back with success message.
-        return redirect()->back()->with('success', 'Engineer added successfully !');
+        return redirect()->back()->with('success', 'Staff added successfully !');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Engineer $engineer)
+    public function show(Staff $staff)
     {
-        return view('app.engineers.show', compact('engineer'));
+        return view('app.staffs.show', compact('staff'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Engineer $engineer)
+    public function edit(Staff $staff)
     {
-        return view('app.engineers.edit', compact('engineer'));
+        return view('app.staffs.edit', compact('staff'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEngineerRequest $request, Engineer $engineer)
+    public function update(UpdateStaffRequest $request, Staff $staff)
     {
-        $engineer->update($request->validated());
-        return redirect()->route('engineer.index');
+        $staff->update($request->validated());
+        return redirect()->route('staff.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Engineer $engineer)
+    public function destroy(Staff $staff)
     {
-        $engineer->delete();
-        return redirect()->route('engineer.index');
+        $staff->delete();
+        return redirect()->route('staff.index');
     }
 
     /**
@@ -109,17 +114,18 @@ class EngineerController extends Controller
      */
     public function restore($id)
     {
-        $engineer = Engineer::withTrashed()->find($id);
-        $engineer->restore();
-        return redirect()->route('engineer.index');
+        $staff = Staff::withTrashed()->find($id);
+        $staff->restore();
+        return redirect()->route('staff.index');
     }
 
     /**
-     * List all engineers.
+     * List all staffs.
      */
     public function list(Request $request)
     {
         $user = User::findOrFail($request->user_id);
+
 
         $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
         
@@ -129,13 +135,13 @@ class EngineerController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
         
-        $query = Engineer::with('users')->orderByRaw(implode(',', $sorts));
+        $query = Staff::with('company')->orderByRaw(implode(',', $sorts));
         if(!empty($queryStr)):
             $query->where('name','LIKE','%'.$queryStr.'%');
         endif;
-        $query->whereHas('users', function($query) use ($user) {
+        $query->whereHas('company', function($query) use ($user) {
 
-            $query->where('users.id',"=",$user->id);  
+            $query->where('id', $user->company->id);
 
         });
         
@@ -166,9 +172,9 @@ class EngineerController extends Controller
                         'email' =>$list->email,
                         'status' => isset($list->status) ? 'Active' : 'Inactive',
                         'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
-                        'delete_url' => route('engineer.destroy', $list->id),
-                        'restore_url' => route('engineer.restore', $list->id),
-                        'edit_url' => route('engineer.edit', $list->id),
+                        'delete_url' => route('staff.destroy', $list->id),
+                        'restore_url' => route('staff.restore', $list->id),
+                        'edit_url' => route('staff.edit', $list->id),
                     ];
                     $i++;
                 

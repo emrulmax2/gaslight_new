@@ -9,6 +9,7 @@ use App\Models\Title;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
+use App\Models\CustomerProperty;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -111,12 +112,29 @@ class CustomerController extends Controller
             'state' => (!empty($request->state) ? $request->state : null),
             'city' => (!empty($request->city) ? $request->city : null),
             'country' => (!empty($request->country) ? $request->country : null),
+            'latitude' => (!empty($request->latitude) ? $request->latitude : null),
+            'longitude' => (!empty($request->longitude) ? $request->longitude : null),
             'note' => (!empty($request->note) ? $request->note : null),
             'auto_reminder' => (isset($request->auto_reminder) && $request->auto_reminder > 0 ? $request->auto_reminder : 0),
             'created_by' => auth()->user()->id
         ];
         $customer = Customer::create($data);
         if($customer->id):
+            $CustomerProperty = CustomerProperty::create([
+                'customer_id' => $customer->id,
+                'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
+                'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
+                'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
+                'state' => (!empty($request->state) ? $request->state : null),
+                'city' => (!empty($request->city) ? $request->city : null),
+                'country' => (!empty($request->country) ? $request->country : null),
+                'note' => (!empty($request->note) ? $request->note : null),
+                'latitude' => (!empty($request->latitude) ? $request->latitude : null),
+                'longitude' => (!empty($request->longitude) ? $request->longitude : null),
+    
+                'created_by' => auth()->user()->id,
+            ]);
+            
             $contact = CustomerContactInformation::create([
                 'customer_id' => $customer->id,
                 'mobile' => (!empty($request->mobile) ? $request->mobile : null),
@@ -150,7 +168,7 @@ class CustomerController extends Controller
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'first_name' => (!empty($request->first_name) ? $request->first_name : null),
-            'last_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),

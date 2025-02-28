@@ -240,6 +240,7 @@ var customerJobDocListTable = (function () {
             },
         });
 
+        
         $('#uploadJobDocumentsBtn').on('click', function(e){
             e.preventDefault();
             let $theBtn = $(this);

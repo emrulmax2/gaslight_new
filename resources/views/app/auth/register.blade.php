@@ -67,7 +67,7 @@
                         >
                             <option value="">Please Select</option>
                             <option value="admin">Admin</option>
-                            <option value="engineer">Engineer</option>
+                            <option value="staff">Staff</option>
                         </x-base.tom-select>
                         <div id="error-role" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>--}}
 

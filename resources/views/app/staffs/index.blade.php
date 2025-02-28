@@ -1,12 +1,12 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
-    <title>Engineer List - Gas Certificate App</title>
+    <title>Staff List - Gas Certificate App</title>
 @endsection
 
 @section('subcontent')
     <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
-        <h2 class="mr-auto text-lg font-medium">Engineer List</h2>
+        <h2 class="mr-auto text-lg font-medium">Users List</h2>
         <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
             <x-base.button
                 class="mr-2 shadow-md"
@@ -16,7 +16,7 @@
             <x-base.lucide
             class="h-4 w-4"
             icon="Plus"
-        /> Add New Engineer
+        /> Add New User
             </x-base.button>
         </div>
     </div>
@@ -205,14 +205,14 @@
         <div class="scrollbar-hidden overflow-x-auto">
             <div
                 class="mt-5"
-                id="engineerListTable"
+                id="staffListTable"
                 data-user="{{ auth()->user()->id }}"
             ></div>
         </div>
     </div>
     
     <!-- END: HTML Table Data -->
-    @include('app.engineers.modal')
+    @include('app.staffs.modal')
 @endsection
 
 @pushOnce('styles')
@@ -229,6 +229,7 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/pages/engineers/list.js')
-    @vite('resources/js/pages/engineers/modal.js')
+    @vite('resources/js/app/staffs/list.js')
+    @vite('resources/js/app/staffs/modal.js')
+    
 @endPushOnce

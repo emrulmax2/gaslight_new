@@ -4,16 +4,16 @@
 
 
     // Tabulator
-    if ($("#engineerListTable").length) {
+    if ($("#staffListTable").length) {
         let user =
-        $('#engineerListTable').attr('data-user') != ''
-            ? $('#engineerListTable').attr('data-user')
+        $('#staffListTable').attr('data-user') != ''
+            ? $('#staffListTable').attr('data-user')
             : '0';
         let queryStr = $('#query-Eng').val() != '' ? $('#query-Eng').val() : '';
         let status = $('#status-Eng').val() != '' ? $('#status-Eng').val() : '1';
         // Setup Tabulator
-        const tabulator = new Tabulator("#engineerListTable", {
-            ajaxURL: route('engineer.list'),
+        const tabulator = new Tabulator("#staffListTable", {
+            ajaxURL: route('staff.list'),
             ajaxParams: {
                 user_id: user,
                 queryStr: queryStr,
