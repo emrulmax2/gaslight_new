@@ -169,6 +169,9 @@ export default defineConfig({
 
                 // User Settings JS
                 "resources/js/app/user-settings/numbering.js",
+
+                'resources/js/app/staffs/list.js',
+                'resources/js/app/staffs/modal.js',
             ],
             refresh: true,
         }),

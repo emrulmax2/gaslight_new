@@ -11,7 +11,7 @@ use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
-use App\Http\Controllers\EngineerController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Customers\CustomerController;
@@ -84,11 +84,11 @@ Route::middleware(Authenticate::class)->group(function() {
 
     });
 
-    Route::resource('engineer', EngineerController::class);
-    Route::controller(EngineerController::class)->group(function() {
+    Route::resource('staff', StaffController::class);
+    Route::controller(StaffController::class)->group(function() {
 
-        Route::get('engineer-list', 'list')->name('engineer.list'); 
-        Route::post('engineer-restore/{id}', 'restore')->name('engineer.restore'); 
+        Route::get('staff-list', 'list')->name('staff.list'); 
+        Route::post('staff-restore/{id}', 'restore')->name('staff.restore'); 
         
     });
 

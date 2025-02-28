@@ -59,7 +59,7 @@
                                 Enable or disable users, and manage their login credentials and access permissions.
                             </div>
                             <x-base.button
-                                id="manage-engineers"
+                                id="manage-staffs"
                                 class="w-full mt-7"
                                 type="button"
                                 rounded
@@ -145,7 +145,7 @@
 
             async function ManageUsers() {
                 // Reset state
-                location.href = route('engineer.index');
+                location.href = route('staff.index');
             }
 
 
@@ -155,7 +155,7 @@
             })
 
 
-            $('#manage-engineers').on('click', function() {
+            $('#manage-staffs').on('click', function() {
                 ManageUsers()
             })
         })()

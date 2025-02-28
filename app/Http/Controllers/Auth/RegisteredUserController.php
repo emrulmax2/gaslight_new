@@ -41,7 +41,7 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            //'role' => 'required|string|in:admin,engineer',
+            //'role' => 'required|string|in:admin,staff',
             'terms' => 'required',
         ]);
 
