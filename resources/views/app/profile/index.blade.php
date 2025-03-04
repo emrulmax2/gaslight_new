@@ -193,9 +193,8 @@
 
 @pushOnce('scripts')
     <script type="module">
-
-const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
-const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
+        const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
+        const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
         function evaluateUpdatedPasswordStrength() {
             const password = document.getElementById('password1').value;
             const strengthBars = document.querySelectorAll('#password-strength1 > div');
