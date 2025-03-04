@@ -221,28 +221,29 @@
             <x-base.menu.button
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"
             >
-                <img
+                {{-- <img
                     src="{{ Vite::asset($faker['photos'][0]) }}"
                     alt="Midone - Tailwind Admin Dashboard Template"
-                />
+                /> --}}
+                <x-avatar name="{{ auth()->user()->name }}" />
             </x-base.menu.button>
             <x-base.menu.items
                 class="relative mt-px w-56 bg-theme-1/80 text-white before:absolute before:inset-0 before:z-[-1] before:block before:rounded-md before:bg-black"
             >
-                <x-base.menu.header class="font-normal">
-                    <div class="font-medium">{{ $fakers[0]['users'][0]['name'] }}</div>
-                    <div class="mt-0.5 text-xs text-white/70 dark:text-slate-500">
-                        {{ $fakers[0]['jobs'][0] }}
-                    </div>
-                </x-base.menu.header>
+            <x-base.menu.header class="font-normal">
+                <div class="font-medium">{{ auth()->user()->name }}</div>
+                <div class="mt-0.5 text-xs text-white/70 dark:text-slate-500">
+                    Admin
+                </div>
+            </x-base.menu.header>
                 <x-base.menu.divider class="bg-white/[0.08]" />
-                <x-base.menu.item class="hover:bg-white/5">
-                    <x-base.lucide
-                        class="mr-2 h-4 w-4"
-                        icon="User"
-                    /> Profile
+                <x-base.menu.item class="hover:bg-white/5" href="{{ route('profile') }}">
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="User"
+                        /> Profile
                 </x-base.menu.item>
-                <x-base.menu.item class="hover:bg-white/5">
+                <x-base.menu.item class="hover:bg-white/5" href="{{ route('staff.index') }}">
                     <x-base.lucide
                         class="mr-2 h-4 w-4"
                         icon="Edit"
