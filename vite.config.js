@@ -172,6 +172,10 @@ export default defineConfig({
 
                 'resources/js/app/staffs/list.js',
                 'resources/js/app/staffs/modal.js',
+                'resources/js/app/staffs/dropzone.js',
+
+                'resources/js/vendors/sign-pad.min.js',
+                'resources/js/app/signature.js',
             ],
             refresh: true,
         }),
