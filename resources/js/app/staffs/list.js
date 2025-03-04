@@ -2,7 +2,10 @@
     "use strict";
 
 
+    const el = document.querySelector("#edituser-modal");
+    const editUserModal = tailwind.Modal.getOrCreateInstance(el);
 
+    const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatesignature-modal"));
     // Tabulator
     if ($("#staffListTable").length) {
         let user =
@@ -33,7 +36,7 @@
                 
                 {
                     title: 'Sl',
-                    field: 'sl',
+                    field: 'id',
                     headerHozAlign: 'left',
                 },
                 {
@@ -53,39 +56,123 @@
                 },
 
                 {
+                    title: 'Signature',
+                    field: 'signature',
+                    headerHozAlign: 'left',
+                    
+                    hozAlign: 'left',
+                    width: '180',
+                    download: false,
+                    formatter(cell, formatterParams) {
+                        let signatureUrl = cell.getData().signature;
+                        if (signatureUrl) {
+                            let a = $(`<div class="flex items-center lg:justify-center"> 
+                                <img src="${signatureUrl}" class=" w-75 h-10 rounded-full" alt="signature">
+                                </div>`);
+                            return a[0];
+                        } else {
+                            return `<div class="flex items-center lg:justify-center">No Signature</div>`;
+                        }
+                    },
+                },
+
+                {
                     title: 'Actions',
                     field: 'id',
                     headerSort: false,
                     hozAlign: 'right',
                     headerHozAlign: 'right',
-                    width: '120',
+                    width: '250',
                     download: false,
                     formatter(cell, formatterParams) {
-                        var btns = '';
-                        if (cell.getData().deleted_at == null) {
-                            btns +=
-                                '<button data-id="' +
-                                cell.getData().id +
-                                '" data-tw-toggle="modal" data-tw-target="#editNoteModal" type="button" class="edit_btn btn-rounded btn btn-success text-white p-0 w-9 h-9 ml-1"><i data-lucide="Pencil" class="w-4 h-4"></i></a>';
-                            if (cell.getData().delete_url != null) {
-                                btns +=
-                                    '<button data-url="' +
-                                    cell.getData().delete_url +
-                                    '"  data-id="' +
-                                    cell.getData().id +
-                                    '" class="delete_btn btn btn-danger text-white btn-rounded ml-1 p-0 w-9 h-9"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
-                            }
-                        } else if (cell.getData().deleted_at != null) {
-                            btns +=
-                                '<button data-id="' +
-                                cell.getData().id +
-                                '" class="restore_btn btn btn-linkedin text-white btn-rounded ml-1 p-0 w-9 h-9"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
+                        let signatureUrl = cell.getData().signature;
+                        let a = [];
+                        if (signatureUrl) {
+                            a =
+                                $(`<div class="flex items-center lg:justify-center">
+                                <a class="flex items-center mr-3 add-sgnature text-info" href="javascript:;">
+                                    <i data-lucide="pencil" class="w-4 h-4 mr-1"></i> Signature
+                                </a>                      
+                                    <a class="flex items-center mr-3 edit" href="javascript:;">
+                                <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
+                            </a>
+                            <a class="flex items-center delete text-danger" href="javascript:;">
+                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
+                            </a>
+                            </div>`);
+                        } else {
+                            a =
+                                $(`<div class="flex items-center lg:justify-center">
+                                <a class="flex items-center mr-3 add-sgnature" href="javascript:;">
+                                    <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Signature
+                                </a>                      
+                                    <a class="flex items-center mr-3 edit" href="javascript:;">
+                                <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
+                            </a>
+                            <a class="flex items-center delete text-danger" href="javascript:;">
+                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
+                            </a>
+                            </div>`);
                         }
+                        $(a)
+                            .find(".edit")
+                            .on("click", function () {
 
-                        return btns;
+                                editUserModal.toggle();
+
+                                let id = cell.getData().id;
+                                let name = cell.getData().name;
+                                let email = cell.getData().email;
+                                let gas_safe_id_card = cell.getData().gas_safe_id_card;
+                                let oil_registration_number = cell.getData().oil_registration_number;
+                                let installer_ref_no = cell.getData().installer_ref_no;
+                                $('#edituser-modal input[name="id"]').val(id);
+                                $('#edituser-modal input[name="name"]').val(name);
+                                $('#edituser-modal input[name="email"]').val(email);
+                                $('#edituser-modal input[name="gas_safe_id_card"]').val(gas_safe_id_card);
+                                $('#edituser-modal input[name="oil_registration_number"]').val(oil_registration_number);
+                                $('#edituser-modal input[name="installer_ref_no"]').val(installer_ref_no);
+                                
+
+                            });
+
+                            $(a)
+                            .find(".add-sgnature")
+                            .on("click", function () {
+                                let id = cell.getData().id;
+                                let company_id = cell.getData().company_id
+                                updatesignatureModal.toggle();
+                                $('#updatesignature-modal input[name="id"]').val(id);
+                                $('#updatesignature-modal input[name="pid"]').val(company_id);
+                                
+                                $('#fileUploadForm input[name="id"]').val(id);
+                                $('#addSignStaffForm input[name="edit_id"]').val(id);
+
+                            });
+                            
+                        $(a)
+                            .find(".delete")
+                            .on("click", function () {
+                                
+                            });
+
+                        
+
+                        return a[0];
+
                     },
                 },
             ],
+            ajaxResponse:function(url, params, response){
+                return response.data;
+            },
+            renderComplete() {
+                createIcons({
+                    icons,
+                    attrs: { "stroke-width": 1.5 },
+                    nameAttr: "data-lucide",
+                });
+            },
         });
 
         tabulator.on("renderComplete", () => {

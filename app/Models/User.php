@@ -26,6 +26,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'photo',
         'password',
         'google_id',
+        'gas_safe_id_card',
+        'oil_registration_number',
+        'installer_ref_no',
     ];
 
     /**

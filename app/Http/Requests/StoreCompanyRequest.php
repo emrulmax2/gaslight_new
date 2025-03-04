@@ -27,7 +27,6 @@ class StoreCompanyRequest extends FormRequest
             'company_phone' => ['required', 'string', 'max:255'],
             'company_address_line_1' => ['required', 'string', 'max:255'],
             'company_postal_code' => ['required', 'string', 'max:255'],
-            'company_state' => ['required', 'string', 'max:255'],
             'company_city' => ['required', 'string', 'max:255'],
             'company_country' => ['required', 'string', 'max:255'],
             'company_registration' => ['required_if:business_type,Company'],//, 'string', 'max:255'

@@ -17,7 +17,7 @@ class FileUploadController extends Controller
             $filename = time() . '_' . $file->getClientOriginalName();
            
                 
-            $filePath = $file->storeAs('companies/'.$request->pid.'/images', $filename, 'public');
+            $filePath = $file->storeAs('users/'.$request->pid.'/images', $filename, 'public');
             
             // Save file metadata to the database
             
@@ -30,7 +30,7 @@ class FileUploadController extends Controller
             ]);
 
             
-            $fileUrl = Storage::disk('public')->url('companies/'.$request->pid.'/images/'.$filename);
+            $fileUrl = Storage::disk('public')->url('users/'.$request->pid.'/images/'.$filename);
             return response()->json([
                 'success' => $filename, 
                 'filePath' => $fileUrl,
