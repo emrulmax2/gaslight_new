@@ -9,68 +9,8 @@
         <h2 class="mr-auto text-lg font-medium">Update Profile</h2>
     </div>
     <div class="grid grid-cols-12 gap-6">
-        <!-- BEGIN: Profile Menu -->
-        <div class="col-span-12 flex flex-col-reverse lg:col-span-4 lg:block 2xl:col-span-3">
-            <div class="intro-y box mt-5">
-                <div class="relative flex items-center p-5">
-                    <div class="image-fit h-12 w-12">
-                        <img
-                            class="rounded-full"
-                            src="{{ Vite::asset($fakers[0]['photos'][0]) }}"
-                            alt="Midone - Tailwind Admin Dashboard Template"
-                        />
-                    </div>
-                    <div class="ml-4 mr-auto">
-                        <div class="text-base font-medium">
-                            {{ $user->name }}
-                        </div>
-                        <div class="text-slate-500">{{ $user->role }}</div>
-                    </div>
-                </div>
-                <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
-                    <a
-                        class="flex items-center font-medium text-primary"
-                        href=""
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Activity"
-                        /> Personal
-                        Information
-                    </a>
-                    {{-- <a
-                        class="mt-5 flex items-center"
-                        href=""
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Box"
-                        /> Account Settings
-                    </a>
-                    <a
-                        class="mt-5 flex items-center"
-                        href=""
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Lock"
-                        /> Change Password
-                    </a>
-                    <a
-                        class="mt-5 flex items-center"
-                        href=""
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Settings"
-                        /> User
-                        Settings
-                    </a> --}}
-                </div>
-            </div>
-        </div>
-        <!-- END: Profile Menu -->
-        <div class="col-span-12 lg:col-span-8 2xl:col-span-9">
+
+        <div class="col-span-12 ">
             <!-- BEGIN: Personal Information -->
             <div class="intro-y box mt-5">
                 <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
@@ -124,7 +64,7 @@
                                     <div class="intro-y mt-5">
                                         <div class="mt-3">
                                             <label data-tw-merge for="gas_safe_id_card1" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
-                                                Gas Safe Id Card <span class="text-danger ">*</span>
+                                                Gas Safe Id Card 
                                             </label>
                                             <input data-tw-merge id="gas_safe_id_card1" value="{{ $user->gas_safe_id_card }}" name="gas_safe_id_card" type="text" placeholder="" class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&amp;[readonly]]:bg-slate-100 [&amp;[readonly]]:cursor-not-allowed [&amp;[readonly]]:dark:bg-darkmode-800/50 [&amp;[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&amp;:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10" />
                                             <div class="mt-2 text-danger error-gas_safe_id_card"></div>
@@ -135,7 +75,7 @@
                                     <div class="intro-y mt-5">
                                         <div class="mt-3">
                                             <label data-tw-merge for="oil_registration_number1"  class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
-                                                Oil Registration Number <span class="text-danger">*</span>
+                                                Oil Registration Number 
                                             </label>
                                             <input data-tw-merge id="oil_registration_number1" value="{{ $user->oil_registration_number }}" name="oil_registration_number" type="text" placeholder="" class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&amp;[readonly]]:bg-slate-100 [&amp;[readonly]]:cursor-not-allowed [&amp;[readonly]]:dark:bg-darkmode-800/50 [&amp;[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&amp;:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10" />
                                             <div class="mt-2 text-danger error-oil_registration_number"></div>
@@ -146,7 +86,7 @@
                                     <div class="intro-y mt-5">
                                         <div class="mt-3">
                                             <label data-tw-merge for="installer_ref_no1" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
-                                                Installer Ref No <span class="text-danger">*</span>
+                                                Installer Ref No 
                                             </label>
                                             <input data-tw-merge id="installer_ref_no1" name="installer_ref_no" value="{{ $user->installer_ref_no }}"  type="text" placeholder="" class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&amp;[readonly]]:bg-slate-100 [&amp;[readonly]]:cursor-not-allowed [&amp;[readonly]]:dark:bg-darkmode-800/50 [&amp;[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&amp;:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10" />
                                             <div class="mt-2 text-danger error-installer_ref_no"></div>

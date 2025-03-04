@@ -232,9 +232,9 @@
                 class="relative mt-px w-56 bg-theme-1/80 text-white before:absolute before:inset-0 before:z-[-1] before:block before:rounded-md before:bg-black"
             >
                 <x-base.menu.header class="font-normal">
-                    <div class="font-medium">{{ $fakers[0]['users'][0]['name'] }}</div>
+                    <div class="font-medium">{{ $user->name }}</div>
                     <div class="mt-0.5 text-xs text-white/70 dark:text-slate-500">
-                        {{ $fakers[0]['jobs'][0] }}
+                        Administrator
                     </div>
                 </x-base.menu.header>
                 <x-base.menu.divider class="bg-white/[0.08]" />

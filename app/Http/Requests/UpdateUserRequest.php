@@ -25,9 +25,6 @@ class UpdateUserRequest extends FormRequest
             'password' => 'nullable|min:8|confirmed',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
-            'gas_safe_id_card' => 'required|string|max:255',
-            'oil_registration_number' => 'required|string|max:255',
-            'installer_ref_no' => 'required|string|max:255',
             
         ];
     }

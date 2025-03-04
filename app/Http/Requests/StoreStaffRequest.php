@@ -25,9 +25,6 @@ class StoreStaffRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:staff',
             'password' => 'required|string|min:8',
-            'gas_safe_id_card' => 'required',
-            'oil_registration_number' => 'required',
-            'installer_ref_no' => 'required',
         ];
     }
 }
