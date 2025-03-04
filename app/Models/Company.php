@@ -13,7 +13,7 @@ class Company extends Model
 
 
     public function staffs()
-{
-    return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');
-}
+    {
+        return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');
+    }
 }

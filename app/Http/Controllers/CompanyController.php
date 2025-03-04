@@ -8,6 +8,9 @@ use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\User;
 
 use App\Fakers\Countries;
+use App\Models\Staff;
+use Illuminate\Support\Facades\Hash;
+
 class CompanyController extends Controller
 {
     /**
@@ -39,10 +42,21 @@ class CompanyController extends Controller
         $validatedData = $request->validated();
         $validatedData['user_id'] = auth()->user()->id; // Assuming you want to set the user_id to the currently authenticated user
 
-        Company::create($validatedData);
+        $company = Company::create($validatedData);
         $user = User::find(auth()->user()->id);
         $user->first_login = 0;
         $user->save();
+
+        
+        $staff = Staff::create([
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => $user->password, 
+            'status' => 1,
+        ]);
+
+        // Attach the staff to the company
+        $company->staffs()->attach($staff->id);
 
         return response()->json(['message' => 'Company created successfully'], 201);
     }
