@@ -4,7 +4,7 @@ size="xl"
 staticBackdrop
 >
     <x-base.dialog.panel>
-        <a
+        {{-- <a
             class="absolute right-0 top-0 mr-3 mt-3"
             data-tw-dismiss="modal"
             href="#"
@@ -13,7 +13,7 @@ staticBackdrop
                 class="h-8 w-8 text-slate-400"
                 icon="X"
             />
-        </a>
+        </a> --}}
         {{-- <div class="absolute left-0 top-0 ml-3 mt-3  bg-primary text-white text-sm font-semibold px-2 py-1 rounded">
             Step <span class="current-step"> 01 </span> of <span class="total-step">02</span>
         </div> --}}
@@ -310,10 +310,10 @@ staticBackdrop
                             <x-base.form-input
                                 type="text"
                                 placeholder="London"
-                                name="company_state"
+                                name="company_country"
                                 class="state"
                             />
-                            <div id="error-company_state" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
+                            <div id="error-company_country" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                         </div>
                     </div>
                     <div
@@ -343,8 +343,6 @@ staticBackdrop
                             <div id="error-company_postal_code" class="step1__input-error text-danger mt-2 dark:text-orange-400"></div>
                         </div>
                     </div>
-
-                    <x-base.form-input name="company_country" id="country" class="w-full country" type="hidden" value="" />
                     <x-base.form-input name="latitude" id="latitude" class="w-full latitude" type="hidden" value="" />
                     <x-base.form-input name="longitude" id="longitude" class="w-full longitude" type="hidden" value="" />
                 </div>

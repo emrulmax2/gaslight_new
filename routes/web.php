@@ -19,10 +19,14 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
 use App\Http\Controllers\Customers\JobDocumentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSettings\NumberingController;
 use App\Http\Controllers\UserSettings\ReminderEmailTemplateController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Profiler\Profile;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -89,6 +93,10 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('staff-list', 'list')->name('staff.list'); 
         Route::post('staff-restore/{id}', 'restore')->name('staff.restore'); 
+        Route::post('staff-draw-signature/','drawSignatureStore')->name('staff.draw-signature'); 
+        Route::post('staff-signature-upload/','fileUploadStore')->name('staff.upload-signature'); 
+        
+        
         
     });
 
@@ -173,6 +181,18 @@ Route::controller(FileUploadController::class)->group(function() {
     Route::delete('/file-delete/{id}', 'delete')->name('file.delete');
 });
 
+Route::controller(ProfileController::class)->group(function() {
+    Route::get('profile', 'index')->name('profile');
+    Route::post('profile/update', 'update')->name('profile.update');
+    
+});
+
+
+Route::controller(UserController::class)->group(function() {
+    Route::post('user/update/{user}', 'update')->name('user.update');
+});
+
+
 
 Route::controller(PageController::class)->group(function () {
     Route::get('dashboard-overview-1', 'dashboardOverview1')->name('dashboard-overview-1');
@@ -238,7 +258,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('regular-form-page', 'regularForm')->name('regular-form');
     Route::get('datepicker-page', 'datepicker')->name('datepicker');
     Route::get('tom-select-page', 'tomSelect')->name('tom-select');
-    Route::get('file-upload-page', 'fileUpload')->name('file-upload');
+    //Route::get('file-upload-page', 'fileUpload')->name('file-upload');
     Route::get('wysiwyg-editor-classic-page', 'wysiwygEditorClassic')->name('wysiwyg-editor-classic');
     Route::get('wysiwyg-editor-inline-page', 'wysiwygEditorInline')->name('wysiwyg-editor-inline');
     Route::get('wysiwyg-editor-balloon-page', 'wysiwygEditorBalloon')->name('wysiwyg-editor-balloon');

@@ -213,11 +213,13 @@
     
     <!-- END: HTML Table Data -->
     @include('app.staffs.modal')
+    @include('app.action-modals')
 @endsection
 
 @pushOnce('styles')
     @vite('resources/css/vendors/tabulator.css')
     @vite('resources/css/custom/signature.css')
+    @vite('resources/css/vendors/dropzone.css')
 @endPushOnce
 
 
@@ -226,10 +228,16 @@
     @vite('resources/js/vendors/lucide.js')
     @vite('resources/js/vendors/xlsx.js')
     @vite('resources/js/vendors/sign-pad.min.js')
+    @vite('resources/js/vendors/axios.js')
+    @vite('resources/js/vendors/dropzone.js')
+    
 @endPushOnce
 
 @pushOnce('scripts')
     @vite('resources/js/app/staffs/list.js')
     @vite('resources/js/app/staffs/modal.js')
+    @vite('resources/js/app/staffs/dropzone.js')
+
+
     
 @endPushOnce
