@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "creagia/laravel-sign-pad": "^2.1",
+        "lab404/laravel-impersonate": "^1.7",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "tightenco/ziggy": "^2.5"

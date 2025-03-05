@@ -9,8 +9,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SuperAdminAuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\UserSettings;
@@ -23,10 +25,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSettings\NumberingController;
 use App\Http\Controllers\UserSettings\ReminderEmailTemplateController;
+use App\Http\Middleware\SuperAdminAuthenticate;
+use App\Http\Middleware\SuperAdminLoggedIn;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
-
+use App\Http\Controllers\ImpersonateController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -59,10 +63,31 @@ Route::post('/email/resend', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
 
 
+
 Route::controller(AuthController::class)->middleware(loggedin::class)->group(function() {
     Route::get('login', 'loginView')->name('login');
     Route::post('login', 'login')->name('login.check');
     
+});
+
+Route::prefix('/super-admin')->name('superadmin.')->group(function() {
+
+    Route::controller(SuperAdminAuthController::class)->middleware(SuperAdminLoggedIn::class)->group(function() {
+        Route::get('login', 'loginView')->name('login');
+        Route::post('login', 'login')->name('login.check');
+        
+    });
+
+    Route::controller(SuperAdminDashboard::class)->middleware(SuperAdminAuthenticate::class)->group(function () {
+        Route::get('/dashboard', 'index')->name('dashboard');
+    });
+    Route::middleware(SuperAdminAuthenticate::class)->group(function() {
+        
+        Route::get('logout', [SuperAdminAuthController::class, 'logout'])->name('logout');
+        Route::get('users-list', [UserController::class, 'list'])->name('users.list');
+
+        
+    });
 });
 
 Route::controller(RegisteredUserController::class)->middleware(loggedin::class)->group(function() {
@@ -175,6 +200,12 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::delete('settings/reminder-email-templates/destroy-attachment/{attachment_id}', 'destroyAttachment')->name('user.settings.reminder.templates.destroy.attachment'); 
     });
 });
+
+Route::middleware(SuperAdminAuthenticate::class)->group(function() {
+    Route::get('/impersonate/{id}', [ImpersonateController::class, 'impersonate'])->name('impersonate');
+});
+
+Route::get('/impersonate-stop', [ImpersonateController::class, 'stopImpersonate'])->name('impersonate.stop');
 
 Route::controller(FileUploadController::class)->group(function() {
     Route::post('/file-upload', 'upload')->name('file.upload');

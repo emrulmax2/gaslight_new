@@ -147,7 +147,10 @@ class StaffController extends Controller
      */
     public function edit(Staff $staff)
     {
-        return view('app.staffs.edit', compact('staff'));
+        $staff->signature;
+        $signature = $staff->signature ? Storage::disk('public')->url($staff->signature->filename) : '';
+
+        return view('app.staffs.edit', compact('staff','signature'));
     }
 
     /**
@@ -171,7 +174,7 @@ class StaffController extends Controller
             return response()->json(['message' => 'Staff updated successfully'], 200);
         }
 
-        return response()->json(['message' => 'Staff Couldn\'t Updated'], 400);
+        return response()->json(['message' => 'Staff Couldn\'t Updated'], 304);
     }
 
     /**

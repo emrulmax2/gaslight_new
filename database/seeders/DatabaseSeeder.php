@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
 
         $this->callIfNotSeeded(UserSeeder::class);
         $this->callIfNotSeeded(OptionSeeder::class);
+        $this->callIfNotSeeded(SuperAdminSeeder::class);
+        $this->callIfNotSeeded(CustomerJobStatusSeeder::class);
+        $this->callIfNotSeeded(CustomerJobPrioritySeeder::class);
+        $this->callIfNotSeeded(JobFormSeeder::class);
     }
 
     /**

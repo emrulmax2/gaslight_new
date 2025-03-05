@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class Authenticate
+class SuperAdminAuthenticate
 {
     /**
      * Handle an incoming request.
@@ -16,18 +16,12 @@ class Authenticate
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!is_null(request()->user())) {
+
+        
+        if (!is_null(Auth::guard('superadmin')->user())) {
             return $next($request);
-        // }else if (!is_null(Auth::guard('client')->user())) {
-            
-        //     return redirect()->route('client.login');
-
-        } else if (!is_null(Auth::guard('superadmin')->user())) {
-            
+        } else {
             return redirect()->route('superadmin.login');
-
-        }  else {
-            return redirect('login');
         }
     }
 }

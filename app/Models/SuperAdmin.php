@@ -10,7 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 
-class User extends Authenticatable implements MustVerifyEmail
+class SuperAdmin extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, Impersonate;
 
@@ -23,13 +23,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'email_verified_at',
-        'active',
+        'status',
         'photo',
-        'password',
-        'google_id',
-        'gas_safe_id_card',
-        'oil_registration_number',
-        'installer_ref_no',
     ];
 
     /**
