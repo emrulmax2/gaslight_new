@@ -54,7 +54,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                        <a href="{{ route('calendars') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
@@ -70,7 +70,7 @@
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         <a href="{{ route('customers') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',

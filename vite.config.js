@@ -162,6 +162,7 @@ export default defineConfig({
                 'resources/js/app/staffs/list.js',
                 'resources/js/app/staffs/modal.js',
                 'resources/js/app/staffs/dropzone.js',
+                
 
                 'resources/js/vendors/sign-pad.min.js',
                 "resources/js/app/companies.js",
@@ -170,13 +171,25 @@ export default defineConfig({
                 "resources/js/app/jobs/create.js",
                 "resources/js/app/jobs/show.js",
 
-                "resources/js/app/customers/job-address/jobs-address-create.js",
-                "resources/js/app/customers/job-address/jobs-address.js",
+                "resources/js/app/customers/job-address/job-address-create.js",
+                "resources/js/app/customers/job-address/job-address.js",
                 "resources/js/app/customers/customers-create.js",
                 "resources/js/app/customers/customers-edit.js",
                 "resources/js/app/customers/customers.js",
 
                 "resources/js/app/calendars/calendar.js",
+
+
+                //superadmin
+                "resources/js/app/superadmin/dashboard/index.js",
+
+                "resources/js/app/boiler-brands/crud.js",
+                "resources/js/app/boiler-brands/list.js",
+
+                "resources/js/app/boiler-manuals/crud.js",
+                "resources/js/app/boiler-manuals/list.js",
+                "resources/js/app/boiler-manuals/dropzone.js",
+
             ],
             refresh: true,
         }),
