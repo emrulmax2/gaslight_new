@@ -91,7 +91,24 @@
                                 </div>
                             </div>
                         </a>
-                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                    {{-- <a href="{{ route('job-addresses') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
+                                            icon="MapPin"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Job Address</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                    </a> --}}
+                        <a href="{{ route('jobs') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
@@ -110,7 +127,7 @@
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',

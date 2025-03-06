@@ -157,17 +157,6 @@ export default defineConfig({
                 "resources/js/dashboard-modal.js",
 
                 // APP JS
-                "resources/js/app/customers.js",
-                "resources/js/app/customers-create.js",
-
-                "resources/js/app/jobs.js",
-                "resources/js/app/properties.js",
-                "resources/js/app/jobs-create.js",
-                "resources/js/app/jobs-show.js",
-                "resources/js/app/customers-edit.js",
-                "resources/js/app/job-uploads.js",
-
-                // User Settings JS
                 "resources/js/app/user-settings/numbering.js",
 
                 'resources/js/app/staffs/list.js',
@@ -175,6 +164,19 @@ export default defineConfig({
                 'resources/js/app/staffs/dropzone.js',
 
                 'resources/js/vendors/sign-pad.min.js',
+                "resources/js/app/companies.js",
+
+                "resources/js/app/jobs/jobs.js",
+                "resources/js/app/jobs/create.js",
+                "resources/js/app/jobs/show.js",
+
+                "resources/js/app/customers/job-address/jobs-address-create.js",
+                "resources/js/app/customers/job-address/jobs-address.js",
+                "resources/js/app/customers/customers-create.js",
+                "resources/js/app/customers/customers-edit.js",
+                "resources/js/app/customers/customers.js",
+
+                "resources/js/app/calendars/calendar.js",
             ],
             refresh: true,
         }),

@@ -1,14 +1,14 @@
+
 ("use strict");
-var customerJobListTable = (function () {
+var customerListTable = (function () {
     var _tableGen = function () {
         
         let querystr = $("#query").val() != "" ? $("#query").val() : "";
         let status = $("#status").val() != "" ? $("#status").val() : "";
-        let customer_id = ($('#customerJobListTable').attr('data-customerid') ? $('#customerJobListTable').attr('data-customerid') : 0);
 
-        let tableContent = new Tabulator("#customerJobListTable", {
-            ajaxURL: route("customers.jobs.list", customer_id),
-            ajaxParams: { querystr: querystr, status: status, customer_id : customer_id },
+        let tableContent = new Tabulator("#customerListTable", {
+            ajaxURL: route("customers.list"),
+            ajaxParams: { querystr: querystr, status: status },
             paginationMode: "remote",
             filterMode: "remote",
             sortMode: "remote",
@@ -19,79 +19,73 @@ var customerJobListTable = (function () {
             layout: "fitColumns",
             responsiveLayout: "collapse",
             placeholder: "No matching records found",
+
             columns: [
                 {
                     title: "#ID",
                     field: "id",
                     vertAlign: 'middle',
                     width: "80",
-                    widthGrow:5
+                    responsive: 0
+                
                 },
                 {
-                    title: 'Ref No',
-                    field: 'reference_no',
+                    title: 'Company',
+                    field: 'company_name',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                    width: "180",
+                    minWidth: 300,
+                    formatter(cell, formatterParams) {
+                        const companyName = cell.getData().company_name;
+                        return `<div class="font-medium whitespace-nowrap">${companyName || ''}</div>`;
+                    }
                 },
                 {
-                    title: "Address",
-                    field: "address_line_1",
+                    title: "Name",
+                    field: "first_name",
                     headerHozAlign: "left",
                     vertAlign: 'middle',
+                    minWidth: 220,
+                    formatter(cell, formatterParams) {
+                        const borderClass = 'border-b lg:border-b-0 border-slate-200 pb-2';
+                        var html = `<div class="${borderClass}">`;
+                        html += '<div class="flex items-center gap-1">';
+                        html += '<span class="sm:hidden"><i data-lucide="user" class="w-4 h-4"></i></span>';
+                        html += '<div class="font-medium whitespace-nowrap">' + cell.getData().full_name + '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                        return html;
+                    }
+                },
+                {
+                    title: 'Address',
+                    field: 'address_line_1',
+                    headerHozAlign: "left",
+                    vertAlign: 'middle',
+                    minWidth: 220,
                     formatter(cell, formatterParams) { 
                         let address = '';
                         address += (cell.getData().address_line_1 != '' ? cell.getData().address_line_1+' ' : '');
                         address += (cell.getData().address_line_2 != '' ? cell.getData().address_line_2+', ' : '');
                         address += (cell.getData().city != '' ? cell.getData().city+', ' : '');
+                        address += (cell.getData().state != '' ? cell.getData().state+', ' : '');
                         address += (cell.getData().postal_code != '' ? cell.getData().postal_code : '');
-                        return (address != '' ? '<div class="text-slate-500 text-xs whitespace-normal">'+address+'</div>' : '');
-                    }
-                },
-                {
-                    title: "Customer",
-                    field: "full_name",
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    formatter(cell, formatterParams) { 
-                        var html = '<a href="'+route('customers.jobs.show', [cell.getData().customer_id, cell.getData().id])+'" class="block">';
-                                html += '<div class="font-medium whitespace-nowrap">'+cell.getData().full_name+'</div>';
-                            html += '</a>';
+                
+                        var html = '<div class="block whitespace-normal">';
+                        html += '<div class="flex items-start">';
+                        html += '<span class="sm:hidden mr-2"><i data-lucide="map-pin" class="w-4 h-4"></i></span>';
+                        html += (address != '' ? '<div class="text-slate-500 text-xs">'+address+'</div>' : '');
+                        html += '</div>';
+                        html += '</div>';
                         return html;
                     }
                 },
                 {
-                    title: 'Priority',
-                    field: 'priority',
+                    title: 'Email',
+                    field: 'email',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                },
-                {
-                    title: 'Description',
-                    field: 'description',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    formatter(cell, formatterParams) { 
-                        return '<div class="text-slate-500 text-xs whitespace-normal">'+cell.getData().description+'</div>';
-                    }
-                },
-                {
-                    title: 'Due Date',
-                    field: 'due_date',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                },
-                {
-                    title: 'Status',
-                    field: 'status',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                },
-                {
-                    title: 'Estimated Value',
-                    field: 'estimated_amount',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
+                    responsive: 0
                 },
                 /*{
                     title: "Actions",
@@ -105,16 +99,17 @@ var customerJobListTable = (function () {
                     formatter(cell, formatterParams) {                        
                         var btns = "";
                         if (cell.getData().deleted_at == null) {
-                            btns += '<button data-customer="'+cell.getData().customer_id+'" data-id="' +cell.getData().id +'" class="delete_btn rounded-full bg-danger text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
+                            btns += '<a href="'+route('customers.jobs', cell.getData().id)+'" class="rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Eye" class="w-4 h-4"></i></a>';
+                            btns += '<button data-id="' +cell.getData().id +'" class="delete_btn rounded-full bg-danger text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
                         }  else {
-                            btns += '<button data-customer="'+cell.getData().customer_id+'" data-id="' +cell.getData().id +'"  class="restore_btn rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
+                            btns += '<button data-id="' +cell.getData().id +'"  class="restore_btn rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
                         }
                         
                         return btns;
                     },
                 },*/
             ],
-            ajaxResponse:function(url, params, response){
+            ajaxResponse: function(url, params, response){
                 return response.data;
             },
             renderComplete() {
@@ -126,8 +121,10 @@ var customerJobListTable = (function () {
             },
         });
 
+        
+
         tableContent.on("rowClick", (e, row) => {
-            window.open(route('customers.jobs.show', [row.getData().customer_id, row.getData().id]), '_blank');
+            window.location.href = route('customers.edit', row.getData().id);
         });
 
         tableContent.on("renderComplete", () => {
@@ -174,6 +171,23 @@ var customerJobListTable = (function () {
         $("#tabulator-print").on("click", function (event) {
             tableContent.print();
         });
+
+        function updateColumnVisibility() {
+            if (window.innerWidth < 768) {
+                tableContent.getColumn("id").hide();
+                tableContent.getColumn("email").hide();
+
+            } else {
+                tableContent.getColumn("id").show();
+                tableContent.getColumn("email").show();
+            }
+        }
+        
+        window.addEventListener("resize", updateColumnVisibility);
+        setTimeout(() => {
+            updateColumnVisibility();
+        }, 200)
+        
     };
     return {
         init: function () {
@@ -184,35 +198,40 @@ var customerJobListTable = (function () {
 
 
 (function () {
-    if ($("#customerJobListTable").length) {
-        customerJobListTable.init();
+    if ($("#customerListTable").length) {
+        customerListTable.init();
 
-        function filtercustomerJobListTable() {
-            customerJobListTable.init();
+        function filterCustomerListTable() {
+            customerListTable.init();
         }
+
+
+
 
         // On submit filter form
         $("#tabulator-html-filter-form").on("keypress", function (event) {
                 let keycode = event.keyCode ? event.keyCode : event.which;
                 if (keycode == "13") {
                     event.preventDefault();
-                    filtercustomerJobListTable();
+                    filterCustomerListTable();
                 }
             }
         );
 
         // On click go button
         $("#tabulator-html-filter-go").on("click", function (event) {
-            filtercustomerJobListTable();
+            filterCustomerListTable();
         });
 
         // On reset filter form
         $("#tabulator-html-filter-reset").on("click", function (event) {
             $("#query").val("");
             $("#status").val("1");
-            filtercustomerJobListTable();
+            filterCustomerListTable();
         });
     }
+
+ 
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
@@ -239,7 +258,7 @@ var customerJobListTable = (function () {
 
 
     // Delete Trigger
-    $('#customerJobListTable').on('click', '.delete_btn', function(){
+    $('#customerListTable').on('click', '.delete_btn', function(){
         let $statusBTN = $(this);
         let row_id = $statusBTN.attr('data-id');
 
@@ -248,12 +267,12 @@ var customerJobListTable = (function () {
             $('#confirmModal .confirmModalTitle').html('Are you sure?');
             $('#confirmModal .confirmModalDesc').html('Do you really want to delete these record? If yes then please click on the agree btn.');
             $('#confirmModal .agreeWith').attr('data-id', row_id);
-            $('#confirmModal .agreeWith').attr('data-action', 'DELETEJOB');
+            $('#confirmModal .agreeWith').attr('data-action', 'DELETE');
         });
     });
 
     // Restore Trigger
-    $('#customerJobListTable').on('click', '.restore_btn', function(){
+    $('#customerListTable').on('click', '.restore_btn', function(){
         let $statusBTN = $(this);
         let row_id = $statusBTN.attr('data-id');
 
@@ -262,7 +281,7 @@ var customerJobListTable = (function () {
             $('#confirmModal .confirmModalTitle').html('Are you sure?');
             $('#confirmModal .confirmModalDesc').html('Do you really want to restore these record? Click on agree to continue.');
             $('#confirmModal .agreeWith').attr('data-id', row_id);
-            $('#confirmModal .agreeWith').attr('data-action', 'RESTOREJOB');
+            $('#confirmModal .agreeWith').attr('data-action', 'RESTORE');
         });
     });
 
@@ -273,11 +292,10 @@ var customerJobListTable = (function () {
         let action = $agreeBTN.attr('data-action');
 
         $('#confirmModal button').attr('disabled', 'disabled');
-        if(action == 'DELETEJOB'){
-            let customer_id = ($('#customerJobListTable').attr('data-customerid') ? $('#customerJobListTable').attr('data-customerid') : 0);
+        if(action == 'DELETE'){
             axios({
                 method: 'delete',
-                url: route('customers.jobs.destroy', [customer_id, row_id]),
+                url: route('customers.destroy', row_id),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
                 if (response.status == 200) {
@@ -290,15 +308,14 @@ var customerJobListTable = (function () {
                         $('#successModal .successModalDesc').html(response.data.msg);
                     });
                 }
-                customerJobListTable.init();
+                customerListTable.init();
             }).catch(error =>{
                 console.log(error)
             });
-        }else if(action == 'RESTOREJOB'){
-            let customer_id = ($('#customerJobListTable').attr('data-customerid') ? $('#customerJobListTable').attr('data-customerid') : 0);
+        }else if(action == 'RESTORE'){
             axios({
                 method: 'post',
-                url: route('customers.jobs.restore', [customer_id, row_id]),
+                url: route('customers.restore', row_id),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
                 if (response.status == 200) {
@@ -311,7 +328,7 @@ var customerJobListTable = (function () {
                         $('#successModal .successModalDesc').html(response.data.msg);
                     });
                 }
-                customerJobListTable.init();
+                customerListTable.init();
             }).catch(error =>{
                 console.log(error)
             });

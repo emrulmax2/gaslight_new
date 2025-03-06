@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ThemeController;
@@ -10,6 +9,7 @@ use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
+use App\Http\Controllers\Calendars\CalendarController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
@@ -17,12 +17,14 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Customers\CustomerController;
+use App\Http\Controllers\Customers\CustomerJobAddressController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
 use App\Http\Controllers\Customers\JobDocumentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Jobs\JobController as JobsJobController;
 use App\Http\Controllers\UserSettings\NumberingController;
 use App\Http\Controllers\UserSettings\ReminderEmailTemplateController;
 use App\Http\Middleware\SuperAdminAuthenticate;
@@ -132,7 +134,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('customers/list', 'list')->name('customers.list'); 
         Route::get('customers/create', 'create')->name('customers.create'); 
         Route::post('customers/store', 'store')->name('customers.store');
-        Route::get('customers/edit/{customer}', 'edit')->name('customers.edit');
+        Route::get('customers/show/{customer}', 'edit')->name('customers.edit');
         Route::post('customers/update', 'update')->name('customers.update');
         Route::delete('customers/destroy/{customer_id}', 'destroy')->name('customers.destroy'); 
         Route::post('customers/restore/{customer_id}', 'restore')->name('customers.restore');
@@ -141,50 +143,49 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('customers/search', 'search')->name('customers.search');
     });
 
-    Route::controller(JobController::class)->group(function() {
-        Route::get('customers/{customer}/jobs', 'index')->name('customers.jobs'); 
-        Route::get('customers/{customer}/jobs/list', 'list')->name('customers.jobs.list'); 
-        Route::post('customers/{customer}/jobs/store', 'store')->name('customers.jobs.store');
-        Route::get('customers/{customer}/jobs/{job}', 'show')->name('customers.jobs.show'); 
-        Route::post('customers/{customer}/jobs/update', 'update')->name('customers.jobs.update'); 
-        Route::delete('customers/{customer}/jobs/destroy/{job_id}', 'destroy')->name('customers.jobs.destroy'); 
-        Route::post('customers/{customer}/jobs/restore/{job_id}', 'restore')->name('customers.jobs.restore');
+    Route::controller(CustomerJobAddressController::class)->group(function(){
+        Route::get('customer/{customer_id}/job-addresses', 'index')->name('customer.job-addresses');
+        Route::get('customer/{customer_id}/job-addresses/list', 'list')->name('customer.job-addresses.list');
+        Route::get('customer/{customer_id}/job-addresses/create', 'job_address_create')->name('customer.job-addresses.create');
+        Route::post('customer/{customer_id}/job-addresses/store', 'job_address_store')->name('customer.job-addresses.store');
+        Route::get('customer/{customer_id}/job-addresses/{address_id}/show', 'job_address_edit')->name('customer.job-addresses.edit');
+        Route::post('customer/{customer_id}/job-addresses/{address_id}/update', 'job_address_update')->name('customer.job-addresses.update');
+        Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy')->name('customer.job-addresses.job_address_destroy');
+        Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore')->name('customer.job-addresses.job_address_restore');
     });
 
-    Route::controller(JobDocumentController::class)->group(function() {
-        Route::post('customers/{customer}/jobs/{job}/document/store', 'store')->name('customers.jobs.document.store');
-        Route::get('customers/{customer}/jobs/{job}/document/list', 'list')->name('customers.jobs.document.list'); 
-        Route::delete('customers/{customer}/jobs/{job}/document}/destroy/{document_id}', 'destroy')->name('customers.jobs.document.destroy'); 
-        Route::post('customers/{customer}/jobs/{job}/document/restore/{document_id}', 'restore')->name('customers.jobs.document.restore');
-    });
+    // Route::controller(JobController::class)->group(function() {
+    //     Route::get('customers/{customer}/jobs', 'index')->name('customers.jobs'); 
+    //     Route::get('customers/{customer}/jobs/list', 'list')->name('customers.jobs.list'); 
+    //     Route::post('customers/{customer}/jobs/store', 'store')->name('customers.jobs.store');
+    //     Route::get('customers/{customer}/jobs/{job}', 'show')->name('customers.jobs.show'); 
+    //     Route::post('customers/{customer}/jobs/update', 'update')->name('customers.jobs.update'); 
+    //     Route::delete('customers/{customer}/jobs/destroy/{job_id}', 'destroy')->name('customers.jobs.destroy'); 
+    //     Route::post('customers/{customer}/jobs/restore/{job_id}', 'restore')->name('customers.jobs.restore');
+    // });
 
     Route::controller(InvoiceController::class)->group(function() {
         Route::get('invoice', 'invoice')->name('invoice');
     });
 
-    //Route::controller(CustomerPropertyController::class)->group(function() {
-        // Route::get('properties', 'index')->name('properties'); 
-        // Route::get('properties/list', 'list')->name('properties.list'); 
-        // Route::get('properties/create', 'create')->name('properties.create'); 
-        //Route::post('properties/store', 'store')->name('properties.store');
-        /*Route::get('customers/show/{customer}', 'show')->name('customers.show'); 
-        Route::delete('customers/destroy/{customer_id}', 'destroy')->name('customers.destroy'); 
-        Route::post('customers/restore/{customer_id}', 'restore')->name('customers.restore');*/
+    Route::controller(JobsJobController::class)->group(function() {
+        Route::get('jobs', 'index')->name('jobs'); 
+        Route::get('jobs/list', 'list')->name('jobs.list'); 
+        Route::get('jobs/create', 'create')->name('jobs.create'); 
+        Route::post('jobs/store','store')->name('jobs.store');
+        Route::get('jobs/show/{job}','show')->name('jobs.show');
+        Route::post('jobs/update','update')->name('jobs.update');
+        Route::post('jobs/get-calendar-details','getCalendarData')->name('jobs.get.calendar.details');
+        Route::post('jobs/add-to-calendar','addToCalendar')->name('jobs.add.to.calendar');
 
-        //Route::post('properties/search', 'search')->name('properties.search');
-    //});
+        Route::post('jobs/search-address', 'searchAddress')->name('jobs.search.address'); 
+        Route::post('jobs/search-customers', 'searchCustomers')->name('jobs.search.customers'); 
+        Route::post('jobs/search-customer-addresses', 'getCustomerAddresses')->name('jobs.get.customer.addresses');
+    });
 
-    Route::controller(PropertyController::class)->group(function() {
-        Route::get('customers/{customer}/job-addresses', 'index')->name('customers.job-addresses'); 
-        Route::get('customers/{customer}/job-addresses/list', 'list')->name('customers.job-addresses.list'); 
-        Route::post('/get-customers-address','getCustomerAddre')->name('getCustomer.address');
-        Route::post('customers/{customer}/job-addresses/store', 'store')->name('customers.job-addresses.store');
-        Route::get('customers/{customer}/job-addresses/edit/{property_id}', 'edit')->name('customers.job-addresses.edit'); 
-        Route::post('customers/{customer}/job-addresses/update/{property_id}', 'update')->name('customers.job-addresses.update'); 
-        Route::delete('customers/{customer}/job-addresses/destroy/{property_id}', 'destroy')->name('customers.job-addresses.destroy'); 
-        Route::post('customers/{customer}/job-addresses/restore/{property_id}', 'restore')->name('customers.job-addresses.restore');
-
-        Route::post('job-addresses/search', 'search')->name('properties.search');
+    Route::controller(CalendarController::class)->group(function() {
+        Route::get('calendar', 'index')->name('calendars'); 
+        Route::get('calendar/events', 'events')->name('calendars.events'); 
     });
 
     Route::controller(NumberingController::class)->group(function() {

@@ -190,7 +190,7 @@ class CustomerController extends Controller
             'other_email' => (!empty($request->other_email) ? $request->other_email : null),
             'updated_by' => auth()->user()->id
         ]);
-        return response()->json(['msg' => 'Customer successfully updated.', 'red' => route('customers.jobs', $customer_id)], 200);
+        return response()->json(['msg' => 'Customer successfully updated.', 'red' => route('customers.edit', $customer_id)], 200);
     }
 
     public function destroy($customer_id){

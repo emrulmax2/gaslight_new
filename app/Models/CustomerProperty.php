@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CustomerProperty extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $appends = ['full_address'];
     
     protected $fillable = [
         'customer_id',
@@ -32,5 +34,18 @@ class CustomerProperty extends Model
 
     public function customer(){
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function contact(){
+        return $this->belongsTo(CustomerContactInformation::class, 'customer_id');
+    }
+
+    public function getFullAddressAttribute(){
+        $address = '';
+        $address .= $this->address_line_1.' '.$this->address_line_2.', ';
+        $address .= (!empty($this->city) ? $this->city.', ' : '');
+        $address .= (!empty($this->postal_code) ? $this->postal_code.', ' : '');
+        $address .= (!empty($this->country) ? $this->country : '');
+        return $address;
     }
 }

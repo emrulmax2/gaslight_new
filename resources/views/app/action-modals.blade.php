@@ -1,5 +1,5 @@
 <!-- BEGIN: Success Modal Content -->
-<x-base.dialog id="successModal">
+<x-base.dialog id="successModal" class="max-w-full">
     <x-base.dialog.panel>
         <div class="p-5 text-center">
             <x-base.lucide class="mx-auto mt-3 h-16 w-16 text-success" icon="CheckCircle" />
@@ -14,7 +14,7 @@
 <!-- END: Success Modal Content -->
 
 <!-- BEGIN: Warning Modal Content -->
-<x-base.dialog id="warningModal">
+<x-base.dialog id="warningModal" class="max-w-full">
     <x-base.dialog.panel>
         <div class="p-5 text-center">
             <x-base.lucide class="mx-auto mt-3 h-16 w-16 text-danger" icon="AlertOctagon" />
@@ -29,7 +29,7 @@
 <!-- END: Warning Modal Content -->
 
 <!-- BEGIN: Confirm Modal Content -->
-<x-base.dialog id="confirmModal">
+<x-base.dialog id="confirmModal" class="max-w-full">
     <x-base.dialog.panel>
         <div class="p-5 text-center">
             <x-base.lucide class="mx-auto mt-3 h-16 w-16 text-danger" icon="AlertOctagon" />
