@@ -1,15 +1,9 @@
-import INTAddressLookUps from '../address_lookup.js';
+
 
 (function(){
-    // INIT Address Lookup
-    if($('.theAddressWrap').length > 0){
-        INTAddressLookUps();
-    }
-
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
-    
-    
+
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
     });
@@ -28,25 +22,27 @@ import INTAddressLookUps from '../address_lookup.js';
         }
     });
 
-    $('#customerCreateForm').on('submit', function(e){
+    /* BEGIN: Update Job */
+    $('#updateJobForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('customerCreateForm');
+        const form = document.getElementById('updateJobForm');
         const $theForm = $(this);
         
-        $('#customerSaveBtn', $theForm).attr('disabled', 'disabled');
-        $("#customerSaveBtn .theLoader").fadeIn();
+        $('#jobUpdateBtn', $theForm).attr('disabled', 'disabled');
+        $("#jobUpdateBtn .theLoader").fadeIn();
 
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('customers.store'),
+            url: route('jobs.update'),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
-            $('#customerSaveBtn', $theForm).removeAttr('disabled');
-            $("#customerSaveBtn .theLoader").fadeOut();
+            $('#jobUpdateBtn', $theForm).removeAttr('disabled');
+            $("#jobUpdateBtn .theLoader").fadeOut();
 
             if (response.status == 200) {
+                
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
@@ -60,13 +56,13 @@ import INTAddressLookUps from '../address_lookup.js';
                 }, 1500);
             }
         }).catch(error => {
-            $('#customerSaveBtn', $theForm).removeAttr('disabled');
-            $("#customerSaveBtn .theLoader").fadeOut();
+            $('#jobUpdateBtn', $theForm).removeAttr('disabled');
+            $("#jobUpdateBtn .theLoader").fadeOut();
             if (error.response) {
                 if (error.response.status == 422) {
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#customerCreateForm .${key}`).addClass('border-danger');
-                        $(`#customerCreateForm  .error-${key}`).html(val);
+                        $(`#updateJobForm .${key}`).addClass('border-danger');
+                        $(`#updateJobForm  .error-${key}`).html(val);
                     }
                 } else if (error.response.status == 304) {
                     warningModal.show();
@@ -84,6 +80,5 @@ import INTAddressLookUps from '../address_lookup.js';
             }
         });
     })
+    /* END: Update Job */
 })();
-
-

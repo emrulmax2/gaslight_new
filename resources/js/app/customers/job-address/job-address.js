@@ -1,13 +1,21 @@
-
 ("use strict");
-var customerListTable = (function () {
+import { route } from 'ziggy-js';
+import INTAddressLookUps from '../../../address_lookup.js';
+(function () { 
+
+    if($('.theAddressWrap').length > 0){
+        INTAddressLookUps();
+    }
+
+var JobAddressListTable = (function () {
     var _tableGen = function () {
         
         let querystr = $("#query").val() != "" ? $("#query").val() : "";
         let status = $("#status").val() != "" ? $("#status").val() : "";
+        let customer_id = $("#customer_id").val() != "" ? $("#customer_id").val() : "";
 
-        let tableContent = new Tabulator("#customerListTable", {
-            ajaxURL: route("customers.list"),
+        let tableContent = new Tabulator("#JobAddressListTable", {
+            ajaxURL: route("customer.job-addresses.list", { customer_id: customer_id}),
             ajaxParams: { querystr: querystr, status: status },
             paginationMode: "remote",
             filterMode: "remote",
@@ -19,80 +27,77 @@ var customerListTable = (function () {
             layout: "fitColumns",
             responsiveLayout: "collapse",
             placeholder: "No matching records found",
-
             columns: [
                 {
                     title: "#ID",
                     field: "id",
                     vertAlign: 'middle',
                     width: "80",
+                    minWidth: 80,
+                    responsive: 0
                 },
                 {
-                    title: 'Company',
-                    field: 'company_name',
+                    title: 'Customer',
+                    field: 'full_name',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                },
-                {
-                    title: "Name",
-                    field: "first_name",
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    formatter(cell, formatterParams) { 
-                        var html = '<div>';
-                                html += '<div class="font-medium whitespace-nowrap">'+cell.getData().full_name+'</div>';
-                                html += (cell.getData().mobile != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+cell.getData().mobile+'</div>' : '');
-                            html += '</div>';
+                    minWidth: 200,
+                    formatter(cell, formatterParams) {
+                        var html = '<div class="flex items-start mb-1">';
+                        html += '<span class="sm:hidden mr-2"><i data-lucide="user" class="w-4 h-4"></i></span>';
+                        html += '<div>';
+                        html += '<div class="font-medium whitespace-nowrap">'+cell.getData().full_name+'</div>';
+                        html += (cell.getData().mobile != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+cell.getData().mobile+'</div>' : '');
+                        html += '</div>';
+                        html += '</div>';
                         return html;
                     }
                 },
                 {
                     title: 'Address',
-                    field: 'address_line_1',
+                    field: 'address',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                    formatter(cell, formatterParams) { 
-                        let address = '';
-                        address += (cell.getData().address_line_1 != '' ? cell.getData().address_line_1+' ' : '');
-                        address += (cell.getData().address_line_2 != '' ? cell.getData().address_line_2+', ' : '');
-                        address += (cell.getData().city != '' ? cell.getData().city+', ' : '');
-                        address += (cell.getData().state != '' ? cell.getData().state+', ' : '');
-                        address += (cell.getData().postal_code != '' ? cell.getData().postal_code : '');
-                        var html = '<div class="block whitespace-normal">';
-                                html += (address != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+address+'</div>' : '');
-                            html += '</div>';
+                    minWidth: 200,
+                    formatter(cell, formatterParams) {
+                        let address = cell.getData().address;
+                        let addressParts = address.split(', ');
+                        var html = '<div class="block lg:flex">';
+                        html += '<div class="flex items-center gap-1">';
+                        html += '<span class="sm:hidden"><i data-lucide="map-pin" class="w-4 h-4"></i></span>';
+                        html += '<div class="text-slate-500 text-xs">' + (addressParts[0] || '') + ', ' + (addressParts[1] || '') + '</div>';
+                        html += '</div>';
+                        html += '<div class="text-slate-500 text-xs mt-0.5 ml-6">' + (addressParts[2] || '') + ', ' + (addressParts[3] || '') + '</div>';
+                        html += '</div>';
                         return html;
                     }
                 },
-                {
-                    title: 'Email',
-                    field: 'email',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                },
-                /*{
-                    title: "Actions",
-                    field: "id",
-                    headerSort: false,
-                    hozAlign: "center",
-                    headerHozAlign: "center",
-                    width: "120",
-                    download:false,
-                    vertAlign: 'middle',
-                    formatter(cell, formatterParams) {                        
-                        var btns = "";
-                        if (cell.getData().deleted_at == null) {
-                            btns += '<a href="'+route('customers.jobs', cell.getData().id)+'" class="rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Eye" class="w-4 h-4"></i></a>';
-                            btns += '<button data-id="' +cell.getData().id +'" class="delete_btn rounded-full bg-danger text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
-                        }  else {
-                            btns += '<button data-id="' +cell.getData().id +'"  class="restore_btn rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
-                        }
+                // {
+                //     title: "Actions",
+                //     field: "id",
+                //     headerSort: false,
+                //     hozAlign: "center",
+                //     headerHozAlign: "center",
+                //     width: "120",
+                //     download:false,
+                //     vertAlign: 'middle',
+                //     minWidth: 120,
+                //     responsive: 0,
+                //     visible: window.innerWidth >= 768,
+                //     formatter(cell, formatterParams) {                        
+                //         var btns = "";
+                //         if (cell.getData().deleted_at == null) {
+                //             btns += '<a href="' + route("customer.job-addresses.edit", { customer_id: cell.getData().customer_id, address_id: cell.getData().id }) + '" class="edit_btn rounded-full bg-primary text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="edit-2" class="w-4 h-4"></i></a>';
+                //             btns += '<button data-customer="'+cell.getData().customer_id+'" data-id="' +cell.getData().id +'" class="delete_btn rounded-full bg-danger text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
+                //         }  else {
+                //             btns += '<button data-customer="'+cell.getData().customer_id+'" data-id="' +cell.getData().id +'"  class="restore_btn rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
+                //         }
                         
-                        return btns;
-                    },
-                },*/
+                //         return btns;
+                //     },
+                // },
             ],
-            ajaxResponse: function(url, params, response){
+            ajaxResponse:function(url, params, response){
                 return response.data;
             },
             renderComplete() {
@@ -102,12 +107,12 @@ var customerListTable = (function () {
                     nameAttr: "data-lucide",
                 });
             },
-        });
 
+        });
+        
         tableContent.on("rowClick", (e, row) => {
-            window.open(route('customers.jobs', row.getData().id), '_blank');
+            window.location.href = route("customer.job-addresses.edit", { customer_id: row.getData().customer_id, address_id: row.getData().id });
         });
-
         tableContent.on("renderComplete", () => {
             createIcons({
                 icons,
@@ -152,21 +157,45 @@ var customerListTable = (function () {
         $("#tabulator-print").on("click", function (event) {
             tableContent.print();
         });
+
+
+        function updateColumnVisibility() {
+            if (window.innerWidth < 768) {
+                tableContent.getColumn("id").hide();
+            } else {
+                tableContent.getColumn("id").show();
+
+            }
+        }
+
+        // Handle window resize
+        window.addEventListener("resize", updateColumnVisibility);
+
+        // Initial column visibility
+        setTimeout(() => {
+            updateColumnVisibility();
+        }, 200);
+
+   
+
+
     };
     return {
         init: function () {
             _tableGen();
         },
     };
+
+
+    
 })();
 
 
-(function () {
-    if ($("#customerListTable").length) {
-        customerListTable.init();
+    if ($("#JobAddressListTable").length) {
+        JobAddressListTable.init();
 
-        function filterCustomerListTable() {
-            customerListTable.init();
+        function filterJobAddressListTable() {
+            JobAddressListTable.init();
         }
 
         // On submit filter form
@@ -174,27 +203,29 @@ var customerListTable = (function () {
                 let keycode = event.keyCode ? event.keyCode : event.which;
                 if (keycode == "13") {
                     event.preventDefault();
-                    filterCustomerListTable();
+                    filterJobAddressListTable();
                 }
             }
         );
 
         // On click go button
         $("#tabulator-html-filter-go").on("click", function (event) {
-            filterCustomerListTable();
+            filterJobAddressListTable();
         });
 
         // On reset filter form
         $("#tabulator-html-filter-reset").on("click", function (event) {
             $("#query").val("");
             $("#status").val("1");
-            filterCustomerListTable();
+            filterJobAddressListTable();
         });
     }
+
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -215,9 +246,11 @@ var customerListTable = (function () {
         }
     });
 
+    
+
 
     // Delete Trigger
-    $('#customerListTable').on('click', '.delete_btn', function(){
+    $('#JobAddressListTable').on('click', '.delete_btn', function(){
         let $statusBTN = $(this);
         let row_id = $statusBTN.attr('data-id');
 
@@ -226,12 +259,12 @@ var customerListTable = (function () {
             $('#confirmModal .confirmModalTitle').html('Are you sure?');
             $('#confirmModal .confirmModalDesc').html('Do you really want to delete these record? If yes then please click on the agree btn.');
             $('#confirmModal .agreeWith').attr('data-id', row_id);
-            $('#confirmModal .agreeWith').attr('data-action', 'DELETE');
+            $('#confirmModal .agreeWith').attr('data-action', 'DELETEProperty');
         });
     });
 
     // Restore Trigger
-    $('#customerListTable').on('click', '.restore_btn', function(){
+    $('#JobAddressListTable').on('click', '.restore_btn', function(){
         let $statusBTN = $(this);
         let row_id = $statusBTN.attr('data-id');
 
@@ -240,21 +273,26 @@ var customerListTable = (function () {
             $('#confirmModal .confirmModalTitle').html('Are you sure?');
             $('#confirmModal .confirmModalDesc').html('Do you really want to restore these record? Click on agree to continue.');
             $('#confirmModal .agreeWith').attr('data-id', row_id);
-            $('#confirmModal .agreeWith').attr('data-action', 'RESTORE');
+            $('#confirmModal .agreeWith').attr('data-action', 'RESTOREProperty');
         });
     });
 
-    // Confirm Modal Action
+    
+
+   
+    
+    // Confirm Modal Action Delete
     $('#confirmModal .agreeWith').on('click', function(){
         let $agreeBTN = $(this);
         let row_id = $agreeBTN.attr('data-id');
         let action = $agreeBTN.attr('data-action');
 
+
         $('#confirmModal button').attr('disabled', 'disabled');
-        if(action == 'DELETE'){
+        if(action == 'DELETEProperty'){
             axios({
                 method: 'delete',
-                url: route('customers.destroy', row_id),
+                url: route('customer.job-addresses.job_address_destroy', [row_id]),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
                 if (response.status == 200) {
@@ -267,14 +305,14 @@ var customerListTable = (function () {
                         $('#successModal .successModalDesc').html(response.data.msg);
                     });
                 }
-                customerListTable.init();
+                JobAddressListTable.init();
             }).catch(error =>{
                 console.log(error)
             });
-        }else if(action == 'RESTORE'){
+        }else if(action == 'RESTOREProperty'){
             axios({
                 method: 'post',
-                url: route('customers.restore', row_id),
+                url: route('customer.job-addresses.job_address_restore', [row_id]),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
                 if (response.status == 200) {
@@ -287,7 +325,7 @@ var customerListTable = (function () {
                         $('#successModal .successModalDesc').html(response.data.msg);
                     });
                 }
-                customerListTable.init();
+                JobAddressListTable.init();
             }).catch(error =>{
                 console.log(error)
             });

@@ -12,10 +12,21 @@ class Company extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
+        'id',
         'user_id',
         'company_name',
         'company_email',
         'company_phone',
+        'vat_number',
+        'display_company_name',
+        'building_or_no',
+        'gas_safe_registration_no',
+        'registration_no',
+        'registration_body_for',
+        'registration_body_for_legionella',
+        'registration_body_no_for_legionella',
+        'company_web_site',
+        'company_tagline',
         'company_address_line_1',
         'company_address_line_2',
         'company_postal_code',
@@ -31,4 +42,12 @@ class Company extends Model
     {
         return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');
     }
+
+
+
+    public function companyBankDetails()
+    {
+        return $this->hasOne(CompanyBankDetails::class, 'Company_id', 'id'); 
+    }
+
 }

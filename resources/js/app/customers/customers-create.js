@@ -1,9 +1,15 @@
-
+import INTAddressLookUps from '../../address_lookup.js';
 
 (function(){
+    // INIT Address Lookup
+    if($('.theAddressWrap').length > 0){
+        INTAddressLookUps();
+    }
+
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
-
+    
+    
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
     });
@@ -22,29 +28,25 @@
         }
     });
 
-    /* BEGIN: Update Job */
-    $('#updateJobForm').on('submit', function(e){
+    $('#customerCreateForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('updateJobForm');
+        const form = document.getElementById('customerCreateForm');
         const $theForm = $(this);
-        let customer_id = $theForm.find('[name="customer_id"]').val()
-        let customer_job_id = $theForm.find('[name="customer_job_id"]').val()
         
-        $('#jobUpdateBtn', $theForm).attr('disabled', 'disabled');
-        $("#jobUpdateBtn .theLoader").fadeIn();
+        $('#customerSaveBtn', $theForm).attr('disabled', 'disabled');
+        $("#customerSaveBtn .theLoader").fadeIn();
 
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('customers.jobs.update', customer_id),
+            url: route('customers.store'),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
-            $('#jobUpdateBtn', $theForm).removeAttr('disabled');
-            $("#jobUpdateBtn .theLoader").fadeOut();
+            $('#customerSaveBtn', $theForm).removeAttr('disabled');
+            $("#customerSaveBtn .theLoader").fadeOut();
 
             if (response.status == 200) {
-                
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
@@ -58,13 +60,13 @@
                 }, 1500);
             }
         }).catch(error => {
-            $('#jobUpdateBtn', $theForm).removeAttr('disabled');
-            $("#jobUpdateBtn .theLoader").fadeOut();
+            $('#customerSaveBtn', $theForm).removeAttr('disabled');
+            $("#customerSaveBtn .theLoader").fadeOut();
             if (error.response) {
                 if (error.response.status == 422) {
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#updateJobForm .${key}`).addClass('border-danger');
-                        $(`#updateJobForm  .error-${key}`).html(val);
+                        $(`#customerCreateForm .${key}`).addClass('border-danger');
+                        $(`#customerCreateForm  .error-${key}`).html(val);
                     }
                 } else if (error.response.status == 304) {
                     warningModal.show();
@@ -82,5 +84,6 @@
             }
         });
     })
-    /* END: Update Job */
 })();
+
+

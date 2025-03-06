@@ -51,7 +51,7 @@ class CustomerJob extends Model
         return $this->belongsTo(CustomerJobStatus::class, 'customer_job_status_id');
     }
 
-    public function documents(){
-        return $this->hasMany(CustomerJobDocument::class, 'customer_job_id', 'id');
+    public function calendar(){
+        return $this->hasOne(CustomerJobCalendar::class, 'job_id', 'id');
     }
 }

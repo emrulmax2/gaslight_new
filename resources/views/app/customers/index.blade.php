@@ -7,7 +7,7 @@
 @section('subcontent')
     <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
         <h2 class="mr-auto text-lg font-medium">Customers</h2>
-        <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
+        <div class="mt-4 w-full sm:mt-0 sm:w-auto hidden lg:flex">
             <x-base.button as="a" href="{{ route('customers.create') }}" class="shadow-md" variant="primary" >
                 <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
                 Add Customer
@@ -18,45 +18,32 @@
     <!-- BEGIN: HTML Table Data -->
     <div class="intro-y box mt-5 p-5">
         <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-            <form class="sm:mr-auto xl:flex" id="tabulator-html-filter-form" >
-                <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                    <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">Keywords</label>
-                    <x-base.form-input class="mt-2 sm:mt-0 sm:w-40 2xl:w-full" id="query" type="text" placeholder="Search..." />
+            <form class="sm:mr-auto lg:flex w-full lg:w-auto" id="tabulator-html-filter-form" >
+                <div class="items-center sm:mr-4 sm:flex xl:mt-0 gap-3">
+                    <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial hidden lg:block">Keywords</label>
+                    <x-base.form-input class="sm:mt-0 2xl:w-full" id="query" type="text" placeholder="Search..." />
                 </div>
-                <div class="items-center sm:mr-4 sm:flex">
+                <div class="items-center hidden lg:mr-4 lg:flex ">
                     <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">Status </label>
                     <x-base.form-select class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full" id="status" >
                         <option value="1">Active</option>
                         <option value="2">Archive</option>
                     </x-base.form-select>
                 </div>
-                <div class="mt-2 xl:mt-0">
+                <div class="xl:mt-0 hidden lg:block">
                     <x-base.button class="w-full sm:w-16" id="tabulator-html-filter-go" type="button" variant="primary" >Go</x-base.button>
                     <x-base.button class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16" id="tabulator-html-filter-reset" type="button" variant="secondary" >Reset</x-base.button>
                 </div>
             </form>
-            <div class="mt-5 flex sm:mt-0">
-                <x-base.button class="mr-2 w-1/2 sm:w-auto" id="tabulator-print" variant="outline-secondary" >
-                    <x-base.lucide class="mr-2 h-4 w-4" icon="Printer" /> Print
-                </x-base.button>
-                <x-base.menu class="w-1/2 sm:w-auto">
-                    <x-base.menu.button class="w-full sm:w-auto" as="x-base.button" variant="outline-secondary" >
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="FileText" /> 
-                        Export
-                        <x-base.lucide class="ml-auto h-4 w-4 sm:ml-2" icon="ChevronDown" />
-                    </x-base.menu.button>
-                    <x-base.menu.items class="w-40">
-                        <x-base.menu.item id="tabulator-export-csv">
-                            <x-base.lucide class="mr-2 h-4 w-4" icon="FileText" /> Export CSV
-                        </x-base.menu.item>
-                        <x-base.menu.item id="tabulator-export-xlsx">
-                            <x-base.lucide class="mr-2 h-4 w-4" icon="FileText" /> Export XLSX </x-base.menu.item>
-                    </x-base.menu.items>
-                </x-base.menu>
-            </div>
         </div>
         <div class="scrollbar-hidden overflow-x-auto">
-            <div class="mt-5" id="customerListTable" ></div>
+            <div class="mt-5 gca_responsive" id="customerListTable" ></div>
+        </div>
+        <div class="mt-4 flex w-full sm:w-auto lg:hidden justify-center">
+            <x-base.button as="a" href="{{ route('customers.create') }}" class="shadow-md" variant="primary" >
+                <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
+                Add Customer
+            </x-base.button>
         </div>
     </div>
     <!-- END: HTML Table Data -->
@@ -76,5 +63,5 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/customers.js')
+    @vite('resources/js/app/customers/customers.js')
 @endPushOnce

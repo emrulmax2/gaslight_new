@@ -4,7 +4,7 @@
     "before:content-[''] before:w-full before:h-screen before:z-10 before:fixed before:inset-x-0 before:bg-black/90 before:transition-opacity before:duration-200 before:ease-in-out",
     'before:invisible before:opacity-0',
     '[&.mobile-menu--active]:before:visible [&.mobile-menu--active]:before:opacity-100',
-    'w-[32px] h-[32px] max-sm:border-0 right-[31px] left-auto  top-[11px]',
+    'w-[32px] h-[32px] max-sm:border-0 right-[35px] left-auto  top-[11px]',
 ])>
     <div class="flex h-full items-center p-0 sm:px-8">{{-- <div class="flex h-[70px] items-center px-3 sm:px-8"> --}}
         {{--<a
