@@ -10,6 +10,7 @@ use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
+use App\Http\Controllers\BoilerManualController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
@@ -31,6 +32,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\SuperAdmin\BoilerBrandController;
+use App\Models\BoilerBrand;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -75,20 +79,42 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
     Route::controller(SuperAdminAuthController::class)->middleware(SuperAdminLoggedIn::class)->group(function() {
         Route::get('login', 'loginView')->name('login');
         Route::post('login', 'login')->name('login.check');
-        
-    });
 
+    });
     Route::controller(SuperAdminDashboard::class)->middleware(SuperAdminAuthenticate::class)->group(function () {
         Route::get('/dashboard', 'index')->name('dashboard');
     });
+
     Route::middleware(SuperAdminAuthenticate::class)->group(function() {
         
         Route::get('logout', [SuperAdminAuthController::class, 'logout'])->name('logout');
         Route::get('users-list', [UserController::class, 'list'])->name('users.list');
+ 
+        Route::resource('boiler-brand', BoilerBrandController::class)->except(['create']);
 
-        
+        Route::controller(BoilerBrandController::class)->group(function() {
+    
+            Route::get('boiler-brand-list', 'list')->name('boiler-brand.list'); 
+            Route::post('boiler-brand-restore/{id}', 'restore')->name('boiler-brand.restore'); 
+    
+        });
+
+        Route::resource('boiler-manual', BoilerManualController::class)->except(['create']);
+        Route::controller(BoilerManualController::class)->group(function() {
+            Route::get('boiler-manual-list', 'list')->name('boiler-manual.list'); 
+            Route::post('boiler-manual-import', 'import')->name('boiler-manual.import'); 
+            Route::post('boiler-manual-restore/{id}', 'restore')->name('boiler-manual.restore'); 
+        });
+
     });
+       
 });
+
+Route::middleware(SuperAdminAuthenticate::class)->group(function() {
+    Route::get('/impersonate/{id}', [ImpersonateController::class, 'impersonate'])->name('impersonate');
+});
+
+Route::get('/impersonate-stop', [ImpersonateController::class, 'stopImpersonate'])->name('impersonate.stop');
 
 Route::controller(RegisteredUserController::class)->middleware(loggedin::class)->group(function() {
     Route::get('register', 'index')->name('register');
@@ -201,11 +227,6 @@ Route::middleware(Authenticate::class)->group(function() {
     });
 });
 
-Route::middleware(SuperAdminAuthenticate::class)->group(function() {
-    Route::get('/impersonate/{id}', [ImpersonateController::class, 'impersonate'])->name('impersonate');
-});
-
-Route::get('/impersonate-stop', [ImpersonateController::class, 'stopImpersonate'])->name('impersonate.stop');
 
 Route::controller(FileUploadController::class)->group(function() {
     Route::post('/file-upload', 'upload')->name('file.upload');
