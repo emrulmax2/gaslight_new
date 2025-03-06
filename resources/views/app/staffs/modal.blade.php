@@ -281,7 +281,7 @@ staticBackdrop
                     </x-base.tab>
                 </x-base.tab.list>
                 <x-base.tab.panels class="border-b border-l border-r">
-                    <x-base.tab.panel class="p-5 leading-relaxed" id="example-1" >
+                    <x-base.tab.panel class="p-5 leading-relaxed" id="example-1" selected>
                         <form id="addSignStaffForm" enctype="multipart/form-data">
                             <input type="hidden" name="edit_id" value="" id="edit_id">
                             <x-creagia-signature-pad name='sign' 
@@ -294,7 +294,7 @@ staticBackdrop
                             />
                         </form>
                     </x-base.tab.panel>
-                    <x-base.tab.panel class="p-5 leading-relaxed" id="example-2" selected>
+                    <x-base.tab.panel class="p-5 leading-relaxed" id="example-2" >
                         <form id="myDropzone" action="/file-upload" class="dropzone [&.dropzone]:border-2 [&.dropzone]:border-dashed dropzone [&.dropzone]:border-slate-300/70 [&.dropzone]:bg-slate-50 [&.dropzone]:cursor-pointer [&.dropzone]:dark:bg-darkmode-600 [&.dropzone]:dark:border-white/5 dz-clickable" id="my-dropzone">
                             @csrf
                             <div class="fallback">
@@ -404,11 +404,11 @@ function evaluatePasswordStrength() {
         $(".sign-pad-button-submit").append(loadingElement);
         //$('.sign-pad-button-submit', $theForm).attr('disabled', 'disabled');
 
-        createIcons({
-                    icons,
-                    attrs: { "stroke-width": 1.5 },
-                    nameAttr: "data-lucide",
-                });
+            createIcons({
+                        icons,
+                        attrs: { "stroke-width": 1.5 },
+                        nameAttr: "data-lucide",
+                    });
                 let formData = new FormData(this);
             axios({
                 method: "post",
@@ -416,11 +416,14 @@ function evaluatePasswordStrength() {
                 data: formData,
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
+
                 $('#userSaveBtn', $theForm).removeAttr('disabled');
                 $("#userSaveBtn .theLoader").fadeOut();
 
                 if (response.status == 201) {
+
                     successModal.show();
+                    
                     document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                         $("#successModal .successModalTitle").html("Congratulations!");
                         $("#successModal .successModalDesc").html(response.data.msg);
@@ -428,9 +431,12 @@ function evaluatePasswordStrength() {
                     });
 
                     setTimeout(() => {
+
                         successModal.hide();
                         location.reload();
+
                     }, 1500);
+
                 }
             }).catch(error => {
                 $('#userSaveBtn', $theForm).removeAttr('disabled');
@@ -662,25 +668,27 @@ function evaluatePasswordStrength() {
         
     });
 
-            // Initialize Dropzone when the second tab is shown
-            document.querySelector('#example-2-tab').addEventListener('shown.tw.tab', function() {
-            
-            const dropzoneElement = document.querySelector('.dropzone');
-            if (dropzoneElement && !dropzoneElement.dropzone) {
-                new Dropzone(dropzoneElement, {
-                    url: "/file-upload",
-                    maxFiles: 1,
-                    acceptedFiles: 'image/*', // Only accept image files
-                    init: function() {
-                        this.on("success", function(file, response) {
-                            console.log("File uploaded successfully");
-                        });
-                        this.on("error", function(file, response) {
-                            console.log("File upload error");
-                        });
-                    }
-                });
-            }
-        });
+    // Initialize Dropzone when the second tab is shown
+    document.querySelector('#example-2-tab').addEventListener('shown.tw.tab', function() {
+        
+        const dropzoneElement = document.querySelector('.dropzone');
+        if (dropzoneElement && !dropzoneElement.dropzone) {
+            new Dropzone(dropzoneElement, {
+                url: "/file-upload",
+                maxFiles: 1,
+                acceptedFiles: 'image/*', // Only accept image files
+                init: function() {
+                    this.on("success", function(file, response) {
+                        console.log("File uploaded successfully");
+                    });
+                    this.on("error", function(file, response) {
+                        console.log("File upload error");
+                    });
+                }
+            });
+        }
+    });
+
+    document.querySelector('#example-1-tab').addEventListener('shown.tw.tab', function() {})
     </script>
 @endPushOnce

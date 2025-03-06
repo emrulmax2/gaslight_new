@@ -12,12 +12,13 @@
   }
   .sign-pad-button-clear {
     margin-top: 20px;
-    background-color: rgb(241 245 249 / 90%);
+    background-color: rgba(206, 206, 206, 0.9);
     color: #475569;
     font-weight: bold;
     padding: 0.5rem 1rem;
     border-radius: 0.2rem;
     transition: background-color 0.3s ease;
+    margin-right: 10px;
   }
   .sign-pad-button-clear:hover {
     background-color: rgb(241 245 249 / 90%);

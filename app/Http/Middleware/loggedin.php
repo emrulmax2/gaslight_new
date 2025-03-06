@@ -16,16 +16,26 @@ class loggedin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!is_null(request()->user())) {
+        // if (!is_null(request()->user())) {
             
-            return redirect('/');
-        // }else if (!is_null(Auth::guard('client')->user())) {
+        //     return redirect('/');
+        // // }else if (!is_null(Auth::guard('client')->user())) {
             
-        //     return redirect()->route('client.login');
+        // //     return redirect()->route('client.login');
 
-        // }else if (!is_null(Auth::guard('admin')->user())) {
+        // // }else if (!is_null(Auth::guard('admin')->user())) {
             
-        //     return redirect()->route('admin.login');
+        // //     return redirect()->route('admin.login');
+
+        // }  else {
+        //     return $next($request);
+        // }
+
+        if (!is_null(request()->user())) {
+            return redirect('/');
+        }else if (!is_null(Auth::guard('superadmin')->user())) {
+            
+            return redirect()->route('superadmin.login');
 
         }  else {
             return $next($request);

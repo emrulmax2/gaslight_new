@@ -90,9 +90,6 @@
                         if (signatureUrl) {
                             a =
                                 $(`<div class="flex items-center lg:justify-center">
-                                <a class="flex items-center mr-3 add-sgnature text-info" href="javascript:;">
-                                    <i data-lucide="pencil" class="w-4 h-4 mr-1"></i> Signature
-                                </a>                      
                                     <a class="flex items-center mr-3 edit" href="javascript:;">
                                 <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                             </a>
@@ -103,9 +100,9 @@
                         } else {
                             a =
                                 $(`<div class="flex items-center lg:justify-center">
-                                <a class="flex items-center mr-3 add-sgnature" href="javascript:;">
+                                    <a class="flex items-center mr-3 add-sgnature" href="javascript:;">
                                     <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Signature
-                                </a>                      
+                                </a>              
                                     <a class="flex items-center mr-3 edit" href="javascript:;">
                                 <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                             </a>
@@ -118,21 +115,22 @@
                             .find(".edit")
                             .on("click", function () {
 
-                                editUserModal.toggle();
+                                //editUserModal.toggle();
 
                                 let id = cell.getData().id;
-                                let name = cell.getData().name;
-                                let email = cell.getData().email;
-                                let gas_safe_id_card = cell.getData().gas_safe_id_card;
-                                let oil_registration_number = cell.getData().oil_registration_number;
-                                let installer_ref_no = cell.getData().installer_ref_no;
-                                $('#edituser-modal input[name="id"]').val(id);
-                                $('#edituser-modal input[name="name"]').val(name);
-                                $('#edituser-modal input[name="email"]').val(email);
-                                $('#edituser-modal input[name="gas_safe_id_card"]').val(gas_safe_id_card);
-                                $('#edituser-modal input[name="oil_registration_number"]').val(oil_registration_number);
-                                $('#edituser-modal input[name="installer_ref_no"]').val(installer_ref_no);
+                                // name = cell.getData().name;
+                                //let email = cell.getData().email;
+                                //let gas_safe_id_card = cell.getData().gas_safe_id_card;
+                                //let oil_registration_number = cell.getData().oil_registration_number;
+                                //let installer_ref_no = cell.getData().installer_ref_no;
+                                //$('#edituser-modal input[name="id"]').val(id);
+                                //$('#edituser-modal input[name="name"]').val(name);
+                                //$('#edituser-modal input[name="email"]').val(email);
+                                //$('#edituser-modal input[name="gas_safe_id_card"]').val(gas_safe_id_card);
+                               // $('#edituser-modal input[name="oil_registration_number"]').val(oil_registration_number);
+                                //$('#edituser-modal input[name="installer_ref_no"]').val(installer_ref_no);
                                 
+                                location.href = route('staff.edit', id);
 
                             });
 

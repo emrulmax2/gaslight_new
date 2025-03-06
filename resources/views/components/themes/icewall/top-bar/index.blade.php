@@ -45,6 +45,7 @@
         <!-- END: Breadcrumb -->
         <!-- BEGIN: Search -->
         <div class="intro-x relative mr-3 sm:mr-6 max-sm:ml-auto">
+            
             <div class="search hidden sm:block">
                 <x-base.form-input
                     class="w-56 rounded-full border-transparent bg-slate-200 pr-8 shadow-none transition-[width] duration-300 ease-in-out focus:w-72 focus:border-transparent dark:bg-darkmode-400/70"
@@ -225,41 +226,46 @@
                     src="{{ Vite::asset($faker['photos'][0]) }}"
                     alt="Midone - Tailwind Admin Dashboard Template"
                 /> --}}
-                <x-avatar name="{{ auth()->user()->name }}" />
+                @if(Auth::guard('superadmin')->check())
+                
+                    <x-avatar name="{{ auth('superadmin')->user()->name }}" />
+                @else
+                    <x-avatar name="{{ auth()->user()->name }}" />
+                @endif
             </x-base.menu.button>
             <x-base.menu.items
                 class="relative mt-px w-56 bg-theme-1/80 text-white before:absolute before:inset-0 before:z-[-1] before:block before:rounded-md before:bg-black"
             >
             <x-base.menu.header class="font-normal">
+                
+                @if(Auth::guard('superadmin')->check())
+                <div class="font-medium">{{ auth('superadmin')->user()->name }}</div>
+                    <div class="mt-0.5 text-xs text-white/70 dark:text-slate-500">
+                        Super Admin
+                    </div>
+                @else
                 <div class="font-medium">{{ auth()->user()->name }}</div>
                 <div class="mt-0.5 text-xs text-white/70 dark:text-slate-500">
                     Admin
                 </div>
+                @endif
             </x-base.menu.header>
                 <x-base.menu.divider class="bg-white/[0.08]" />
+                
+                @if(Auth::guard('superadmin')->check())
+                
+                <x-base.menu.item class="hover:bg-white/5" href="{{ route('superadmin.logout') }}">
+                    <x-base.lucide
+                        class="mr-2 h-4 w-4"
+                        icon="ToggleRight"
+                    /> Logout
+                </x-base.menu.item>
+                @else
                 <x-base.menu.item class="hover:bg-white/5" href="{{ route('profile') }}">
                         <x-base.lucide
                             class="mr-2 h-4 w-4"
                             icon="User"
                         /> Profile
-                </x-base.menu.item>
-                <x-base.menu.item class="hover:bg-white/5" href="{{ route('staff.index') }}">
-                    <x-base.lucide
-                        class="mr-2 h-4 w-4"
-                        icon="Edit"
-                    /> Add Account
-                </x-base.menu.item>
-                <x-base.menu.item class="hover:bg-white/5">
-                    <x-base.lucide
-                        class="mr-2 h-4 w-4"
-                        icon="Lock"
-                    /> Reset Password
-                </x-base.menu.item>
-                <x-base.menu.item class="hover:bg-white/5">
-                    <x-base.lucide
-                        class="mr-2 h-4 w-4"
-                        icon="HelpCircle"
-                    /> Help
                 </x-base.menu.item>
                 <x-base.menu.divider class="bg-white/[0.08]" />
                 <x-base.menu.item class="hover:bg-white/5" href="{{ route('logout') }}">
@@ -268,6 +274,17 @@
                         icon="ToggleRight"
                     /> Logout
                 </x-base.menu.item>
+                @endif
+
+                @if (session()->has('impersonate'))
+                    <x-base.menu.divider class="bg-white/[0.08]" />
+                    <x-base.menu.item class="hover:bg-white/5" href="{{ route('impersonate.stop') }}">
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="UserX"
+                        /> Stop Impersonating
+                    </x-base.menu.item>
+                @endif
             </x-base.menu.items>
         </x-base.menu>
 
