@@ -37,6 +37,13 @@ class TitleSeeder extends Seeder
                 'active' => 1,
                 'created_by' => 1,
                 'created_at' => date("Y-m-d", time())
+            ],
+            
+            [ 
+                'name' => 'Dr',
+                'active' => 1,
+                'created_by' => 1,
+                'created_at' => date("Y-m-d", time())
             ]
 
         ]);
