@@ -720,7 +720,7 @@
                                 
                                     @php 
                                         $address = '';
-                                        $address .= $job->property->address_line_1.' '.$job->property->address_line_2.', ';
+                                        $address .= (!empty($job->property->address_line_1) ? $job->property->address_line_1.' '.$job->property->address_line_2.', ' : '');
                                         $address .= ( !empty($job->property->city) ? $job->property->city.', ' : '');
                                         $address .= (!empty($job->property->state) ? $job->property->state.', ' : '');
                                         $address .= (!empty($job->property->postal_code) ? $job->property->postal_code.', ' : '');
