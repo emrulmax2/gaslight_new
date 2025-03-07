@@ -190,6 +190,15 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('customer/{customer_id}/jobs/{job_id}/show', 'job_edit')->name('customer.jobs.edit');
         Route::post('customer/{customer_id}/jobs/{job_id}/update', 'job_update')->name('customer.jobs.update');
     });
+    // Route::controller(JobController::class)->group(function() {
+    //     Route::get('customers/{customer}/jobs', 'index')->name('customers.jobs'); 
+    //     Route::get('customers/{customer}/jobs/list', 'list')->name('customers.jobs.list'); 
+    //     Route::post('customers/{customer}/jobs/store', 'store')->name('customers.jobs.store');
+    //     Route::get('customers/{customer}/jobs/{job}', 'show')->name('customers.jobs.show'); 
+    //     Route::post('customers/{customer}/jobs/update', 'update')->name('customers.jobs.update'); 
+    //     Route::delete('customers/{customer}/jobs/destroy/{job_id}', 'destroy')->name('customers.jobs.destroy'); 
+    //     Route::post('customers/{customer}/jobs/restore/{job_id}', 'restore')->name('customers.jobs.restore');
+    // });
 
     // Route::controller(JobController::class)->group(function() {
     //     Route::get('customers/{customer}/jobs', 'index')->name('customers.jobs'); 
