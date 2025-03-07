@@ -79,6 +79,11 @@ class CompanyController extends Controller
             $validatedData
         );
 
+        $company = Company::updateOrCreate(
+            ['user_id' => auth()->id()],
+            $validatedData
+        );
+
         if ($request->hasFile('company_logo')) {
             if (!empty($company->company_logo)) {
                 $oldImagePath = str_replace('storage/', '', $company->company_logo);

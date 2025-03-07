@@ -350,6 +350,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
     });
 
     $(document).on('mouseup', function(e){
+        console.log('mouse up')
         $(document).find('.searchWrap.active').each(function(){
             let $theActiveWrap = $(this);
             let $theResultContainer = $theActiveWrap.find('.searchResultCotainter');

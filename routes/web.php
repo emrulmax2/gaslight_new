@@ -130,7 +130,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('/', 'index')->name('company.dashboard');
     });
 
-    Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
+    Route::controller(BoilerManualController::class)->group(function() {
         Route::get('boiler-manuals', 'index')->name('boiler-manuals');
     });
     Route::controller(UserSettings::class)->group(function () {
