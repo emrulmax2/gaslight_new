@@ -173,7 +173,11 @@
     margin-left: 0;
     margin-right: 0;
 }
-
+#jobCalendar.full-calendar .fc-list-event-dot{
+    width: 10px;
+    height: 10px;
+    border: none !important;
+}
 @media (max-width: 1023px){
     #jobCalendar.full-calendar .fc-toolbar .fc-toolbar-chunk:nth-child(3){
         width: 100%;
@@ -195,5 +199,18 @@
         width: 100%;
         display: flex;
         justify-content: space-between;
+    }
+    #jobCalendar.fc-direction-ltr .fc-daygrid-more-link{
+        margin-right: 0;
+        padding: 0;
+        white-space: normal;
+        text-align: center;
+        line-height: 1;
+    }
+    #jobCalendar.full-calendar .fc-daygrid-day-bottom{
+        padding-top: 0;
+        top: -5px;
+        position: relative;
+        margin: 0;
     }
 }
