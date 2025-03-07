@@ -5,15 +5,24 @@
 @endsection
 
 @section('subcontent')
-    <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
-        <h2 class="mr-auto text-lg font-medium">Customers</h2>
-        <div class="mt-4 w-full sm:mt-0 sm:w-auto hidden lg:flex">
-            <x-base.button as="a" href="{{ route('customers.create') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
-                Add Customer
-            </x-base.button>
-        </div>
+<div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
+    <h2 class="mr-auto text-lg font-medium hidden lg:block">Customers</h2>
+    <div class="mt-4 w-full sm:mt-0 sm:w-auto hidden lg:flex gap-2">
+        <x-base.button as="a" href="{{ route('customers.create') }}" class="shadow-md" variant="primary">
+            <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
+            Add Customer
+        </x-base.button>
+        <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+            <x-base.lucide class="h-4 w-4" icon="home" />
+        </x-base.button>
     </div>
+    <div class="flex w-full justify-between items-center lg:hidden">
+        <h2 class="text-lg font-medium">Customers</h2>
+        <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+            <x-base.lucide class="h-4 w-4" icon="home" />
+        </x-base.button>
+    </div>
+</div>
     
     <!-- BEGIN: HTML Table Data -->
     <div class="intro-y box mt-5 p-5">

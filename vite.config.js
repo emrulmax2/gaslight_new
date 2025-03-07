@@ -177,6 +177,10 @@ export default defineConfig({
                 "resources/js/app/customers/customers-edit.js",
                 "resources/js/app/customers/customers.js",
 
+                "resources/js/app/customers/jobs/customer-jobs.js",
+                "resources/js/app/customers/jobs/jobs-create.js",
+                "resources/js/app/customers/jobs/jobs-update.js",
+
                 "resources/js/app/calendars/calendar.js",
 
 

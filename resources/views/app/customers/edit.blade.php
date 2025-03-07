@@ -6,11 +6,20 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
-        <h2 class="mr-auto text-lg font-medium">Customer Details</h2>
-        <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
+        <h2 class="mr-auto text-lg font-medium hidden lg:block">Customer Details</h2>
+        <div class="mt-4 w-full sm:mt-0 sm:w-auto hidden lg:flex gap-2">
             <x-base.button as="a" href="{{ route('customers') }}" class="shadow-md" variant="primary" >
                 <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
                 Customer List
+            </x-base.button>
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+                <x-base.lucide class="h-4 w-4" icon="home" />
+            </x-base.button>
+        </div>
+        <div class="flex w-full justify-between items-center lg:hidden">
+            <h2 class="text-lg font-medium">Customer Details</h2>
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+                <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
         </div>
     </div>
@@ -212,7 +221,7 @@
                     <div class="grid grid-cols-12 gap-4 items-center">
                         <div class="col-span-12 m-5">
                             <div class="flex flex-col space-y-4">
-                                <x-base.button as="a" href="{{ route('jobs') }}" class="mr-1 w-full" data-tw-dismiss="modal" type="button" variant="primary">
+                                <x-base.button as="a" href="{{ route('customer.jobs', $customer->id) }}" class="mr-1 w-full" data-tw-dismiss="modal" type="button" variant="primary">
                                     <x-base.lucide class="mr-2 h-4 w-4" icon="flame" />Jobs
                                 </x-base.button>
                                 <x-base.button as="a" href="{{ route('customer.job-addresses', $customer->id) }}" class="w-full shadow-md" variant="primary">

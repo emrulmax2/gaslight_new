@@ -19,6 +19,7 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerJobAddressController;
+use App\Http\Controllers\Customers\CustomerJobsController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
@@ -178,6 +179,16 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('customer/{customer_id}/job-addresses/{address_id}/update', 'job_address_update')->name('customer.job-addresses.update');
         Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy')->name('customer.job-addresses.job_address_destroy');
         Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore')->name('customer.job-addresses.job_address_restore');
+    });
+
+
+    Route::controller(CustomerJobsController::class)->group(function(){
+        Route::get('customer/{customer_id}/jobs', 'index')->name('customer.jobs');
+        Route::get('customer/{customer_id}/jobs/list', 'list')->name('customer.jobs.list');
+        Route::get('customer/{customer_id}/jobs/create', 'job_create')->name('customer.jobs.create');
+        Route::post('customer/{customer_id}/jobs/store', 'job_store')->name('customer.jobs.store');
+        Route::get('customer/{customer_id}/jobs/{job_id}/show', 'job_edit')->name('customer.jobs.edit');
+        Route::post('customer/{customer_id}/jobs/{job_id}/update', 'job_update')->name('customer.jobs.update');
     });
 
     // Route::controller(JobController::class)->group(function() {
