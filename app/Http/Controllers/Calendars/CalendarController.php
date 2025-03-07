@@ -20,8 +20,8 @@ class CalendarController extends Controller
 
     public function events(Request $request){
         $user_id = auth()->user()->id;
-        $start = Carbon::create($request->input('start'));
-        $end = Carbon::create($request->input('end'));
+        $start = Carbon::create($request->input('start'))->format('Y-m-d');
+        $end = Carbon::create($request->input('end'))->format('Y-m-d');
 
         $events = [];
         $Query = CustomerJobCalendar::with('job', 'job.customer', 'job.property', 'slot')->whereBetween('date', [$start, $end])->whereHas('job', function($q) use($user_id){
@@ -37,21 +37,18 @@ class CalendarController extends Controller
 
                 $titleHtml = (isset($list->job->customer->full_name) && !empty($list->job->customer->full_name) ? '<div class="font-medium mb-1">'.$list->job->customer->full_name.'</div>' : '');
                 $titleHtml .= (isset($list->job->property->full_address) && !empty($list->job->property->full_address) ? '<div class="text-xs text-slate-500 whitespace-normal break-words">'.$list->job->property->full_address.'</div>' : '');
-                $data[$i]['title'] = (isset($list->job->customer->full_name) && !empty($list->job->customer->full_name) ? $list->job->customer->full_name : '');
-                $data[$i]['start'] = $start;
-                $data[$i]['end'] = $end;
-                $data[$i]['allDay'] = 0;
-                $data[$i]['htmlTitle'] = $titleHtml;
-                $data[$i]['backgroundColor'] = '#1e3a8a';
-                $data[$i]['textColor'] = '#FFFFFF';
+                $events[$i]['title'] = (isset($list->job->customer->full_name) && !empty($list->job->customer->full_name) ? $list->job->customer->full_name : '');
+                $events[$i]['start'] = $start;
+                $events[$i]['end'] = $end;
+                $events[$i]['allDay'] = 0;
+                $events[$i]['htmlTitle'] = $titleHtml;
+                $events[$i]['backgroundColor'] = (isset($list->slot->color_code) && !empty($list->slot->color_code) ? $list->slot->color_code : '#1e3a8a');
+                $events[$i]['borderColor'] = (isset($list->slot->color_code) && !empty($list->slot->color_code) ? $list->slot->color_code : '#1e3a8a');
+                $events[$i]['textColor'] = '#FFFFFF';
                 $i++;
             endforeach;
         endif;
 
-        $eventOutput = [
-            'timeZone' => 'UTC',
-            'events' => $events
-        ];
-        return response()->json($data, 200);
+        return response()->json($events, 200);
     }
 }

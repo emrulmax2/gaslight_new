@@ -15,10 +15,11 @@
     </div>
 </div>
 <form method="post" action="#" id="companyStoreForm" enctype="multipart/form-data">
+    <x-base.form-input type="hidden" name="company_id" id="company_id" value="{{ $company->id }}"/>
     <div class="grid grid-cols-12 gap-x-6 gap-y-10 mt-5">
         <div  class="flex flex-col col-span-12 gap-x-6 gap-y-10 md:col-span-9 xl:col-span-9">
             <div  class="relative before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']">
-                <div class="intro-y box mb-3">
+                <div class="intro-y box mb-5">
                     <!-- Header -->
                     <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">Company Information</h2>
@@ -30,6 +31,14 @@
                                 <x-base.form-input type="text" id="company_name" name="company_name" value="{{ isset($company->company_name) ? $company->company_name : '' }}" />
                             </div>
                             <div>
+                                <x-base.form-label for="business_type">Company Business Type</x-base.form-label>
+                                <x-base.tom-select id="business_type" name="business_type" class="w-full">
+                                    <option value="Company" {{ isset($company->business_type) && $company->business_type == 'Company' ? 'selected' : '' }}>Company</option>
+                                    <option value="Sole trader" {{ isset($company->business_type) && $company->business_type == 'Sole trader' ? 'selected' : '' }}>Sole Trader</option>
+                                    <option value="Other" {{ isset($company->business_type) && $company->business_type == 'Other' ? 'selected' : '' }}>Other</option>
+                                </x-base.tom-select>
+                            </div>
+                            <div class="registrationWrap" style="display: {{ isset($company->business_type) && $company->business_type == 'Company' ? 'block' : 'none' }};">
                                 <x-base.form-label for="company_registration">Company Registration Number</x-base.form-label>
                                 <x-base.form-input type="text" id="company_registration" name="company_registration"  value="{{ isset($company->company_registration) ? $company->company_registration : '' }}"/>
                             </div>
@@ -37,39 +46,17 @@
                                 <x-base.form-label for="vat_number">VAT Number</x-base.form-label>
                                 <x-base.form-input id="vat_number" type="text" name="vat_number" value="{{ isset($company->vat_number) ? $company->vat_number : '' }}"/>
                             </div>
-                            <div>
-                                <x-base.form-label for="business_type">Company Business Type</x-base.form-label>
-                                <x-base.tom-select id="business_type" name="business_type" class="w-full">
-                                    <option value="1" {{ isset($company->business_type) && $company->business_type == '1' ? 'selected' : '' }}>Company</option>
-                                    <option value="2" {{ isset($company->business_type) && $company->business_type == '2' ? 'selected' : '' }}>Sole Trader</option>
-                                </x-base.tom-select>
-                            </div>
                         </div>
-                
-                        <!-- Display Company Name Checkbox -->
-                        <div class="col-span-12 mt-4">
-                            <div class="mb-3">
-                                <div class="inline-flex items-center">
-                                    <input type="hidden" name="display_company_name" value="0">
-                                    <label class="flex items-center cursor-pointer relative" for="check-display_company_name">
-                                        <input type="checkbox" name="display_company_name" value="1" id="check-display_company_name" class="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-gray-100 checked:bg-blue-500 checked:border-blue-800"
-                                            {{ isset($company->display_company_name) && $company->display_company_name == 1 ? 'checked' : '' }} />
-                                            <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" stroke-width="1">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                                </svg>
-                                            </span>
-                                    </label>
-                                    <label class="cursor-pointer ml-2 text-slate-600 text-sm" for="check-display_company_name">
-                                        Display company name on certificates?
-                                    </label>
-                                </div>
+                        <div class="mt-4">
+                            <div data-tw-merge class="flex items-center">
+                                <input data-tw-merge {{ (isset($company->display_company_name) && $company->display_company_name == 1 ? 'Checked' : '') }} type="checkbox" name="display_company_name" value="1" class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&amp;[type=&#039;radio&#039;]]:checked:bg-primary [&amp;[type=&#039;radio&#039;]]:checked:border-primary [&amp;[type=&#039;radio&#039;]]:checked:border-opacity-10 [&amp;[type=&#039;checkbox&#039;]]:checked:bg-primary [&amp;[type=&#039;checkbox&#039;]]:checked:border-primary [&amp;[type=&#039;checkbox&#039;]]:checked:border-opacity-10 [&amp;:disabled:not(:checked)]:bg-slate-100 [&amp;:disabled:not(:checked)]:cursor-not-allowed [&amp;:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&amp;:disabled:checked]:opacity-70 [&amp;:disabled:checked]:cursor-not-allowed [&amp;:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white" id="display_company_name" />
+                                <label data-tw-merge for="display_company_name" class="cursor-pointer ml-2">Display company name on certificates?</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="intro-y box mb-3">
+                <div class="intro-y box mb-5 z-20">
                     <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">Registered Details</h2>
                     </div>
@@ -84,10 +71,14 @@
                                 <x-base.form-input type="text" name="registration_no" value="{{ isset($company->registration_no) ? $company->registration_no : '' }}"/>
                             </div>
                             <div>
-                                <x-base.form-label for="registration_body_for">Registration Body For</x-base.form-label>
-                                <x-base.tom-select  name="registration_body_for" class="w-full" >
-                                    <option value="1" {{ $company->registration_body_for == '1' ? 'selected' : ''}}>OFTEC</option>
-                                    <option value="2" {{ $company->registration_body_for == '2' ? 'selected' : ''}}>AETEC</option>
+                                <x-base.form-label for="register_body_id">Registration Body For</x-base.form-label>
+                                <x-base.tom-select  name="register_body_id" class="w-full" >
+                                    <option value="">Please Select</option>
+                                    @if($registerBodies->isNotEmpty())
+                                        @foreach($registerBodies as $bdy)
+                                            <option value="{{ $bdy->id }}" {{ $company->registration_body_for == $bdy->id ? 'selected' : ''}}>{{ $bdy->name }}</option>
+                                        @endforeach
+                                    @endif
                                 </x-base.tom-select>
                             </div>
                             <div>
@@ -101,33 +92,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="intro-y box mb-3">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">Contact Details</h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <x-base.form-label for="building_or_no">Building or No</x-base.form-label>
-                                <x-base.form-input type="text" name="building_or_no" value="{{ isset($company->building_or_no) ? $company->building_or_no : '' }}"/>
-                            </div>
-                            <div>
-                                <x-base.form-label for="company_address_line_1">Street Address</x-base.form-label>
-                                <x-base.form-input type="text" name="company_address_line_1" value="{{ isset($company->company_address_line_1) ? $company->company_address_line_1 : '' }}" />
-                            </div>
-                            
-                            <div>
-                                <x-base.form-label for="company_city">Town/City</x-base.form-label>
-                                <x-base.form-input  type="text" name="company_city" value="{{ isset($company->company_city) ? $company->company_city : '' }}"/>
-                            </div>
-                            <div>    
-                                <x-base.form-label for="company_country">Region or Country</x-base.form-label>
-                                <x-base.form-input type="text" name="company_country" value="{{ isset($company->company_country) ? $company->company_country : '' }}"/>
-                            </div>
-                            <div>
-                                <x-base.form-label for="company_postal_code">Postcode</x-base.form-label>
-                                <x-base.form-input  type="text" name="company_postal_code" value="{{ isset($company->company_postal_code) ? $company->company_postal_code : '' }}"/>
-                            </div>
+                <div class="grid grid-cols-2 gap-x-5 gap-y-3 mb-5 z-10">
+                    <div class="intro-y box">
+                        <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
+                            <h2 class="mr-auto text-base font-medium">Contact Details</h2>
+                        </div>
+                        <div class="p-5">
+                            <div class="grid grid-cols-1 gap-y-2">
                             <div>
                                 <x-base.form-label for="company_phone">Phone Number</x-base.form-label>
                                 <x-base.form-input type="text" name="company_phone" value="{{ isset($company->company_phone) ? $company->company_phone : '' }}"/>
@@ -144,48 +115,89 @@
                                 <x-base.form-label for="company_email">Admin Email</x-base.form-label>
                                 <x-base.form-input type="text" name="company_email" value="{{ isset($company->company_email) ? $company->company_email : '' }}"/>
                             </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="intro-y box">
+                        <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
+                            <h2 class="mr-auto text-base font-medium">Contact Details</h2>
+                        </div>
+                        <div class="p-5">
+                            <div class="grid grid-cols-1 gap-y-2 theAddressWrap" id="companyAddressWrap">
+                                <div>
+                                    <x-base.form-label for="customer_address_line_1">Address Lookup</x-base.form-label>
+                                    <x-base.form-input name="address_lookup" id="customer_address_lookup" class="w-full theAddressLookup" type="text" placeholder="Search address here..." />
+                                </div>
+                                <div>
+                                    <x-base.form-label for="company_address_line_1">Address Line 1</x-base.form-label>
+                                    <x-base.form-input value="{{ isset($company->company_address_line_1) ? $company->company_address_line_1 : '' }}" name="company_address_line_1" id="company_address_line_1" class="w-full address_line_1" type="text" placeholder="Address Line 1" />
+                                    <div class="acc__input-error error-company_address_line_1 text-danger text-xs mt-1"></div>
+                                </div>
+                                <div>
+                                    <x-base.form-label for="company_address_line_2">Address Line 2</x-base.form-label>
+                                    <x-base.form-input value="{{ isset($company->company_address_line_2) ? $company->company_address_line_2 : '' }}" name="company_address_line_2" id="company_address_line_2" class="w-full address_line_2" type="text" placeholder="Address Line 2 (Optional)" />
+                                </div>
+                                <div class="grid grid-cols-12 gap-y-2 gap-x-5">
+                                    <div class="col-span-12 sm:col-span-4">
+                                        <x-base.form-label for="company_city">Town/City</x-base.form-label>
+                                        <x-base.form-input value="{{ isset($company->company_city) ? $company->company_city : '' }}" name="company_city" id="company_city" class="w-full city" type="text" placeholder="Town/City" />
+                                        <div class="acc__input-error error-company_city text-danger text-xs mt-1"></div>
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-4">
+                                        <x-base.form-label for="company_state">Region/County</x-base.form-label>
+                                        <x-base.form-input value="{{ isset($company->company_state) ? $company->company_state : '' }}" name="company_state" id="company_state" class="w-full state" type="text" placeholder="Region/County" />
+                                    </div>
+                                    <div class="col-span-12 sm:col-span-4">
+                                        <x-base.form-label for="company_postal_code">Post Code</x-base.form-label>
+                                        <x-base.form-input value="{{ isset($company->company_postal_code) ? $company->company_postal_code : '' }}" name="company_postal_code" id="company_postal_code" class="w-full postal_code" type="text" placeholder="Post Code" />
+                                        <div class="acc__input-error error-company_postal_code text-danger text-xs mt-1"></div>
+                                    </div>
+                                </div>
+                                <x-base.form-input value="{{ isset($company->company_country) ? $company->company_country : '' }}" name="company_country" id="company_country" class="w-full country" type="hidden" value="" />
+                                <x-base.form-input name="latitude" class="w-full latitude" type="hidden" value="" />
+                                <x-base.form-input name="longitude" class="w-full longitude" type="hidden" value="" />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="intro-y box mb-3">
+                
+                <div class="intro-y box mb-5">
                     <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">Payment Terms and Bank Details</h2>
                     </div>
                     <div class="p-5">
-                        <div class="grid grid-cols-3 gap-4">
+                        <div class="grid grid-cols-4 gap-4">
                             <div>
                                 <x-base.form-label for="bank_name">Bank Name</x-base.form-label>
                                 <x-base.form-input type="text" name="bank_name" value="{{ optional($company->companyBankDetails)->bank_name ?? '' }}"/>
                             </div>
                             <div>
-                                <x-base.form-label for="name_on_account">Name on Account</x-base.form-label>
+                                <x-base.form-label for="name_on_account">Account Name</x-base.form-label>
                                 <x-base.form-input type="text" name="name_on_account" value="{{ optional($company->companyBankDetails)->name_on_account ?? '' }}"/>
                             </div>
-                            
                             <div>     
                                 <x-base.form-label for="sort_code">Sort Code</x-base.form-label>
-                                <x-base.form-input type="text" name="sort_code" value="{{ optional($company->companyBankDetails)->sort_code ?? '' }}"/>
+                                <x-base.form-input type="number" name="sort_code" value="{{ optional($company->companyBankDetails)->sort_code ?? '' }}"/>
                             </div>
                             <div>
                                 <x-base.form-label for="account_number">Account Number</x-base.form-label>
-                                <x-base.form-input  type="text" name="account_number" value="{{ optional($company->companyBankDetails)->account_number ?? '' }}"/>
+                                <x-base.form-input  type="number" name="account_number" value="{{ optional($company->companyBankDetails)->account_number ?? '' }}"/>
                             </div>
                             
                         </div>
-                        <div class="grid grid-cols-3 gap-4 mt-3">
-                            <div>
-                                <x-base.form-label for="payment_term">Payment Terms</x-base.form-label>
-                                <x-base.form-textarea.index name="payment_term" cols="30" rows="3"> {{ optional($company->companyBankDetails)->payment_term ?? '' }} </x-base.form-textarea.index>
-                            </div>
+                        <div class="mt-3">
+                            <x-base.form-label for="payment_term">Payment Terms</x-base.form-label>
+                            <x-base.form-textarea.index name="payment_term" rows="3"> {{ optional($company->companyBankDetails)->payment_term ?? '' }} </x-base.form-textarea.index>
                         </div>
                     </div>
                 </div>
-                <div class="intro-y box mb-3">
+                <div class="intro-y box mb-5">
                     <div class="p-5">
                         <div class="flex flex-col items-left"> 
-                            <p class="mt-2 mx-4 text-base font-medium text-left"></p>
-                            Please click on the 'upload a file' button to upload a logo for your records. If are having any issues please email your logo to support@gasengineersoftware.co.uk and we will
-                            </hr>
+                            <p class="mt-2 mx-4 text-base font-medium text-center">
+                                Please click on the 'upload a file' button to upload a logo for your records. 
+                                If are having any issues please email your logo to our support team.
+                            </p>
                         </div>
                     
                         <div class="space-y-4 flex items-center justify-center">
@@ -195,11 +207,10 @@
                                     <input id="fileInput" name="company_logo" class="file-upload-input absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept="image/*" />
                                     <h3 class="drag-text text-gray-400 text-lg font-semibold">Drag and drop a file or select Add Image</h3>
                                     <div class="flex justify-center" id="thumbnail-preview-container">
-                                        @if ($company->company_logo)
-                                        <img id="thumbnail-preview" src="{{ asset($company->company_logo) }}" alt="Company Logo"
-                                        class="h-24 w-24 border border-gray-300 rounded-md p-1 shadow-xl mt-2 hover:shadow-lg">
+                                        @if ($company->logo_url)
+                                            <img id="thumbnail-preview" src="{{ $company->logo_url }}" alt="{{ $company->company_name }}" class="h-24 w-24 border border-gray-300 rounded-md p-1 shadow-xl mt-2 hover:shadow-lg">
                                         @else   
-                                        <img id="thumbnail-preview" src="{{ Vite::asset('resources/images/gas_safe_register.png') }}" alt="Company Logo" class="h-24 w-24 border border-gray-300 rounded-md p-1 shadow-xl mt-2 hover:shadow-lg">
+                                            <img id="thumbnail-preview" src="{{ Vite::asset('resources/images/gas_safe_register.png') }}" alt="{{ $company->company_name }}" class="h-24 w-24 border border-gray-300 rounded-md p-1 shadow-xl mt-2 hover:shadow-lg">
                                         @endif
                                     </div>
                                 </div>

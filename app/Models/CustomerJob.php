@@ -52,6 +52,6 @@ class CustomerJob extends Model
     }
 
     public function calendar(){
-        return $this->hasOne(CustomerJobCalendar::class, 'job_id', 'id');
+        return $this->hasOne(CustomerJobCalendar::class, 'customer_job_id', 'id');
     }
 }

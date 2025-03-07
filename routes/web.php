@@ -138,16 +138,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
     });
     Route::controller(UserSettings::class)->group(function () {
-
         Route::get('/settings', 'index')->name('user.settings');
     });
 
-    Route::resource('company', CompanyController::class);
+    Route::resource('company', CompanyController::class)->except(['update']);
     Route::controller(CompanyController::class)->group(function() {
-
         Route::get('company-list', 'list')->name('company.list'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
-
+        Route::post('company/update', 'update')->name('company.update'); 
     });
 
     Route::resource('staff', StaffController::class);
