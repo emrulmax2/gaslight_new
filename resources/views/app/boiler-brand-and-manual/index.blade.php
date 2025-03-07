@@ -34,10 +34,20 @@
                         </x-base.tom-select>
                     
                     </div>
-
+                    
                     <!-- BEGIN: HTML Table Data -->
                     <div class="intro-y box mt-5 p-5 col-span-12">
                         <div class="grid grid-cols-12 gap-6">
+                            <!--Implement a search method that get container-->
+                            <div id="search-box" class="col-span-12 hidden">
+                            <x-base.form-input
+                                class="mt-2 sm:mt-0 w-full"
+                                id="text-search"
+                                type="text"
+                                placeholder="Search..."
+                                
+                            />
+                            </div>
                             <!-- Alphabetic Index -->
                             <div class="col-span-12 boiler-brands-container"></div>
                             <!-- Boiler Brands -->
@@ -76,7 +86,7 @@
                     headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                 }).then(response => {
                         // Handle the response data
-                        console.log(response.data);
+                        
                         // Update the UI with the fetched data
                         //implement card view
                         const boilerBrandsManual = response.data;
@@ -94,13 +104,13 @@
                             `;
                         } else {
                             boilerBrandsManual.forEach(manual => {
-
+                                $('#search-box').removeClass('hidden');
                                 boilerBrandsContainer.innerHTML += `
-                                <a href="${manual.url}" class="col-span-12 sm:col-span-6 xl:col-span-4 mt-6 my-3">
+                                <a href="${manual.url}" id="${manual.model}" class="col-span-12 sm:col-span-6 xl:col-span-4 mt-6 my-3">
                                     <div class="w-auto">
                                         <div class="intro-y box p-5 my-3">
                                             <div class="flex items-center">
-                                                <div class="font-medium text-base">${manual.model}</div>
+                                                <div class="model-name font-medium text-base">${manual.model}</div>
                                             </div>
                                             <div class="mt-4">
                                                 <div class="text-gray-600">Fuel Type</div>
@@ -121,6 +131,19 @@
                         console.error('There was an error fetching the data!', error);
                     });
             }
+        });
+        const textSearch = document.getElementById('text-search');
+        textSearch.addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            const boilerBrands = document.querySelectorAll('.boiler-brands-container a');
+            boilerBrands.forEach(brand => {
+                const brandName = brand.querySelector('.model-name').textContent.toLowerCase();
+                if (brandName.includes(searchValue)) {
+                    brand.style.display = 'block';
+                } else {
+                    brand.style.display = 'none';
+                }
+            });
         });
     </script>
 @endPushOnce
