@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\CalendarTimeSlot;
+use App\Models\Company;
+use App\Models\Title;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,6 +25,10 @@ class DatabaseSeeder extends Seeder
         $this->callIfNotSeeded(CustomerJobStatusSeeder::class);
         $this->callIfNotSeeded(CustomerJobPrioritySeeder::class);
         $this->callIfNotSeeded(JobFormSeeder::class);
+        $this->callIfNotSeeded(CalendarTimeSlotSeeder::class);
+        $this->callIfNotSeeded(CompanySeeder::class);
+        $this->callIfNotSeeded(StaffSeeder::class);
+        $this->callIfNotSeeded(TitleSeeder::class);
     }
 
     /**

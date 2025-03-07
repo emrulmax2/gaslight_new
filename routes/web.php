@@ -9,8 +9,9 @@ use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
+use App\Http\Controllers\BoilerBrandAndManualPageController;
 use App\Http\Controllers\Calendars\CalendarController;
-use App\Http\Controllers\BoilerManualController;
+use App\Http\Controllers\SuperAdmin\BoilerManualController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
@@ -128,6 +129,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('/', 'index')->name('company.dashboard');
     });
 
+    Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
+        Route::get('boiler-manuals', 'index')->name('boiler-manuals');
+    });
     Route::controller(UserSettings::class)->group(function () {
 
         Route::get('/settings', 'index')->name('user.settings');

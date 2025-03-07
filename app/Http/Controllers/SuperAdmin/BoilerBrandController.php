@@ -83,7 +83,19 @@ class BoilerBrandController extends Controller
      */
     public function destroy(BoilerBrand $boilerBrand)
     {
-        //
+        $boilerBrand->delete();
+        return response()->json(['message' => 'Boiler Brand deleted successfully'], 200);
+
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore($id)
+    {
+        $boilerBrand = BoilerBrand::withTrashed()->find($id);
+        $boilerBrand->restore();
+        return response()->json(['message' => 'Boiler Brand restored successfully'], 200);  
     }
 
 

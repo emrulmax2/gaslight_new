@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SuperAdmin;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\BoilerManual;
 use Illuminate\Http\Request;
@@ -12,7 +14,6 @@ class BoilerManualController extends Controller
      */
     public function index()
     {
-        //
     }
 
     /**
@@ -81,7 +82,19 @@ class BoilerManualController extends Controller
      */
     public function destroy(BoilerManual $boilerManual)
     {
-        //
+        $boilerManual->delete();
+        return response()->json(['message' => 'Boiler Manual deleted successfully'], 200);
+
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore($id)
+    {
+        $boilerManual = BoilerManual::withTrashed()->find($id);
+        $boilerManual->restore();
+        return response()->json(['message' => 'Boiler Manual restored successfully'], 200);
     }
 
 
