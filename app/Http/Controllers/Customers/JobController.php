@@ -136,7 +136,7 @@ class JobController extends Controller
 
     public function update(Customer $customer, Request $request){
         $customer_id = $customer->id;
-        $job_id = $request->customer_job_id;
+        $customer_job_id = $request->customer_customer_job_id;
         $data = [
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
@@ -147,23 +147,23 @@ class JobController extends Controller
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'updated_by' => auth()->user()->id,
         ];
-        $job = CustomerJob::where('id', $job_id)->update($data);
+        $job = CustomerJob::where('id', $customer_job_id)->update($data);
 
         if($job):
-            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('customers.jobs.show', [$customer_id, $job_id])], 200);
+            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('customers.jobs.show', [$customer_id, $customer_job_id])], 200);
         else:
             return response()->json(['msg' => 'No changes found. Please change and update fields if need.', 'red' => ''], 304);
         endif;
     }
 
-    public function destroy(Customer $customer, $job_id){
-        $customer = CustomerJob::find($job_id)->delete();
+    public function destroy(Customer $customer, $customer_job_id){
+        $customer = CustomerJob::find($customer_job_id)->delete();
 
         return response()->json(['msg' => 'Customer Job data successfully deleted.', 'red' => ''], 200);
     }
 
-    public function restore(Customer $customer, $job_id){
-        $customer = CustomerJob::where('id', $job_id)->withTrashed()->restore();
+    public function restore(Customer $customer, $customer_job_id){
+        $customer = CustomerJob::where('id', $customer_job_id)->withTrashed()->restore();
 
         return response()->json(['msg' => 'Customer Job data Successfully Restored!', 'red' => ''], 200);
     }

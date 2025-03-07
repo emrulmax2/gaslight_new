@@ -45,13 +45,7 @@
         <!-- END: Breadcrumb -->
         
         <!-- BEGIN: Account Menu -->
-        <a href="{{ route('user.settings') }}" class="intro-x mr-4 sm:mr-6">
-            <x-base.lucide
-                class="h-5 w-5 text-white/70"
-                icon="settings"
-            />
-        </a>
-        <x-base.menu class="max-sm:mr-[45px]">
+        <x-base.menu class="max-sm:mr-[45px] ml-auto">
             <x-base.menu.button
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"
             >

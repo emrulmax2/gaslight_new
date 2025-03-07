@@ -6,7 +6,8 @@
     '[&.mobile-menu--active]:before:visible [&.mobile-menu--active]:before:opacity-100',
     'w-[32px] h-[32px] max-sm:border-0 right-[35px] left-auto  top-[11px]',
 ])>
-    <div class="flex h-full items-center p-0 sm:px-8">{{-- <div class="flex h-[70px] items-center px-3 sm:px-8"> --}}
+    <div class="flex h-full items-center p-0 sm:px-8">
+        {{-- <div class="flex h-[70px] items-center px-3 sm:px-8"> --}}
         {{--<a
             class="mr-auto flex"
             href=""

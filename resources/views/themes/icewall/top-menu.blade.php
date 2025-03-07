@@ -9,11 +9,10 @@
         'icewall px-5 sm:px-8 py-5 relative max-sm:pt-3',
         "after:content-[''] after:bg-gradient-to-b after:from-theme-1 after:to-theme-2 dark:after:from-darkmode-800 dark:after:to-darkmode-800 after:fixed after:inset-0 after:z-[-2]",
     ])>
-        <x-mobile-menu />
         <x-themes.icewall.top-bar />
         <!-- BEGIN: Top Menu -->
         <nav
-            class="top-nav relative z-50 -mt-2 hidden translate-y-[35px] opacity-0 md:block xl:-mt-[3px] xl:px-6 xl:pt-[12px]">
+            class="top-nav relative z-50 -mt-2 hidden translate-y-[35px] opacity-0 md:block xl:-mt-[3px] xl:px-6 xl:pt-[12px] ">
             <ul class="flex flex-wrap xl:h-[50px]">
                 @foreach ($mainMenu as $menuKey => $menu)
                     <li>

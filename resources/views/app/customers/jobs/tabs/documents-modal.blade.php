@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <x-base.form-input name="customer_id" type="hidden" value="{{ $customer->id }}" />
-                <x-base.form-input name="customer_job_id" type="hidden" value="{{ $job->id }}" />
+                <x-base.form-input name="customer_customer_job_id" type="hidden" value="{{ $job->id }}" />
             </form>
         </x-base.dialog.description>
         <x-base.dialog.footer>
