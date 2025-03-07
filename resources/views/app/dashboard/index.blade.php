@@ -10,15 +10,15 @@
             <div class="grid grid-cols-12 gap-6">
                 <!-- BEGIN: General Report -->
                 <div class="col-span-12 mt-4 sm:mt-8">
-                    <div class="intro-y flex h-auto sm:h-10 items-center">
-                        <h2 class="mr-5 truncate text-lg font-medium">General Report</h2>
+                    {{--<div class="intro-y flex h-auto sm:h-10 items-center">
+                        <h2 class="mr-5 truncate text-lg font-medium">Dashboard</h2>
                         <a class="ml-auto flex items-center text-primary" href="" >
                             <x-base.lucide
                                 class="mr-3 h-4 w-4"
                                 icon="RefreshCcw"
                             /> Reload Data
                         </a>
-                    </div>
+                    </div>--}}
                     <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
@@ -45,32 +45,15 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
-                                            icon="file-text"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                            icon="layers"
                                         />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Quote Or Invoice</div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Existing Records & Drafts</div>
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ route('calendars') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
-                                            icon="calendar"
-                                        />
-                                    </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Calendar</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
-                                </div>
-                            </div>
-                        </a>
                         <a href="{{ route('customers') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -91,23 +74,6 @@
                                 </div>
                             </div>
                         </a>
-                    {{-- <a href="{{ route('job-addresses') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
-                                            icon="MapPin"
-                                        />
-                                    </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Job Address</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
-                                </div>
-                            </div>
-                    </a> --}}
                         <a href="{{ route('jobs') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -128,46 +94,23 @@
                                 </div>
                             </div>
                         </a>
-                        {{--<div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                        <a href="{{ route('calendars') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
                             ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
                                             class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
-                                            icon="book-text"
+                                            icon="calendar"
                                         />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Invoices</div>
-                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>2.149<span class="sm:hidden">)</span>
-                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Calendar</div>
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-success"
-                                            icon="book-dashed"
-                                        />
-                                    </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Quotes</div>
-                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>458<span class="sm:hidden">)</span>
-                                    </div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
-                                </div>
-                            </div>
-                        </div>--}}
+                        </a>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -185,7 +128,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                        <a href="{{ route('boiler-manuals') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
@@ -193,15 +136,15 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="layers"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-info"
+                                            icon="thermometer-sun"
                                         />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Existing Records & Drafts</div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Boiler Manual</div>
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         <a href="{{ route('user.settings') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -219,6 +162,23 @@
                                 </div>
                             </div>
                         </a>
+                        {{--<div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                            <div @class([
+                                'relative zoom-in',
+                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                            ])>
+                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                    <div class="inline-flex sm:flex">
+                                        <x-base.lucide
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
+                                            icon="file-text"
+                                        />
+                                    </div>
+                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Quote Or Invoice</div>
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                </div>
+                            </div>
+                        </div>--}}
                     </div>
                 </div>
                 <!-- END: General Report -->

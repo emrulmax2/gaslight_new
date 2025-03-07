@@ -18,12 +18,12 @@ class TopMenu
                     'title' => 'Dashboard',
                     'route_name' => 'company.dashboard'
                 ],
-                'customers' => [
+                /*'customers' => [
                     'icon' => 'users',
                     'route_name' => 'customers',
                     'title' => 'Customers'
                 ],
-                /*'apps' => [
+                'apps' => [
                     'icon' => 'activity',
                     'title' => 'Apps',
                     'sub_menu' => [
