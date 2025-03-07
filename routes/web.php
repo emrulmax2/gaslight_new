@@ -107,6 +107,7 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::controller(BoilerManualController::class)->group(function() {
             Route::get('boiler-manual-list', 'list')->name('boiler-manual.list'); 
             Route::post('boiler-manual-import', 'import')->name('boiler-manual.import'); 
+            Route::get('boiler-manual-export/{id}', 'export')->name('boiler-manual.export'); 
             Route::post('boiler-manual-restore/{id}', 'restore')->name('boiler-manual.restore'); 
         });
 

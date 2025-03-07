@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Exports\BoilarManualExport;
 use App\Http\Controllers\Controller;
-
 use App\Models\BoilerManual;
 use Illuminate\Http\Request;
+
+use App\Imports\BoilarManualImport;
+use App\Models\FileRecord;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BoilerManualController extends Controller
 {
@@ -152,6 +157,33 @@ class BoilerManualController extends Controller
             endforeach;
         endif;
         
-        return response()->json(['last_page' => $last_page, 'data' => $data]);
+        return response()->json(['last_page' => $last_page,"current_page"=> $page*1 , 'data' => $data]);
+    }
+
+    public function import(Request $request) {
+        $boilerBrandId = $request->input('boiler_brand_id');
+
+        $fileRecords = FileRecord::find($request->input('file_id'));
+
+        Excel::import(new BoilarManualImport($boilerBrandId), storage_path('app/public/'.$fileRecords->path));
+        $filePath = $fileRecords->path;
+        // remove from file record
+        if (Storage::disk('public')->exists($filePath)) {
+
+            Storage::disk('public')->delete($filePath);
+
+            $fileRecords->delete();
+
+            return response()->json(['message' => "file cleared successfully with imported data "], 201);
+        }
+
+        return response()->json(['message' => "Imported Successfully without clearing garbage data"], 201);
+    }
+
+    public function export(Request $request) {
+        $boilerBrandId = $request->id;
+        $boilerManuals = [];
+        $fileName = 'boiler_manuals_'.$boilerBrandId.'.xlsx';
+        return Excel::download(new BoilarManualExport($boilerManuals), $fileName);
     }
 }

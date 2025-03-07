@@ -7,8 +7,6 @@ use App\Http\Requests\StoreBoilerBrandRequest;
 use App\Models\BoilerBrand;
 use Illuminate\Http\Request;
 
-use App\Imports\BoilarManualImport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class BoilerBrandController extends Controller
 {
@@ -150,9 +148,4 @@ class BoilerBrandController extends Controller
         return response()->json(['last_page' => $last_page, 'data' => $data]);
     }
 
-
-    public function import(Request $request) {
-        $boilerBrandId = $request->input('boiler_brand_id');
-        Excel::import(new BoilarManualImport($boilerBrandId), $request->file('file'));
-    }
 }

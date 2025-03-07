@@ -220,7 +220,7 @@ staticBackdrop
                 </form>
                 <div class="mb-4">
                     <form id="uploadExcelForm" enctype="multipart/form-data" class="mb-4">
-                        <input type="file_id" name="file_id">
+                        <input type="hidden" name="file_id">
                         <input type="hidden" name="boiler_brand_id" id="boiler_brand_id" value="{{ $boilerBrand->id }}" />
                         <div class="mt-5 text-right">
                             <x-base.button class="w-36 border-0 rounded-0" id="userSaveBtn" type="submit" variant="primary">

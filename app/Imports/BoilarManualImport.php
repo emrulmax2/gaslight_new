@@ -4,8 +4,9 @@ namespace App\Imports;
 
 use App\Models\BoilerManual;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class BoilarManualImport implements ToModel
+class BoilarManualImport implements ToModel, WithHeadingRow
 {
     protected $boilerBrandId;
 
@@ -22,11 +23,11 @@ class BoilarManualImport implements ToModel
     {
         return new BoilerManual([
             'boiler_brand_id' => $this->boilerBrandId,
-            'gc_no' => $row[1],
-            'url' => $row[2],
-            'model' => $row[3],
-            'fuel_type' => $row[4],
-            'year_of_manufacture' => $row[5],
+            'gc_no' => $row['gc_no'],
+            'url' => $row['url'],
+            'model' => $row['model'],
+            'fuel_type' => $row['fuel_type'],
+            'year_of_manufacture' => $row['year_of_manufacture'],
         ]);
     }
 }
