@@ -19,16 +19,17 @@ var BoilerBrandListTable = (function () {
                     status: status,
                     'boiler_brand_id': boiler_brand_id,
                 },
-                ajaxFiltering: true,
-                ajaxSorting: true,
+                pagination: "remote", // Ensure pagination is set to remote
+                paginationMode: "remote",
+                filterMode: "remote",
+                sortMode: "remote",
                 printAsHtml: true,
                 printStyled: true,
-                pagination: 'remote',
                 paginationSize: 10,
                 paginationSizeSelector: [true, 5, 10, 20, 30, 40],
-                layout: 'fitColumns',
-                responsiveLayout: 'collapse',
-                placeholder: 'No matching records found',
+                layout: "fitColumns",
+                responsiveLayout: "collapse",
+                placeholder: "No matching records found",
                 columns: [
                     
                     {
@@ -114,7 +115,9 @@ var BoilerBrandListTable = (function () {
                     },
                 ],
                 ajaxResponse:function(url, params, response){
-                    return response.data;
+                    //console.log("Pagination Data:", response); // Log the response to check pagination data
+        
+                    return response;
                 },
                 renderComplete() {
                     createIcons({

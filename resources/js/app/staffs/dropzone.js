@@ -1,3 +1,5 @@
+const { default: axios } = require("axios");
+
 (function () {
     "use strict";
 
@@ -39,7 +41,7 @@
             let fileId = response.id;
             let filePath = response.filePath;
             
-            console.log(filePath);
+            //console.log(filePath);
             $('#fileUploadForm input[name="file_path"]').val(filePath);
             $('#fileUploadForm input[name="file_id"]').val(fileId);
         },
@@ -77,6 +79,8 @@
 
                 // Remove the file from Dropzone
                 dz.removeFile(file);
+                // remove file from file_id input   
+                
             });
 
             // Add the button to the file preview element

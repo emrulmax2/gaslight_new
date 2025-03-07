@@ -45,6 +45,12 @@ import listPlugin from '@fullcalendar/list';
             console.log(eventInfo)
             return { html: html }
         },
+        eventDidMount: function(info) {
+            var dotEl = info.el.getElementsByClassName('fc-list-event-dot')[0];
+            if (dotEl) {
+                dotEl.style.backgroundColor = info.event.backgroundColor;
+            }
+        },
         /*events: [
             {
                 title: "Vue Vixens Day",

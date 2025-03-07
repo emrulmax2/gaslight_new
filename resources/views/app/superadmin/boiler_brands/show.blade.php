@@ -59,6 +59,12 @@
                                     <x-base.button class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16" id="tabulator-html-filter-reset" type="button" variant="secondary" >Reset</x-base.button>
                                 </div>
                             </form>
+                            <div class="mt-2 xl:mt-0 ml-auto">
+                                <x-base.button as='a' href="{{ route('superadmin.boiler-manual.export', $boilerBrand->id) }}" class="w-full sm:w-36" id="tabulator-html-filter-go" type="button" variant="outline-primary" >
+                                    <x-base.lucide class="mr-2 h-5 w-5" icon="file-down" />
+                                    Sample Excel</x-base.button>
+                                
+                            </div>
                         </div>
                         <div class="scrollbar-hidden overflow-x-auto">
                             <div

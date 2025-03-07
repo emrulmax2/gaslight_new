@@ -40,8 +40,8 @@
             let filePath = response.filePath;
             
             console.log(filePath);
-            $('#fileUploadForm input[name="file_path"]').val(filePath);
-            $('#fileUploadForm input[name="file_id"]').val(fileId);
+            //$('#fileUploadForm input[name="file_path"]').val(filePath);
+            $('#uploadExcelForm input[name="file_id"]').val(fileId);
         },
         });
 
@@ -77,6 +77,9 @@
 
                 // Remove the file from Dropzone
                 dz.removeFile(file);
+
+                let fileId = $('#uploadExcelForm input[name="file_id"]').val();
+                axios.delete(`/file-delete/${fileId}`);
             });
 
             // Add the button to the file preview element

@@ -107,6 +107,7 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::controller(BoilerManualController::class)->group(function() {
             Route::get('boiler-manual-list', 'list')->name('boiler-manual.list'); 
             Route::post('boiler-manual-import', 'import')->name('boiler-manual.import'); 
+            Route::get('boiler-manual-export/{id}', 'export')->name('boiler-manual.export'); 
             Route::post('boiler-manual-restore/{id}', 'restore')->name('boiler-manual.restore'); 
         });
 
@@ -137,16 +138,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
     });
     Route::controller(UserSettings::class)->group(function () {
-
         Route::get('/settings', 'index')->name('user.settings');
     });
 
-    Route::resource('company', CompanyController::class);
+    Route::resource('company', CompanyController::class)->except(['update']);
     Route::controller(CompanyController::class)->group(function() {
-
         Route::get('company-list', 'list')->name('company.list'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
-
+        Route::post('company/update', 'update')->name('company.update'); 
     });
 
     Route::resource('staff', StaffController::class);

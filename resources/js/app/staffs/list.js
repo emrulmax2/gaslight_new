@@ -162,7 +162,7 @@
                 },
             ],
             ajaxResponse:function(url, params, response){
-                return response.data;
+                return response;
             },
             renderComplete() {
                 createIcons({
