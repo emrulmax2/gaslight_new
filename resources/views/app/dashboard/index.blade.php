@@ -6,7 +6,7 @@
 
 @section('subcontent')
     <div class="grid grid-cols-12 gap-6">
-        <div class="col-span-12 2xl:col-span-9">
+        <div class="col-span-12"><!-- 2xl:col-span-9 -->
             <div class="grid grid-cols-12 gap-6">
                 <!-- BEGIN: General Report -->
                 <div class="col-span-12 mt-4 sm:mt-8">
@@ -85,7 +85,7 @@
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Customers</div>
                                     <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>4.5K<span class="sm:hidden">)</span>
+                                        <span class="ml-1 sm:hidden">(</span>{{ $user_customers > 0 ? $user_customers : 0 }}<span class="sm:hidden">)</span>
                                     </div>
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
@@ -122,13 +122,13 @@
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Jobs</div>
                                     <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>3.721<span class="sm:hidden">)</span>
+                                        <span class="ml-1 sm:hidden">(</span>{{ ($user_jobs > 0 ? $user_jobs : 0)}}<span class="sm:hidden">)</span>
                                     </div>
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </a>
-                        <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                        {{--<div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
@@ -167,7 +167,7 @@
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
-                        </div>
+                        </div>--}}
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -185,23 +185,6 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ route('boiler-manuals') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-info"
-                                            icon="thermometer-sun"
-                                        />
-                                    </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Boiler Manual</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
-                                </div>
-                            </div>
-                        </a>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -236,7 +219,6 @@
                                 </div>
                             </div>
                         </a>
-
                     </div>
                 </div>
                 <!-- END: General Report -->
@@ -706,7 +688,7 @@
                 <!-- END: Weekly Top Products -->--}}
             </div>
         </div>
-        <div class="col-span-12 2xl:col-span-3 max-sm:hidden">
+        {{--<div class="col-span-12 2xl:col-span-3 max-sm:hidden">
             <div class="-mb-10 pb-10 2xl:border-l">
                 <div class="grid grid-cols-12 gap-x-6 gap-y-6 2xl:gap-x-0 2xl:pl-6">
                     <!-- BEGIN: Transactions -->
@@ -717,10 +699,9 @@
                         <div class="mt-5">
                             @if($recent_jobs->count() > 0)
                                 @foreach($recent_jobs as $job)
-                                
                                     @php 
                                         $address = '';
-                                        $address .= (!empty($job->property->address_line_1) ? $job->property->address_line_1.' '.$job->property->address_line_2.', ' : '');
+                                        $address .= $job->property->address_line_1.' '.$job->property->address_line_2.', ';
                                         $address .= ( !empty($job->property->city) ? $job->property->city.', ' : '');
                                         $address .= (!empty($job->property->state) ? $job->property->state.', ' : '');
                                         $address .= (!empty($job->property->postal_code) ? $job->property->postal_code.', ' : '');
@@ -1141,7 +1122,7 @@
                     <!-- END: Schedules -->--}}
                 </div>
             </div>
-        </div>
+        </div>--}}
     </div>
     @include('app.dashboard.modal.index')
 @endsection

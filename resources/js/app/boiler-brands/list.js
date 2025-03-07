@@ -16,16 +16,17 @@ var BoilerBrandListTable = (function () {
                     queryStr: querystr,
                     status: status,
                 },
-                ajaxFiltering: true,
-                ajaxSorting: true,
+                pagination: "remote", // Ensure pagination is set to remote
+                paginationMode: "remote",
+                filterMode: "remote",
+                sortMode: "remote",
                 printAsHtml: true,
                 printStyled: true,
-                pagination: 'remote',
                 paginationSize: 10,
                 paginationSizeSelector: [true, 5, 10, 20, 30, 40],
-                layout: 'fitColumns',
-                responsiveLayout: 'collapse',
-                placeholder: 'No matching records found',
+                layout: "fitColumns",
+                responsiveLayout: "collapse",
+                placeholder: "No matching records found",
                 columns: [
                     
                     {

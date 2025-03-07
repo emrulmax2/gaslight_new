@@ -145,7 +145,7 @@ class BoilerBrandController extends Controller
             endforeach;
         endif;
         
-        return response()->json(['last_page' => $last_page, 'data' => $data]);
+        return response()->json(['last_page' => $last_page, 'data' => $data , 'current_page' => $page*1], 200);
     }
 
 }
