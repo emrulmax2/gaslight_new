@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('customer_job_calendars', function (Blueprint $table) {
-            $table->dropForeign(['customer_job_calendars_job_id_foreign', 'job_id']);
+            $table->dropForeign(['customer_job_calendars_job_id_foreign']);
             $table->dropColumn('job_id');
             $table->foreignId('customer_job_id')->after('customer_id')->index()->constrained('customer_jobs', 'id')->cascadeOnDelete();
         });
