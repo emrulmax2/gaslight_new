@@ -134,7 +134,7 @@ class CustomerJobsController extends Controller
     }
 
     public function job_edit(Request $request) {
-        $job = CustomerJob::where('id', $request->job_id)->firstOrFail();
+        $job = CustomerJob::where('id', $request->customer_job_id)->firstOrFail();
         $job->load(['customer', 'property', 'property.customer', 'customer.contact']);
         return view('app.customers.jobs.show', [
             'title' => 'Jobs - Gas Certificate APP',
@@ -150,7 +150,7 @@ class CustomerJobsController extends Controller
     }
 
     public function job_update(Request $request) {
-        $job_id = $request->job_id;
+        $customer_job_id = $request->customer_job_id;
         $data = [
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
@@ -161,9 +161,9 @@ class CustomerJobsController extends Controller
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'updated_by' => auth()->user()->id,
         ];
-        $job = CustomerJob::where('id', $job_id)->update($data);
+        $job = CustomerJob::where('id', $customer_job_id)->update($data);
         if($job):
-            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('customer.jobs.edit', ['customer_id' => $request->customer_id, 'job_id' => $job_id])], 200);
+            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('customer.jobs.edit', ['customer_id' => $request->customer_id, 'customer_job_id' => $customer_job_id])], 200);
         else:
             return response()->json(['msg' => 'No changes found. Please change and update fields if need.', 'red' => ''], 304);
         endif;

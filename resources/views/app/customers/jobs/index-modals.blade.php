@@ -7,7 +7,7 @@
                 <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
             </x-base.dialog.title>
             <x-base.dialog.description >
-                <x-base.form-input name="job_id" class="w-full" type="hidden" value="0" />
+                <x-base.form-input name="customer_job_id" class="w-full" type="hidden" value="0" />
                 <div class="mb-4">
                     <x-base.form-label for="date">Date <span class="text-danger">*</span></x-base.form-label>
                     <x-base.litepicker name="date" id="date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />

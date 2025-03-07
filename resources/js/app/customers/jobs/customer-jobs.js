@@ -147,7 +147,7 @@ var customerJobListTable = (function () {
             var field = cell.getColumn().getField();
             var customer_id = cell.getData().customer_id;
             if(field != 'action'){
-                window.location.href = route('customer.jobs.edit', {customer_id: customer_id, job_id: row_id});
+                window.location.href = route('customer.jobs.edit', {customer_id: customer_id, customer_job_id: row_id});
             }
         });
 
@@ -245,7 +245,7 @@ var customerJobListTable = (function () {
     });
     
     document.getElementById('addJobCalenderModal').addEventListener('hide.tw.modal', function(event) {
-        $('#addJobCalenderModal input[name="job_id"]').val('0');
+        $('#addJobCalenderModal input[name="customer_job_id"]').val('0');
         $('#addJobCalenderModal input[name="date"]').val('');
         $('#addJobCalenderModal input[type="radio"]').prop('checked', false);
     });
@@ -253,17 +253,17 @@ var customerJobListTable = (function () {
     $('#customerJobListTable').on('click', '.addCalenderBtn', function(e){
         e.preventDefault();
         let $theBtn = $(this);
-        let job_id = $theBtn.attr('data-id');
+        let customer_job_id = $theBtn.attr('data-id');
 
         axios({
             method: "post",
             url: route('jobs.get.calendar.details'),
-            data: {job_id : job_id},
+            data: {customer_job_id : customer_job_id},
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             if (response.status == 200) {
                 var row = response.data.row;
-                $('#addJobCalenderModal input[name="job_id"]').val(job_id);
+                $('#addJobCalenderModal input[name="customer_job_id"]').val(customer_job_id);
                 $('#addJobCalenderModal input[name="date"]').val(row.date);
                 $('#addJobCalenderModal input#slot-'+row.calendar_time_slot_id).prop('checked', true);
             }

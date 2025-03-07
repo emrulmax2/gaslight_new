@@ -12,7 +12,7 @@ class CustomerJobCalendar extends Model
 
     protected $fillable = [
         'customer_id',
-        'customer_job_id',
+        'customer_customer_job_id',
         'date',
         'calendar_time_slot_id',
         'status',
@@ -36,7 +36,7 @@ class CustomerJobCalendar extends Model
     }
 
     public function job(){
-        return $this->belongsTo(CustomerJob::class, 'customer_job_id');
+        return $this->belongsTo(CustomerJob::class, 'customer_customer_job_id');
     }
 
     public function slot(){

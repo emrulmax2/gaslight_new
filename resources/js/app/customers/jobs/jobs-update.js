@@ -29,13 +29,13 @@
         $('#jobUpdateBtn', $theForm).attr('disabled', 'disabled');
         $("#jobUpdateBtn .theLoader").fadeIn();
 
-        let job_id = $theForm.find('[name="job_id"]').val();
+        let customer_job_id = $theForm.find('[name="customer_job_id"]').val();
         let customer_id = $theForm.find('[name="customer_id"]').val();
 
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('customer.jobs.update', {customer_id: customer_id, job_id: job_id }),
+            url: route('customer.jobs.update', {customer_id: customer_id, customer_job_id: customer_job_id }),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {

@@ -147,7 +147,7 @@
                         Home
                     </x-base.button>
                     
-                    <x-base.form-input type="hidden" value="{{ $job->id }}" name="job_id" />
+                    <x-base.form-input type="hidden" value="{{ $job->id }}" name="customer_job_id" />
                 </div>
             </div>
         </div>

@@ -148,7 +148,7 @@ class JobController extends Controller
     }
 
     public function update(Customer $customer, Request $request){
-        $job_id = $request->job_id;
+        $customer_job_id = $request->customer_job_id;
         $data = [
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
@@ -159,35 +159,35 @@ class JobController extends Controller
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'updated_by' => auth()->user()->id,
         ];
-        $job = CustomerJob::where('id', $job_id)->update($data);
+        $job = CustomerJob::where('id', $customer_job_id)->update($data);
         if($job):
-            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('jobs.show', $job_id)], 200);
+            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('jobs.show', $customer_job_id)], 200);
         else:
             return response()->json(['msg' => 'No changes found. Please change and update fields if need.', 'red' => ''], 304);
         endif;
     }
 
     public function getCalendarData(Request $request){
-        $job_id = $request->job_id;
-        $row = CustomerJobCalendar::where('job_id', $job_id)->orderBy('id', 'DESC')->get()->first();
+        $customer_job_id = $request->customer_job_id;
+        $row = CustomerJobCalendar::where('customer_job_id', $customer_job_id)->orderBy('id', 'DESC')->get()->first();
 
         return response()->json(['row' => $row], 200);
     }
 
     public function addToCalendar(JobAddToCalendarRequest $request){
-        $job_id = $request->job_id;
-        $job = CustomerJob::find($job_id);
-        $row = CustomerJobCalendar::where('job_id', $job_id)->orderBy('id', 'DESC')->get()->first();
+        $customer_job_id = $request->customer_job_id;
+        $job = CustomerJob::find($customer_job_id);
+        $row = CustomerJobCalendar::where('customer_job_id', $customer_job_id)->orderBy('id', 'DESC')->get()->first();
         
         $data = [
             'customer_id' => $job->customer_id,
-            'job_id' => $job_id,
+            'customer_job_id' => $customer_job_id,
             'date' => (isset($request->date) && !empty($request->date) ? date('Y-m-d', strtotime($request->date)) : null),
             'calendar_time_slot_id' => (isset($request->calendar_time_slot_id) && $request->calendar_time_slot_id > 0 ? $request->calendar_time_slot_id : null)
         ];
         if(isset($row->id) && $row->id > 0):
             $data['updated_by'] = auth()->user()->id;
-            $calendar = CustomerJobCalendar::where('job_id', $job_id)->where('id', $row->id)->update($data);
+            $calendar = CustomerJobCalendar::where('customer_job_id', $customer_job_id)->where('id', $row->id)->update($data);
         else:
             $data['status'] = 'New';
             $data['created_by'] = auth()->user()->id;
@@ -195,7 +195,7 @@ class JobController extends Controller
             $calendar = CustomerJobCalendar::create($data);
         endif;
 
-        return response()->json(['msg' => 'Job successfully added to the calendar.', 'red' => route('jobs.show', $job_id)], 200);
+        return response()->json(['msg' => 'Job successfully added to the calendar.', 'red' => route('jobs.show', $customer_job_id)], 200);
     }
 
 
