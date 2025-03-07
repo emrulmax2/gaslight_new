@@ -130,7 +130,10 @@ Route::middleware(Authenticate::class)->group(function() {
     });
 
     Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
+        
         Route::get('boiler-manuals', 'index')->name('boiler-manuals');
+        Route::get('boiler-manuals/{id}', 'boilerBrandManualByBoilerBrandId')->name('boiler-manuals.show');
+
     });
     Route::controller(UserSettings::class)->group(function () {
 
