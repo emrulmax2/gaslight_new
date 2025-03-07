@@ -1,13 +1,14 @@
 ("use strict");
-var jobListTable = (function () {
+var customerJobListTable = (function () {
     var _tableGen = function () {
         
         let querystr = $("#query").val() != "" ? $("#query").val() : "";
         let status = $("#status").val() != "" ? $("#status").val() : "";
+        let customer_id = $("#customer_id").val() != "" ? $("#customer_id").val() : "";
 
-        let tableContent = new Tabulator("#jobListTable", {
-            ajaxURL: route("jobs.list"),
-            ajaxParams: { querystr: querystr, status: status },
+        let tableContent = new Tabulator("#customerJobListTable", {
+            ajaxURL: route("customer.jobs.list", { customer_id: customer_id }),
+            ajaxParams: { querystr: querystr, status: status, customer_id: customer_id },
             paginationMode: "remote",
             filterMode: "remote",
             sortMode: "remote",
@@ -24,13 +25,7 @@ var jobListTable = (function () {
                     field: "id",
                     vertAlign: 'middle',
                     width: "80",
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    }
+                    responsive: 0
                 },
                 {
                     title: 'Ref No',
@@ -38,13 +33,7 @@ var jobListTable = (function () {
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     width: "180",
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    }
+                    responsive: 0
                 },
                 {
                     title: 'Description',
@@ -54,12 +43,6 @@ var jobListTable = (function () {
                     minWidth: 220,
                     formatter(cell, formatterParams) { 
                         return '<div class="font-medium whitespace-normal">'+cell.getData().description+'</div>';
-                    },
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
                     }
                 },
                 {
@@ -74,12 +57,6 @@ var jobListTable = (function () {
                                 html += cell.getData().full_name;
                             html += '</div>';
                         return html;
-                    },
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
                     }
                 },
                 {
@@ -96,14 +73,6 @@ var jobListTable = (function () {
                         address += (cell.getData().city != '' ? cell.getData().city+', ' : '');
                         address += (cell.getData().postal_code != '' ? cell.getData().postal_code : '');
                         return (address != '' ? '<div class="text-slate-500 text-xs whitespace-normal flex justify-start items-start">'+theIcon+address+'</div>' : '');
-                    },
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                        console.log('click')
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                        console.log('tap')
                     }
                 },
                 {
@@ -111,52 +80,28 @@ var jobListTable = (function () {
                     field: 'priority',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    }
+                    responsive: 0
                 },
                 {
                     title: 'Due Date',
                     field: 'due_date',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    }
+                    responsive: 0
                 },
                 {
                     title: 'Status',
                     field: 'status',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    }
+                    responsive: 0
                 },
                 {
                     title: 'Estimated Value',
                     field: 'estimated_amount',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
-                    }
+                    responsive: 0
                 },
                 {
                     title: "&nbsp;",
@@ -196,23 +141,15 @@ var jobListTable = (function () {
             },
         });
 
-        // tableContent.on("cellClick", function(e, cell){
-        //     console.log('no click')
-        //     var row = cell.getRow(cell);
-        //     var row_id = row.getData().id;
-        //     var field = cell.getColumn().getField();
-        //     if(field != 'action'){
-        //         //window.location.href = route('jobs.show', row_id);
-        //     }
-        // });
-
-        // tableContent.on("rowClick", (e, row) => {
-        //     var cells = row.getCells();
-        //     if (window.innerWidth < 768) {
-        //         window.location.href = route('jobs.show', row.getData().id);
-        //         //window.open(route('jobs.show', row.getData().id));
-        //     }
-        // });
+        tableContent.on("cellClick", function(e, cell){
+            var row = cell.getRow(cell);
+            var row_id = row.getData().id;
+            var field = cell.getColumn().getField();
+            var customer_id = cell.getData().customer_id;
+            if(field != 'action'){
+                window.location.href = route('customer.jobs.edit', {customer_id: customer_id, job_id: row_id});
+            }
+        });
 
         tableContent.on("renderComplete", () => {
             createIcons({
@@ -267,11 +204,11 @@ var jobListTable = (function () {
 
 
 (function () {
-    if ($("#jobListTable").length) {
-        jobListTable.init();
+    if ($("#customerJobListTable").length) {
+        customerJobListTable.init();
 
-        function filterjobListTable() {
-            jobListTable.init();
+        function filtercustomerJobListTable() {
+            customerJobListTable.init();
         }
 
         // On submit filter form
@@ -279,21 +216,21 @@ var jobListTable = (function () {
                 let keycode = event.keyCode ? event.keyCode : event.which;
                 if (keycode == "13") {
                     event.preventDefault();
-                    filterjobListTable();
+                    filtercustomerJobListTable();
                 }
             }
         );
 
         // On click go button
         $("#tabulator-html-filter-go").on("click", function (event) {
-            filterjobListTable();
+            filtercustomerJobListTable();
         });
 
         // On reset filter form
         $("#tabulator-html-filter-reset").on("click", function (event) {
             $("#query").val("");
             $("#status").val("1");
-            filterjobListTable();
+            filtercustomerJobListTable();
         });
     }
 
@@ -313,102 +250,7 @@ var jobListTable = (function () {
         $('#addJobCalenderModal input[type="radio"]').prop('checked', false);
     });
 
-    $('#successModal .agreeWith').on('click', function(e){
-        e.preventDefault();
-        let $theBtn = $(this);
-        if($theBtn.attr('data-action') == 'RELOAD'){
-            if($theBtn.attr('data-redirect') != ''){
-                window.location.href = $theBtn.attr('data-redirect');
-            }else{
-                window.location.reload();
-            }
-        }else{
-            successModal.hide();
-        }
-    });
-
-
-    // Delete Trigger
-    $('#jobListTable').on('click', '.delete_btn', function(){
-        let $statusBTN = $(this);
-        let row_id = $statusBTN.attr('data-id');
-
-        confirmModal.show();
-        document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
-            $('#confirmModal .confirmModalTitle').html('Are you sure?');
-            $('#confirmModal .confirmModalDesc').html('Do you really want to delete these record? If yes then please click on the agree btn.');
-            $('#confirmModal .agreeWith').attr('data-id', row_id);
-            $('#confirmModal .agreeWith').attr('data-action', 'DELETEJOB');
-        });
-    });
-
-    // Restore Trigger
-    $('#jobListTable').on('click', '.restore_btn', function(){
-        let $statusBTN = $(this);
-        let row_id = $statusBTN.attr('data-id');
-
-        confirmModal.show();
-        document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
-            $('#confirmModal .confirmModalTitle').html('Are you sure?');
-            $('#confirmModal .confirmModalDesc').html('Do you really want to restore these record? Click on agree to continue.');
-            $('#confirmModal .agreeWith').attr('data-id', row_id);
-            $('#confirmModal .agreeWith').attr('data-action', 'RESTOREJOB');
-        });
-    });
-
-    // Confirm Modal Action
-    $('#confirmModal .agreeWith').on('click', function(){
-        let $agreeBTN = $(this);
-        let row_id = $agreeBTN.attr('data-id');
-        let action = $agreeBTN.attr('data-action');
-
-        $('#confirmModal button').attr('disabled', 'disabled');
-        if(action == 'DELETEJOB'){
-            let customer_id = ($('#jobListTable').attr('data-customerid') ? $('#jobListTable').attr('data-customerid') : 0);
-            axios({
-                method: 'delete',
-                url: route('customers.jobs.destroy', [customer_id, row_id]),
-                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            }).then(response => {
-                if (response.status == 200) {
-                    $('#confirmModal button').removeAttr('disabled');
-                    confirmModal.hide();
-
-                    successModal.show();
-                    document.getElementById('successModal').addEventListener('shown.tw.modal', function(event){
-                        $('#successModal .successModalTitle').html('WOW!');
-                        $('#successModal .successModalDesc').html(response.data.msg);
-                    });
-                }
-                jobListTable.init();
-            }).catch(error =>{
-                console.log(error)
-            });
-        }else if(action == 'RESTOREJOB'){
-            let customer_id = ($('#jobListTable').attr('data-customerid') ? $('#jobListTable').attr('data-customerid') : 0);
-            axios({
-                method: 'post',
-                url: route('customers.jobs.restore', [customer_id, row_id]),
-                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            }).then(response => {
-                if (response.status == 200) {
-                    $('#confirmModal button').removeAttr('disabled');
-                    confirmModal.hide();
-
-                    successModal.show();
-                    document.getElementById('successModal').addEventListener('shown.tw.modal', function(event){
-                        $('#successModal .successModalTitle').html('WOW!');
-                        $('#successModal .successModalDesc').html(response.data.msg);
-                    });
-                }
-                jobListTable.init();
-            }).catch(error =>{
-                console.log(error)
-            });
-        }
-    });
-
-    $('#jobListTable').on('click', '.addCalenderBtn', function(e){
+    $('#customerJobListTable').on('click', '.addCalenderBtn', function(e){
         e.preventDefault();
         let $theBtn = $(this);
         let job_id = $theBtn.attr('data-id');
@@ -464,7 +306,7 @@ var jobListTable = (function () {
                     successModal.hide();
                 }, 1500);
             }
-            jobListTable.init();
+            customerJobListTable.init();
         }).catch(error => {
             $('#addCalendarBtn', $theForm).removeAttr('disabled');
             $("#addCalendarBtn .theLoader").fadeOut();

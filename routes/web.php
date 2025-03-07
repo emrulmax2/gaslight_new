@@ -20,6 +20,7 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerJobAddressController;
+use App\Http\Controllers\Customers\CustomerJobsController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
@@ -130,7 +131,10 @@ Route::middleware(Authenticate::class)->group(function() {
     });
 
     Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
+        
         Route::get('boiler-manuals', 'index')->name('boiler-manuals');
+        Route::get('boiler-manuals/{id}', 'boilerBrandManualByBoilerBrandId')->name('boiler-manuals.show');
+
     });
     Route::controller(UserSettings::class)->group(function () {
 
@@ -183,6 +187,25 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy')->name('customer.job-addresses.job_address_destroy');
         Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore')->name('customer.job-addresses.job_address_restore');
     });
+
+
+    Route::controller(CustomerJobsController::class)->group(function(){
+        Route::get('customer/{customer_id}/jobs', 'index')->name('customer.jobs');
+        Route::get('customer/{customer_id}/jobs/list', 'list')->name('customer.jobs.list');
+        Route::get('customer/{customer_id}/jobs/create', 'job_create')->name('customer.jobs.create');
+        Route::post('customer/{customer_id}/jobs/store', 'job_store')->name('customer.jobs.store');
+        Route::get('customer/{customer_id}/jobs/{job_id}/show', 'job_edit')->name('customer.jobs.edit');
+        Route::post('customer/{customer_id}/jobs/{job_id}/update', 'job_update')->name('customer.jobs.update');
+    });
+    // Route::controller(JobController::class)->group(function() {
+    //     Route::get('customers/{customer}/jobs', 'index')->name('customers.jobs'); 
+    //     Route::get('customers/{customer}/jobs/list', 'list')->name('customers.jobs.list'); 
+    //     Route::post('customers/{customer}/jobs/store', 'store')->name('customers.jobs.store');
+    //     Route::get('customers/{customer}/jobs/{job}', 'show')->name('customers.jobs.show'); 
+    //     Route::post('customers/{customer}/jobs/update', 'update')->name('customers.jobs.update'); 
+    //     Route::delete('customers/{customer}/jobs/destroy/{job_id}', 'destroy')->name('customers.jobs.destroy'); 
+    //     Route::post('customers/{customer}/jobs/restore/{job_id}', 'restore')->name('customers.jobs.restore');
+    // });
 
     // Route::controller(JobController::class)->group(function() {
     //     Route::get('customers/{customer}/jobs', 'index')->name('customers.jobs'); 

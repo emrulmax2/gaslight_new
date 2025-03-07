@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('customer_job_calendars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->index()->constrained()->cascadeOnDelete();
-            $table->foreignId('job_id')->index()->constrained()->cascadeOnDelete();
+            $table->foreignId('customer_job_id')->index()->constrained()->cascadeOnDelete();
             $table->date('date')->nullable();
             $table->foreignId('calendar_time_slot_id')->index()->constrained()->cascadeOnDelete();
             $table->enum('status', ['New', 'Uncompleted', 'Complete', 'Cancelled'])->default('New');
