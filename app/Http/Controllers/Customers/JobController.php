@@ -136,7 +136,7 @@ class JobController extends Controller
 
     public function update(Customer $customer, Request $request){
         $customer_id = $customer->id;
-        $customer_job_id = $request->customer_customer_job_id;
+        $customer_job_id = $request->customer_job_id;
         $data = [
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
