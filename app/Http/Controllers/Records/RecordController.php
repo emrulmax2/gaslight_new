@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class RecordController extends Controller
 {
     public function index($record, CustomerJob $job){
+        $job->load(['customer', 'customer.contact', 'property']);
         return view('app.records.'.$record.'.index', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [

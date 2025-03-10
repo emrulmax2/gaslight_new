@@ -30,24 +30,24 @@
         <div class="intro-y col-span-2 hidden 2xl:block">
             <div class="sticky top-0">
                 <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
-                    <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-3" variant="linkedin">
+                    <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-2" variant="linkedin">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
                         Approve & Email
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                     </x-base.button>
-                    <x-base.button type="button" class="w-full mb-3 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
+                    <x-base.button type="button" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="eye-off" />
                         Approve & Preview
                     </x-base.button>
-                    <x-base.button type="button" class="w-full mb-3 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#4ab3f4] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
+                    <x-base.button type="button" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#4ab3f4] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
                         Add Pre-Payment
                     </x-base.button>
-                    <x-base.button type="button" class="w-full mb-3 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#517fa4e6] focus:bg-[#517fa4e6] hover:text-white focus:text-white">
+                    <x-base.button type="button" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#517fa4e6] focus:bg-[#517fa4e6] hover:text-white focus:text-white">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="minus-circle" />
                         Add Discount
                     </x-base.button>
-                    <x-base.button class="w-full mb-3 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#f1f5f9e6] focus:bg-[#f1f5f9e6]">
+                    <x-base.button class="w-full border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#f1f5f9e6] focus:bg-[#f1f5f9e6]">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-right" />
                         Convert Invoice to Quote
                     </x-base.button>
@@ -58,9 +58,9 @@
                         Save
                     </x-base.button>
                 </div>
-                <div class="flex justify-between items-center mt-3">
-                    <span>Non-Vat Invoice</span>
-                    <x-base.form-switch.input id="nonVatInvoiceCheck" type="checkbox" />
+                <div class="flex items-center mt-3 w-full ml-0">
+                    <label for="nonVatInvoiceCheck" class="cursor-pointer ml-0 font-medium">Non-VAT Invoice</label>
+                    <input {{ (empty($company->vat_number) ? 'Checked' : '') }} name="vat_registerd" value="1" id="nonVatInvoiceCheck" type="checkbox" class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&amp;[type='radio']]:checked:bg-primary [&amp;[type='radio']]:checked:border-primary [&amp;[type='radio']]:checked:border-opacity-10 [&amp;[type='checkbox']]:checked:bg-primary [&amp;[type='checkbox']]:checked:border-primary [&amp;[type='checkbox']]:checked:border-opacity-10 [&amp;:disabled:not(:checked)]:bg-slate-100 [&amp;:disabled:not(:checked)]:cursor-not-allowed [&amp;:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&amp;:disabled:checked]:opacity-70 [&amp;:disabled:checked]:cursor-not-allowed [&amp;:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white ml-auto">
                 </div>
             </div>
         </div>
@@ -76,65 +76,45 @@
                                 <span class="font-bold text-xl">Address to</span>
                             </div>
                             <div class="mt-1">
-                                <span>Mr Limon Sarker</span>
-                                <br>
-                                <span>189 Launge avenue</span>
-                                <br>
-                                <span>Romford</span>
-                                <br>
-                                <span>Grater London</span>
-                                <br>
-                                <span>RM2</span>
+                                <span class="block font-medium mb-1">{{ (isset($job->customer->full_name) ? $job->customer->full_name : '') }}</span>
+                                {!! (isset($job->customer->full_address_html) ? $job->customer->full_address_html : '') !!}
                             </div>
                             <div class="mt-2 flex justify-end items-center gap-1">
-                                <x-base.button
-                                class="mb-2 mr-1"
-                                variant="outline-danger"
-                            >
-                                Use alternative billing address
-                            </x-base.button>
+                                <x-base.button class="mb-2 mr-1" variant="outline-danger" >
+                                    Use alternative billing address
+                                </x-base.button>
                             </div>
                         </div>
                         <div class="px-5 py-10 sm:px-8 sm:py-8 text-right">
-                            <div class="text-3xl font-semibold text-primary">Quote</div>
+                            <div class="text-3xl font-semibold text-primary">Invoice</div>
                             <div class="mt-2">
-                                <span class="font-bold text-xl">Test User</span>
+                                <span class="font-bold text-xl">{{ (isset($company->company_name) ? $company->company_name : '')}}</span>
                             </div>
                             <div class="mt-1">
-                                <span>1 Example Street</span>
+                                {!! (isset($company->full_address_html) ? $company->full_address_html : '') !!}
                                 <br>
-                                <span>Example Town</span>
-                                <br>
-                                <span>EX1 1EX</span>
-                                <br>
-                                <span>kldkfjoie@gmail.com</span>
-                                <br>
+                                @if(!empty($company->vat_number))
                                 <div>
                                     <span class="font-bold">VAT:</span>
-                                    <span>123456789</span>
+                                    <span>{{ $company->vat_number }}</span>
                                 </div>
+                                @endif
                             </div>
                             <div class="mt-2 flex justify-end items-center gap-1">
                                 <span class="font-bold">Date Issued:</span>
-                                <x-base.litepicker class="block w-32" data-single-mode="true" />
+                                <x-base.litepicker name="issued_date" value="{{ date('d-m-Y') }}" class="block w-32 text-right" data-format="dd-mm-yyyy" data-single-mode="true" />
                             
                             </div>
                             <div class="mt-2 flex justify-end items-center gap-1">
                                 <span class="font-bold">Job Ref No:</span>
-                                <x-base.form-input class="block w-32" id="regular-form-1" type="text" />
+                                <x-base.form-input class="block w-32 text-right" id="regular-form-1" type="text" />
                             </div>
                             <div class="mt-10 lg:ml-auto lg:mt-0 lg:text-right">
                                 <div class="mt-2">
                                     <span class="font-bold text-xl">Job Address</span>
                                 </div>
                                 <div class="mt-1">
-                                    <span>5 Talbot Road</span>
-                                    <br>
-                                    <span>Baurnemouth</span>
-                                    <br>
-                                    <span>Baurnemouth, Cristach and poole</span>
-                                    <br>
-                                    <span>BH9, 2JB</span>
+                                    {!! (isset($job->property->full_address_html) ? $job->property->full_address_html : '') !!}
                                 </div>
                             </div>
                         </div>
