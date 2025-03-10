@@ -18,7 +18,7 @@ use Illuminate\Support\Number;
 
 class JobController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
         return view('app.jobs.index', [
             'title' => 'Jobs - Gas Certificate APP',
             'breadcrumbs' => [
@@ -34,6 +34,7 @@ class JobController extends Controller
     public function list(Request $request){
         $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
         $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
+        $recordparams = (isset($request->recordparams) && !empty($request->recordparams) ? $request->recordparams : '');
 
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
         $sorts = [];
@@ -69,9 +70,11 @@ class JobController extends Controller
         if(!empty($Query)):
             $i = 1;
             foreach($Query as $list):
+                $theUrl = (!empty($recordparams) ? route('records', [$recordparams, $list->id]) : route('jobs.show', $list->id));
                 $data[] = [
                     'id' => $list->id,
                     'sl' => $i,
+                    'url' => $theUrl,
                     'customer_id' => $list->customer_id,
                     'description' => $list->description,
                     'full_name' => (isset($list->customer->full_name) ? $list->customer->full_name : ''),

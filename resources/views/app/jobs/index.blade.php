@@ -36,7 +36,7 @@
                 </div>
             </form>
             <div class="mt-5 flex sm:mt-0 max-sm:hidden">
-                <x-base.button href="{{ route('jobs.create') }}" as="a" type="button" class="w-auto" variant="primary" >
+                <x-base.button href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs.create', ['record' => request()->record]) : route('jobs.create')) }}" as="a" type="button" class="w-auto" variant="primary" >
                     <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" /> Add Job
                 </x-base.button>
                 {{--<x-base.menu class="w-1/2 sm:w-auto">
@@ -56,7 +56,7 @@
             </div>
         </div>
         <div class="scrollbar-hidden overflow-x-auto">
-            <div class="mt-3 sm:mt-5 gca_responsive" id="jobListTable" ></div>
+            <div class="mt-3 sm:mt-5 gca_responsive" data-params="{{ (isset(request()->record) && !empty(request()->record) ? request()->record : '') }}" id="jobListTable" ></div>
         </div>
 
         <div class="mt-4 flex w-full sm:mt-0 sm:w-auto lg:hidden justify-center">

@@ -57,10 +57,13 @@ class CompanyController extends Controller
     {
         $validatedData = $request->validated();
         $validatedData['user_id'] = auth()->id();
+        $validatedData['gas_safe_registration_no'] = (isset($request->gas_safe_registration_no) && !empty($request->gas_safe_registration_no)) ? $request->gas_safe_registration_no : null;
+        
 
         $company = Company::create($validatedData);
         $user = User::find(auth()->user()->id);
         $user->first_login = 0;
+        $user->gas_safe_id_card = (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card) ? $request->gas_safe_id_card : null);
         $user->save();
 
         
@@ -71,7 +74,6 @@ class CompanyController extends Controller
             'status' => 1,
         ]);
 
-        // Attach the staff to the company
         $company->staffs()->attach($staff->id);
 
         return response()->json(['message' => 'Company created successfully'], 201);

@@ -10,6 +10,7 @@ use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
 use App\Http\Controllers\BoilerBrandAndManualPageController;
+use App\Http\Controllers\Calculator\GasRateCalculator;
 use App\Http\Controllers\Calendars\CalendarController;
 use App\Http\Controllers\SuperAdmin\BoilerManualController;
 use App\Http\Controllers\CompanyController;
@@ -36,6 +37,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Models\BoilerBrand;
 
@@ -252,6 +254,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::delete('settings/reminder-email-templates/destroy-attachment/{attachment_id}', 'destroyAttachment')->name('user.settings.reminder.templates.destroy.attachment'); 
     });
+
+    Route::controller(GasRateCalculator::class)->group(function() {
+        Route::get('gas-rate-calculator', 'index')->name('gas.rate.calculator');
+    });
+
+    Route::controller(RecordController::class)->group(function() {
+        Route::get('records/{record}/{job}', 'index')->name('records');
+    });
 });
 
 
@@ -270,6 +280,9 @@ Route::controller(ProfileController::class)->group(function() {
 Route::controller(UserController::class)->group(function() {
     Route::post('user/update/{user}', 'update')->name('user.update');
 });
+
+
+Route::view('calculator', 'app.calculator.index')->name('calculator');
 
 
 

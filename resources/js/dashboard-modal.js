@@ -391,4 +391,18 @@ import INTAddressLookUps from './address_lookup.js';
 
     // Initial check on page load
     handleCompanyTypeChange();
+
+    // show / hide vat number
+    const vatEnableCheckbox = document.getElementById("vat_number");
+    const vatNumberInput = document.querySelector(".vat_number_input");
+    console.log(vatNumberInput)
+
+
+    vatEnableCheckbox.addEventListener("change", function () {
+        if (this.checked) {
+            vatNumberInput.classList.remove("hidden");
+        } else {
+            vatNumberInput.classList.add("hidden");
+        }
+    })
 })();
