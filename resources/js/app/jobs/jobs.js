@@ -4,10 +4,11 @@ var jobListTable = (function () {
         
         let querystr = $("#query").val() != "" ? $("#query").val() : "";
         let status = $("#status").val() != "" ? $("#status").val() : "";
+        let recordparams = $("#jobListTable").attr('data-params') != "" ? $("#jobListTable").attr('data-params') : "";
 
         let tableContent = new Tabulator("#jobListTable", {
             ajaxURL: route("jobs.list"),
-            ajaxParams: { querystr: querystr, status: status },
+            ajaxParams: { querystr: querystr, status: status, recordparams : recordparams},
             paginationMode: "remote",
             filterMode: "remote",
             sortMode: "remote",
@@ -26,10 +27,10 @@ var jobListTable = (function () {
                     width: "80",
                     responsive: 0,
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -40,10 +41,10 @@ var jobListTable = (function () {
                     width: "180",
                     responsive: 0,
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -56,10 +57,10 @@ var jobListTable = (function () {
                         return '<div class="font-medium whitespace-normal">'+cell.getData().description+'</div>';
                     },
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -76,10 +77,10 @@ var jobListTable = (function () {
                         return html;
                     },
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -113,10 +114,10 @@ var jobListTable = (function () {
                     vertAlign: 'middle',
                     responsive: 0,
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -126,10 +127,10 @@ var jobListTable = (function () {
                     vertAlign: 'middle',
                     responsive: 0,
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -139,10 +140,10 @@ var jobListTable = (function () {
                     vertAlign: 'middle',
                     responsive: 0,
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -152,10 +153,10 @@ var jobListTable = (function () {
                     vertAlign: 'middle',
                     responsive: 0,
                     cellClick:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                        window.location.href = route('jobs.show', cell.getData().id);
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {
@@ -206,13 +207,14 @@ var jobListTable = (function () {
         //     }
         // });
 
-        // tableContent.on("rowClick", (e, row) => {
-        //     var cells = row.getCells();
-        //     if (window.innerWidth < 768) {
-        //         window.location.href = route('jobs.show', row.getData().id);
-        //         //window.open(route('jobs.show', row.getData().id));
-        //     }
-        // });
+        tableContent.on("rowClick", (e, row) => {
+            var cells = row.getCells();
+            if (window.innerWidth < 768) {
+                if(!$(e.target).hasClass('addCalenderBtn') && !$(e.target).parents('button').hasClass('addCalenderBtn')){
+                    window.location.href = row.getData().url;
+                }
+            }
+        });
 
         tableContent.on("renderComplete", () => {
             createIcons({

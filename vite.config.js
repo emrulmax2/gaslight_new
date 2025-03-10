@@ -197,6 +197,7 @@ export default defineConfig({
                 "resources/js/app/boiler-manuals/dropzone.js",
 
                 "resources/js/app/calendars/calendar.js",
+                "resources/js/app/calculator/calculator.js",
             ],
             refresh: true,
         }),
