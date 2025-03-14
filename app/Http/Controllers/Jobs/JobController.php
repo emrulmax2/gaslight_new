@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Jobs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobAddToCalendarRequest;
 use App\Http\Requests\JobStoreRequest;
+use App\Http\Requests\JobUpdateRequest;
 use App\Models\CalendarTimeSlot;
 use App\Models\Customer;
 use App\Models\CustomerJob;
@@ -84,8 +85,6 @@ class JobController extends Controller
                     'postal_code' => (isset($list->property->postal_code) && !empty($list->property->postal_code) ? $list->property->postal_code : ''),
                     'priority' => (isset($list->priority->name) && !empty($list->priority->name) ? $list->priority->name : ''),
                     'status' => (isset($list->status->name) && !empty($list->status->name) ? $list->status->name : ''),
-                    'due_date' => (!empty($list->due_date) ? date('jS F, Y', strtotime($list->due_date)) : ''),
-                    'reference_no' => (!empty($list->reference_no) ? $list->reference_no : ''),
                     'estimated_amount' => (!empty($list->estimated_amount) ? Number::currency($list->estimated_amount, in: 'GBP') : Number::currency(0, in: 'GBP')),
                     'deleted_at' => $list->deleted_at,
                     'calendar_added' => (isset($list->calendar->id) && $list->calendar->id > 0 ? 1 : 0),
@@ -109,7 +108,8 @@ class JobController extends Controller
             'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
-            'customers' => Customer::with('title')->where('created_by', auth()->user()->id)->orderBy('first_name', 'asc')->get()
+            'customers' => Customer::with('title')->where('created_by', auth()->user()->id)->orderBy('first_name', 'asc')->get(),
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get()
         ]);
     }
 
@@ -127,6 +127,17 @@ class JobController extends Controller
             'created_by' => auth()->user()->id,
         ];
         $job = CustomerJob::create($data);
+
+        if(!empty($request->job_calender_date) && !empty($request->calendar_time_slot_id)):
+            CustomerJobCalendar::Create(
+                [
+                    'customer_id' => $job->customer_id,
+                    'customer_job_id' => $job->id,
+                    'date' => !empty($request->job_calender_date) ? date('Y-m-d', strtotime($request->job_calender_date)) : null,
+                    'calendar_time_slot_id' => $request->calendar_time_slot_id ?? null,
+                ]
+        );
+        endif;
 
         if($job->id):
             return response()->json(['msg' => 'Job successfully created.', 'red' => route('jobs.show', $job->id)], 200);
@@ -146,11 +157,14 @@ class JobController extends Controller
             'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
             'job' => $job
         ]);
     }
 
-    public function update(Customer $customer, Request $request){
+    public function update(JobUpdateRequest $request){
+
+
         $customer_job_id = $request->customer_job_id;
         $data = [
             'description' => (!empty($request->description) ? $request->description : null),
@@ -162,7 +176,21 @@ class JobController extends Controller
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'updated_by' => auth()->user()->id,
         ];
-        $job = CustomerJob::where('id', $customer_job_id)->update($data);
+
+        $job = CustomerJob::find($customer_job_id);
+        $job->update($data);
+
+        if(!empty($request->job_calender_date) && !empty($request->calendar_time_slot_id)):
+            CustomerJobCalendar::updateOrCreate(
+                ['customer_job_id' => $customer_job_id],
+                [
+                    'customer_id' => $job->customer_id,
+                    'date' => !empty($request->job_calender_date) ? date('Y-m-d', strtotime($request->job_calender_date)) : null,
+                    'calendar_time_slot_id' => $request->calendar_time_slot_id ?? null,
+                ]
+            );
+        endif;
+
         if($job):
             return response()->json(['msg' => 'Job successfully updated.', 'red' => route('jobs.show', $customer_job_id)], 200);
         else:

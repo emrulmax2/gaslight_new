@@ -198,6 +198,10 @@ export default defineConfig({
 
                 "resources/js/app/calendars/calendar.js",
                 "resources/js/app/calculator/calculator.js",
+                "resources/js/app/initial-setup.js",
+                
+                "resources/js/app/homewoner_gass_safety_record.js",
+
             ],
             refresh: true,
         }),

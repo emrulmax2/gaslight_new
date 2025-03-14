@@ -34,20 +34,6 @@ var jobListTable = (function () {
                     }
                 },
                 {
-                    title: 'Ref No',
-                    field: 'reference_no',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    width: "180",
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = cell.getData().url;
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = cell.getData().url;
-                    }
-                },
-                {
                     title: 'Description',
                     field: 'description',
                     headerHozAlign: "left",
@@ -110,19 +96,6 @@ var jobListTable = (function () {
                 {
                     title: 'Priority',
                     field: 'priority',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    responsive: 0,
-                    cellClick:function(e, cell){
-                        window.location.href = cell.getData().url;
-                    },
-                    cellTap:function(e, cell){
-                        window.location.href = cell.getData().url;
-                    }
-                },
-                {
-                    title: 'Due Date',
-                    field: 'due_date',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     responsive: 0,
@@ -239,17 +212,13 @@ var jobListTable = (function () {
         function updateColumnVisibility() {
             if (window.innerWidth < 768) {
                 tableContent.getColumn("id").hide();
-                tableContent.getColumn("reference_no").hide();
                 tableContent.getColumn("priority").hide();
-                tableContent.getColumn("due_date").hide();
                 tableContent.getColumn("status").hide();
                 tableContent.getColumn("estimated_amount").hide();
 
             } else {
                 tableContent.getColumn("id").show();
-                tableContent.getColumn("reference_no").show();
                 tableContent.getColumn("priority").show();
-                tableContent.getColumn("due_date").show();
                 tableContent.getColumn("status").show();
                 tableContent.getColumn("estimated_amount").show();
             }

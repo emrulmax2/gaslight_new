@@ -41,21 +41,43 @@ class AuthController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function login(LoginRequest $request)
+    // {
+    //     if (!Auth::attempt([
+    //         'email' => $request->email,
+    //         'password' => $request->password
+    //     ])) {
+    //         throw new \Exception('Wrong email or password.');
+    //     } else {
+    //         User::where('id', auth()->user()->id)->update([
+    //             'last_login_ip' => $request->getClientIp(),
+    //             'last_login_at' => Carbon::now()
+    //         ]);
+    //     }
+    // }
+
+
     public function login(LoginRequest $request)
     {
         if (!Auth::attempt([
             'email' => $request->email,
             'password' => $request->password
         ])) {
-            throw new \Exception('Wrong email or password.');
-        } else {
-            User::where('id', auth()->user()->id)->update([
-                'last_login_ip' => $request->getClientIp(),
-                'last_login_at' => Carbon::now()
-            ]);
+            return response()->json(['message' => 'Wrong email or password.'], 401);
         }
-    }
 
+        $user = Auth::user(); 
+
+        $user->update([
+            'last_login_ip' => $request->getClientIp(),
+            'last_login_at' => Carbon::now()
+        ]);
+
+        return response()->json([
+            'first_login' => $user->first_login, 
+            'message' => 'Login successful'
+        ]);
+    }
     /**
      * Logout user.
      *
