@@ -17,53 +17,53 @@
                 <div class="intro-y box p-5 max-sm:hidden">
                     <div class="form-wizard-header">
                         <div class="form-wizard-steps wizard">
-                            <x-base.button type="button" data-appliance="0" data-id="step_1" class="form-wizard-step-item active w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide class="w-4 h-4 mr-2 text-success" icon="check-circle"/>
-                                Job Address Details <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="0" data-id="step_1" class="form-wizard-step-item relative pr-[25px] pl-[30px] active w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
+                                <x-base.lucide class="w-3.5 h-3.5 mr-2 text-success absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>
+                                Job Address Details <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_2" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide class="w-4 h-4 mr-2 text-success" icon="check-circle"/>    
-                                Customer Details <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="0" data-id="step_2" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
+                                <x-base.lucide class="w-3.5 h-3.5 mr-2 text-success absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>    
+                                Customer Details <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="1" data-id="step_3" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsra1->id) && $gsra1->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsra1->id) && $gsra1->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/> 
-                                Appliance 1 <span class="info">{{ (isset($gsra1->make->name) && !empty($gsra1->make->name) ? $gsra1->make->name.' ' : '') }}{{ (isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="1" data-id="step_3" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsra1->id) && $gsra1->id > 0 ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsra1->id) && $gsra1->id > 0 ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/> 
+                                Appliance 1 &nbsp;<span class="info">{{ (isset($gsra1->make->name) && !empty($gsra1->make->name) ? $gsra1->make->name.' ' : '') }}{{ (isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="2" data-id="step_4" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsra2->id) && $gsra2->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsra2->id) && $gsra2->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>    
-                                Appliance 2 <span class="info">{{ (isset($gsra2->make->name) && !empty($gsra2->make->name) ? $gsra2->make->name.' ' : '') }}{{ (isset($gsra2->type->name) && !empty($gsra2->type->name) ? $gsra2->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="2" data-id="step_4" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsra2->id) && $gsra2->id > 0 ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsra2->id) && $gsra2->id > 0 ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>    
+                                Appliance 2 &nbsp;<span class="info">{{ (isset($gsra2->make->name) && !empty($gsra2->make->name) ? $gsra2->make->name.' ' : '') }}{{ (isset($gsra2->type->name) && !empty($gsra2->type->name) ? $gsra2->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="3" data-id="step_5" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsra3->id) && $gsra3->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsra3->id) && $gsra3->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>
-                                Appliance 3 <span class="info">{{ (isset($gsra3->make->name) && !empty($gsra3->make->name) ? $gsra3->make->name.' ' : '') }}{{ (isset($gsra3->type->name) && !empty($gsra3->type->name) ? $gsra3->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="3" data-id="step_5" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsra3->id) && $gsra3->id > 0 ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsra3->id) && $gsra3->id > 0 ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>
+                                Appliance 3 &nbsp;<span class="info">{{ (isset($gsra3->make->name) && !empty($gsra3->make->name) ? $gsra3->make->name.' ' : '') }}{{ (isset($gsra3->type->name) && !empty($gsra3->type->name) ? $gsra3->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="4" data-id="step_6" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsra4->id) && $gsra4->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsra4->id) && $gsra4->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>   
-                                Appliance 4 <span class="info">{{ (isset($gsra4->make->name) && !empty($gsra4->make->name) ? $gsra4->make->name.' ' : '') }}{{ (isset($gsra4->type->name) && !empty($gsra4->type->name) ? $gsra4->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="4" data-id="step_6" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsra4->id) && $gsra4->id > 0 ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsra4->id) && $gsra4->id > 0 ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>   
+                                Appliance 4 &nbsp;<span class="info">{{ (isset($gsra4->make->name) && !empty($gsra4->make->name) ? $gsra4->make->name.' ' : '') }}{{ (isset($gsra4->type->name) && !empty($gsra4->type->name) ? $gsra4->type->name.' ' : '') }}</span><x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_7" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsr->has_coalarm) && $gsr->has_coalarm ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsr->has_coalarm) && $gsr->has_coalarm ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>
-                                CO Alarm(s) <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="0" data-id="step_7" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsr->has_coalarm) && $gsr->has_coalarm ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsr->has_coalarm) && $gsr->has_coalarm ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>
+                                CO Alarm(s) <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_8" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsr->has_satisfactory_check) && $gsr->has_satisfactory_check ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsr->has_satisfactory_check) && $gsr->has_satisfactory_check ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>
-                                Safety Checks <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="0" data-id="step_8" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsr->has_satisfactory_check) && $gsr->has_satisfactory_check ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsr->has_satisfactory_check) && $gsr->has_satisfactory_check ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>
+                                Safety Checks <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_9" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsr->has_comments) && $gsr->has_comments ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsr->has_comments) && $gsr->has_comments ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>  
-                                Comments <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="0" data-id="step_9" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsr->has_comments) && $gsr->has_comments ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsr->has_comments) && $gsr->has_comments ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>  
+                                Comments <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_10" class="form-wizard-step-item w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success">
-                                <x-base.lucide style="display: {{ (isset($gsr->has_signatures) && $gsr->has_signatures ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsr->has_signatures) && $gsr->has_signatures ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>  
-                                Signatures <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-right"/>
+                            <x-base.button type="button" data-appliance="0" data-id="step_10" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                                <x-base.lucide style="display: {{ (isset($gsr->has_signatures) && $gsr->has_signatures ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
+                                <x-base.lucide style="display: {{ (isset($gsr->has_signatures) && $gsr->has_signatures ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>  
+                                Signatures <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
                         </div>
                     </div>
@@ -209,7 +209,7 @@
                 </fieldset>
                 <fieldset id="step_3" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 1</h2>
+                        <h2 class="text-base font-medium">Appliance 1 <span class="info">{{ (isset($gsra1->make->name) && !empty($gsra1->make->name) ? $gsra1->make->name.' ' : '') }}{{ (isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name.' ' : '') }}</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm">
@@ -230,7 +230,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Make</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[1][boiler_brand_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceMake" name="app[1][boiler_brand_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($boilers->count() > 0)
                                         @foreach($boilers as $option)
@@ -245,7 +245,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Type</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[1][appliance_type_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceType" name="app[1][appliance_type_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($types->count() > 0)
                                         @foreach($types as $option)
@@ -556,7 +556,7 @@
                 </fieldset>
                 <fieldset id="step_4" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 2</h2>
+                        <h2 class="text-base font-medium">Appliance 2 <span class="info">{{ (isset($gsra2->make->name) && !empty($gsra2->make->name) ? $gsra2->make->name.' ' : '') }}{{ (isset($gsra2->type->name) && !empty($gsra2->type->name) ? $gsra2->type->name.' ' : '') }}</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm2">
@@ -577,7 +577,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Make</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[2][boiler_brand_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceMake" name="app[2][boiler_brand_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($boilers->count() > 0)
                                         @foreach($boilers as $option)
@@ -592,7 +592,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Type</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[2][appliance_type_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceType" name="app[2][appliance_type_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($types->count() > 0)
                                         @foreach($types as $option)
@@ -903,7 +903,7 @@
                 </fieldset>
                 <fieldset id="step_5" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 3</h2>
+                        <h2 class="text-base font-medium">Appliance 3 <span class="info">{{ (isset($gsra3->make->name) && !empty($gsra3->make->name) ? $gsra3->make->name.' ' : '') }}{{ (isset($gsra3->type->name) && !empty($gsra3->type->name) ? $gsra3->type->name.' ' : '') }}</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm3">
@@ -924,7 +924,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Make</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[3][boiler_brand_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceMake" name="app[3][boiler_brand_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($boilers->count() > 0)
                                         @foreach($boilers as $option)
@@ -939,7 +939,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Type</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[3][appliance_type_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceType" name="app[3][appliance_type_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($types->count() > 0)
                                         @foreach($types as $option)
@@ -1250,7 +1250,7 @@
                 </fieldset>
                 <fieldset id="step_6" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 4</h2>
+                        <h2 class="text-base font-medium">Appliance 4 <span class="info">{{ (isset($gsra4->make->name) && !empty($gsra4->make->name) ? $gsra4->make->name.' ' : '') }}{{ (isset($gsra4->type->name) && !empty($gsra4->type->name) ? $gsra4->type->name.' ' : '') }}</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm4">
@@ -1271,7 +1271,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Make</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[4][boiler_brand_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceMake" name="app[4][boiler_brand_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($boilers->count() > 0)
                                         @foreach($boilers as $option)
@@ -1286,7 +1286,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Type</x-base.form-label>
-                                <x-base.tom-select class="w-full" name="app[4][appliance_type_id]" data-placeholder="Please Select">
+                                <x-base.tom-select class="w-full applianceType" name="app[4][appliance_type_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($types->count() > 0)
                                         @foreach($types as $option)

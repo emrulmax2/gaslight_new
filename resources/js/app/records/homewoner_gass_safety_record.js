@@ -30,12 +30,22 @@ import INTAddressLookUps from '../../address_lookup.js';
         }
     });
 
+    //Trigger Form Input Change
+    let formDataChanged = false;
+    $('.form-wizard').on('keyup paste', '.show .wizard-step-form input:not([type="radio"]):not([type="checkbox"])', function(){formDataChanged = true;});
+    $('.form-wizard').on('keyup paste', '.show .wizard-step-form textarea', function(){formDataChanged = true;});
+    $('.form-wizard').on('change', '.show .wizard-step-form select', function(){formDataChanged = true;});
+    $('.form-wizard').on('change', '.show .wizard-step-form input[type="radio"]', function(){formDataChanged = true;});
+    $('.form-wizard').on('change', '.show .wizard-step-form input[type="checkbox"]', function(){formDataChanged = true;});
+
+    // Toggle N/A Button
     $(document).on('click', '.naToggleBtn', function(e){
         e.preventDefault();
         let $theBtn = $(this);
         let thevalue = $theBtn.attr('data-value');
 
         $theBtn.siblings('input').val(thevalue);
+        formDataChanged = true;
     })
 
     $('.form-wizard-next-btn').on('click', function () {
@@ -148,7 +158,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         }
     });
     
-
+    // ON Previous Button Click
     $('.form-wizard-previous-btn').on('click', function () {
         var counter = parseInt($(".wizard-counter").text());
         
@@ -173,6 +183,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         });
     });
 
+    // Step Buttons ON Click
     $('.form-wizard-steps .form-wizard-step-item').on('click', function(e){
         e.preventDefault();
         let $theBtn = $(this);
@@ -185,12 +196,77 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         $currentActiveForm.removeClass("show");
         $theTargetedForm.addClass("show");
-        $theTargetedForm.find('.wizard-step-form').css({'display' : 'block'});
+        //$theTargetedForm.find('.wizard-step-form').css({'display' : 'block'});
 
         $thePrevActiveBtn.removeClass('active');
         $theBtn.addClass('active');
     });
 
+    // Mobile Device Header ON Click
+    $('.wizard-fieldset .wizard-fieldset-header').on('click', function(e){
+        e.preventDefault();
+
+        let $theHeader = $(this);
+        let $parentfieldSet = $theHeader.parents('.wizard-fieldset');
+        let theFieldSetIndex = $parentfieldSet.index();
+
+        let $allStepBtns = $('.form-wizard-steps .form-wizard-step-item');
+        let $allFieldSets = $('.form-wizard .wizard-fieldset');
+        
+        if($parentfieldSet.hasClass('show')){
+            $allStepBtns.eq(theFieldSetIndex).removeClass('active');
+            //$parentfieldSet.find('.wizard-step-form').slideUp('fast');
+            $parentfieldSet.removeClass('show');
+        }else{
+            $allStepBtns.removeClass('active');
+            //$allFieldSets.find('.wizard-step-form').slideUp('fast');
+            $allFieldSets.removeClass('show');
+
+            $allStepBtns.eq(theFieldSetIndex).addClass('active');
+            //$parentfieldSet.find('.wizard-step-form').slideDown('fast')
+            $parentfieldSet.addClass('show')
+        }
+    });
+
+    //Appliance Type & Make On Change
+    $('.applianceMake').on('change', function(){
+        let $theMake = $(this);
+        let $theFieldset = $theMake.parents('.wizard-fieldset');
+        let fieldSetIndex = $theFieldset.index();
+
+        let $theType = $theFieldset.find('.applianceType');
+
+        let theMake = $theMake.val();
+        let theMakeText = $('option:selected', $theMake).text();
+        let theType = $theType.val();
+        let theTypeText = $('option:selected', $theType).text();
+
+        let theHtml = theMake > 0 ? theMakeText+' ' : '';
+            theHtml += theType > 0 ? theTypeText : '';
+
+        $theFieldset.find('.wizard-fieldset-header h2 span').html(theHtml);
+        $('.form-wizard-steps .form-wizard-step-item').eq(fieldSetIndex).children('span').html(theHtml);
+    });
+    $('.applianceType').on('change', function(){
+        let $theType = $(this);
+        let $theFieldset = $theType.parents('.wizard-fieldset');
+        let fieldSetIndex = $theFieldset.index();
+
+        let $theMake = $theFieldset.find('.applianceMake');
+
+        let theMake = $theMake.val();
+        let theMakeText = $('option:selected', $theMake).text();
+        let theType = $theType.val();
+        let theTypeText = $('option:selected', $theType).text();
+
+        let theHtml = theMake > 0 ? theMakeText+' ' : '';
+            theHtml += theType > 0 ? theTypeText : '';
+
+        $theFieldset.find('.wizard-fieldset-header h2 span').html(theHtml);
+        $('.form-wizard-steps .form-wizard-step-item').eq(fieldSetIndex).children('span').html(theHtml);
+    });
+
+    // Appliance SKip Or Continue Modal Buttons On Click
     $('#applianceConfirmModal').on('click', '.agreeMore', function(e){
         e.preventDefault();
         let $currentActiveTab = $('.form-wizard').find('.form-wizard-step-item.active');
@@ -210,7 +286,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         $currentActiveTab.removeClass('active');
         $('.form-wizard').find('.form-wizard-step-item').eq(nextFormIndex).addClass('active');
     });
-
     $('#applianceConfirmModal').on('click', '.canceleMore', function(e){
         e.preventDefault();
         let $currentActiveTab = $('.form-wizard').find('.form-wizard-step-item.active');
@@ -229,31 +304,6 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         $currentActiveTab.removeClass('active');
         $('.form-wizard').find('.form-wizard-step-item').eq(nextFormIndex).addClass('active');
-    });
-
-    $('.wizard-fieldset .wizard-fieldset-header').on('click', function(e){
-        e.preventDefault();
-
-        let $theHeader = $(this);
-        let $parentfieldSet = $theHeader.parents('.wizard-fieldset');
-        let theFieldSetIndex = $parentfieldSet.index();
-
-        let $allStepBtns = $('.form-wizard-steps .form-wizard-step-item');
-        let $allFieldSets = $('.form-wizard .wizard-fieldset');
-        
-        if($parentfieldSet.hasClass('show')){
-            $allStepBtns.eq(theFieldSetIndex).removeClass('active');
-            $parentfieldSet.find('.wizard-step-form').slideUp('fast');
-            $parentfieldSet.removeClass('show');
-        }else{
-            $allStepBtns.removeClass('active');
-            $allFieldSets.find('.wizard-step-form').slideUp('fast');
-            $allFieldSets.removeClass('show');
-
-            $allStepBtns.eq(theFieldSetIndex).addClass('active');
-            $parentfieldSet.find('.wizard-step-form').slideDown('fast')
-            $parentfieldSet.addClass('show')
-        }
     });
 
 })();
