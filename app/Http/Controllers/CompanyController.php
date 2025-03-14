@@ -50,6 +50,10 @@ class CompanyController extends Controller
         //
     }
 
+    public function initialSetup(){
+        return view('app.dashboard.initial-setup');
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -75,8 +79,8 @@ class CompanyController extends Controller
         ]);
 
         $company->staffs()->attach($staff->id);
-
-        return response()->json(['message' => 'Company created successfully'], 201);
+        return response()->json(['msg' => 'Company created successfully.', 'red' => route('company.dashboard')], 200);
+        // return response()->json(['message' => 'Company created successfully'], 201);
     }
 
     /**

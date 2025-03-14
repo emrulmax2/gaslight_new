@@ -42,9 +42,16 @@
                                 <x-base.form-label for="company_registration">Company Registration Number</x-base.form-label>
                                 <x-base.form-input type="text" id="company_registration" name="company_registration"  value="{{ isset($company->company_registration) ? $company->company_registration : '' }}"/>
                             </div>
-                            <div>
+                            <div class="pt-0 lg:pt-3 flex">
+                                <div class="flex gap-3">
+                                    <label for="vat_number_check" class="cursor-pointer">VAT Registered</label>
+                                    <x-base.form-switch.input id="vat_number_check" name="vat_number_check" value="1" type="checkbox" checked="{{ isset($company->vat_number) ? 'checked' : '' }}" />
+                                </div>
+                            </div>
+
+                            <div class="vat_number_input {{ isset($company->vat_number) ? '' : 'hidden' }}">
                                 <x-base.form-label for="vat_number">VAT Number</x-base.form-label>
-                                <x-base.form-input id="vat_number" type="text" name="vat_number" value="{{ isset($company->vat_number) ? $company->vat_number : '' }}"/>
+                                <x-base.form-input id="vat_number" type="text" name="vat_number" value="{{ isset($company->vat_number) ? $company->vat_number : '' }}" placeholder="VAT Number"/>
                             </div>
                         </div>
                         <div class="mt-4">

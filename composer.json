@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
         "creagia/laravel-sign-pad": "^2.1",
         "lab404/laravel-impersonate": "^1.7",
         "laravel/framework": "^11.9",

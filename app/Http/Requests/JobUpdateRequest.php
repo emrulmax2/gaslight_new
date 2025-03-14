@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class JobStoreRequest extends FormRequest
+class JobUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,6 @@ class JobStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'required',
-            'customer_property_id' => 'required',
             'job_calender_date' => 'nullable|date',
             'calendar_time_slot_id' => 'required_with:job_calender_date|nullable',
         ];
@@ -32,8 +30,6 @@ class JobStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'customer_id.required' => 'Customer is required.',
-            'customer_property_id.required' => 'Customer property is required.',
             'job_calender_date.date' => 'Please enter a valid date.',
             'calendar_time_slot_id.required_with' => 'The slot field is required when appointment date is selected.',
         ];

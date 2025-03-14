@@ -30,7 +30,7 @@
         <div class="intro-y col-span-2 hidden 2xl:block">
             <div class="sticky top-0">
                 <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
-                    <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-2" variant="linkedin">
+                    <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-2 approveAndEmailBtn" variant="linkedin">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
                         Approve & Email
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
@@ -39,11 +39,11 @@
                         <x-base.lucide class="mr-2 h-4 w-4" icon="eye-off" />
                         Approve & Preview
                     </x-base.button>
-                    <x-base.button type="button" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#4ab3f4] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
+                    <x-base.button type="button" id="addPrepaymentBtn" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#4ab3f4] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
                         Add Pre-Payment
                     </x-base.button>
-                    <x-base.button type="button" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#517fa4e6] focus:bg-[#517fa4e6] hover:text-white focus:text-white">
+                    <x-base.button type="button" id="addDiscountBtn" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#517fa4e6] focus:bg-[#517fa4e6] hover:text-white focus:text-white">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="minus-circle" />
                         Add Discount
                     </x-base.button>
@@ -79,11 +79,6 @@
                                 <span class="block font-medium mb-1">{{ (isset($job->customer->full_name) ? $job->customer->full_name : '') }}</span>
                                 {!! (isset($job->customer->full_address_html) ? $job->customer->full_address_html : '') !!}
                             </div>
-                            <div class="mt-2 flex justify-end items-center gap-1">
-                                <x-base.button class="mb-2 mr-1" variant="outline-danger" >
-                                    Use alternative billing address
-                                </x-base.button>
-                            </div>
                         </div>
                         <div class="px-5 py-10 sm:px-8 sm:py-8 text-right">
                             <div class="text-3xl font-semibold text-primary">Invoice</div>
@@ -92,22 +87,33 @@
                             </div>
                             <div class="mt-1">
                                 {!! (isset($company->full_address_html) ? $company->full_address_html : '') !!}
+                                @if(isset($company->company_email))
+                                    <div>
+                                        <span>{{ $company->company_email }}</span>
+                                    </div>
+                                @endif
+                                @if(isset($company->company_phone))
+                                    <div>
+                                        <span>{{ $company->company_phone }}</span>
+                                    </div>
+                                @endif
                                 <br>
                                 @if(!empty($company->vat_number))
-                                <div>
+                                <div class="vatNumberField">
                                     <span class="font-bold">VAT:</span>
                                     <span>{{ $company->vat_number }}</span>
                                 </div>
                                 @endif
+
                             </div>
                             <div class="mt-2 flex justify-end items-center gap-1">
                                 <span class="font-bold">Date Issued:</span>
-                                <x-base.litepicker name="issued_date" value="{{ date('d-m-Y') }}" class="block w-32 text-right" data-format="dd-mm-yyyy" data-single-mode="true" />
-                            
+                                <x-base.litepicker name="issued_date" id="date_issued" value="{{ isset($job->issued_date) ? date('d-m-Y', strtotime($job->issued_date)) : date('d-m-Y') }}" class="block w-32 text-right" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off" />
+
                             </div>
                             <div class="mt-2 flex justify-end items-center gap-1">
                                 <span class="font-bold">Job Ref No:</span>
-                                <x-base.form-input class="block w-32 text-right" id="regular-form-1" type="text" />
+                                <x-base.form-input class="block w-32 text-right" id="job_ref_no" type="text" value="{{ (isset($job->reference_no) ? $job->reference_no : $ref_no) }}" />
                             </div>
                             <div class="mt-10 lg:ml-auto lg:mt-0 lg:text-right">
                                 <div class="mt-2">
@@ -122,59 +128,42 @@
                 </div>
                 <div class="px-5 py-2 sm:px-8 sm:py-8">
                     <div class="overflow-x-auto">
-                        <x-base.table class="invoiceItemsTable">
+                        <x-base.table bordered sm class="invoiceItemsTable">
                             <x-base.table.thead>
                                 <x-base.table.tr>
-                                    <x-base.table.th class="description whitespace-nowrap border-b-2 dark:border-darkmode-400">
-                                        DESCRIPTION
-                                    </x-base.table.th>
-                                    <x-base.table.th class="units whitespace-nowrap border-b-2 text-right dark:border-darkmode-400">
-                                        Units
-                                    </x-base.table.th>
-                                    <x-base.table.th class="price whitespace-nowrap border-b-2 text-right dark:border-darkmode-400">
-                                        PRICE
-                                    </x-base.table.th>
-                                    <x-base.table.th class="vatField whitespace-nowrap border-b-2 text-right dark:border-darkmode-400">
-                                        Vat %
-                                    </x-base.table.th>
-                                    <x-base.table.th class="lineTotal whitespace-nowrap border-b-2 text-right dark:border-darkmode-400">
-                                        Line Total
-                                    </x-base.table.th>
+                                    <x-base.table.th class="description whitespace-nowrap text-right">DESCRIPTION</x-base.table.th>
+                                    <x-base.table.th class="units whitespace-nowrap text-right">UNITS</x-base.table.th>
+                                    <x-base.table.th class="price whitespace-nowrap text-right">PRICE</x-base.table.th>
+                                    <x-base.table.th class="vatField whitespace-nowrap text-right">VAT %</x-base.table.th>
+                                    <x-base.table.th class="lineTotal whitespace-nowrap text-right">LINE TOTAL</x-base.table.th>
                                 </x-base.table.tr>
                             </x-base.table.thead>
                             <x-base.table.tbody >
                                 <x-base.table.tr class="editInvoiceModal" data-id="1" >
-                                    <x-base.table.td class="description border-b dark:border-darkmode-400 flex gap-2">
-                                        <div>
-                                            <x-base.lucide
-                                                class="mx-auto block"
-                                                icon="grip-vertical"
-                                            />
-                                        </div>
-                                        <div class="whitespace-nowrap font-medium">
-                                            Gas Certificate
+                                    <x-base.table.td class="description">
+                                        <div class="flex justify-start items-start">
+                                            <x-base.lucide class="w-4 h-4 mr-3" icon="check-circle" />
+                                            <span>{{ (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item') }}</span>
                                         </div>
                                     </x-base.table.td>
-                                    <x-base.table.td class="units w-32 border-b text-right dark:border-darkmode-400">
-                                        10
+                                    <x-base.table.td class="units w-[120px] text-right">
+                                        1
                                     </x-base.table.td>
-                                    <x-base.table.td class="w-32 border-b text-right dark:border-darkmode-400">
-                                        <span class="currency">$</span> <span class="price">25</span>
+                                    <x-base.table.td class="price w-[120px] text-right font-medium">
+                                        {{ Number::currency(0, 'GBP') }}
                                     </x-base.table.td>
-                                    <x-base.table.td class="vatField w-32 border-b text-right font-medium dark:border-darkmode-400">
-                                        <span class="currency">$</span> <span class="vat">5</span>
+                                    <x-base.table.td class="vat w-[120px] text-right font-medium">
+                                        {{ Number::currency(0, 'GBP') }}
                                     </x-base.table.td>
-                                    <x-base.table.td class="w-32 border-b text-right font-medium dark:border-darkmode-400">
-                                        <span class="currency">$</span> <span class="lineTotal">250</span>
+                                    <x-base.table.td class="lineTotal w-[120px] text-right font-medium">
+                                        {{ Number::currency(0, 'GBP') }}
                                     </x-base.table.td>
                                 </x-base.table.tr>
                             </x-base.table.tbody>
                         </x-base.table>
-                        <x-base.button class="mt-2 ml-5 mb-2 mr-1" variant="outline-danger" id="addInvoiceModalShow" > <x-base.lucide
-                            class="mx-auto block"
-                            
-                            icon="Plus"
-                        /> Add Item </x-base.button>
+                        <x-base.button class="mt-2 ml-5 mb-2 mr-1 text-sm" variant="secondary" id="addInvoiceModalShow" >
+                            <x-base.lucide class="mx-auto block" icon="Plus"/> Add Item 
+                        </x-base.button>
                     </div>
                 </div>
                 <div class="flex flex-col-reverse px-5 pb-10 sm:flex-row sm:px-8 sm:pb-8">
@@ -187,33 +176,45 @@
                     <div class="calculation text-center sm:ml-auto sm:text-right">
                         <div class="mt-2 font-medium text-md">
                             <span>Subtotal:</span>
-                            <span class="ml-2 currency">$</span> <span class="subtotal_price">250.00</span>
+                            <span class="ml-2 currency">$</span> <span class="subtotal_price">0.00</span>
                         </div>
                         <div class="mt-2 font-medium text-md vatTotalField">
                             <span>Vat Total:</span>
-                            <span class="ml-2 currency">$</span> <span class="vat_total_price">12.50</span>
+                            <span class="ml-2 currency">$</span> <span class="vat_total_price">0.00</span>
                         </div>
                         <div class="mt-2 font-bold text-md">
                             <span>Total:</span>
-                            <span class="ml-2 currency">$</span> <span class="total_price">262.50</span>
+                            <span class="ml-2 currency">$</span> <span class="total_price">0.00</span>
+                        </div>
+                        <hr>
+                        <div class="my-1 font-bold text-md paidToDateField hidden">
+                            <span>Paid to date:</span>
+                            <span class="ml-2 currency">$</span> <span class="paid_to_date">0.00</span>
                         </div>
                         <hr>
                         <div class="mt-2 font-medium text-md">
                             <span>Due:</span>
-                            <span class="ml-2 currency">$</span> <span class="due_price">262.50</span>
+                            <span class="ml-2 currency">$</span> <span class="due_price">0.00</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <x-base.form-input class="" id="customer_job_id" type="hidden" value="{{ $job->id }}" />
     </div>
     @include('app.records.invoice.modals')
     @include('app.action-modals')
 @endsection
+@pushOnce('styles')
+    @vite('resources/css/vendors/tabulator.css')
+@endPushOnce
 
 @pushOnce('vendors')
     @vite('resources/js/vendors/axios.js')
+    @vite('resources/js/vendors/tabulator.js')
     @vite('resources/js/vendors/lucide.js')
+    @vite('resources/js/vendors/lodash.js')
+    @vite('resources/js/vendors/xlsx.js')
 @endPushOnce
 
 @pushOnce('scripts')

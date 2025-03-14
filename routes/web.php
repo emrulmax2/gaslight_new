@@ -6,6 +6,7 @@ use App\Http\Controllers\LayoutController;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\CheckFirstLogin;
 use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
@@ -37,7 +38,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
+use App\Http\Controllers\Records\RecordInvoiceController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Models\BoilerBrand;
 
@@ -130,7 +133,7 @@ Route::controller(RegisteredUserController::class)->middleware(loggedin::class)-
 
 Route::middleware(Authenticate::class)->group(function() {
     Route::controller(Dashboard::class)->group(function () {
-        Route::get('/', 'index')->name('company.dashboard');
+        Route::get('/', 'index')->name('company.dashboard')->middleware(CheckFirstLogin::class);
     });
 
     Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
@@ -146,6 +149,7 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::resource('company', CompanyController::class)->except(['update']);
     Route::controller(CompanyController::class)->group(function() {
         Route::get('company-list', 'list')->name('company.list'); 
+        Route::get('initial-setup', 'initialSetup')->name('initial.setup'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
         Route::post('company/update', 'update')->name('company.update'); 
     });
@@ -261,6 +265,20 @@ Route::middleware(Authenticate::class)->group(function() {
 
     Route::controller(RecordController::class)->group(function() {
         Route::get('records/{record}/{job}', 'index')->name('records');
+    });
+    
+    Route::controller(RecordInvoiceController::class)->group(function(){
+        Route::post('invoice/approve-and-send-email', 'approveAndSendEmail')->name('invoice.approve.and.send.email');
+    });
+    
+    Route::controller(HomeOwnerGasSafetyController::class)->group(function(){
+        Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.address');
+        Route::post('records/store-customer', 'storeCustomer')->name('records.store.customer');
+        Route::post('records/store-appliance', 'storeAppliance')->name('records.store.appliance');
+        Route::post('records/store-co-alarms', 'storeCoAlarms')->name('records.store.co.alarms');
+        Route::post('records/store-satisfactory-check', 'storeSatisfactoryCheck')->name('records.store.satisfactory.check');
+        Route::post('records/store-comments', 'storeComments')->name('records.store.comments');
+        Route::post('records/store-signatures', 'storeSignatures')->name('records.store.signatures');
     });
 });
 
