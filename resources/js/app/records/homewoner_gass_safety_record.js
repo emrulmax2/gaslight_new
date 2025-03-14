@@ -243,22 +243,17 @@ import INTAddressLookUps from '../../address_lookup.js';
         
         if($parentfieldSet.hasClass('show')){
             $allStepBtns.eq(theFieldSetIndex).removeClass('active');
-            $parentfieldSet.find('.wizard-step-form').slideUp('fast', function(){
-                $parentfieldSet.removeClass('show');
-            });
+            $parentfieldSet.find('.wizard-step-form').slideUp('fast');
+            $parentfieldSet.removeClass('show');
         }else{
             $allStepBtns.removeClass('active');
-            $allFieldSets.find('.show .wizard-step-form').slideUp('fast', function(){
-                $allFieldSets.removeClass('show');
-            });
+            $allFieldSets.find('.wizard-step-form').slideUp('fast');
+            $allFieldSets.removeClass('show');
 
             $allStepBtns.eq(theFieldSetIndex).addClass('active');
-            $parentfieldSet.find('.wizard-step-form').slideDown('fast', function(){
-                $parentfieldSet.addClass('show')
-            })
+            $parentfieldSet.find('.wizard-step-form').slideDown('fast')
+            $parentfieldSet.addClass('show')
         }
     });
-
-    
 
 })();
