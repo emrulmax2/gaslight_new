@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobStoreRequest;
+use App\Models\CalendarTimeSlot;
 use App\Models\Customer;
 use App\Models\CustomerJob;
 use App\Models\CustomerJobPriority;
@@ -129,6 +130,7 @@ class JobController extends Controller
             'customers' => Customer::where('created_by', auth()->user()->id)->orderBy('last_name', 'ASC')->get(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
             'customer' => $customer,
             'job' => $job
         ]);

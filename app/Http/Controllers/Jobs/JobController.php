@@ -140,7 +140,13 @@ class JobController extends Controller
         endif;
 
         if($job->id):
-            return response()->json(['msg' => 'Job successfully created.', 'red' => route('jobs.show', $job->id)], 200);
+            return response()->json([
+                'msg' => 'Job successfully created.',
+                'record' => $request->record,
+                'red' => isset(request()->record) && !empty(request()->record) 
+                    ? route('jobs.show', ['job' => $job->id, 'record' => request()->record])
+                    : route('jobs.show', $job->id)
+            ], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
@@ -192,7 +198,13 @@ class JobController extends Controller
         endif;
 
         if($job):
-            return response()->json(['msg' => 'Job successfully updated.', 'red' => route('jobs.show', $customer_job_id)], 200);
+            return response()->json([
+                'msg' => 'Job successfully updated.',
+                'record' => $request->record,
+                'red' => isset(request()->record) && !empty(request()->record) 
+                    ? route('jobs.show', ['job' => $job->id, 'record' => request()->record])
+                    : route('jobs.show', $job->id)
+            ], 200);
         else:
             return response()->json(['msg' => 'No changes found. Please change and update fields if need.', 'red' => ''], 304);
         endif;

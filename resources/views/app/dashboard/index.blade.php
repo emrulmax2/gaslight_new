@@ -63,7 +63,7 @@
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
                                             class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="User"
+                                            icon="Users"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Customers</div>
@@ -83,7 +83,7 @@
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
                                             class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
-                                            icon="flame"
+                                            icon="Briefcase"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Jobs</div>
@@ -120,11 +120,11 @@
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
                                             class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
-                                            icon="flame"
+                                            icon="calculator"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Gas Rate Calculator</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="flame" />
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </a>
@@ -137,7 +137,7 @@
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
                                             class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-info"
-                                            icon="thermometer-sun"
+                                            icon="BookOpen"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Boiler Manual</div>

@@ -59,10 +59,10 @@
                                     @endif
                                 </x-base.tom-select>
                             </div>
-                            <div class="col-span-12 sm:col-span-4">
+                            {{-- <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="due_date">Due Date</x-base.form-label>
                                 <x-base.litepicker value="{{ (!empty($job->due_date) ? date('d-m-Y', strtotime($job->due_date)) : '') }}" name="due_date" id="due_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />
-                            </div>
+                            </div> --}}
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="customer_job_status_id">Job Status</x-base.form-label>
                                 <x-base.tom-select class="w-full" id="customer_job_status_id" name="customer_job_status_id" data-placeholder="Please Select">
@@ -77,6 +77,22 @@
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="reference_no">Job Ref No</x-base.form-label>
                                 <x-base.form-input value="{{ (!empty($job->reference_no) ? $job->reference_no : '') }}" name="reference_no" id="reference_no" class="w-full" type="text" placeholder="Reference No" />
+                            </div>
+                            <div class="col-span-12 sm:col-span-4">
+                                <x-base.form-label for="job_calender_date">Appointment Date</x-base.form-label>
+                                <x-base.form-input value="{{ (!empty($job->calendar->date) ? date('d-m-Y', strtotime($job->calendar->date)) : '') }}" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                            </div>
+                            <div class="col-span-12 sm:col-span-4 z-20 calenderSlot {{ (!empty($job->calendar->calendar_time_slot_id) ? '' : 'hidden') }}">
+                                <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
+                                <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
+                                    <option value="">Please Select</option>
+                                    @if($slots->count() > 0)
+                                        @foreach($slots as $slot)
+                                            <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
+                                        @endforeach
+                                    @endif
+                                </x-base.tom-select>
+                                <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs mt-1"></div>
                             </div>
                         </div>
                     </div>

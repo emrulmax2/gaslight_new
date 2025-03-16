@@ -28,7 +28,7 @@
     <form method="post" action="#" id="addCustomerJobForm">
         <input type="hidden" name="customer_id" value="{{ $customer->id }}">
         <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-9">
+            <div class="col-span-12 sm:col-span-9 relative z-20">
                 <div class="intro-y box">
                 <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">
@@ -78,10 +78,10 @@
                                     @endif
                                 </x-base.tom-select>
                             </div>
-                            <div class="col-span-12 sm:col-span-4">
+                            {{-- <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="due_date">Due Date</x-base.form-label>
                                 <x-base.litepicker name="due_date" id="due_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />
-                            </div>
+                            </div> --}}
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="customer_job_status_id">Job Status</x-base.form-label>
                                 <x-base.tom-select class="w-full" id="customer_job_status_id" name="customer_job_status_id" data-placeholder="Please Select">
@@ -93,15 +93,34 @@
                                     @endif
                                 </x-base.tom-select>
                             </div>
+
+                            
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="reference_no">Job Ref No</x-base.form-label>
                                 <x-base.form-input name="reference_no" id="reference_no" class="w-full" type="text" placeholder="Reference No" />
+                            </div>
+                            <div class="col-span-12 sm:col-span-4">
+                                <x-base.form-label for="job_calender_date">Appointment Date</x-base.form-label>
+                                <x-base.form-input value="" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                                <div class="acc__input-error error-job_calender_date text-danger text-xs mt-1"></div>
+                            </div>
+                            <div class="col-span-12 sm:col-span-4 z-20 hidden calenderSlot">
+                                <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
+                                <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
+                                    <option value="">Please Select</option>
+                                    @if($slots->count() > 0)
+                                        @foreach($slots as $slot)
+                                            <option value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
+                                        @endforeach
+                                    @endif
+                                </x-base.tom-select>
+                                <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs mt-1"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 sm:col-span-3">
+            <div class="col-span-12 sm:col-span-3 relative z-10">
                 <div class="intro-y box p-5">
                     <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-3" variant="success">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />

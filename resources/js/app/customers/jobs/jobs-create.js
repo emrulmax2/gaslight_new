@@ -164,7 +164,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('customers.job-addresses.store', customer_id),
+            url: route('customer.job-addresses.store', customer_id),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
@@ -368,5 +368,36 @@ import INTAddressLookUps from '../../../address_lookup.js';
         })
     });
     /* END: Search Address & Customers */
+
+    let dateOption = {
+        autoApply: true,
+        singleMode: true,
+        numberOfColumns: 1,
+        numberOfMonths: 1,
+        showWeekNumbers: false,
+        minDate: new Date() - 1,
+        inlineMode: false,
+        format: "DD-MM-YYYY",
+        dropdowns: {
+            minYear: 1900,
+            maxYear: 2050,
+            months: true,
+            years: true,
+        },
+    };
+    const jobCalenderDate = new Litepicker({
+        element: document.getElementById('job_calender_date'),
+        ...dateOption
+    });
+
+    const calenderSlot = document.querySelector('.calenderSlot');
+
+    jobCalenderDate.on('selected', (date) => {
+        if(date){
+            calenderSlot.classList.remove('hidden');
+        }else{
+            calenderSlot.classList.add('hidden');
+        }
+    });
 
 })();

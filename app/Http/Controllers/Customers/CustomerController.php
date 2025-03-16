@@ -103,7 +103,7 @@ class CustomerController extends Controller
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'first_name' => (!empty($request->first_name) ? $request->first_name : null),
-            'last_name' => $request->first_name,
+            'last_name' => (isset($request->last_name) && !empty($request->last_name) ? $request->last_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
@@ -143,7 +143,13 @@ class CustomerController extends Controller
                 'other_email' => (!empty($request->other_email) ? $request->other_email : null),
                 'created_by' => auth()->user()->id
             ]);
-            return response()->json(['msg' => 'Customer successfully created.', 'red' => route('customers')], 200);
+            return response()->json([
+                'msg' => 'Customer successfully created.',
+                'record' => $request->record,
+                'red' => isset(request()->record) && !empty(request()->record) 
+                    ? route('jobs.create', ['record' => request()->record])
+                    : route('customers')
+            ], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
@@ -168,7 +174,7 @@ class CustomerController extends Controller
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'first_name' => (!empty($request->first_name) ? $request->first_name : null),
-            'last_name' => $request->last_name,
+            'last_name' => (isset($request->last_name) && !empty($request->last_name) ? $request->last_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),

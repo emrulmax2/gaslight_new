@@ -8,9 +8,8 @@
     <div class="intro-y mt-8 flex items-center flex-row">
         <h2 class="mr-auto text-lg font-medium">Jobs</h2>
         <div class="flex mt-0 w-auto">
-            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Dashboard
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+                <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
         </div>
     </div>

@@ -46,7 +46,13 @@ import Litepicker from 'litepicker';
         $('#jobSaveBtn', $theForm).attr('disabled', 'disabled');
         $("#jobSaveBtn .theLoader").fadeIn();
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordParam = urlParams.get('record');
+
         let form_data = new FormData(form);
+        if(recordParam){
+            form_data.append('record', recordParam);
+        }
         axios({
             method: "post",
             url: route('jobs.store', customer_id),
@@ -165,7 +171,7 @@ import Litepicker from 'litepicker';
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('customers.job-addresses.store', customer_id),
+            url: route('customer.job-addresses.store', customer_id),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {

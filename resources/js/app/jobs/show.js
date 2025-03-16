@@ -30,7 +30,14 @@ import Litepicker from "litepicker";
         $('#jobUpdateBtn', $theForm).attr('disabled', 'disabled');
         $("#jobUpdateBtn .theLoader").fadeIn();
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordParam = urlParams.get('record');
+
         let form_data = new FormData(form);
+
+        if(recordParam){
+            form_data.append('record', recordParam);
+        }
         axios({
             method: "post",
             url: route('jobs.update'),

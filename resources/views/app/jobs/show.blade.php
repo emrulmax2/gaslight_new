@@ -8,9 +8,8 @@
     <div class="intro-y mt-8 flex items-center flex-row">
         <h2 class="mr-auto text-lg font-medium">Job Details</h2>
         <div class="flex mt-0 w-auto">
-            <x-base.button as="a" href="{{ route('jobs') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Job List
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+                <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
         </div>
     </div>
@@ -69,7 +68,7 @@
                                 <x-base.form-label for="job_calender_date">Appointment Date</x-base.form-label>
                                 <x-base.form-input value="{{ (!empty($job->calendar->date) ? date('d-m-Y', strtotime($job->calendar->date)) : '') }}" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
                             </div>
-                            <div class="col-span-12 sm:col-span-4 calenderSlot {{ (!empty($job->calendar->calendar_time_slot_id) ? '' : 'hidden') }}">
+                            <div class="col-span-12 sm:col-span-4 z-20 calenderSlot {{ (!empty($job->calendar->calendar_time_slot_id) ? '' : 'hidden') }}">
                                 <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
                                 <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
@@ -85,7 +84,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 sm:col-span-3">
+            <div class="col-span-12 sm:col-span-3 z-10">
                 <div class="intro-y box mb-5">
                     <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">
@@ -151,9 +150,9 @@
                         Update Job
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                     </x-base.button>
-                    <x-base.button as="a" href="{{ route('company.dashboard') }}" class="w-full" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="home" />
-                        Home
+                    <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs', ['record' => request()->record]) :  route('jobs')) }}" class="w-full" variant="danger">
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                        Cancel
                     </x-base.button>
                     
                     <x-base.form-input type="hidden" value="{{ $job->id }}" name="customer_job_id" />

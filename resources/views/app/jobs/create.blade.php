@@ -8,9 +8,8 @@
     <div class="intro-y mt-8 flex items-center flex-row">
         <h2 class="mr-auto text-lg font-medium">New Job</h2>
         <div class="flex mt-0 w-auto">
-            <x-base.button as="a" href="{{ route('jobs') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Job List
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+                <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
         </div>
     </div>
@@ -36,7 +35,7 @@
                                         <div class="p-10 flex justify-center items-center"><span class="h-10 w-10"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span></div>
                                     </div>
 
-                                    <x-base.button as="a" href="{{ route('customers.create') }}" class="text-white font-bold w-full rounded-md rounded-tl-none rounded-tr-none" variant="success">
+                                    <x-base.button as="a" href="{{ route('customers.create', ['record' => 'invoice']) }}" class="text-white font-bold w-full rounded-md rounded-tl-none rounded-tr-none" variant="success">
                                         <x-base.lucide class="mr-2 h-4 w-4 stroke-[1.3]" icon="plus-circle" />
                                         Add Customer
                                     </x-base.button>
@@ -106,7 +105,7 @@
                                 <x-base.form-input value="" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
                                 <div class="acc__input-error error-job_calender_date text-danger text-xs mt-1"></div>
                             </div>
-                            <div class="col-span-12 sm:col-span-4 hidden calenderSlot">
+                            <div class="col-span-12 sm:col-span-4 z-20 hidden calenderSlot">
                                 <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
                                 <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
@@ -122,16 +121,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 sm:col-span-3">
+            <div class="col-span-12 sm:col-span-3 z-10">
                 <div class="intro-y box p-5">
                     <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-3" variant="success">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
                         Save Job
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                     </x-base.button>
-                    <x-base.button as="a" href="{{ route('company.dashboard') }}" class="w-full" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="home" />
-                        Home
+                    <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs', ['record' => request()->record]) :  route('jobs')) }}" class="w-full" variant="danger">
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                        Cancel
                     </x-base.button>
                 </div>
             </div>

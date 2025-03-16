@@ -5,19 +5,9 @@
 @endsection
 
 @section('subcontent')
-    <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
-        <h2 class="mr-auto text-lg font-medium hidden lg:block">New Customer</h2>
-        <div class="mt-4 w-full sm:mt-0 sm:w-auto hidden lg:flex gap-2">
-            <x-base.button as="a" href="{{ route('customers') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Customer List
-            </x-base.button>
-            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
-                <x-base.lucide class="h-4 w-4" icon="home" />
-            </x-base.button>
-        </div>
-        <div class="flex w-full justify-between items-center lg:hidden">
-            <h2 class="text-lg font-medium">New Customer</h2>
+    <div class="intro-y mt-8 flex items-center">
+        <h2 class="mr-auto text-lg font-medium">New Customer</h2>
+        <div class=" sm:w-auto flex gap-2">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
@@ -197,9 +187,9 @@
                                         Save Customer
                                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                     </x-base.button>
-                                    <x-base.button as="a" href="{{ route('company.dashboard') }}" class="w-full shadow-md" variant="danger">
-                                        <x-base.lucide class="mr-2 h-4 w-4" icon="home" />
-                                        Home
+                                    <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs.create', ['record' => request()->record]) :  route('customers')) }}" class="w-full" variant="danger">
+                                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                                        Cancel
                                     </x-base.button>
                                 </div>
                             </div>

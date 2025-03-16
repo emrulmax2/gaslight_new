@@ -73,7 +73,7 @@
                     </div>
                     <div class="space-y-2">
                         <p class="text-gray-700 font-medium">GAS RATE
-                            <span class="text-gray-500 text-sm block">FT<sup>3</sup>/HR</span>
+                            <span class="text-gray-500 text-sm block">M<sup>3</sup>/HR</span>
                         </p>
                         <p id="gas_rate" class="text-lg sm:text-3xl font-bold text-gray-800">0.00</p>
                     </div>
