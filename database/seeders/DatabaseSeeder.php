@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->callIfNotSeeded(CompanySeeder::class);
         $this->callIfNotSeeded(StaffSeeder::class);
         $this->callIfNotSeeded(TitleSeeder::class);
+        $this->callIfNotSeeded(PaymentMethodSeeder::class);
     }
 
     /**
