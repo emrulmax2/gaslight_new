@@ -30,6 +30,11 @@ class DatabaseSeeder extends Seeder
         $this->callIfNotSeeded(StaffSeeder::class);
         $this->callIfNotSeeded(TitleSeeder::class);
         $this->callIfNotSeeded(PaymentMethodSeeder::class);
+        $this->callIfNotSeeded(ApplianceFlueTypeSeeder::class);
+        $this->callIfNotSeeded(ApplianceLocationSeeder::class);
+        $this->callIfNotSeeded(ApplianceTypeSeeder::class);
+        $this->callIfNotSeeded(BoilerBrandsSeeder::class);
+        $this->callIfNotSeeded(RelationSeeder::class);
     }
 
     /**
