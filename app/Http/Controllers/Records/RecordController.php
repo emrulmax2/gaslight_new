@@ -72,7 +72,7 @@ class RecordController extends Controller
     protected function jobInvoiceCheck($job_id, $form_id){
         $job = CustomerJob::find($job_id);
         $user_id = auth()->user()->id;
-        $company = Company::where('user_id', $user_id)->get()->first();
+        $company = Company::with('bank')->where('user_id', $user_id)->get()->first();
         $invoice = Invoice::with('items')->where('customer_job_id', $job_id)->where('job_form_id', $form_id)
                     ->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         if(isset($invoice->id) && $invoice->id > 0):
@@ -100,6 +100,7 @@ class RecordController extends Controller
                 'reference_no' => (isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : null),
                 'non_vat_invoice' => (isset($company->vat_number) && !empty($company->vat_number) ? 0 : 1),
                 'vat_number' => (isset($company->vat_number) && !empty($company->vat_number) ? $company->vat_number : null),
+                'payment_term' => (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null),
                 'status' => 'Draft',
                 
                 'created_by' => $user_id
