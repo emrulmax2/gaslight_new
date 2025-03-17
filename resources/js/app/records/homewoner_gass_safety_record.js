@@ -311,8 +311,13 @@ import INTAddressLookUps from '../../address_lookup.js';
         let theHtml = theMake > 0 ? theMakeText+' ' : '';
             theHtml += theType > 0 ? theTypeText : '';
 
-        $theFieldset.find('.wizard-fieldset-header h2 span').html(theHtml);
-        $('.form-wizard-steps .form-wizard-step-item').eq(fieldSetIndex).children('span').html(theHtml);
+        if(theHtml != ''){
+            $theFieldset.find('.wizard-fieldset-header h2 span').html(theHtml);
+            $('.form-wizard-steps .form-wizard-step-item').eq(fieldSetIndex).children('span').html(theHtml);
+        }else{
+            $theFieldset.find('.wizard-fieldset-header h2 span').html($theFieldset.attr('data-title'));
+            $('.form-wizard-steps .form-wizard-step-item').eq(fieldSetIndex).children('span').html($('.form-wizard-steps .form-wizard-step-item').eq(fieldSetIndex).attr('data-title'));
+        }
     });
     $('.applianceType').on('change', function(){
         let $theType = $(this);

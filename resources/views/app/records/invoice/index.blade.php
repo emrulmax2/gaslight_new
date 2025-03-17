@@ -98,7 +98,7 @@
                                         </div>
                                     @endif
                                     <br>
-                                    @if($company->non_vat_invoice != 1)
+                                    @if($invoice->non_vat_invoice != 1)
                                     <div class="vatNumberField">
                                         <span class="font-bold">VAT:</span>
                                         <span>{{ $invoice->vat_number }}</span>
@@ -222,42 +222,42 @@
                         </div>
                     </div>
                     <div class="flex flex-col-reverse px-5 pb-10 sm:flex-row sm:px-8 sm:pb-8">
-                        <div class="mt-10 text-center sm:mt-0 sm:text-left w-2/5">
-                            <div class=" text-slate-500">Notes:</div>
-                            <div class="mt-1 text-lg">
-                                <textarea name="notes" class="w-full transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 " rows="2">{{ (!empty($invoice->notes) ? $invoice->notes : '') }}</textarea>
-                            </div>
-                            <div class="grid grid-cols-12 gap-4 mt-3">
+                        <div class="mt-10 text-center sm:mt-0 sm:text-left w-3/5">
+                            <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-12 sm:col-span-6">
                                     <x-base.form-label class="mb-1">Payment Terms</x-base.form-label>
-                                    <x-base.form-textarea rows="2" name="payment_terms" class="w-full">{{ (isset($company->bank->payment_term) ? $company->bank->payment_term : '') }}</x-base.form-textarea>
+                                    <x-base.form-textarea rows="2" name="payment_term" class="w-full">{{ (isset($invoice->payment_term) ? $invoice->payment_term : '') }}</x-base.form-textarea>
                                 </div>
-                                <div class="col-span-12 sm:col-span-6">
-                                    <x-base.form-label class="mb-1 font-medium">Bank Details:</x-base.form-label>
+                                <div class="col-span-12 sm:col-span-6 sm:pl-10">
+                                    <x-base.form-label class="mb-1">Bank Details:</x-base.form-label>
                                     @if(isset($company->bank->bank_name) && !empty($company->bank->bank_name))
-                                    <div>
-                                        <span class="font-medium text-slate-500 mr-3">Bank Name:</span>
+                                    <div class="mb-1">
+                                        <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Bank Name:</span>
                                         <span>{{ $company->bank->bank_name}}</span>
                                     </div>
                                     @endif
                                     @if(isset($company->bank->name_on_account) && !empty($company->bank->name_on_account))
-                                    <div>
-                                        <span class="font-medium text-slate-500 mr-3">Account Name:</span>
+                                    <div class="mb-1">
+                                        <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Account Name:</span>
                                         <span>{{ $company->bank->name_on_account}}</span>
                                     </div>
                                     @endif
                                     @if(isset($company->bank->sort_code) && !empty($company->bank->sort_code))
-                                    <div>
-                                        <span class="font-medium text-slate-500 mr-3">Sort Code:</span>
+                                    <div class="mb-1">
+                                        <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Sort Code:</span>
                                         <span>{{ $company->bank->sort_code}}</span>
                                     </div>
                                     @endif
                                     @if(isset($company->bank->account_number) && !empty($company->bank->account_number))
-                                    <div>
-                                        <span class="font-medium text-slate-500 mr-3">Account Number:</span>
+                                    <div class="mb-1">
+                                        <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Account Number:</span>
                                         <span>{{ $company->bank->account_number}}</span>
                                     </div>
                                     @endif
+                                </div>
+                                <div class="col-span-12 sm:col-span-6">
+                                    <x-base.form-label class="mb-1">Notes</x-base.form-label>
+                                    <x-base.form-textarea rows="2" name="notes" class="w-full">{{ (!empty($invoice->notes) ? $invoice->notes : '') }}</x-base.form-textarea>
                                 </div>
                             </div>
                         </div>

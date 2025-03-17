@@ -96,13 +96,13 @@
                         </h2>
                     </div>
                     <div class="p-5">
-                        <dib class="flex items-start justify-start mb-1">
+                        <div class="flex items-start justify-start mb-1">
                             <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="user" />
                             <span class="font-medium text-slate-500">
                                 {{ $job->customer->full_name }}
                             </span>
-                        </dib>
-                        <dib class="flex items-start justify-start mb-1">
+                        </div>
+                        <div class="flex items-start justify-start mb-1">
                             <x-base.lucide class="mr-3 h-4 w-4 text-danger" icon="map-pin" />
                             <span class="text-slate-500">
                                 {{ $job->customer->address_line_1.' '.$job->customer->address_line_2.', ' }}
@@ -111,13 +111,15 @@
                                 {{ (isset($job->customer->postal_code) && !empty($job->customer->postal_code) ? $job->customer->postal_code.', ' : '') }}
                                 {{ (isset($job->customer->country) && !empty($job->customer->country) ? $job->customer->country : '') }}
                             </span>
-                        </dib>
-                        <dib class="flex items-start justify-start">
+                        </div>
+                        @if(isset($job->customer->contact->mobile) && !empty($job->customer->contact->mobile))
+                        <div class="flex items-start justify-start">
                             <x-base.lucide class="mr-3 h-4 w-4 text-danger" icon="smartphone" />
                             <span class="text-slate-500">
                                 {{ (isset($job->customer->contact->mobile) && !empty($job->customer->contact->mobile) ? $job->customer->contact->mobile.', ' : '') }}
                             </span>
-                        </dib>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 <div class="intro-y box mb-5">
@@ -127,13 +129,13 @@
                         </h2>
                     </div>
                     <div class="p-5">
-                        <dib class="flex items-start justify-start mb-1">
+                        <div class="flex items-start justify-start mb-1">
                             <x-base.lucide class="mr-3 h-4 w-4 text-warning" icon="user" />
                             <span class="font-medium text-slate-500">
                                 {{ (isset($job->property->customer->full_name) && !empty($job->property->customer->full_name) ? $job->property->customer->full_name : '') }}
                             </span>
-                        </dib>
-                        <dib class="flex items-start justify-start mb-1">
+                        </div>
+                        <div class="flex items-start justify-start mb-1">
                             <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="map-pin" />
                             <span class="text-slate-500">
                                 {{ (isset($job->property->address_line_1) && !empty($job->property->address_line_1) ? $job->property->address_line_1.' '.$job->property->address_line_2.', ' : '') }}
@@ -142,7 +144,7 @@
                                 {{ (isset($job->property->postal_code) && !empty($job->property->postal_code) ? $job->property->postal_code.', ' : '') }}
                                 {{ (isset($job->property->country) && !empty($job->property->country) ? $job->property->country : '') }}
                             </span>
-                        </dib>
+                        </div>
                     </div>
                 </div>
                 <div class="intro-y box p-5">

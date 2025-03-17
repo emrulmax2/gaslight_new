@@ -23,6 +23,7 @@ class Invoice extends Model
         'payment_method_id',
         'advance_date',
         'notes',
+        'payment_term',
         'status',
         
         'created_by',
