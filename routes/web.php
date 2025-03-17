@@ -259,7 +259,8 @@ Route::middleware(Authenticate::class)->group(function() {
     });
 
     Route::controller(RecordController::class)->group(function() {
-        Route::get('records/{record}/{job}', 'index')->name('records');
+        Route::get('create-records', 'index')->name('records.create');
+        Route::get('records/{record}/{job}', 'records')->name('records');
     });
     
     Route::controller(InvoiceController::class)->group(function(){

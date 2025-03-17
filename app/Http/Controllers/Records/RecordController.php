@@ -22,7 +22,18 @@ use Illuminate\Support\Number;
 
 class RecordController extends Controller
 {
-    public function index($record, CustomerJob $job){
+    public function index(){
+        return view('app.records.index', [
+            'title' => 'Create New Record - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Create Records', 'href' => 'javascript:void(0);'],
+            ],
+            'forms' => JobForm::with('childs')->where('parent_id', 0)->orderBy('id', 'ASC')->get()
+        ]);
+    }
+
+
+    public function records($record, CustomerJob $job){
         $job->load(['customer', 'customer.contact', 'property']);
         $form = JobForm::where('slug', $record)->get()->first();
         $data = [

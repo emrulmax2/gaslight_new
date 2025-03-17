@@ -24,7 +24,7 @@ class Dashboard extends Controller
             'recent_jobs' => CustomerJob::with('customer', 'property')->where('created_by', $theUser)->orderBy('id', 'DESC')->take(5)->get(),
             'user_jobs' => CustomerJob::where('created_by', $theUser)->get()->count(),
             'user_customers' => Customer::where('created_by', $theUser)->get()->count(),
-            'forms' => JobForm::with('childs')->where('parent_id', 0)->orderBy('id', 'ASC')->get()
+            //'forms' => JobForm::with('childs')->where('parent_id', 0)->orderBy('id', 'ASC')->get()
         ]);
     }
 }
