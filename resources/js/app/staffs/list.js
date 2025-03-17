@@ -15,7 +15,7 @@
         let queryStr = $('#query-Eng').val() != '' ? $('#query-Eng').val() : '';
         let status = $('#status-Eng').val() != '' ? $('#status-Eng').val() : '1';
         // Setup Tabulator
-        const tabulator = new Tabulator("#staffListTable", {
+        const tableData = new Tabulator("#staffListTable", {
             ajaxURL: route('staff.list'),
             ajaxParams: {
                 user_id: user,
@@ -27,8 +27,8 @@
             printAsHtml: true,
             printStyled: true,
             pagination: 'remote',
-            paginationSize: 10,
-            paginationSizeSelector: [true, 5, 10, 20, 30, 40],
+            paginationSize: 30,
+            paginationSizeSelector: [true, 30,50,100],
             layout: 'fitColumns',
             responsiveLayout: 'collapse',
             placeholder: 'No matching records found',
@@ -162,7 +162,7 @@
                 },
             ],
             ajaxResponse:function(url, params, response){
-                return response;
+                return response.data;
             },
             renderComplete() {
                 createIcons({
@@ -173,7 +173,7 @@
             },
         });
 
-        tabulator.on("renderComplete", () => {
+        tableData.on("renderComplete", () => {
             createIcons({
                 icons,
                 attrs: {
@@ -185,7 +185,7 @@
 
         // Redraw table onresize
         window.addEventListener("resize", () => {
-            tabulator.redraw();
+            tableData.redraw();
             createIcons({
                 icons,
                 "stroke-width": 1.5,
@@ -198,7 +198,7 @@
             let field = $("#tabulator-html-filter-field").val();
             let type = $("#tabulator-html-filter-type").val();
             let value = $("#tabulator-html-filter-value").val();
-            tabulator.setFilter(field, type, value);
+            tableData.setFilter(field, type, value);
         }
 
         // On submit filter form
@@ -228,28 +228,28 @@
 
         // Export
         $("#tabulator-export-csv").on("click", function (event) {
-            tabulator.download("csv", "data.csv");
+            tableData.download("csv", "data.csv");
         });
 
         $("#tabulator-export-json").on("click", function (event) {
-            tabulator.download("json", "data.json");
+            tableData.download("json", "data.json");
         });
 
         $("#tabulator-export-xlsx").on("click", function (event) {
-            tabulator.download("xlsx", "data.xlsx", {
+            tableData.download("xlsx", "data.xlsx", {
                 sheetName: "Products",
             });
         });
 
         $("#tabulator-export-html").on("click", function (event) {
-            tabulator.download("html", "data.html", {
+            tableData.download("html", "data.html", {
                 style: true,
             });
         });
 
         // Print
         $("#tabulator-print").on("click", function (event) {
-            tabulator.print();
+            tableData.print();
         });
     }
 })();
