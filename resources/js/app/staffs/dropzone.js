@@ -1,4 +1,4 @@
-const { default: axios } = require("axios");
+// Dropzone
 
 (function () {
     "use strict";

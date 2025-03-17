@@ -200,7 +200,7 @@ export default defineConfig({
                 "resources/js/app/calculator/calculator.js",
                 "resources/js/app/initial-setup.js",
                 
-                "resources/js/app/homewoner_gass_safety_record.js",
+                "resources/js/app/records/homewoner_gass_safety_record.js",
 
             ],
             refresh: true,
