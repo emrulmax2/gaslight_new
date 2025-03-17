@@ -3,7 +3,8 @@ if (localStorage.getItem("theme-color") === null) {
     localStorage.setItem("theme-color", "theme-3");
     $("html").attr("class", "theme-3");
 } else {
-    $("html").attr("class", localStorage.getItem("theme-color"));
+    //$("html").attr("class", localStorage.getItem("theme-color"));
+    $("html").attr("class", "theme-3");
 }
 
 // Set appearance mode on page load
