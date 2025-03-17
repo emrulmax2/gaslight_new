@@ -450,7 +450,7 @@
 </x-base.dialog>
 
 <!-- BEGIN: Modal Content -->
-<x-base.dialog id="createCertificateOrInvModal">
+{{--<x-base.dialog id="createCertificateOrInvModal">
     <x-base.dialog.panel>
         <form method="post" action="#" id="createCertificateOrInvForm">
             <x-base.dialog.description class="p-0">
@@ -478,5 +478,5 @@
             </x-base.dialog.description>
         </form>
     </x-base.dialog.panel>
-</x-base.dialog>
+</x-base.dialog>--}}
 <!-- END: Modal Content -->

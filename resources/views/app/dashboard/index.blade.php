@@ -20,7 +20,7 @@
                         </a>
                     </div>--}}
                     <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
-                        <div data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                        <a href="{{ route('records.create') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
@@ -28,7 +28,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-success"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="file-plus"
                                         />
                                     </div>
@@ -36,7 +36,7 @@
                                     <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         <div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
                             <div @class([
                                 'relative zoom-in',
@@ -63,7 +63,7 @@
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
                                             class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="User"
+                                            icon="Users"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Customers</div>
@@ -82,8 +82,8 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
-                                            icon="flame"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                            icon="Briefcase"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Jobs</div>
@@ -102,7 +102,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="calendar"
                                         />
                                     </div>
@@ -119,12 +119,12 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
-                                            icon="flame"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                            icon="calculator"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Gas Rate Calculator</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="flame" />
+                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
                             </div>
                         </a>
@@ -136,8 +136,8 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-info"
-                                            icon="thermometer-sun"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                            icon="BookOpen"
                                         />
                                     </div>
                                     <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Boiler Manual</div>
@@ -153,7 +153,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-danger"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="settings"
                                         />
                                     </div>
@@ -170,7 +170,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="file-text"
                                         />
                                     </div>
@@ -1082,7 +1082,7 @@
                     <!-- END: Schedules -->--}}
                 </div>
             </div>
-        </div>--}}
+        </div>
     </div>
     @include('app.dashboard.modal.index')
 @endsection

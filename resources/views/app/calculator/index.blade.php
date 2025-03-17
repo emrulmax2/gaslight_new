@@ -42,7 +42,7 @@
             </div>
             <div class="buttons flex mb-8">
                 <x-base.button id="reset" class="mb-2 mr-2 sm:mr-3 w-24 text-white" variant="warning">Reset</x-base.button>
-                <x-base.button id="start" class="mb-2 mr-2 sm:mr-3 w-24 text-white" variant="success">Start</x-base.button>
+                <x-base.button id="start" class="mb-2 mr-2 sm:mr-3 w-24 text-white hidden" variant="success">Start</x-base.button>
                 <x-base.button id="calculate" class="mb-2 mr-1 w-24 text-white hidden" variant="primary">Calculate</x-base.button>
             </div>
             <div class="base-timer relative w-60 h-60 mb-8">
@@ -60,7 +60,7 @@
                     <span class="imperial_timer">0:00</span>
                     <x-base.form-select id="metric_timer" class="w-24 hidden" data-placeholder="Please Select">
                         <option value="60">01.00</option>
-                        <option value="120">02.00</option>
+                        <option value="120" selected>02.00</option>
                     </x-base.form-select>
                     <span class="timeLabel"></span>
                 </div>
@@ -73,7 +73,7 @@
                     </div>
                     <div class="space-y-2">
                         <p class="text-gray-700 font-medium">GAS RATE
-                            <span class="text-gray-500 text-sm block">FT<sup>3</sup>/HR</span>
+                            <span class="text-gray-500 text-sm block">M<sup>3</sup>/HR</span>
                         </p>
                         <p id="gas_rate" class="text-lg sm:text-3xl font-bold text-gray-800">0.00</p>
                     </div>

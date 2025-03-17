@@ -89,7 +89,7 @@ class CustomerJobAddressController extends Controller
                     'full_name' => $list->customer->full_name,
                     'mobile' => isset($list->contact->mobile) ? $list->contact->mobile : '',
                     'customer_id' => $list->customer_id,
-                    'address' => implode(', ', $addressParts),
+                    'address' => $list->full_address,
                     'deleted_at' => $list->deleted_at
                 ];
                 $i++;

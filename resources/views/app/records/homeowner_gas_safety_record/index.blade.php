@@ -72,7 +72,10 @@
             <div class="col-span-12 sm:col-span-9">
                 <fieldset id="step_1" class="wizard-fieldset intro-y box show mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Job Address Details</h2>
+                        <h2 class="text-base font-medium inline-flex items-center">
+                            <x-base.lucide class="w-4 h-4 text-success mr-2" icon="check-circle"/>
+                            Job Address Details
+                        </h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="jobAddressDetailsForm">
@@ -141,7 +144,10 @@
                 </fieldset>
                 <fieldset id="step_2" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Customer Details</h2>
+                        <h2 class="text-base font-medium inline-flex items-center">
+                            <x-base.lucide class="w-4 h-4 text-success mr-2" icon="check-circle"/>
+                            Customer Details
+                        </h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="customerDetailsForm">
@@ -209,7 +215,11 @@
                 </fieldset>
                 <fieldset id="step_3" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 1 <span class="info">{{ (isset($gsra1->make->name) && !empty($gsra1->make->name) ? $gsra1->make->name.' ' : '') }}{{ (isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name.' ' : '') }}</h2>
+                        <h2 class="text-base font-medium inline-flex items-center">
+                            <x-base.lucide style="display: {{ (isset($gsra1->id) && $gsra1->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
+                            <x-base.lucide style="display: {{ (isset($gsra1->id) && $gsra1->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/> 
+                            <span>Appliance 1 <span class="info">{{ (isset($gsra1->make->name) && !empty($gsra1->make->name) ? ' - '.$gsra1->make->name.' ' : '') }}{{ (isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name.' ' : '') }}</span>
+                        </h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm">
@@ -280,53 +290,80 @@
                             <div class="col-span-12 sm:col-span-4"></div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Safety Devices</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->safety_devices) && $gsra1->safety_devices == 'Yes' ? '1' : '0') }}" id="app_1_sd_yes" name="app[1][safety_devices]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_sd_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->safety_devices) && $gsra1->safety_devices == 'No' ? '1' : '0') }}" id="app_1_sd_no" name="app[1][safety_devices]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_sd_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->safety_devices) && $gsra1->safety_devices == 'N/A' ? '1' : '0') }}" id="app_1_sd_na" name="app[1][safety_devices]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_sd_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_sd_yes" name="app[1][safety_devices]" {{ (isset($gsra1->safety_devices) && $gsra1->safety_devices == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_sd_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_sd_no" name="app[1][safety_devices]" {{ (isset($gsra1->safety_devices) && $gsra1->safety_devices == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_sd_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_sd_na" name="app[1][safety_devices]" {{ (isset($gsra1->safety_devices) && $gsra1->safety_devices == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_sd_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Spillage Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->spillage_test) && $gsra1->spillage_test == 'Pass' ? '1' : '0') }}" id="app_1_spgt_yes" name="app[1][spillage_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_1_spgt_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->spillage_test) && $gsra1->spillage_test == 'Fail' ? '1' : '0') }}" id="app_1_spgt_no" name="app[1][spillage_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_1_spgt_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->spillage_test) && $gsra1->spillage_test == 'N/A' ? '1' : '0') }}" id="app_1_spgt_na" name="app[1][spillage_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_spgt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_spgt_yes" name="app[1][spillage_test]" {{ (isset($gsra1->spillage_test) && $gsra1->spillage_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_spgt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_spgt_no" name="app[1][spillage_test]" {{ (isset($gsra1->spillage_test) && $gsra1->spillage_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_spgt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_spgt_na" name="app[1][spillage_test]" {{ (isset($gsra1->spillage_test) && $gsra1->spillage_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_spgt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Smoke Pellet Flue Flow Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->smoke_pellet_test) && $gsra1->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_1_spfft_yes" name="app[1][smoke_pellet_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_1_spfft_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->smoke_pellet_test) && $gsra1->smoke_pellet_test == 'Fail' ? '1' : '0') }}" id="app_1_spfft_no" name="app[1][smoke_pellet_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_1_spfft_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->smoke_pellet_test) && $gsra1->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_1_spfft_na" name="app[1][smoke_pellet_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_spfft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_spfft_yes" name="app[1][smoke_pellet_test]" {{ (isset($gsra1->smoke_pellet_test) && $gsra1->smoke_pellet_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_spfft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_spfft_no" name="app[1][smoke_pellet_test]" {{ (isset($gsra1->smoke_pellet_test) && $gsra1->smoke_pellet_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_spfft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_spfft_na" name="app[1][smoke_pellet_test]" {{ (isset($gsra1->smoke_pellet_test) && $gsra1->smoke_pellet_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_spfft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 pt-2">
@@ -407,138 +444,210 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Satisfactory Termination</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->satisfactory_termination) && $gsra1->satisfactory_termination == 'Yes' ? '1' : '0') }}" id="app_1_sft_yes" name="app[1][satisfactory_termination]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_sft_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->satisfactory_termination) && $gsra1->satisfactory_termination == 'No' ? '1' : '0') }}" id="app_1_sft_no" name="app[1][satisfactory_termination]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_sft_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->satisfactory_termination) && $gsra1->satisfactory_termination == 'N/A' ? '1' : '0') }}" id="app_1_sft_na" name="app[1][satisfactory_termination]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_sft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_sft_yes" name="app[1][satisfactory_termination]" {{ (isset($gsra1->satisfactory_termination) && $gsra1->satisfactory_termination == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_sft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_sft_no" name="app[1][satisfactory_termination]" {{ (isset($gsra1->satisfactory_termination) && $gsra1->satisfactory_termination == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_sft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_sft_na" name="app[1][satisfactory_termination]" {{ (isset($gsra1->satisfactory_termination) && $gsra1->satisfactory_termination == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_sft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Flue Visual Condition</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->flue_visual_condition) && $gsra1->flue_visual_condition == 'Yes' ? '1' : '0') }}" id="app_1_fvc_yes" name="app[1][flue_visual_condition]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_fvc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->flue_visual_condition) && $gsra1->flue_visual_condition == 'No' ? '1' : '0') }}" id="app_1_fvc_no" name="app[1][flue_visual_condition]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_fvc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->flue_visual_condition) && $gsra1->flue_visual_condition == 'N/A' ? '1' : '0') }}" id="app_1_fvc_na" name="app[1][flue_visual_condition]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_fvc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_fvc_yes" name="app[1][flue_visual_condition]" {{ (isset($gsra1->flue_visual_condition) && $gsra1->flue_visual_condition == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_fvc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_fvc_no" name="app[1][flue_visual_condition]" {{ (isset($gsra1->flue_visual_condition) && $gsra1->flue_visual_condition == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_fvc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_fvc_na" name="app[1][flue_visual_condition]" {{ (isset($gsra1->flue_visual_condition) && $gsra1->flue_visual_condition == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_fvc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Adequate Ventilation</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->adequate_ventilation) && $gsra1->adequate_ventilation == 'Yes' ? '1' : '0') }}" id="app_1_av_yes" name="app[1][adequate_ventilation]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_av_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->adequate_ventilation) && $gsra1->adequate_ventilation == 'No' ? '1' : '0') }}" id="app_1_av_no" name="app[1][adequate_ventilation]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_av_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->adequate_ventilation) && $gsra1->adequate_ventilation == 'N/A' ? '1' : '0') }}" id="app_1_av_na" name="app[1][adequate_ventilation]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_av_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_av_yes" name="app[1][adequate_ventilation]" {{ (isset($gsra1->adequate_ventilation) && $gsra1->adequate_ventilation == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_av_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_av_no" name="app[1][adequate_ventilation]" {{ (isset($gsra1->adequate_ventilation) && $gsra1->adequate_ventilation == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_av_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_av_na" name="app[1][adequate_ventilation]" {{ (isset($gsra1->adequate_ventilation) && $gsra1->adequate_ventilation == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_av_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Landlord's Appliance</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->landlord_appliance) && $gsra1->landlord_appliance == 'Yes' ? '1' : '0') }}" id="app_1_la_yes" name="app[1][landlord_appliance]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_la_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->landlord_appliance) && $gsra1->landlord_appliance == 'No' ? '1' : '0') }}" id="app_1_la_no" name="app[1][landlord_appliance]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_la_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->landlord_appliance) && $gsra1->landlord_appliance == 'N/A' ? '1' : '0') }}" id="app_1_la_na" name="app[1][landlord_appliance]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_la_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_la_yes" name="app[1][landlord_appliance]" {{ (isset($gsra1->landlord_appliance) && $gsra1->landlord_appliance == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_la_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_la_no" name="app[1][landlord_appliance]" {{ (isset($gsra1->landlord_appliance) && $gsra1->landlord_appliance == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_la_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_la_na" name="app[1][landlord_appliance]" {{ (isset($gsra1->landlord_appliance) && $gsra1->landlord_appliance == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_la_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Inspected</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->inspected) && $gsra1->inspected == 'Yes' ? '1' : '0') }}" id="app_1_ipt_yes" name="app[1][inspected]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_ipt_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->inspected) && $gsra1->inspected == 'No' ? '1' : '0') }}" id="app_1_ipt_no" name="app[1][inspected]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_ipt_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->inspected) && $gsra1->inspected == 'N/A' ? '1' : '0') }}" id="app_1_ipt_na" name="app[1][inspected]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_ipt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_ipt_yes" name="app[1][inspected]" {{ (isset($gsra1->inspected) && $gsra1->inspected == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_ipt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_ipt_no" name="app[1][inspected]" {{ (isset($gsra1->inspected) && $gsra1->inspected == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_ipt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_ipt_na" name="app[1][inspected]" {{ (isset($gsra1->inspected) && $gsra1->inspected == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_ipt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Visual Check</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_visual_check) && $gsra1->appliance_visual_check == 'Yes' ? '1' : '0') }}" id="app_1_avc_yes" name="app[1][appliance_visual_check]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_avc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_visual_check) && $gsra1->appliance_visual_check == 'No' ? '1' : '0') }}" id="app_1_avc_no" name="app[1][appliance_visual_check]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_avc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_visual_check) && $gsra1->appliance_visual_check == 'N/A' ? '1' : '0') }}" id="app_1_avc_na" name="app[1][appliance_visual_check]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_avc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_avc_yes" name="app[1][appliance_visual_check]" {{ (isset($gsra1->appliance_visual_check) && $gsra1->appliance_visual_check == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_avc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_avc_no" name="app[1][appliance_visual_check]" {{ (isset($gsra1->appliance_visual_check) && $gsra1->appliance_visual_check == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_avc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_avc_na" name="app[1][appliance_visual_check]" {{ (isset($gsra1->appliance_visual_check) && $gsra1->appliance_visual_check == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_avc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Serviced</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_serviced) && $gsra1->appliance_serviced == 'Yes' ? '1' : '0') }}" id="app_1_as_yes" name="app[1][appliance_serviced]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_as_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_serviced) && $gsra1->appliance_serviced == 'No' ? '1' : '0') }}" id="app_1_as_no" name="app[1][appliance_serviced]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_as_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_serviced) && $gsra1->appliance_serviced == 'N/A' ? '1' : '0') }}" id="app_1_as_na" name="app[1][appliance_serviced]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_as_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_as_yes" name="app[1][appliance_serviced]" {{ (isset($gsra1->appliance_serviced) && $gsra1->appliance_serviced == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_as_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_as_no" name="app[1][appliance_serviced]" {{ (isset($gsra1->appliance_serviced) && $gsra1->appliance_serviced == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_as_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_as_na" name="app[1][appliance_serviced]" {{ (isset($gsra1->appliance_serviced) && $gsra1->appliance_serviced == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_as_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Safe to Use</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_safe_to_use) && $gsra1->appliance_safe_to_use == 'Yes' ? '1' : '0') }}" id="app_1_asu_yes" name="app[1][appliance_safe_to_use]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_1_asu_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_safe_to_use) && $gsra1->appliance_safe_to_use == 'No' ? '1' : '0') }}" id="app_1_asu_no" name="app[1][appliance_safe_to_use]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_1_asu_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra1->appliance_safe_to_use) && $gsra1->appliance_safe_to_use == 'N/A' ? '1' : '0') }}" id="app_1_asu_na" name="app[1][appliance_safe_to_use]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_1_asu_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_asu_yes" name="app[1][appliance_safe_to_use]" {{ (isset($gsra1->appliance_safe_to_use) && $gsra1->appliance_safe_to_use == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_asu_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_asu_no" name="app[1][appliance_safe_to_use]" {{ (isset($gsra1->appliance_safe_to_use) && $gsra1->appliance_safe_to_use == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_asu_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_1_asu_na" name="app[1][appliance_safe_to_use]" {{ (isset($gsra1->appliance_safe_to_use) && $gsra1->appliance_safe_to_use == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_1_asu_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -556,7 +665,11 @@
                 </fieldset>
                 <fieldset id="step_4" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 2 <span class="info">{{ (isset($gsra2->make->name) && !empty($gsra2->make->name) ? $gsra2->make->name.' ' : '') }}{{ (isset($gsra2->type->name) && !empty($gsra2->type->name) ? $gsra2->type->name.' ' : '') }}</h2>
+                        <h2 class="text-base font-medium inline-flex items-center">
+                            <x-base.lucide style="display: {{ (isset($gsra2->id) && $gsra2->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
+                            <x-base.lucide style="display: {{ (isset($gsra2->id) && $gsra2->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>
+                            <span>Appliance 2 <span class="info">{{ (isset($gsra2->make->name) && !empty($gsra2->make->name) ? $gsra2->make->name.' ' : '') }}{{ (isset($gsra2->type->name) && !empty($gsra2->type->name) ? $gsra2->type->name.' ' : '') }}</span>
+                        </h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm2">
@@ -627,53 +740,80 @@
                             <div class="col-span-12 sm:col-span-4"></div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Safety Devices</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->safety_devices) && $gsra2->safety_devices == 'Yes' ? '1' : '0') }}" id="app_2_sd_yes" name="app[2][safety_devices]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_sd_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->safety_devices) && $gsra2->safety_devices == 'No' ? '1' : '0') }}" id="app_2_sd_no" name="app[2][safety_devices]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_sd_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->safety_devices) && $gsra2->safety_devices == 'N/A' ? '1' : '0') }}" id="app_2_sd_na" name="app[2][safety_devices]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_sd_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_sd_yes" name="app[2][safety_devices]" {{ (isset($gsra2->safety_devices) && $gsra2->safety_devices == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_sd_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_sd_no" name="app[2][safety_devices]" {{ (isset($gsra2->safety_devices) && $gsra2->safety_devices == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_sd_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_sd_na" name="app[2][safety_devices]" {{ (isset($gsra2->safety_devices) && $gsra2->safety_devices == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_sd_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Spillage Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->spillage_test) && $gsra2->spillage_test == 'Pass' ? '1' : '0') }}" id="app_2_spgt_yes" name="app[2][spillage_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_2_spgt_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->spillage_test) && $gsra2->spillage_test == 'Fail' ? '1' : '0') }}" id="app_2_spgt_no" name="app[2][spillage_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_2_spgt_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->spillage_test) && $gsra2->spillage_test == 'N/A' ? '1' : '0') }}" id="app_2_spgt_na" name="app[2][spillage_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_spgt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_spgt_yes" name="app[2][spillage_test]" {{ (isset($gsra2->spillage_test) && $gsra2->spillage_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_spgt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_spgt_no" name="app[2][spillage_test]" {{ (isset($gsra2->spillage_test) && $gsra2->spillage_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_spgt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_spgt_na" name="app[2][spillage_test]" {{ (isset($gsra2->spillage_test) && $gsra2->spillage_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_spgt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Smoke Pellet Flue Flow Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->smoke_pellet_test) && $gsra2->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_2_spfft_yes" name="app[2][smoke_pellet_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_2_spfft_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->smoke_pellet_test) && $gsra2->smoke_pellet_test == 'Fail' ? '1' : '0') }}" id="app_2_spfft_no" name="app[2][smoke_pellet_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_2_spfft_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->smoke_pellet_test) && $gsra2->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_2_spfft_na" name="app[2][smoke_pellet_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_spfft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_spfft_yes" name="app[2][smoke_pellet_test]" {{ (isset($gsra2->smoke_pellet_test) && $gsra2->smoke_pellet_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_spfft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_spfft_no" name="app[2][smoke_pellet_test]" {{ (isset($gsra2->smoke_pellet_test) && $gsra2->smoke_pellet_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_spfft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_spfft_na" name="app[2][smoke_pellet_test]" {{ (isset($gsra2->smoke_pellet_test) && $gsra2->smoke_pellet_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_spfft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 pt-2">
@@ -754,138 +894,210 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Satisfactory Termination</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->satisfactory_termination) && $gsra2->satisfactory_termination == 'Yes' ? '1' : '0') }}" id="app_2_sft_yes" name="app[2][satisfactory_termination]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_sft_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->satisfactory_termination) && $gsra2->satisfactory_termination == 'No' ? '1' : '0') }}" id="app_2_sft_no" name="app[2][satisfactory_termination]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_sft_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->satisfactory_termination) && $gsra2->satisfactory_termination == 'N/A' ? '1' : '0') }}" id="app_2_sft_na" name="app[2][satisfactory_termination]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_sft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_sft_yes" name="app[2][satisfactory_termination]" {{ (isset($gsra2->satisfactory_termination) && $gsra2->satisfactory_termination == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_sft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_sft_no" name="app[2][satisfactory_termination]" {{ (isset($gsra2->satisfactory_termination) && $gsra2->satisfactory_termination == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_sft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_sft_na" name="app[2][satisfactory_termination]" {{ (isset($gsra2->satisfactory_termination) && $gsra2->satisfactory_termination == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_sft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Flue Visual Condition</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->flue_visual_condition) && $gsra2->flue_visual_condition == 'Yes' ? '1' : '0') }}" id="app_2_fvc_yes" name="app[2][flue_visual_condition]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_fvc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->flue_visual_condition) && $gsra2->flue_visual_condition == 'No' ? '1' : '0') }}" id="app_2_fvc_no" name="app[2][flue_visual_condition]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_fvc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->flue_visual_condition) && $gsra2->flue_visual_condition == 'N/A' ? '1' : '0') }}" id="app_2_fvc_na" name="app[2][flue_visual_condition]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_fvc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_fvc_yes" name="app[2][flue_visual_condition]" {{ (isset($gsra2->flue_visual_condition) && $gsra2->flue_visual_condition == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_fvc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_fvc_no" name="app[2][flue_visual_condition]" {{ (isset($gsra2->flue_visual_condition) && $gsra2->flue_visual_condition == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_fvc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_fvc_na" name="app[2][flue_visual_condition]" {{ (isset($gsra2->flue_visual_condition) && $gsra2->flue_visual_condition == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_fvc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Adequate Ventilation</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->adequate_ventilation) && $gsra2->adequate_ventilation == 'Yes' ? '1' : '0') }}" id="app_2_av_yes" name="app[2][adequate_ventilation]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_av_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->adequate_ventilation) && $gsra2->adequate_ventilation == 'No' ? '1' : '0') }}" id="app_2_av_no" name="app[2][adequate_ventilation]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_av_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->adequate_ventilation) && $gsra2->adequate_ventilation == 'N/A' ? '1' : '0') }}" id="app_2_av_na" name="app[2][adequate_ventilation]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_av_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_av_yes" name="app[2][adequate_ventilation]" {{ (isset($gsra2->adequate_ventilation) && $gsra2->adequate_ventilation == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_av_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_av_no" name="app[2][adequate_ventilation]" {{ (isset($gsra2->adequate_ventilation) && $gsra2->adequate_ventilation == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_av_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_av_na" name="app[2][adequate_ventilation]" {{ (isset($gsra2->adequate_ventilation) && $gsra2->adequate_ventilation == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_av_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Landlord's Appliance</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->landlord_appliance) && $gsra2->landlord_appliance == 'Yes' ? '1' : '0') }}" id="app_2_la_yes" name="app[2][landlord_appliance]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_la_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->landlord_appliance) && $gsra2->landlord_appliance == 'No' ? '1' : '0') }}" id="app_2_la_no" name="app[2][landlord_appliance]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_la_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->landlord_appliance) && $gsra2->landlord_appliance == 'N/A' ? '1' : '0') }}" id="app_2_la_na" name="app[2][landlord_appliance]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_la_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_la_yes" name="app[2][landlord_appliance]" {{ (isset($gsra2->landlord_appliance) && $gsra2->landlord_appliance == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_la_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_la_no" name="app[2][landlord_appliance]" {{ (isset($gsra2->landlord_appliance) && $gsra2->landlord_appliance == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_la_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_la_na" name="app[2][landlord_appliance]" {{ (isset($gsra2->landlord_appliance) && $gsra2->landlord_appliance == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_la_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Inspected</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->inspected) && $gsra2->inspected == 'Yes' ? '1' : '0') }}" id="app_2_ipt_yes" name="app[2][inspected]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_ipt_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->inspected) && $gsra2->inspected == 'No' ? '1' : '0') }}" id="app_2_ipt_no" name="app[2][inspected]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_ipt_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->inspected) && $gsra2->inspected == 'N/A' ? '1' : '0') }}" id="app_2_ipt_na" name="app[2][inspected]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_ipt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_ipt_yes" name="app[2][inspected]" {{ (isset($gsra2->inspected) && $gsra2->inspected == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_ipt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_ipt_no" name="app[2][inspected]" {{ (isset($gsra2->inspected) && $gsra2->inspected == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_ipt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_ipt_na" name="app[2][inspected]" {{ (isset($gsra2->inspected) && $gsra2->inspected == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_ipt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Visual Check</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_visual_check) && $gsra2->appliance_visual_check == 'Yes' ? '1' : '0') }}" id="app_2_avc_yes" name="app[2][appliance_visual_check]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_avc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_visual_check) && $gsra2->appliance_visual_check == 'No' ? '1' : '0') }}" id="app_2_avc_no" name="app[2][appliance_visual_check]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_avc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_visual_check) && $gsra2->appliance_visual_check == 'N/A' ? '1' : '0') }}" id="app_2_avc_na" name="app[2][appliance_visual_check]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_avc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_avc_yes" name="app[2][appliance_visual_check]" {{ (isset($gsra2->appliance_visual_check) && $gsra2->appliance_visual_check == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_avc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_avc_no" name="app[2][appliance_visual_check]" {{ (isset($gsra2->appliance_visual_check) && $gsra2->appliance_visual_check == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_avc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_avc_na" name="app[2][appliance_visual_check]" {{ (isset($gsra2->appliance_visual_check) && $gsra2->appliance_visual_check == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_avc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Serviced</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_serviced) && $gsra2->appliance_serviced == 'Yes' ? '1' : '0') }}" id="app_2_as_yes" name="app[2][appliance_serviced]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_as_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_serviced) && $gsra2->appliance_serviced == 'No' ? '1' : '0') }}" id="app_2_as_no" name="app[2][appliance_serviced]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_as_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_serviced) && $gsra2->appliance_serviced == 'N/A' ? '1' : '0') }}" id="app_2_as_na" name="app[2][appliance_serviced]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_as_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_as_yes" name="app[2][appliance_serviced]" {{ (isset($gsra2->appliance_serviced) && $gsra2->appliance_serviced == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_as_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_as_no" name="app[2][appliance_serviced]" {{ (isset($gsra2->appliance_serviced) && $gsra2->appliance_serviced == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_as_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_as_na" name="app[2][appliance_serviced]" {{ (isset($gsra2->appliance_serviced) && $gsra2->appliance_serviced == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_as_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Safe to Use</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_safe_to_use) && $gsra2->appliance_safe_to_use == 'Yes' ? '1' : '0') }}" id="app_2_asu_yes" name="app[2][appliance_safe_to_use]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_2_asu_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_safe_to_use) && $gsra2->appliance_safe_to_use == 'No' ? '1' : '0') }}" id="app_2_asu_no" name="app[2][appliance_safe_to_use]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_2_asu_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra2->appliance_safe_to_use) && $gsra2->appliance_safe_to_use == 'N/A' ? '1' : '0') }}" id="app_2_asu_na" name="app[2][appliance_safe_to_use]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_2_asu_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_asu_yes" name="app[2][appliance_safe_to_use]" {{ (isset($gsra2->appliance_safe_to_use) && $gsra2->appliance_safe_to_use == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_asu_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_asu_no" name="app[2][appliance_safe_to_use]" {{ (isset($gsra2->appliance_safe_to_use) && $gsra2->appliance_safe_to_use == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_asu_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_2_asu_na" name="app[2][appliance_safe_to_use]" {{ (isset($gsra2->appliance_safe_to_use) && $gsra2->appliance_safe_to_use == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_2_asu_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -903,7 +1115,11 @@
                 </fieldset>
                 <fieldset id="step_5" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 3 <span class="info">{{ (isset($gsra3->make->name) && !empty($gsra3->make->name) ? $gsra3->make->name.' ' : '') }}{{ (isset($gsra3->type->name) && !empty($gsra3->type->name) ? $gsra3->type->name.' ' : '') }}</h2>
+                        <h2 class="text-base font-medium inline-flex items-center">
+                            <x-base.lucide style="display: {{ (isset($gsra3->id) && $gsra3->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
+                            <x-base.lucide style="display: {{ (isset($gsra3->id) && $gsra3->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>
+                            <span>Appliance 3 <span class="info">{{ (isset($gsra3->make->name) && !empty($gsra3->make->name) ? $gsra3->make->name.' ' : '') }}{{ (isset($gsra3->type->name) && !empty($gsra3->type->name) ? $gsra3->type->name.' ' : '') }}</span>
+                        </h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm3">
@@ -974,53 +1190,80 @@
                             <div class="col-span-12 sm:col-span-4"></div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Safety Devices</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->safety_devices) && $gsra3->safety_devices == 'Yes' ? '1' : '0') }}" id="app_3_sd_yes" name="app[3][safety_devices]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_sd_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->safety_devices) && $gsra3->safety_devices == 'No' ? '1' : '0') }}" id="app_3_sd_no" name="app[3][safety_devices]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_sd_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->safety_devices) && $gsra3->safety_devices == 'N/A' ? '1' : '0') }}" id="app_3_sd_na" name="app[3][safety_devices]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_sd_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_sd_yes" name="app[3][safety_devices]" {{ (isset($gsra3->safety_devices) && $gsra3->safety_devices == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_sd_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_sd_no" name="app[3][safety_devices]" {{ (isset($gsra3->safety_devices) && $gsra3->safety_devices == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_sd_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_sd_na" name="app[3][safety_devices]" {{ (isset($gsra3->safety_devices) && $gsra3->safety_devices == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_sd_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Spillage Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->spillage_test) && $gsra3->spillage_test == 'Pass' ? '1' : '0') }}" id="app_3_spgt_yes" name="app[3][spillage_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_3_spgt_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->spillage_test) && $gsra3->spillage_test == 'Fail' ? '1' : '0') }}" id="app_3_spgt_no" name="app[3][spillage_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_3_spgt_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->spillage_test) && $gsra3->spillage_test == 'N/A' ? '1' : '0') }}" id="app_3_spgt_na" name="app[3][spillage_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_spgt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_spgt_yes" name="app[3][spillage_test]" {{ (isset($gsra3->spillage_test) && $gsra3->spillage_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_spgt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_spgt_no" name="app[3][spillage_test]" {{ (isset($gsra3->spillage_test) && $gsra3->spillage_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_spgt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_spgt_na" name="app[3][spillage_test]" {{ (isset($gsra3->spillage_test) && $gsra3->spillage_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_spgt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Smoke Pellet Flue Flow Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->smoke_pellet_test) && $gsra3->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_3_spfft_yes" name="app[3][smoke_pellet_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_3_spfft_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->smoke_pellet_test) && $gsra3->smoke_pellet_test == 'Fail' ? '1' : '0') }}" id="app_3_spfft_no" name="app[3][smoke_pellet_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_3_spfft_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->smoke_pellet_test) && $gsra3->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_3_spfft_na" name="app[3][smoke_pellet_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_spfft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_spfft_yes" name="app[3][smoke_pellet_test]" {{ (isset($gsra3->smoke_pellet_test) && $gsra3->smoke_pellet_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_spfft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_spfft_no" name="app[3][smoke_pellet_test]" {{ (isset($gsra3->smoke_pellet_test) && $gsra3->smoke_pellet_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_spfft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_spfft_na" name="app[3][smoke_pellet_test]" {{ (isset($gsra3->smoke_pellet_test) && $gsra3->smoke_pellet_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_spfft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 pt-2">
@@ -1101,138 +1344,210 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Satisfactory Termination</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->satisfactory_termination) && $gsra3->satisfactory_termination == 'Yes' ? '1' : '0') }}" id="app_3_sft_yes" name="app[3][satisfactory_termination]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_sft_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->satisfactory_termination) && $gsra3->satisfactory_termination == 'No' ? '1' : '0') }}" id="app_3_sft_no" name="app[3][satisfactory_termination]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_sft_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->satisfactory_termination) && $gsra3->satisfactory_termination == 'N/A' ? '1' : '0') }}" id="app_3_sft_na" name="app[3][satisfactory_termination]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_sft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_sft_yes" name="app[3][satisfactory_termination]" {{ (isset($gsra3->satisfactory_termination) && $gsra3->satisfactory_termination == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_sft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_sft_no" name="app[3][satisfactory_termination]" {{ (isset($gsra3->satisfactory_termination) && $gsra3->satisfactory_termination == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_sft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_sft_na" name="app[3][satisfactory_termination]" {{ (isset($gsra3->satisfactory_termination) && $gsra3->satisfactory_termination == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_sft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Flue Visual Condition</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->flue_visual_condition) && $gsra3->flue_visual_condition == 'Yes' ? '1' : '0') }}" id="app_3_fvc_yes" name="app[3][flue_visual_condition]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_fvc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->flue_visual_condition) && $gsra3->flue_visual_condition == 'No' ? '1' : '0') }}" id="app_3_fvc_no" name="app[3][flue_visual_condition]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_fvc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->flue_visual_condition) && $gsra3->flue_visual_condition == 'N/A' ? '1' : '0') }}" id="app_3_fvc_na" name="app[3][flue_visual_condition]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_fvc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_fvc_yes" name="app[3][flue_visual_condition]" {{ (isset($gsra3->flue_visual_condition) && $gsra3->flue_visual_condition == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_fvc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_fvc_no" name="app[3][flue_visual_condition]" {{ (isset($gsra3->flue_visual_condition) && $gsra3->flue_visual_condition == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_fvc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_fvc_na" name="app[3][flue_visual_condition]" {{ (isset($gsra3->flue_visual_condition) && $gsra3->flue_visual_condition == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_fvc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Adequate Ventilation</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->adequate_ventilation) && $gsra3->adequate_ventilation == 'Yes' ? '1' : '0') }}" id="app_3_av_yes" name="app[3][adequate_ventilation]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_av_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->adequate_ventilation) && $gsra3->adequate_ventilation == 'No' ? '1' : '0') }}" id="app_3_av_no" name="app[3][adequate_ventilation]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_av_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->adequate_ventilation) && $gsra3->adequate_ventilation == 'N/A' ? '1' : '0') }}" id="app_3_av_na" name="app[3][adequate_ventilation]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_av_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_av_yes" name="app[3][adequate_ventilation]" {{ (isset($gsra3->adequate_ventilation) && $gsra3->adequate_ventilation == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_av_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_av_no" name="app[3][adequate_ventilation]" {{ (isset($gsra3->adequate_ventilation) && $gsra3->adequate_ventilation == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_av_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_av_na" name="app[3][adequate_ventilation]" {{ (isset($gsra3->adequate_ventilation) && $gsra3->adequate_ventilation == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_av_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Landlord's Appliance</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->landlord_appliance) && $gsra3->landlord_appliance == 'Yes' ? '1' : '0') }}" id="app_3_la_yes" name="app[3][landlord_appliance]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_la_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->landlord_appliance) && $gsra3->landlord_appliance == 'No' ? '1' : '0') }}" id="app_3_la_no" name="app[3][landlord_appliance]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_la_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->landlord_appliance) && $gsra3->landlord_appliance == 'N/A' ? '1' : '0') }}" id="app_3_la_na" name="app[3][landlord_appliance]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_la_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_la_yes" name="app[3][landlord_appliance]" {{ (isset($gsra3->landlord_appliance) && $gsra3->landlord_appliance == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_la_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_la_no" name="app[3][landlord_appliance]" {{ (isset($gsra3->landlord_appliance) && $gsra3->landlord_appliance == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_la_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_la_na" name="app[3][landlord_appliance]" {{ (isset($gsra3->landlord_appliance) && $gsra3->landlord_appliance == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_la_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Inspected</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->inspected) && $gsra3->inspected == 'Yes' ? '1' : '0') }}" id="app_3_ipt_yes" name="app[3][inspected]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_ipt_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->inspected) && $gsra3->inspected == 'No' ? '1' : '0') }}" id="app_3_ipt_no" name="app[3][inspected]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_ipt_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->inspected) && $gsra3->inspected == 'N/A' ? '1' : '0') }}" id="app_3_ipt_na" name="app[3][inspected]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_ipt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_ipt_yes" name="app[3][inspected]" {{ (isset($gsra3->inspected) && $gsra3->inspected == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_ipt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_ipt_no" name="app[3][inspected]" {{ (isset($gsra3->inspected) && $gsra3->inspected == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_ipt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_ipt_na" name="app[3][inspected]" {{ (isset($gsra3->inspected) && $gsra3->inspected == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_ipt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Visual Check</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_visual_check) && $gsra3->appliance_visual_check == 'Yes' ? '1' : '0') }}" id="app_3_avc_yes" name="app[3][appliance_visual_check]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_avc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_visual_check) && $gsra3->appliance_visual_check == 'No' ? '1' : '0') }}" id="app_3_avc_no" name="app[3][appliance_visual_check]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_avc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_visual_check) && $gsra3->appliance_visual_check == 'N/A' ? '1' : '0') }}" id="app_3_avc_na" name="app[3][appliance_visual_check]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_avc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_avc_yes" name="app[3][appliance_visual_check]" {{ (isset($gsra3->appliance_visual_check) && $gsra3->appliance_visual_check == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_avc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_avc_no" name="app[3][appliance_visual_check]" {{ (isset($gsra3->appliance_visual_check) && $gsra3->appliance_visual_check == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_avc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_avc_na" name="app[3][appliance_visual_check]" {{ (isset($gsra3->appliance_visual_check) && $gsra3->appliance_visual_check == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_avc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Serviced</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_serviced) && $gsra3->appliance_serviced == 'Yes' ? '1' : '0') }}" id="app_3_as_yes" name="app[3][appliance_serviced]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_as_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_serviced) && $gsra3->appliance_serviced == 'No' ? '1' : '0') }}" id="app_3_as_no" name="app[3][appliance_serviced]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_as_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_serviced) && $gsra3->appliance_serviced == 'N/A' ? '1' : '0') }}" id="app_3_as_na" name="app[3][appliance_serviced]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_as_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_as_yes" name="app[3][appliance_serviced]" {{ (isset($gsra3->appliance_serviced) && $gsra3->appliance_serviced == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_as_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_as_no" name="app[3][appliance_serviced]" {{ (isset($gsra3->appliance_serviced) && $gsra3->appliance_serviced == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_as_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_as_na" name="app[3][appliance_serviced]" {{ (isset($gsra3->appliance_serviced) && $gsra3->appliance_serviced == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_as_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Safe to Use</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_safe_to_use) && $gsra3->appliance_safe_to_use == 'Yes' ? '1' : '0') }}" id="app_3_asu_yes" name="app[3][appliance_safe_to_use]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_3_asu_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_safe_to_use) && $gsra3->appliance_safe_to_use == 'No' ? '1' : '0') }}" id="app_3_asu_no" name="app[3][appliance_safe_to_use]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_3_asu_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra3->appliance_safe_to_use) && $gsra3->appliance_safe_to_use == 'N/A' ? '1' : '0') }}" id="app_3_asu_na" name="app[3][appliance_safe_to_use]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_3_asu_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_asu_yes" name="app[3][appliance_safe_to_use]" {{ (isset($gsra3->appliance_safe_to_use) && $gsra3->appliance_safe_to_use == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_asu_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_asu_no" name="app[3][appliance_safe_to_use]" {{ (isset($gsra3->appliance_safe_to_use) && $gsra3->appliance_safe_to_use == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_asu_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_3_asu_na" name="app[3][appliance_safe_to_use]" {{ (isset($gsra3->appliance_safe_to_use) && $gsra3->appliance_safe_to_use == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_3_asu_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1250,7 +1565,11 @@
                 </fieldset>
                 <fieldset id="step_6" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">Appliance 4 <span class="info">{{ (isset($gsra4->make->name) && !empty($gsra4->make->name) ? $gsra4->make->name.' ' : '') }}{{ (isset($gsra4->type->name) && !empty($gsra4->type->name) ? $gsra4->type->name.' ' : '') }}</h2>
+                        <h2 class="text-base font-medium inline-flex items-center">
+                            <x-base.lucide style="display: {{ (isset($gsra4->id) && $gsra4->id > 0 ? 'none' : 'block') }};" class="w-4 h-4 mr-2 text-danger unsavedIcon" icon="x-circle"/>    
+                            <x-base.lucide style="display: {{ (isset($gsra4->id) && $gsra4->id > 0 ? 'block' : 'none') }};" class="w-4 h-4 mr-2 text-success savedIcon" icon="check-circle"/>
+                            <span>Appliance 4 <span class="info">{{ (isset($gsra4->make->name) && !empty($gsra4->make->name) ? $gsra4->make->name.' ' : '') }}{{ (isset($gsra4->type->name) && !empty($gsra4->type->name) ? $gsra4->type->name.' ' : '') }}</span>
+                        </h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="applianceDetailsForm4">
@@ -1321,53 +1640,80 @@
                             <div class="col-span-12 sm:col-span-4"></div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Safety Devices</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->safety_devices) && $gsra4->safety_devices == 'Yes' ? '1' : '0') }}" id="app_4_sd_yes" name="app[4][safety_devices]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_sd_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->safety_devices) && $gsra4->safety_devices == 'No' ? '1' : '0') }}" id="app_4_sd_no" name="app[4][safety_devices]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_sd_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->safety_devices) && $gsra4->safety_devices == 'N/A' ? '1' : '0') }}" id="app_4_sd_na" name="app[4][safety_devices]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_sd_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_sd_yes" name="app[4][safety_devices]" {{ (isset($gsra4->safety_devices) && $gsra4->safety_devices == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_sd_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_sd_no" name="app[4][safety_devices]" {{ (isset($gsra4->safety_devices) && $gsra4->safety_devices == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_sd_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_sd_na" name="app[4][safety_devices]" {{ (isset($gsra4->safety_devices) && $gsra4->safety_devices == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_sd_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Spillage Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->spillage_test) && $gsra4->spillage_test == 'Pass' ? '1' : '0') }}" id="app_4_spgt_yes" name="app[4][spillage_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_4_spgt_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->spillage_test) && $gsra4->spillage_test == 'Fail' ? '1' : '0') }}" id="app_4_spgt_no" name="app[4][spillage_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_4_spgt_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->spillage_test) && $gsra4->spillage_test == 'N/A' ? '1' : '0') }}" id="app_4_spgt_na" name="app[4][spillage_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_spgt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_spgt_yes" name="app[4][spillage_test]" {{ (isset($gsra4->spillage_test) && $gsra4->spillage_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_spgt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_spgt_no" name="app[4][spillage_test]" {{ (isset($gsra4->spillage_test) && $gsra4->spillage_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_spgt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_spgt_na" name="app[4][spillage_test]" {{ (isset($gsra4->spillage_test) && $gsra4->spillage_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_spgt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Smoke Pellet Flue Flow Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->smoke_pellet_test) && $gsra4->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_4_spfft_yes" name="app[4][smoke_pellet_test]" type="radio" value="Pass"/>
-                                        <x-base.form-check.label for="app_4_spfft_yes">Pass</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->smoke_pellet_test) && $gsra4->smoke_pellet_test == 'Fail' ? '1' : '0') }}" id="app_4_spfft_no" name="app[4][smoke_pellet_test]" type="radio" value="Fail"/>
-                                        <x-base.form-check.label for="app_4_spfft_no">Fail</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->smoke_pellet_test) && $gsra4->smoke_pellet_test == 'Pass' ? '1' : '0') }}" id="app_4_spfft_na" name="app[4][smoke_pellet_test]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_spfft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_spfft_yes" name="app[4][smoke_pellet_test]" {{ (isset($gsra4->smoke_pellet_test) && $gsra4->smoke_pellet_test == 'Pass' ? 'Checked' : '') }} value="Pass" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_spfft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Pass
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_spfft_no" name="app[4][smoke_pellet_test]" {{ (isset($gsra4->smoke_pellet_test) && $gsra4->smoke_pellet_test == 'Fail' ? 'Checked' : '') }} value="Fail" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_spfft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            Fail
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_spfft_na" name="app[4][smoke_pellet_test]" {{ (isset($gsra4->smoke_pellet_test) && $gsra4->smoke_pellet_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_spfft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 pt-2">
@@ -1448,138 +1794,210 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Satisfactory Termination</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->satisfactory_termination) && $gsra4->satisfactory_termination == 'Yes' ? '1' : '0') }}" id="app_4_sft_yes" name="app[4][satisfactory_termination]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_sft_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->satisfactory_termination) && $gsra4->satisfactory_termination == 'No' ? '1' : '0') }}" id="app_4_sft_no" name="app[4][satisfactory_termination]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_sft_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->satisfactory_termination) && $gsra4->satisfactory_termination == 'N/A' ? '1' : '0') }}" id="app_4_sft_na" name="app[4][satisfactory_termination]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_sft_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_sft_yes" name="app[4][satisfactory_termination]" {{ (isset($gsra4->satisfactory_termination) && $gsra4->satisfactory_termination == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_sft_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_sft_no" name="app[4][satisfactory_termination]" {{ (isset($gsra4->satisfactory_termination) && $gsra4->satisfactory_termination == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_sft_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_sft_na" name="app[4][satisfactory_termination]" {{ (isset($gsra4->satisfactory_termination) && $gsra4->satisfactory_termination == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_sft_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Flue Visual Condition</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->flue_visual_condition) && $gsra4->flue_visual_condition == 'Yes' ? '1' : '0') }}" id="app_4_fvc_yes" name="app[4][flue_visual_condition]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_fvc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->flue_visual_condition) && $gsra4->flue_visual_condition == 'No' ? '1' : '0') }}" id="app_4_fvc_no" name="app[4][flue_visual_condition]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_fvc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->flue_visual_condition) && $gsra4->flue_visual_condition == 'N/A' ? '1' : '0') }}" id="app_4_fvc_na" name="app[4][flue_visual_condition]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_fvc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_fvc_yes" name="app[4][flue_visual_condition]" {{ (isset($gsra4->flue_visual_condition) && $gsra4->flue_visual_condition == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_fvc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_fvc_no" name="app[4][flue_visual_condition]" {{ (isset($gsra4->flue_visual_condition) && $gsra4->flue_visual_condition == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_fvc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_fvc_na" name="app[4][flue_visual_condition]" {{ (isset($gsra4->flue_visual_condition) && $gsra4->flue_visual_condition == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_fvc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Adequate Ventilation</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->adequate_ventilation) && $gsra4->adequate_ventilation == 'Yes' ? '1' : '0') }}" id="app_4_av_yes" name="app[4][adequate_ventilation]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_av_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->adequate_ventilation) && $gsra4->adequate_ventilation == 'No' ? '1' : '0') }}" id="app_4_av_no" name="app[4][adequate_ventilation]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_av_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->adequate_ventilation) && $gsra4->adequate_ventilation == 'N/A' ? '1' : '0') }}" id="app_4_av_na" name="app[4][adequate_ventilation]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_av_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_av_yes" name="app[4][adequate_ventilation]" {{ (isset($gsra4->adequate_ventilation) && $gsra4->adequate_ventilation == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_av_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_av_no" name="app[4][adequate_ventilation]" {{ (isset($gsra4->adequate_ventilation) && $gsra4->adequate_ventilation == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_av_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_av_na" name="app[4][adequate_ventilation]" {{ (isset($gsra4->adequate_ventilation) && $gsra4->adequate_ventilation == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_av_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Landlord's Appliance</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->landlord_appliance) && $gsra4->landlord_appliance == 'Yes' ? '1' : '0') }}" id="app_4_la_yes" name="app[4][landlord_appliance]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_la_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->landlord_appliance) && $gsra4->landlord_appliance == 'No' ? '1' : '0') }}" id="app_4_la_no" name="app[4][landlord_appliance]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_la_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->landlord_appliance) && $gsra4->landlord_appliance == 'N/A' ? '1' : '0') }}" id="app_4_la_na" name="app[4][landlord_appliance]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_la_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_la_yes" name="app[4][landlord_appliance]" {{ (isset($gsra4->landlord_appliance) && $gsra4->landlord_appliance == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_la_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_la_no" name="app[4][landlord_appliance]" {{ (isset($gsra4->landlord_appliance) && $gsra4->landlord_appliance == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_la_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_la_na" name="app[4][landlord_appliance]" {{ (isset($gsra4->landlord_appliance) && $gsra4->landlord_appliance == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_la_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Inspected</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->inspected) && $gsra4->inspected == 'Yes' ? '1' : '0') }}" id="app_4_ipt_yes" name="app[4][inspected]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_ipt_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->inspected) && $gsra4->inspected == 'No' ? '1' : '0') }}" id="app_4_ipt_no" name="app[4][inspected]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_ipt_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->inspected) && $gsra4->inspected == 'N/A' ? '1' : '0') }}" id="app_4_ipt_na" name="app[4][inspected]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_ipt_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_ipt_yes" name="app[4][inspected]" {{ (isset($gsra4->inspected) && $gsra4->inspected == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_ipt_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_ipt_no" name="app[4][inspected]" {{ (isset($gsra4->inspected) && $gsra4->inspected == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_ipt_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_ipt_na" name="app[4][inspected]" {{ (isset($gsra4->inspected) && $gsra4->inspected == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_ipt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Visual Check</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_visual_check) && $gsra4->appliance_visual_check == 'Yes' ? '1' : '0') }}" id="app_4_avc_yes" name="app[4][appliance_visual_check]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_avc_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_visual_check) && $gsra4->appliance_visual_check == 'No' ? '1' : '0') }}" id="app_4_avc_no" name="app[4][appliance_visual_check]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_avc_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_visual_check) && $gsra4->appliance_visual_check == 'N/A' ? '1' : '0') }}" id="app_4_avc_na" name="app[4][appliance_visual_check]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_avc_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_avc_yes" name="app[4][appliance_visual_check]" {{ (isset($gsra4->appliance_visual_check) && $gsra4->appliance_visual_check == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_avc_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_avc_no" name="app[4][appliance_visual_check]" {{ (isset($gsra4->appliance_visual_check) && $gsra4->appliance_visual_check == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_avc_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_avc_na" name="app[4][appliance_visual_check]" {{ (isset($gsra4->appliance_visual_check) && $gsra4->appliance_visual_check == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_avc_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Serviced</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_serviced) && $gsra4->appliance_serviced == 'Yes' ? '1' : '0') }}" id="app_4_as_yes" name="app[4][appliance_serviced]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_as_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_serviced) && $gsra4->appliance_serviced == 'No' ? '1' : '0') }}" id="app_4_as_no" name="app[4][appliance_serviced]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_as_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_serviced) && $gsra4->appliance_serviced == 'N/A' ? '1' : '0') }}" id="app_4_as_na" name="app[4][appliance_serviced]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_as_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_as_yes" name="app[4][appliance_serviced]" {{ (isset($gsra4->appliance_serviced) && $gsra4->appliance_serviced == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_as_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_as_no" name="app[4][appliance_serviced]" {{ (isset($gsra4->appliance_serviced) && $gsra4->appliance_serviced == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_as_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_as_na" name="app[4][appliance_serviced]" {{ (isset($gsra4->appliance_serviced) && $gsra4->appliance_serviced == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_as_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Appliance Safe to Use</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_safe_to_use) && $gsra4->appliance_safe_to_use == 'Yes' ? '1' : '0') }}" id="app_4_asu_yes" name="app[4][appliance_safe_to_use]" type="radio" value="Yes"/>
-                                        <x-base.form-check.label for="app_4_asu_yes">Yes</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_safe_to_use) && $gsra4->appliance_safe_to_use == 'No' ? '1' : '0') }}" id="app_4_asu_no" name="app[4][appliance_safe_to_use]" type="radio" value="No"/>
-                                        <x-base.form-check.label for="app_4_asu_no">No</x-base.form-check.label>
-                                    </x-base.form-check>
-                                    <x-base.form-check class="mr-2">
-                                        <x-base.form-check.input checked="{{ (isset($gsra4->appliance_safe_to_use) && $gsra4->appliance_safe_to_use == 'N/A' ? '1' : '0') }}" id="app_4_asu_na" name="app[4][appliance_safe_to_use]" type="radio" value="N/A"/>
-                                        <x-base.form-check.label for="app_4_asu_na">N/A</x-base.form-check.label>
-                                    </x-base.form-check>
+                                <div class="flex justify-start items-center">
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_asu_yes" name="app[4][appliance_safe_to_use]" {{ (isset($gsra4->appliance_safe_to_use) && $gsra4->appliance_safe_to_use == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_asu_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            YES
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_asu_no" name="app[4][appliance_safe_to_use]" {{ (isset($gsra4->appliance_safe_to_use) && $gsra4->appliance_safe_to_use == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_asu_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            NO
+                                        </x-base.button>
+                                    </div>
+                                    <div class="radioItem mr-[3px]">
+                                        <input id="app_4_asu_na" name="app[4][appliance_safe_to_use]" {{ (isset($gsra4->appliance_safe_to_use) && $gsra4->appliance_safe_to_use == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
+                                        <x-base.button as="label" for="app_4_asu_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
+                                            <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
+                                            N/A
+                                        </x-base.button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1597,7 +2015,7 @@
                 </fieldset>
                 <fieldset id="step_7" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">CP Alarm(s)</h2>
+                        <h2 class="text-base font-medium">CO Alarm(s)</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
                     <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="coAlarmsForm">
@@ -1647,7 +2065,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Satisfactory Visual Inspection</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->satisfactory_visual_inspaction) && $gsr->satisfactory_visual_inspaction == 'Yes' ? '1' : '0') }}" id="app_4_gip_svi_yes" name="satisfactory_visual_inspaction" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_svi_yes">Yes</x-base.form-check.label>
@@ -1660,7 +2078,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Emergency Control Accessible</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->emergency_control_accessible) && $gsr->emergency_control_accessible == 'Yes' ? '1' : '0') }}" id="app_4_gip_eca_yes" name="emergency_control_accessible" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_eca_yes">Yes</x-base.form-check.label>
@@ -1673,7 +2091,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Satisfactory Gas Tightness Test</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->satisfactory_gas_tightness_test) && $gsr->satisfactory_gas_tightness_test == 'Yes' ? '1' : '0') }}" id="app_4_gip_sgtt_yes" name="satisfactory_gas_tightness_test" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_sgtt_yes">Yes</x-base.form-check.label>
@@ -1690,7 +2108,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Equipotential Bonding Satisfactory</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->equipotential_bonding_satisfactory) && $gsr->equipotential_bonding_satisfactory == 'Yes' ? '1' : '0') }}" id="app_4_gip_ebs_yes" name="equipotential_bonding_satisfactory" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_ebs_yes">Yes</x-base.form-check.label>
@@ -1710,7 +2128,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Approved CO Alarm Fitted</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->co_alarm_fitted) && $gsr->co_alarm_fitted == 'Yes' ? '1' : '0') }}" id="app_4_gip_acoaf_yes" name="co_alarm_fitted" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_acoaf_yes">Yes</x-base.form-check.label>
@@ -1727,7 +2145,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Are CO Alarm in Date</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->co_alarm_in_date) && $gsr->co_alarm_in_date == 'Yes' ? '1' : '0') }}" id="app_4_gip_acoid_yes" name="co_alarm_in_date" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_acoid_yes">Yes</x-base.form-check.label>
@@ -1744,7 +2162,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Testing of CO Alarm Satisfactory</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->co_alarm_test_satisfactory) && $gsr->co_alarm_test_satisfactory == 'Yes' ? '1' : '0') }}" id="app_4_gip_tcoas_yes" name="co_alarm_test_satisfactory" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_tcoas_yes">Yes</x-base.form-check.label>
@@ -1761,7 +2179,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label>Smoke Alarms Fitted</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->smoke_alarm_fitted) && $gsr->smoke_alarm_fitted == 'Yes' ? '1' : '0') }}" id="app_4_gip_saf_yes" name="smoke_alarm_fitted" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_gip_saf_yes">Yes</x-base.form-check.label>
@@ -1812,7 +2230,7 @@
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Has Flue Cap Been Put Back?</x-base.form-label>
-                                <div class="flex flex-col sm:flex-row">
+                                <div class="flex flex-row">
                                     <x-base.form-check class="mr-2">
                                         <x-base.form-check.input checked="{{ (isset($gsr->flue_cap_put_back) && $gsr->flue_cap_put_back == 'Yes' ? '1' : '0') }}" id="app_4_hfcbpb_yes" name="flue_cap_put_back" type="radio" value="Yes"/>
                                         <x-base.form-check.label for="app_4_hfcbpb_yes">Yes</x-base.form-check.label>

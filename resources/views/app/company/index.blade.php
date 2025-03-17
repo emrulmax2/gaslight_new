@@ -5,12 +5,11 @@
 @endsection
 
 @section('subcontent')
-<div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
+<div class="intro-y mt-8 flex items-center">
     <h2 class="mr-auto text-lg font-medium">Company Setting</h2>
-    <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
-        <x-base.button as="a" href="{{ route('user.settings') }}" class="shadow-md" variant="primary" >
-            <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-            Back Setting
+    <div class="flex">
+        <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+            <x-base.lucide class="h-4 w-4" icon="home" />
         </x-base.button>
     </div>
 </div>
@@ -25,12 +24,12 @@
                         <h2 class="mr-auto text-base font-medium">Company Information</h2>
                     </div>
                     <div class="p-5">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="company_name">Company Name</x-base.form-label>
                                 <x-base.form-input type="text" id="company_name" name="company_name" value="{{ isset($company->company_name) ? $company->company_name : '' }}" />
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="business_type">Company Business Type</x-base.form-label>
                                 <x-base.tom-select id="business_type" name="business_type" class="w-full">
                                     <option value="Company" {{ isset($company->business_type) && $company->business_type == 'Company' ? 'selected' : '' }}>Company</option>
@@ -38,23 +37,23 @@
                                     <option value="Other" {{ isset($company->business_type) && $company->business_type == 'Other' ? 'selected' : '' }}>Other</option>
                                 </x-base.tom-select>
                             </div>
-                            <div class="registrationWrap" style="display: {{ isset($company->business_type) && $company->business_type == 'Company' ? 'block' : 'none' }};">
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4 registrationWrap" style="display: {{ isset($company->business_type) && $company->business_type == 'Company' ? 'block' : 'none' }};">
                                 <x-base.form-label for="company_registration">Company Registration Number</x-base.form-label>
                                 <x-base.form-input type="text" id="company_registration" name="company_registration"  value="{{ isset($company->company_registration) ? $company->company_registration : '' }}"/>
                             </div>
-                            <div class="pt-0 lg:pt-3 flex">
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4  pt-0 lg:pt-3 flex">
                                 <div class="flex gap-3">
                                     <label for="vat_number_check" class="cursor-pointer">VAT Registered</label>
                                     <x-base.form-switch.input id="vat_number_check" name="vat_number_check" value="1" type="checkbox" checked="{{ isset($company->vat_number) ? 'checked' : '' }}" />
                                 </div>
                             </div>
 
-                            <div class="vat_number_input {{ isset($company->vat_number) ? '' : 'hidden' }}">
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4  vat_number_input {{ isset($company->vat_number) ? '' : 'hidden' }}">
                                 <x-base.form-label for="vat_number">VAT Number</x-base.form-label>
                                 <x-base.form-input id="vat_number" type="text" name="vat_number" value="{{ isset($company->vat_number) ? $company->vat_number : '' }}" placeholder="VAT Number"/>
                             </div>
                         </div>
-                        <div class="mt-4">
+                        <div class="col-span-12 sm:col-span-6 md:col-span-4  mt-4">
                             <div data-tw-merge class="flex items-center">
                                 <input data-tw-merge {{ (isset($company->display_company_name) && $company->display_company_name == 1 ? 'Checked' : '') }} type="checkbox" name="display_company_name" value="1" class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&amp;[type=&#039;radio&#039;]]:checked:bg-primary [&amp;[type=&#039;radio&#039;]]:checked:border-primary [&amp;[type=&#039;radio&#039;]]:checked:border-opacity-10 [&amp;[type=&#039;checkbox&#039;]]:checked:bg-primary [&amp;[type=&#039;checkbox&#039;]]:checked:border-primary [&amp;[type=&#039;checkbox&#039;]]:checked:border-opacity-10 [&amp;:disabled:not(:checked)]:bg-slate-100 [&amp;:disabled:not(:checked)]:cursor-not-allowed [&amp;:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&amp;:disabled:checked]:opacity-70 [&amp;:disabled:checked]:cursor-not-allowed [&amp;:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white" id="display_company_name" />
                                 <label data-tw-merge for="display_company_name" class="cursor-pointer ml-2">Display company name on certificates?</label>
@@ -68,16 +67,16 @@
                         <h2 class="mr-auto text-base font-medium">Registered Details</h2>
                     </div>
                     <div class="p-5">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="gas_safe_registration_no">Gas Safe Registration No</x-base.form-label>
                                 <x-base.form-input type="text" name="gas_safe_registration_no"  value="{{ isset($company->gas_safe_registration_no) ? $company->gas_safe_registration_no : '' }}"/>
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="registration_no">Registration No</x-base.form-label>
                                 <x-base.form-input type="text" name="registration_no" value="{{ isset($company->registration_no) ? $company->registration_no : '' }}"/>
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="register_body_id">Registration Body For</x-base.form-label>
                                 <x-base.tom-select  name="register_body_id" class="w-full" >
                                     <option value="">Please Select</option>
@@ -88,18 +87,18 @@
                                     @endif
                                 </x-base.tom-select>
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="registration_body_for_legionella">Registration Body For Legionella Risk Assessment</x-base.form-label>
                                 <x-base.form-input type="text" name="registration_body_for_legionella" value="{{ isset($company->registration_body_for_legionella) ? $company->registration_body_for_legionella : '' }}"/>
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="registration_body_no_for_legionella">Registration No For Legionella Risk Assessment</x-base.form-label>
                                 <x-base.form-input  type="text" name="registration_body_no_for_legionella" value="{{ isset($company->registration_body_no_for_legionella) ? $company->registration_body_no_for_legionella : '' }}"/>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-x-5 gap-y-3 mb-5 z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3 mb-5 z-10">
                     <div class="intro-y box">
                         <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                             <h2 class="mr-auto text-base font-medium">Contact Details</h2>
@@ -173,20 +172,20 @@
                         <h2 class="mr-auto text-base font-medium">Payment Terms and Bank Details</h2>
                     </div>
                     <div class="p-5">
-                        <div class="grid grid-cols-4 gap-4">
-                            <div>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label for="bank_name">Bank Name</x-base.form-label>
                                 <x-base.form-input type="text" name="bank_name" value="{{ optional($company->companyBankDetails)->bank_name ?? '' }}"/>
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label for="name_on_account">Account Name</x-base.form-label>
                                 <x-base.form-input type="text" name="name_on_account" value="{{ optional($company->companyBankDetails)->name_on_account ?? '' }}"/>
                             </div>
-                            <div>     
+                            <div class="col-span-12 sm:col-span-3">     
                                 <x-base.form-label for="sort_code">Sort Code</x-base.form-label>
                                 <x-base.form-input type="number" name="sort_code" value="{{ optional($company->companyBankDetails)->sort_code ?? '' }}"/>
                             </div>
-                            <div>
+                            <div class="col-span-12 sm:col-span-3">
                                 <x-base.form-label for="account_number">Account Number</x-base.form-label>
                                 <x-base.form-input  type="number" name="account_number" value="{{ optional($company->companyBankDetails)->account_number ?? '' }}"/>
                             </div>
@@ -201,7 +200,7 @@
                 <div class="intro-y box mb-5">
                     <div class="p-5">
                         <div class="flex flex-col items-left"> 
-                            <p class="mt-2 mx-4 text-base font-medium text-center">
+                            <p class="mt-0 sm:mt-2 mx-0 sm:mx-4 text-base font-medium text-center">
                                 Please click on the 'upload a file' button to upload a logo for your records. 
                                 If are having any issues please email your logo to our support team.
                             </p>
@@ -209,7 +208,7 @@
                     
                         <div class="space-y-4 flex items-center justify-center">
                             <!-- File Input -->
-                            <div class="file-upload-container bg-white p-6 rounded-lg w-full">
+                            <div class="file-upload-container bg-white p-0 sm:p-6 rounded-lg w-full">
                                 <div class="image-upload-wrap border-4 border-dotted border-gray-200 p-10 text-center relative cursor-pointer">
                                     <input id="fileInput" name="company_logo" class="file-upload-input absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept="image/*" />
                                     <h3 class="drag-text text-gray-400 text-lg font-semibold">Drag and drop a file or select Add Image</h3>

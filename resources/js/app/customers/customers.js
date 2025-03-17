@@ -9,7 +9,7 @@ var customerListTable = (function () {
         let tableContent = new Tabulator("#customerListTable", {
             ajaxURL: route("customers.list"),
             ajaxParams: { querystr: querystr, status: status },
-            paginationMode: "remote",
+            pagination: "remote",
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,
@@ -19,7 +19,6 @@ var customerListTable = (function () {
             layout: "fitColumns",
             responsiveLayout: "collapse",
             placeholder: "No matching records found",
-
             columns: [
                 {
                     title: "#ID",

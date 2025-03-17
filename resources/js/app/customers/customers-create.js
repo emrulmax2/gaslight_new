@@ -36,7 +36,14 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('#customerSaveBtn', $theForm).attr('disabled', 'disabled');
         $("#customerSaveBtn .theLoader").fadeIn();
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordParam = urlParams.get('record');
+
         let form_data = new FormData(form);
+
+        if(recordParam){
+            form_data.append('record', recordParam);
+        }
         axios({
             method: "post",
             url: route('customers.store'),
