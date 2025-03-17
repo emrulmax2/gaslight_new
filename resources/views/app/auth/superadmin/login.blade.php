@@ -118,14 +118,14 @@
             "after:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-screen after:lg:w-[800%] after:bg-texture-white after:bg-fixed after:bg-center after:lg:bg-[25rem_-25rem] after:bg-no-repeat",
         ])>
             <div class="sticky top-0 z-10 flex-col justify-center hidden h-screen ml-16 lg:flex xl:ml-28 2xl:ml-36">
-                <div class="text-[2.6rem] font-medium leading-[1.4] text-white xl:text-5xl xl:leading-[1.2]">
-                    Embrace Excellence <br> in Dashboard Development
+                <div class="text-[2.6rem] font-medium leading-[1.4] text-white xl:text-3xl xl:leading-[1.2]">
+                    Your Complete Solution for Fast, Reliable Gas Certificates
+                </div>
+                <div class="text-[2.6rem] font-medium leading-[1.4] text-white xl:text-3xl xl:leading-[1.2]">
+                    Keeping Your Work Safe and Simple.
                 </div>
                 <div class="mt-5 text-base leading-relaxed text-white/70 xl:text-lg">
-                    Unlock the potential of Tailwise, where developers craft
-                    meticulously structured, visually stunning dashboards with
-                    feature-rich modules. Join us today to shape the future of your
-                    application development.
+                    Empowering gas engineers with an effortless certification process, our app lets you issue gas certificates anytime, anywhere. Simplify your workflow and stay on top of your jobs with fast, reliable, and compliant certification at your fingertips.
                 </div>
                 <div class="flex flex-col gap-3 mt-10 xl:flex-row xl:items-center">
                     <div class="flex items-center">
