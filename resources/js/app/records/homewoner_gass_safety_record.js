@@ -103,9 +103,15 @@ import INTAddressLookUps from '../../address_lookup.js';
                             currentActiveStep.find('.unsavedIcon').fadeOut('fast', function(){
                                 currentActiveStep.find('.savedIcon').fadeIn();
                             });
+                            parentFieldset.find('.unsavedIcon').fadeOut('fast', function(){
+                                parentFieldset.find('.savedIcon').fadeIn();
+                            });
                         }else{
                             currentActiveStep.find('.savedIcon').fadeOut('fast', function(){
                                 currentActiveStep.find('.unsavedIcon').fadeIn();
+                            });
+                            parentFieldset.find('.savedIcon').fadeOut('fast', function(){
+                                parentFieldset.find('.unsavedIcon').fadeIn();
                             });
                         }
                     }
@@ -205,6 +211,10 @@ import INTAddressLookUps from '../../address_lookup.js';
     // Mobile Device Header ON Click
     $('.wizard-fieldset .wizard-fieldset-header').on('click', function(e){
         e.preventDefault();
+        let $currentActiveFieldset = $('.form-wizard .wizard-fieldset.show');
+        let $currentActiveForm = $currentActiveFieldset.find('.wizard-step-form');
+        let parentFieldset = $currentActiveForm.parents('.wizard-fieldset');
+        let currentActiveStep = $('.form-wizard-steps .form-wizard-step-item.active');
 
         let $theHeader = $(this);
         let $parentfieldSet = $theHeader.parents('.wizard-fieldset');
@@ -215,16 +225,73 @@ import INTAddressLookUps from '../../address_lookup.js';
         
         if($parentfieldSet.hasClass('show')){
             $allStepBtns.eq(theFieldSetIndex).removeClass('active');
-            //$parentfieldSet.find('.wizard-step-form').slideUp('fast');
             $parentfieldSet.removeClass('show');
         }else{
+            let formid = $currentActiveForm.attr('id');
+            const form = document.getElementById(formid);
+            let form_data = new FormData(form);
+            let url;
+            console.log(parentFieldset.index())
+            if(parentFieldset.index() == 0){
+                url = route('records.store.job.address');
+            }else if(parentFieldset.index() == 1){
+                url = route('records.store.customer');
+            }else if(parentFieldset.index() == 2 || parentFieldset.index() == 3 || parentFieldset.index() == 4 || parentFieldset.index() == 5){
+                url = route('records.store.appliance');
+            }else if(parentFieldset.index() == 6){
+                url = route('records.store.co.alarms');
+            }else if(parentFieldset.index() == 7){
+                url = route('records.store.satisfactory.check');
+            }else if(parentFieldset.index() == 8){
+                url = route('records.store.comments');
+            }else if(parentFieldset.index() == 9){
+                url = route('records.store.signatures');
+            }
+
+            if(url != ''){
+                $.ajax({
+                    method: 'POST',
+                    url: url,
+                    data: form_data,
+                    dataType: 'json',
+                    async: false,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                    success: function(res, textStatus, xhr){
+                        if(xhr.status == 200){
+                            let saved = res.saved;
+                            if(saved == 1){
+                                currentActiveStep.find('.unsavedIcon').fadeOut('fast', function(){
+                                    currentActiveStep.find('.savedIcon').fadeIn();
+                                });
+                                $currentActiveFieldset.find('.unsavedIcon').fadeOut('fast', function(){
+                                    $currentActiveFieldset.find('.savedIcon').fadeIn();
+                                });
+                            }else{
+                                currentActiveStep.find('.savedIcon').fadeOut('fast', function(){
+                                    currentActiveStep.find('.unsavedIcon').fadeIn();
+                                });
+                                $currentActiveFieldset.find('.savedIcon').fadeOut('fast', function(){
+                                    $currentActiveFieldset.find('.unsavedIcon').fadeIn();
+                                });
+                            }
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if(jqXHR.status == 422){
+                            console.log(textStatus+' => '+errorThrown);
+                        }
+                    }
+                });
+            }
             $allStepBtns.removeClass('active');
-            //$allFieldSets.find('.wizard-step-form').slideUp('fast');
             $allFieldSets.removeClass('show');
 
             $allStepBtns.eq(theFieldSetIndex).addClass('active');
-            //$parentfieldSet.find('.wizard-step-form').slideDown('fast')
-            $parentfieldSet.addClass('show')
+            $parentfieldSet.addClass('show');
         }
     });
 

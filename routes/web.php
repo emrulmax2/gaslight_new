@@ -23,7 +23,6 @@ use App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Customers\CustomerJobAddressController;
 use App\Http\Controllers\Customers\CustomerJobsController;
-use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
 use App\Http\Controllers\Customers\JobDocumentController;
@@ -40,7 +39,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
-use App\Http\Controllers\Records\RecordInvoiceController;
+use App\Http\Controllers\Records\InvoiceController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Models\BoilerBrand;
 
@@ -222,10 +221,6 @@ Route::middleware(Authenticate::class)->group(function() {
     //     Route::post('customers/{customer}/jobs/restore/{customer_job_id}', 'restore')->name('customers.jobs.restore');
     // });
 
-    Route::controller(InvoiceController::class)->group(function() {
-        Route::get('invoice', 'invoice')->name('invoice');
-    });
-
     Route::controller(JobsJobController::class)->group(function() {
         Route::get('jobs', 'index')->name('jobs'); 
         Route::get('jobs/list', 'list')->name('jobs.list'); 
@@ -267,8 +262,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('records/{record}/{job}', 'index')->name('records');
     });
     
-    Route::controller(RecordInvoiceController::class)->group(function(){
-        Route::post('invoice/approve-and-send-email', 'approveAndSendEmail')->name('invoice.approve.and.send.email');
+    Route::controller(InvoiceController::class)->group(function(){
+        //Route::post('invoice/approve-and-send-email', 'approveAndSendEmail')->name('invoice.approve.and.send.email');
+        Route::post('records/invoice/store', 'store')->name('invoice.store');
     });
     
     Route::controller(HomeOwnerGasSafetyController::class)->group(function(){

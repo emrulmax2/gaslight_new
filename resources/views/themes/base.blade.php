@@ -1,13 +1,4 @@
 <!DOCTYPE html>
-<!--
-Template Name: Midone - Admin Dashboard Template
-Author: Left4code
-Website: http://www.left4code.com/
-Contact: muhammadrizki@left4code.com
-Purchase: https://themeforest.net/user/left4code/portfolio
-Renew Support: https://themeforest.net/user/left4code/portfolio
-License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
--->
 <html
     class="opacity-0"
     lang="{{ str_replace('_', '-', app()->getLocale()) }}"
@@ -24,18 +15,11 @@ License: You must have a valid license purchased only from themeforest(the above
         name="viewport"
         content="width=device-width, initial-scale=1"
     >
-    <meta
-        name="description"
-        content="Midone admin is super flexible, powerful, clean & modern responsive tailwind admin template with unlimited possibilities."
+    <meta name="description" content="Midone admin is super flexible, powerful, clean & modern responsive tailwind admin template with unlimited possibilities."
     >
-    <meta
-        name="keywords"
-        content="admin template, midone Admin Template, dashboard template, flat admin template, responsive admin template, web app"
+    <meta name="keywords" content="admin template, midone Admin Template, dashboard template, flat admin template, responsive admin template, web app"
     >
-    <meta
-        name="author"
-        content="LCC Team"
-    >
+    <meta name="author" content="LCC Team">
     
     @yield('head')
 
@@ -51,7 +35,7 @@ License: You must have a valid license purchased only from themeforest(the above
 <!-- END: Head -->
 
 <body>
-    <x-theme-switcher />
+    {{--<x-theme-switcher />--}}
 
     @yield('content')
 

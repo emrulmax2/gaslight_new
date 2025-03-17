@@ -45,7 +45,7 @@
         <!-- END: Breadcrumb -->
         
         <!-- BEGIN: Account Menu -->
-        <x-base.menu class="max-sm:mr-[45px] ml-auto">
+        <x-base.menu class="ml-auto">
             <x-base.menu.button
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"
             >

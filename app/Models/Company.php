@@ -53,8 +53,6 @@ class Company extends Model
         return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');
     }
 
-
-
     public function companyBankDetails()
     {
         return $this->hasOne(CompanyBankDetails::class, 'Company_id', 'id'); 
@@ -78,6 +76,11 @@ class Company extends Model
         $address .= (!empty($this->company_state) ? $this->company_state.',<br/> ' : '');
         $address .= (!empty($this->company_country) ? $this->company_country : '');
         return $address;
+    }
+
+    public function bank()
+    {
+        return $this->hasOne(CompanyBankDetails::class, 'Company_id', 'id'); 
     }
 
 }

@@ -26,6 +26,8 @@ typeSelect.addEventListener("change", reset);
 calculateBtn.addEventListener("click", calculateGasRate);
 measurementSelect.addEventListener("change", handleMeasurementChange);
 metricTimerSelect.addEventListener("change", handleTimerChange);
+initialReading.addEventListener("input", updateStartButtonVisibility);
+finalReading.addEventListener("input", updateStartButtonVisibility);
 
 function initializeUI() {
     if (measurementSelect.value == "imperial") {
@@ -43,6 +45,21 @@ function initializeUI() {
         timerPath.classList.add("arc");
         setCircleDasharray();
     }
+    updateStartButtonVisibility();
+}
+
+
+function updateStartButtonVisibility() {
+    if (measurementSelect.value === "metric") {
+        if (initialReading.value.trim() === "") {
+            startStopBtn.classList.add("hidden");
+        } else if (initialReading.value.trim() !== "" && finalReading.value.trim() !== "") {
+            startStopBtn.classList.add("hidden");
+        } else {
+            startStopBtn.classList.remove("hidden");
+        }
+    }
+
 }
 
 initializeUI();
@@ -68,6 +85,7 @@ function handleMeasurementChange() {
         timeLabel.innerHTML = formatTime(timeLeft);
         readingInput.classList.add("hidden");
     }
+    updateStartButtonVisibility();
 }
 
 function handleTimerChange() {
@@ -91,6 +109,7 @@ function startStop() {
         startStopBtn.classList.remove("bg-success", "border-success", "text-white");
         startStopBtn.classList.add("bg-danger", "border-danger", "text-white");
     }
+    updateStartButtonVisibility();
 }
 
 function start() {
@@ -135,6 +154,7 @@ function stop() {
     }
     clearInterval(timerInterval);
     timerInterval = null;
+    updateStartButtonVisibility();
 }
 
 function reset() {
@@ -172,6 +192,8 @@ function reset() {
     calculateBtn.classList.add("hidden");
     initialReading.value = "";
     finalReading.value = "";
+
+    updateStartButtonVisibility();
 }
 
 function timeIsUp() {
@@ -238,6 +260,7 @@ finalReading.addEventListener("input", () => {
     } else {
         calculateBtn.classList.remove("hidden");
     }
+    updateStartButtonVisibility();
 });
 
 function calculateGasRate() {

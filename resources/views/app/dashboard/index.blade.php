@@ -28,7 +28,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-success"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="file-plus"
                                         />
                                     </div>
@@ -82,7 +82,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="Briefcase"
                                         />
                                     </div>
@@ -102,7 +102,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="calendar"
                                         />
                                     </div>
@@ -119,7 +119,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-warning"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="calculator"
                                         />
                                     </div>
@@ -136,7 +136,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-info"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="BookOpen"
                                         />
                                     </div>
@@ -153,7 +153,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-danger"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="settings"
                                         />
                                     </div>
@@ -170,7 +170,7 @@
                                 <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
                                     <div class="inline-flex sm:flex">
                                         <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-pending"
+                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
                                             icon="file-text"
                                         />
                                     </div>
@@ -1082,7 +1082,7 @@
                     <!-- END: Schedules -->--}}
                 </div>
             </div>
-        </div>--}}
+        </div>
     </div>
     @include('app.dashboard.modal.index')
 @endsection

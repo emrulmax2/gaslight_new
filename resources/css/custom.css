@@ -253,3 +253,21 @@
     }
 }
 /* Wizard Form Styling End */
+.radioItem  label{
+    opacity: .35;
+}
+.radioItem input[type="radio"]:checked + label{
+    opacity: 1;
+}
+.radioItem label svg.checked{
+    display: none;
+}
+.radioItem input[type="radio"]:checked + label svg.checked{
+    display: inline-flex;
+}
+.radioItem label svg.unchecked{
+    display: inline-flex;
+}
+.radioItem input[type="radio"]:checked + label svg.unchecked{
+    display: none;
+}

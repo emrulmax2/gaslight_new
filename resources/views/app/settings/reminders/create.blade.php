@@ -90,7 +90,7 @@
                     </x-base.button>
                     <x-base.button as="a" href="{{ route('user.settings') }}" class="w-full" variant="danger" >
                         <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
-                        Cancle
+                        Cancel
                     </x-base.button>
                 </div>
             </div>

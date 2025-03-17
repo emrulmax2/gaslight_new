@@ -6,18 +6,8 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium hidden lg:block">Job Details</h2>
-        <div class="mt-0 w-auto hidden lg:flex gap-2">
-            <x-base.button as="a" href="{{ route('customer.jobs', $job->customer->id) }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Job List
-            </x-base.button>
-            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
-                <x-base.lucide class="h-4 w-4" icon="home" />
-            </x-base.button>
-        </div>
-        <div class="flex w-full justify-between items-center lg:hidden">
-            <h2 class="text-lg font-medium">Job Details</h2>
+        <h2 class="mr-auto text-lg font-medium">Job Details</h2>
+        <div class="mt-0 w-auto gap-2">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
@@ -27,7 +17,7 @@
     <!-- BEGIN: HTML Table Data -->
     <form method="post" action="#" id="updateJobForm">
         <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-9">
+            <div class="col-span-12 sm:col-span-9 relative z-20">
                 <div class="intro-y box">
                     <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">
@@ -98,7 +88,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 sm:col-span-3">
+            <div class="col-span-12 sm:col-span-3 relative z-10">
                 <div class="intro-y box mb-5">
                     <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">
@@ -156,9 +146,6 @@
                     </div>
                 </div>
                 <div class="intro-y box p-5">
-                    <x-base.button type="button" class="mb-3 w-full text-white" variant="primary" >
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="calendar-plus" />Add Appointment
-                    </x-base.button>
                     <x-base.button type="button" class="mb-3 w-full text-white" variant="twitter" data-tw-toggle="modal" data-tw-target="#jobActionsListModal">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />Create
                     </x-base.button>
@@ -167,9 +154,9 @@
                         Update Job
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                     </x-base.button>
-                    <x-base.button as="a" href="{{ route('company.dashboard') }}" class="w-full" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="home" />
-                        Home
+                    <x-base.button as="a" href="{{ route('customer.jobs', $job->customer->id) }}" class="w-full" variant="danger">
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                        Cancel
                     </x-base.button>
                     
                     <x-base.form-input type="hidden" value="{{ $job->id }}" name="customer_job_id" />

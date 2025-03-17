@@ -6,18 +6,8 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium hidden lg:block">New Job</h2>
-        <div class="mt-0 w-auto hidden lg:flex gap-2">
-            <x-base.button as="a" href="{{ route('customer.jobs', $customer->id) }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Job List
-            </x-base.button>
-            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
-                <x-base.lucide class="h-4 w-4" icon="home" />
-            </x-base.button>
-        </div>
-        <div class="flex w-full justify-between items-center lg:hidden">
-            <h2 class="text-lg font-medium">New Job</h2>
+        <h2 class="mr-auto text-lg font-medium">New Job</h2>
+        <div class="mt-0 w-auto gap-2">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
@@ -127,9 +117,9 @@
                         Save Job
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                     </x-base.button>
-                    <x-base.button as="a" href="{{ route('company.dashboard') }}" class="w-full" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="home" />
-                        Home
+                    <x-base.button as="a" href="{{ route('customer.jobs', $customer->id) }}" class="w-full" variant="danger">
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                        Cancel
                     </x-base.button>
                 </div>
             </div>

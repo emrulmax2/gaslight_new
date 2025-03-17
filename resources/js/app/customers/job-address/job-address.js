@@ -59,18 +59,6 @@ var JobAddressListTable = (function () {
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     minWidth: 200,
-                    formatter(cell, formatterParams) {
-                        let address = cell.getData().address;
-                        let addressParts = address.split(', ');
-                        var html = '<div class="block lg:flex">';
-                        html += '<div class="flex items-center gap-1">';
-                        html += '<span class="sm:hidden"><i data-lucide="map-pin" class="w-4 h-4"></i></span>';
-                        html += '<div class="text-slate-500 text-xs">' + (addressParts[0] || '') + ', ' + (addressParts[1] || '') + '</div>';
-                        html += '</div>';
-                        html += '<div class="text-slate-500 text-xs mt-0.5 ml-6">' + (addressParts[2] || '') + ', ' + (addressParts[3] || '') + '</div>';
-                        html += '</div>';
-                        return html;
-                    }
                 },
                 // {
                 //     title: "Actions",

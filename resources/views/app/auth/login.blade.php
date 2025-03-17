@@ -1,7 +1,7 @@
 @extends('../themes/base')
 
 @section('head')
-    <title>Tailwise - Admin Dashboard Template</title>
+    <title>Gas Engineer App</title>
 @endsection
 
 @section('content')
@@ -33,29 +33,7 @@
                             Sign Up
                         </a>
                     </div>
-                    <x-base.alert
-                        class="my-7 flex items-center rounded-[0.6rem] border-primary/20 bg-primary/5 px-4 py-3 leading-[1.7]"
-                        variant="outline-primary"
-                    >
-                        <div class="">
-                            <x-base.lucide
-                                class="mr-2 h-7 w-7 fill-primary/10 stroke-[0.8]"
-                                icon="Lightbulb"
-                            />
-                        </div>
-                        <div class="ml-1 mr-8">
-                            Welcome to <span class="font-medium">Tailwise</span>
-                            demo! Simply click
-                            <span class="font-medium">Sign In</span> to explore
-                            and access our documentation.
-                        </div>
-                        <x-base.alert.dismiss-button class="btn-close text-primary">
-                            <x-base.lucide
-                                class="w-5 h-5"
-                                icon="X"
-                            />
-                        </x-base.alert.dismiss-button>
-                    </x-base.alert>
+                    
                     <div class="mt-6">
                         <form id="login-form">
                         <x-base.form-label>Email*</x-base.form-label>
@@ -100,13 +78,13 @@
                                 icon="oval" color="#fff"
                             />
                             </x-base.button>
-                            <a href="{{ route('register') }}"
+                            <!--<a href="{{ route('register') }}"
                                 class="transition duration-200 border shadow-sm inline-flex items-center justify-center px-3 font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed border-secondary text-slate-500 dark:border-darkmode-100/40 dark:text-slate-300 [&:hover:not(:disabled)]:bg-secondary/20 [&:hover:not(:disabled)]:dark:bg-darkmode-100/10 rounded-full mt-3 w-full bg-white/70 py-3.5"
                                 variant="outline-secondary"
                                 rounded
                             >
                                 Sign Up
-                            </a>
+                            </a>-->
                         </div>
                     </div>
                 </div>

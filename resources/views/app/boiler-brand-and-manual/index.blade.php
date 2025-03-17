@@ -12,10 +12,10 @@
                 <div class="col-span-12 mt-4 sm:mt-8">
                     <div class="intro-y flex h-auto sm:h-10 items-center">
                         <h2 class="mr-5 truncate text-lg font-medium">Search By Brand</h2>
-                        <div class=" ml-auto mt-4 flex w-full sm:mt-0 sm:w-auto items-end">
+                        <div class="ml-auto mt-4 flex w-full sm:mt-0 sm:w-auto items-end">
                             <x-base.button as='a' href="{{ route('company.dashboard') }}" id="bck"  class="shadow-md add_btn" variant="primary" >
-                                <x-base.lucide class="mr-2 h-6 w-6" icon="circle-arrow-left" />
-                                Back to Dashboard
+                                <x-base.lucide class="h-6 w-6" icon="home" />
+                                
                             </x-base.button>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                     </div>
                     
                     <!-- BEGIN: HTML Table Data -->
-                    <div class="intro-y box mt-5 p-5 col-span-12">
+                    <div class="intro-y box mt-5 p-5 col-span-12 brandContainer hidden">
                         <div class="grid grid-cols-12 gap-6">
                             <!--Implement a search method that get container-->
                             <div id="search-box" class="col-span-12 hidden">
@@ -73,77 +73,80 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    <script type="module">
-        // implement axios search when brand is selected
-        const boilerBrandSelect = document.getElementById('boiler-brand-select');
-        boilerBrandSelect.addEventListener('change', function() {
-            const brandId = this.value;
-            if (brandId) {
+<script type="module">
+    const boilerBrandSelect = document.getElementById('boiler-brand-select');
+    const brandContainer = document.querySelector('.brandContainer');
+    const boilerBrandsContainer = document.querySelector('.boiler-brands-container');
+    
+    brandContainer.classList.add('hidden');
 
-                axios({
-                    method: "get",
-                    url: route('boiler-manuals.show', brandId),
-                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                }).then(response => {
-                        // Handle the response data
-                        
-                        // Update the UI with the fetched data
-                        //implement card view
-                        const boilerBrandsManual = response.data;
-                        const boilerBrandsContainer = document.querySelector('.boiler-brands-container');
-                        boilerBrandsContainer.innerHTML = '';
+    boilerBrandSelect.addEventListener('change', function() {
+        const brandId = this.value;
+        if (brandId) {
+            axios({
+                method: "get",
+                url: route('boiler-manuals.show', brandId),
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                boilerBrandsContainer.innerHTML = '';
+                const boilerBrandsManual = response.data;
 
-                        //if ther are no manuals then show a message
-                        if (boilerBrandsManual.length === 0) {
-                            boilerBrandsContainer.innerHTML = `
-                            <div class="col-span-12">
-                                <div class="intro-y flex h-auto sm:h-10 items-center">
-                                    <h2 class="mr-5 truncate text-lg font-medium">No Manual Found</h2>
-                                </div>
+                if (boilerBrandsManual.length === 0) {
+                    boilerBrandsContainer.innerHTML = `
+                        <div class="col-span-12">
+                            <div class="intro-y flex h-auto sm:h-10 items-center">
+                                <h2 class="mr-5 truncate text-lg font-medium">No Manual Found</h2>
                             </div>
-                            `;
-                        } else {
-                            boilerBrandsManual.forEach(manual => {
-                                $('#search-box').removeClass('hidden');
-                                boilerBrandsContainer.innerHTML += `
-                                <a href="${manual.url}" id="${manual.model}" class="col-span-12 sm:col-span-6 xl:col-span-4 mt-6 my-3">
-                                    <div class="w-auto">
-                                        <div class="intro-y box p-5 my-3">
-                                            <div class="flex items-center">
-                                                <div class="model-name font-medium text-base">${manual.model}</div>
-                                            </div>
-                                            <div class="mt-4">
-                                                <div class="text-gray-600">Fuel Type</div>
-                                                <div class="text-base font-medium">${manual.fuel_type}</div>
-                                            </div>
-                                            <div class="mt-4">
-                                                <div class="text-gray-600">GC No</div>
-                                                <div class="text-base font-medium">${manual.gc_no}</div>
-                                            </div>
+                        </div>
+                    `;
+                } else {
+                    boilerBrandsManual.forEach(manual => {
+                        $('#search-box').removeClass('hidden');
+                        boilerBrandsContainer.innerHTML += `
+                            <a href="${manual.url}" id="${manual.model}" class="col-span-12 sm:col-span-6 xl:col-span-4 mt-6 my-3">
+                                <div class="w-auto">
+                                    <div class="intro-y box p-5 my-3">
+                                        <div class="flex items-center">
+                                            <div class="model-name font-medium text-base">${manual.model}</div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="text-gray-600">Fuel Type</div>
+                                            <div class="text-base font-medium">${manual.fuel_type}</div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="text-gray-600">GC No</div>
+                                            <div class="text-base font-medium">${manual.gc_no}</div>
                                         </div>
                                     </div>
-                                </a>
-                                `;
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('There was an error fetching the data!', error);
+                                </div>
+                            </a>
+                        `;
                     });
+                }
+                brandContainer.classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('There was an error fetching the data!', error);
+                brandContainer.classList.add('hidden');
+            });
+        } else {
+            brandContainer.classList.add('hidden');
+            $('#search-box').addClass('hidden');
+        }
+    });
+
+    const textSearch = document.getElementById('text-search');
+    textSearch.addEventListener('input', function() {
+        const searchValue = this.value.toLowerCase();
+        const boilerBrands = document.querySelectorAll('.boiler-brands-container a');
+        boilerBrands.forEach(brand => {
+            const brandName = brand.querySelector('.model-name').textContent.toLowerCase();
+            if (brandName.includes(searchValue)) {
+                brand.style.display = 'block';
+            } else {
+                brand.style.display = 'none';
             }
         });
-        const textSearch = document.getElementById('text-search');
-        textSearch.addEventListener('input', function() {
-            const searchValue = this.value.toLowerCase();
-            const boilerBrands = document.querySelectorAll('.boiler-brands-container a');
-            boilerBrands.forEach(brand => {
-                const brandName = brand.querySelector('.model-name').textContent.toLowerCase();
-                if (brandName.includes(searchValue)) {
-                    brand.style.display = 'block';
-                } else {
-                    brand.style.display = 'none';
-                }
-            });
-        });
-    </script>
+    });
+</script>
 @endPushOnce
