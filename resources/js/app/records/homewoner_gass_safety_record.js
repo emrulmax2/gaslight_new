@@ -73,12 +73,10 @@ import INTAddressLookUps from '../../address_lookup.js';
         }else if(parentFieldset.index() == 2 || parentFieldset.index() == 3 || parentFieldset.index() == 4 || parentFieldset.index() == 5){
             url = route('records.store.appliance');
         }else if(parentFieldset.index() == 6){
-            url = route('records.store.co.alarms');
-        }else if(parentFieldset.index() == 7){
             url = route('records.store.satisfactory.check');
-        }else if(parentFieldset.index() == 8){
+        }else if(parentFieldset.index() == 7){
             url = route('records.store.comments');
-        }else if(parentFieldset.index() == 9){
+        }else if(parentFieldset.index() == 8){
             url = route('records.store.signatures');
         }
 
@@ -163,6 +161,58 @@ import INTAddressLookUps from '../../address_lookup.js';
             });
         }
     });
+
+    //Save Final Step
+    $(document).on('click', '.form-wizard-final-btn', function(e){
+        e.preventDefault();
+        $('.gsfSignature .sign-pad-button-submit').trigger('click');
+    });
+    $('#signatureForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('signatureForm');
+        let $form = $(this);
+    
+        $('.form-wizard-next-btn, .form-wizard-final-btn', $form).attr('disabled', 'disabled');
+        $('.form-wizard-final-btn .theIcon', $form).fadeOut();
+        $('.form-wizard-final-btn .theLoader', $form).fadeIn();
+
+        let form_data = new FormData(form);
+        let url = route('records.store.signatures');
+
+        $.ajax({
+            method: 'POST',
+            url: url,
+            data: form_data,
+            dataType: 'json',
+            async: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            success: function(res, textStatus, xhr){
+                $('.form-wizard-next-btn, .form-wizard-final-btn', $form).removeAttr('disabled');
+                $('.form-wizard-final-btn .theLoader', $form).fadeOut();
+                $('.form-wizard-final-btn .theIcon', $form).fadeIn();
+                if(xhr.status == 200){
+                    window.location.href = res.red;
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $('.form-wizard-next-btn, .form-wizard-final-btn', $form).removeAttr('disabled');
+                $('.form-wizard-final-btn .theLoader', $form).fadeOut();
+                $('.form-wizard-final-btn .theIcon', $form).fadeIn();
+                if(jqXHR.status == 422){
+                    for (const [key, val] of Object.entries(jqXHR.responseJSON.errors)) {
+                        $(`#signatureForm .${key}`).addClass('border-danger');
+                        $(`#signatureForm  .error-${key}`).html(val);
+                    }
+                }else{
+                    console.log(textStatus+' => '+errorThrown);
+                }
+            }
+        });
+    })
     
     // ON Previous Button Click
     $('.form-wizard-previous-btn').on('click', function () {
@@ -227,65 +277,65 @@ import INTAddressLookUps from '../../address_lookup.js';
             $allStepBtns.eq(theFieldSetIndex).removeClass('active');
             $parentfieldSet.removeClass('show');
         }else{
-            let formid = $currentActiveForm.attr('id');
-            const form = document.getElementById(formid);
-            let form_data = new FormData(form);
-            let url;
-            console.log(parentFieldset.index())
-            if(parentFieldset.index() == 0){
-                url = route('records.store.job.address');
-            }else if(parentFieldset.index() == 1){
-                url = route('records.store.customer');
-            }else if(parentFieldset.index() == 2 || parentFieldset.index() == 3 || parentFieldset.index() == 4 || parentFieldset.index() == 5){
-                url = route('records.store.appliance');
-            }else if(parentFieldset.index() == 6){
-                url = route('records.store.co.alarms');
-            }else if(parentFieldset.index() == 7){
-                url = route('records.store.satisfactory.check');
-            }else if(parentFieldset.index() == 8){
-                url = route('records.store.comments');
-            }else if(parentFieldset.index() == 9){
-                url = route('records.store.signatures');
-            }
+            if($currentActiveForm.length > 0){
+                let formid = $currentActiveForm.attr('id');
+                const form = document.getElementById(formid);
+                let form_data = new FormData(form);
+                let url;
+                
+                if(parentFieldset.index() == 0){
+                    url = route('records.store.job.address');
+                }else if(parentFieldset.index() == 1){
+                    url = route('records.store.customer');
+                }else if(parentFieldset.index() == 2 || parentFieldset.index() == 3 || parentFieldset.index() == 4 || parentFieldset.index() == 5){
+                    url = route('records.store.appliance');
+                }else if(parentFieldset.index() == 6){
+                    url = route('records.store.satisfactory.check');
+                }else if(parentFieldset.index() == 7){
+                    url = route('records.store.comments');
+                }else if(parentFieldset.index() == 8){
+                    url = route('records.store.signatures');
+                }
 
-            if(url != ''){
-                $.ajax({
-                    method: 'POST',
-                    url: url,
-                    data: form_data,
-                    dataType: 'json',
-                    async: false,
-                    enctype: 'multipart/form-data',
-                    processData: false,
-                    contentType: false,
-                    cache: false,
-                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                    success: function(res, textStatus, xhr){
-                        if(xhr.status == 200){
-                            let saved = res.saved;
-                            if(saved == 1){
-                                currentActiveStep.find('.unsavedIcon').fadeOut('fast', function(){
-                                    currentActiveStep.find('.savedIcon').fadeIn();
-                                });
-                                $currentActiveFieldset.find('.unsavedIcon').fadeOut('fast', function(){
-                                    $currentActiveFieldset.find('.savedIcon').fadeIn();
-                                });
-                            }else{
-                                currentActiveStep.find('.savedIcon').fadeOut('fast', function(){
-                                    currentActiveStep.find('.unsavedIcon').fadeIn();
-                                });
-                                $currentActiveFieldset.find('.savedIcon').fadeOut('fast', function(){
-                                    $currentActiveFieldset.find('.unsavedIcon').fadeIn();
-                                });
+                if(url != ''){
+                    $.ajax({
+                        method: 'POST',
+                        url: url,
+                        data: form_data,
+                        dataType: 'json',
+                        async: false,
+                        enctype: 'multipart/form-data',
+                        processData: false,
+                        contentType: false,
+                        cache: false,
+                        headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                        success: function(res, textStatus, xhr){
+                            if(xhr.status == 200){
+                                let saved = res.saved;
+                                if(saved == 1){
+                                    currentActiveStep.find('.unsavedIcon').fadeOut('fast', function(){
+                                        currentActiveStep.find('.savedIcon').fadeIn();
+                                    });
+                                    $currentActiveFieldset.find('.unsavedIcon').fadeOut('fast', function(){
+                                        $currentActiveFieldset.find('.savedIcon').fadeIn();
+                                    });
+                                }else{
+                                    currentActiveStep.find('.savedIcon').fadeOut('fast', function(){
+                                        currentActiveStep.find('.unsavedIcon').fadeIn();
+                                    });
+                                    $currentActiveFieldset.find('.savedIcon').fadeOut('fast', function(){
+                                        $currentActiveFieldset.find('.unsavedIcon').fadeIn();
+                                    });
+                                }
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            if(jqXHR.status == 422){
+                                console.log(textStatus+' => '+errorThrown);
                             }
                         }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        if(jqXHR.status == 422){
-                            console.log(textStatus+' => '+errorThrown);
-                        }
-                    }
-                });
+                    });
+                }
             }
             $allStepBtns.removeClass('active');
             $allFieldSets.removeClass('show');
@@ -377,5 +427,73 @@ import INTAddressLookUps from '../../address_lookup.js';
         $currentActiveTab.removeClass('active');
         $('.form-wizard').find('.form-wizard-step-item').eq(nextFormIndex).addClass('active');
     });
+
+    // Signature Toggle
+    /*$('.gsfSignatureBtns .signBtns').on('click', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+
+        $('.gsfSignatureBtns .uploadBtns').removeClass('active');
+        $theBtn.addClass('active');
+
+        $('.gsfSignature .customeUploads').fadeOut('fast', function(){
+            $('.gsfSignature .e-signpad').fadeIn();
+            $('#signature_image').fadeOut('fast', function(){
+                $('.customeUploads .customeUploadsContent').fadeIn();
+                $('#signature_file').val('');
+            })
+        });
+        
+    })
+    $('.gsfSignatureBtns .uploadBtns').on('click', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+
+        $('.gsfSignatureBtns .signBtns').removeClass('active');
+        $theBtn.addClass('active');
+
+        $('.gsfSignature').find('.sign-pad-button-clear').trigger('click');
+        $('.gsfSignature .e-signpad').fadeOut('fast', function(){
+            $('.gsfSignature .customeUploads').fadeIn();
+        });
+    });
+
+    $(document).on('change', '#signature_file', function(){
+        if($('#signature_file').get(0).files.length === 0){
+            $('#signature_image').fadeOut('fast', function(){
+                $('.customeUploads .customeUploadsContent').fadeIn();
+            })
+        }else{
+            if(this.files[0].size > 2097152){
+                $('#signature_file').val('');
+                $('#signature_image').fadeOut('fast', function(){
+                    $('.customeUploads .customeUploadsContent').fadeIn('fast', function(){
+                        $('.customeUploads .customeUploadsContent .sizeError').remove();
+                        $('.customeUploads .customeUploadsContent').append('<div role="alert" class="sizeError inline-flex alert relative border rounded-md px-3 py-2 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mt-3 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>File size must not be more than 2 MB</div>')
+                        
+                        setTimeout(() => {
+                            $('.customeUploads .customeUploadsContent .sizeError').remove();
+                        }, 2000);
+                    });
+                })
+            }else{
+                $('.customeUploads .customeUploadsContent').fadeOut('fast', function(){
+                    showPreview('signature_file', 'signature_image');
+                    $('#signature_image').fadeIn();
+                })
+            }
+        }
+    })
+
+    function showPreview(inputId, targetImageId) {
+        var src = document.getElementById(inputId);
+        var target = document.getElementById(targetImageId);
+        var title = document.getElementById('selected_image_title');
+        var fr = new FileReader();
+        fr.onload = function () {
+            target.src = fr.result;
+        }
+        fr.readAsDataURL(src.files[0]);
+    };*/
 
 })();

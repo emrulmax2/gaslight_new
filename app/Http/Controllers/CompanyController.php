@@ -104,11 +104,12 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request)
     {
+
         $company = Company::find($request->company_id);
         $companyLogoName = (isset($company->company_logo) && !empty($company->company_logo) ? $company->company_logo : '');
         $companyData = [
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
-            'vat_number' => (!empty($request->company_email) ? $request->company_email : null),
+            'vat_number' => (!empty($request->vat_number) ? $request->vat_number : null),
             'business_type' => (!empty($request->business_type) ? $request->business_type : null),
             'company_registration' => ($request->business_type == 'Company' && !empty($request->company_registration) ? $request->company_registration : null),
             'display_company_name' => (!empty($request->display_company_name) && $request->display_company_name > 0 ? $request->display_company_name : 0),

@@ -77,9 +77,11 @@
         if(!isNonVatCheck){
             $('#invoiceItemsTable').find('.vatCol, .vatField').fadeIn();
             $('.vatTotalField').fadeIn();
+            $('.vatNumberField').fadeIn();
         }else{
             $('#invoiceItemsTable').find('.vatCol, .vatField').fadeOut();
             $('.vatTotalField').fadeOut();
+            $('.vatNumberField').fadeOut();
         }
 
         //Recalculate the invoice here.....
@@ -103,7 +105,7 @@
 
             if(!isNonVatCheck){
                 $('#addInvoiceItemModal .vatWrap').fadeIn('fast', function(){
-                    $('input', this).val(0);
+                    $('input', this).val(20);
                 });
             }else{
                 $('#addInvoiceItemModal .vatWrap').fadeOut('fast', function(){
@@ -311,11 +313,11 @@
             invoiceDiscountModal.show();
             document.getElementById('invoiceDiscountModal').addEventListener('shown.tw.modal', function(event){
                 $('#invoiceDiscountModal .dueLeft').html(theLabel);
-                $('#invoiceDiscountModal [name="discount_amount"]').val(DueAmount);
-                $('#invoiceDiscountModal [name="max_discount"]').val(DueAmount);
+                $('#invoiceDiscountModal [name="discount_amount"]').val(DueAmount.toFixed(2));
+                $('#invoiceDiscountModal [name="max_discount"]').val(DueAmount.toFixed(2));
                 if(!isNonVatCheck){
                     $('#invoiceDiscountModal .discountVatField').fadeIn('fast', function(){
-                        $('input', this).val(0);
+                        $('input', this).val(20);
                     });
                 }else{
                     $('#invoiceDiscountModal .discountVatField').fadeOut('fast', function(){

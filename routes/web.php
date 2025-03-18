@@ -272,7 +272,6 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.address');
         Route::post('records/store-customer', 'storeCustomer')->name('records.store.customer');
         Route::post('records/store-appliance', 'storeAppliance')->name('records.store.appliance');
-        Route::post('records/store-co-alarms', 'storeCoAlarms')->name('records.store.co.alarms');
         Route::post('records/store-satisfactory-check', 'storeSatisfactoryCheck')->name('records.store.satisfactory.check');
         Route::post('records/store-comments', 'storeComments')->name('records.store.comments');
         Route::post('records/store-signatures', 'storeSignatures')->name('records.store.signatures');
@@ -365,7 +364,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('regular-form-page', 'regularForm')->name('regular-form');
     Route::get('datepicker-page', 'datepicker')->name('datepicker');
     Route::get('tom-select-page', 'tomSelect')->name('tom-select');
-    //Route::get('file-upload-page', 'fileUpload')->name('file-upload');
+    Route::get('file-upload-page', 'fileUpload')->name('file-upload');
     Route::get('wysiwyg-editor-classic-page', 'wysiwygEditorClassic')->name('wysiwyg-editor-classic');
     Route::get('wysiwyg-editor-inline-page', 'wysiwygEditorInline')->name('wysiwyg-editor-inline');
     Route::get('wysiwyg-editor-balloon-page', 'wysiwygEditorBalloon')->name('wysiwyg-editor-balloon');

@@ -271,3 +271,26 @@
 .radioItem input[type="radio"]:checked + label svg.unchecked{
     display: none;
 }
+
+.gsfSignature .sign-pad-button-submit{
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+.gsfSignature .sign-pad-button-clear{
+    margin: 0;
+    display: block;
+    width: 100%;
+    border-radius: 0 0 3px 3px;
+    color: #64748b;
+    background: #e2e8f0b3;
+}
+.gsfSignature .e-signpad > div {
+    display: block;
+    width: 100%;
+}
+.gsfSignatureBtns button.active:hover{
+    background: #259E94 !important;
+    opacity: .8;
+}

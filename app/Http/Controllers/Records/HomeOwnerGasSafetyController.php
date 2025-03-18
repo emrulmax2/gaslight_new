@@ -10,7 +10,10 @@ use App\Models\CustomerProperty;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
 use App\Models\JobForm;
+use Creagia\LaravelSignPad\Signature;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class HomeOwnerGasSafetyController extends Controller
 {
@@ -132,29 +135,6 @@ class HomeOwnerGasSafetyController extends Controller
         endif;
     }
 
-    public function storeCoAlarms(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasSafetyRecord = GasSafetyRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-
-            'cp_alarm_fitted' => (isset($request->cp_alarm_fitted) && !empty($request->cp_alarm_fitted) ? $request->cp_alarm_fitted : null),
-            'cp_alarm_satisfactory' => (isset($request->cp_alarm_satisfactory) && !empty($request->cp_alarm_satisfactory) ? $request->cp_alarm_satisfactory : null),
-            
-            'created_by' => $user_id,
-            'updated_by' => $user_id,
-        ]);
-
-        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1], 200);
-    }
-
     public function storeSatisfactoryCheck(Request $request){
         $customer_job_id = $request->customer_job_id;
         $job_form_id = $request->job_form_id;
@@ -217,6 +197,7 @@ class HomeOwnerGasSafetyController extends Controller
         $form = JobForm::find($job_form_id);
         $user_id = auth()->user()->id;
 
+        
         $gasSafetyRecord = GasSafetyRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
             'customer_id' => $job->customer_id,
             'customer_job_id' => $customer_job_id,
@@ -230,7 +211,25 @@ class HomeOwnerGasSafetyController extends Controller
             'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
+        
+        if($request->input('sign') !== null):
+            $gasSafetyRecord->deleteSignature();
+            
+            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+            $signatureData = base64_decode($signatureData);
+            $imageName = 'signatures/' . Str::uuid() . '.png';
+            Storage::disk('public')->put($imageName, $signatureData);
+            $signature = new Signature();
+            $signature->model_type = GasSafetyRecord::class;
+            $signature->model_id = $gasSafetyRecord->id;
+            $signature->uuid = Str::uuid();
+            $signature->filename = $imageName;
+            $signature->document_filename = null;
+            $signature->certified = false;
+            $signature->from_ips = json_encode([request()->ip()]);
+            $signature->save();
+        endif;
 
-        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1], 200);
+        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1, 'red' => route('records', [$form->slug, $customer_job_id])], 200);
     }
 }
