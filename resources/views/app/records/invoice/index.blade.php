@@ -7,7 +7,7 @@
 @section('subcontent')
     <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
         <h2 class="mr-auto text-lg font-medium">Invoice</h2>
-        <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
+        {{--<div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
             <x-base.button class="mr-2 shadow-md" variant="primary">Print</x-base.button>
             <x-base.menu class="ml-auto sm:ml-0">
                 <x-base.menu.button class="!box px-2" as="x-base.button" >
@@ -24,7 +24,7 @@
                     </x-base.menu.item>
                 </x-base.menu.items>
             </x-base.menu>
-        </div>
+        </div>--}}
     </div>
     <form method="post" action="#" id="JobInvoiceForm">
         <div class="grid grid-cols-11 gap-x-6 pb-20 mt-5">
@@ -59,7 +59,7 @@
                     </div>
                     <x-base.form-switch class="flex items-center mt-3 w-full ml-0">
                         <x-base.form-switch.label for="nonVatInvoiceCheck" class="cursor-pointer ml-0 font-medium">Non-VAT Invoice</x-base.form-switch.label>
-                        <x-base.form-switch.input checked="{{ ($invoice->non_vat_invoice == 1 ? 1 : 0) }}" id="nonVatInvoiceCheck" class="mr-0 ml-auto" type="checkbox" name="vat_registerd" value="1" />
+                        <x-base.form-switch.input checked="{{ ($invoice->non_vat_invoice == 1 ? 1 : 0) }}" id="nonVatInvoiceCheck" class="mr-0 ml-auto" type="checkbox" name="non_vat_invoice" value="1" />
                     </x-base.form-switch>
                     <input type="hidden" value="1" name="submit_type"/>
                 </div>
@@ -72,7 +72,7 @@
                                 <div class="text-3xl font-semibold text-primary">
                                     <img class="w-28" src="{{ Vite::asset('resources/images/gas_safe_register.png') }}" alt="Gas Safe Register Logo">
                                 </div>
-                                <div class="mt-2">
+                                <div class="mt-5">
                                     <span class="font-bold text-xl">Address to</span>
                                 </div>
                                 <div class="mt-1">
@@ -81,7 +81,8 @@
                                 </div>
                             </div>
                             <div class="px-5 py-10 sm:px-8 sm:py-8 text-right">
-                                <div class="text-3xl font-semibold">Invoice <span class="text-primary">#{{ $invoice->invoice_number }}</span></div>
+                                <div class="text-3xl font-semibold">Invoice</div>
+                                <div class="text-xl font-semibold text-primary">Ref: {{ $invoice->invoice_number }}</div>
                                 <div class="mt-2">
                                     <span class="font-bold text-xl">{{ (isset($company->company_name) ? $company->company_name : '')}}</span>
                                 </div>
@@ -134,7 +135,7 @@
                                         <x-base.table.th class="description whitespace-nowrap text-left">DESCRIPTION</x-base.table.th>
                                         <x-base.table.th class="units whitespace-nowrap text-right">UNITS</x-base.table.th>
                                         <x-base.table.th class="price whitespace-nowrap text-right">PRICE</x-base.table.th>
-                                        <x-base.table.th class="vatField whitespace-nowrap text-right">VAT %</x-base.table.th>
+                                        <x-base.table.th class="vatField whitespace-nowrap text-right" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'table-cell' }};">VAT %</x-base.table.th>
                                         <x-base.table.th class="lineTotal whitespace-nowrap text-right">LINE TOTAL</x-base.table.th>
                                     </x-base.table.tr>
                                 </x-base.table.thead>
@@ -167,7 +168,7 @@
                                                     {{ Number::currency($unitPrice, 'GBP') }}
                                                     <input type="hidden" name="inv[{{ $key }}][unit_price]" class="unit_price" value="{{ $unitPrice }}"/>
                                                 </x-base.table.td>
-                                                <x-base.table.td class="vatCol w-[120px] text-right font-medium">
+                                                <x-base.table.td class="vatCol w-[120px] text-right font-medium" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'table-cell' }};">
                                                     {{ $vatRate.'%' }}
                                                     <input type="hidden" name="inv[{{ $key }}][vat_rate]" class="vat_rate" value="{{ $vatRate }}"/>
                                                     <input type="hidden" name="inv[{{ $key }}][vat_amount]" class="vat_amount" value="{{ $vatAmount }}"/>
@@ -203,7 +204,7 @@
                                                 {{ Number::currency($unitPrice, 'GBP') }}
                                                 <input type="hidden" name="inv[1][unit_price]" class="unit_price" value="{{ $unitPrice }}"/>
                                             </x-base.table.td>
-                                            <x-base.table.td class="vatCol w-[120px] text-right font-medium">
+                                            <x-base.table.td class="vatCol w-[120px] text-right font-medium" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'table-cell' }};">
                                                 {{ $vatRate.'%' }}
                                                 <input type="hidden" name="inv[1][vat_rate]" class="vat_rate" value="{{ $vatRate }}"/>
                                                 <input type="hidden" name="inv[1][vat_amount]" class="vat_amount" value="{{ $vatAmount }}"/>
@@ -267,7 +268,7 @@
                                 <span class="w-[80px] inline-flex justify-end subtotal_price">£0.00</span>
                                 <input type="hidden" name="sub_total" value="0"/>
                             </div>
-                            <div class="mt-2 font-medium text-md vatTotalField">
+                            <div class="mt-2 font-medium text-md vatTotalField" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'block' }};">
                                 <span>Vat Total:</span>
                                 <span class="w-[80px] inline-flex justify-end vat_total_price">£0.00</span>
                                 <input type="hidden" name="vat_total_price" value="0"/>

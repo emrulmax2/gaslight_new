@@ -159,9 +159,7 @@
                                         <div class="acc__input-error error-company_postal_code text-danger text-xs mt-1"></div>
                                     </div>
                                 </div>
-                                <x-base.form-input value="{{ isset($company->company_country) ? $company->company_country : '' }}" name="company_country" id="company_country" class="w-full country" type="hidden" value="" />
-                                <x-base.form-input name="latitude" class="w-full latitude" type="hidden" value="" />
-                                <x-base.form-input name="longitude" class="w-full longitude" type="hidden" value="" />
+                                <x-base.form-input value="{{ isset($company->company_country) ? $company->company_country : '' }}" name="company_country" id="company_country" class="w-full country" type="hidden" />
                             </div>
                         </div>
                     </div>

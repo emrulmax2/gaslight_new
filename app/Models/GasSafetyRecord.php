@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
+use Creagia\LaravelSignPad\Concerns\RequiresSignature;
+use Creagia\LaravelSignPad\Contracts\CanBeSigned;
 
-class GasSafetyRecord extends Model
+class GasSafetyRecord extends Model implements CanBeSigned
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, RequiresSignature;
 
     protected $appends = ['has_coalarm', 'has_satisfactory_check', 'has_comments', 'has_signatures'];
     
@@ -56,10 +59,6 @@ class GasSafetyRecord extends Model
 
     public function getNextInspectionDateAttribute($value) {
         return (!empty($value) ? date('d-m-Y', strtotime($value)) : '');
-    }
-
-    public function getHasCoalarmAttribute(){
-        return (!empty($this->cp_alarm_fitted) || !empty($this->cp_alarm_satisfactory) ? true : false);
     }
 
     public function getHasSatisfactoryCheckAttribute(){

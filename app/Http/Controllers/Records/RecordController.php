@@ -18,7 +18,9 @@ use App\Models\JobForm;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\PaymentMethod;
 use App\Models\Relation;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
+use Creagia\LaravelSignPad\Signature;
 
 class RecordController extends Controller
 {
@@ -52,6 +54,8 @@ class RecordController extends Controller
             $data['methods'] = PaymentMethod::where('active', 1)->orderBy('name', 'asc')->get();
         elseif($record == 'homeowner_gas_safety_record'):
             $GasSafetyRecord = GasSafetyRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();
+            $GasSafetyRecord->signature;
+            
             $gsr_id = (isset($GasSafetyRecord->id) && $GasSafetyRecord->id > 0 ? $GasSafetyRecord->id : 0);
             $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
@@ -63,6 +67,7 @@ class RecordController extends Controller
             $data['gsra2'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 2)->get()->first();
             $data['gsra3'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 3)->get()->first();
             $data['gsra4'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 4)->get()->first();
+            $data['signature'] = $GasSafetyRecord->signature ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
         endif;
 
 

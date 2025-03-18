@@ -73,7 +73,7 @@ class Company extends Model
         $address .= $this->company_address_line_1.' '.$this->company_address_line_2.',<br/> ';
         $address .= (!empty($this->company_city) ? $this->company_city.', ' : '');
         $address .= (!empty($this->company_postal_code) ? $this->company_postal_code.',<br/> ' : '');
-        $address .= (!empty($this->company_state) ? $this->company_state.',<br/> ' : '');
+        $address .= (!empty($this->company_state) ? $this->company_state.', ' : '');
         $address .= (!empty($this->company_country) ? $this->company_country : '');
         return $address;
     }

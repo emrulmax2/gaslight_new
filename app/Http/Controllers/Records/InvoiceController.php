@@ -124,6 +124,7 @@ class InvoiceController extends Controller
                                 .mr-3{margin-right: 3px;}
                                 .mr-1{margin-right: 4px;}
                                 .pt-10{padding-top: 10px;}
+                                .pt-9{padding-top: 9px;}
                                 .mt-5{margin-top: 5px;}
                                 .mb-3{margin-bottom: 3px;}
                                 .mb-4{margin-bottom: 4px;}
@@ -141,12 +142,15 @@ class InvoiceController extends Controller
                                 .w-80{width: 80px;}
                                 .w-100{width: 100px;}
                                 .w-120{width: 120px;}
-                                .inline-block{display: inline-block}
+                                .w-130{width: 130px;}
+                                .w-140{width: 140px;}
+                                .inline-block{display: inline-block;}
 
                                 .titleLabel{font-size: 20px; font-weight: bold; line-height: 28px; margin-bottom: 5px;}
                                 .customerDetails{ position: relative;}
                                 .customerName{font-size: 14px; line-height: 20px; margin-bottom: 4px; color: #64748b;}
-                                .invoiceTitle{font-size: 28px; line-height: 34px; margin-bottom: 8px;}
+                                .invoiceTitle{font-size: 28px; line-height: 34px; margin-bottom: 0px;}
+                                .invoiceRef{font-size: 20px; line-height: 26px; margin-bottom: 8px;}
                                 .calculationTable{width: 210px; float: right;}
                                 .calculationTable tr th:first-child{text-align: right;}
                                 .calculationTable tr th:last-child{width: 100px; text-align: right;}
@@ -161,7 +165,7 @@ class InvoiceController extends Controller
                 $PDFHTML .= '<table class="mb-60">';
                     $PDFHTML .= '<tr>';
                         $PDFHTML .= '<td class="customerAddressWrap v-top">';
-                            $PDFHTML .= '<img src="' . $logoBase64 . '" alt="Gas Safe Engineer APP" style="width: 126px; height: auto; margin-bottom: 8px;">';
+                            $PDFHTML .= '<img src="' . $logoBase64 . '" alt="Gas Safe Engineer APP" style="width: 126px; height: auto; margin-bottom: 20px;">';
                             $PDFHTML .= '<div class="titleLabel">Address to</div>';
                             $PDFHTML .= '<div class="customerDetails">';
                                 $PDFHTML .= '<div class="customerName font-medium">'.$invoice->customer->full_name.'</div>';
@@ -169,7 +173,8 @@ class InvoiceController extends Controller
                             $PDFHTML .= '</div>';
                         $PDFHTML .= '</td>';
                         $PDFHTML .= '<td class="invoiceDetails text-right v-top">';
-                            $PDFHTML .= '<div class="invoiceTitle font-bold">Invoice <span class="text-primary">#'.$invoice->invoice_number.'</span></div>';
+                            $PDFHTML .= '<div class="invoiceTitle font-bold">Invoice</div>';
+                            $PDFHTML .= '<div class="invoiceRef font-bold text-primary">Ref: '.$invoice->invoice_number.'</div>';
                             $PDFHTML .= '<div class="titleLabel mb-8">'.$invoice->user->company->company_name.'</div>';
                             $PDFHTML .= '<div class="companyAddress">'.(isset($invoice->user->company->full_address_html) ? $invoice->user->company->full_address_html : '').'</div>';
                             if(isset($invoice->user->company->company_email) && !empty($invoice->user->company->company_email)):
@@ -186,13 +191,13 @@ class InvoiceController extends Controller
                             endif;
                             if(!empty($invoice->issued_date) && !empty($invoice->issued_date)):
                                 $PDFHTML .= '<div class="mb-1">';
-                                    $PDFHTML .= '<span class="font-bold mr-3">Issued Date:</span>';
+                                    $PDFHTML .= '<span class="font-bold mr-3">Date:</span>';
                                     $PDFHTML .= '<span>'.date('jS F, Y', strtotime($invoice->issued_date)).'</span>';
                                 $PDFHTML .= '</div>';
                             endif;
                             if(!empty($invoice->issued_date) && !empty($invoice->issued_date)):
                                 $PDFHTML .= '<div class="mb-1">';
-                                    $PDFHTML .= '<span class="font-bold mr-3">Issued Date:</span>';
+                                    $PDFHTML .= '<span class="font-bold mr-3">Job Ref No:</span>';
                                     $PDFHTML .= '<span>'.(isset($invoice->reference_no) ? $invoice->reference_no : '').'</span>';
                                 $PDFHTML .= '</div>';
                             endif;
@@ -208,10 +213,19 @@ class InvoiceController extends Controller
                             $PDFHTML .= '<th class="text-left">DESCRIPTION</th>';
                             $PDFHTML .= '<th class="text-right">UNITS</th>';
                             $PDFHTML .= '<th class="text-right">PRICE</th>';
-                            $PDFHTML .= '<th class="text-right">VAT %</th>';
+                            if($invoice->non_vat_invoice != 1):
+                                $PDFHTML .= '<th class="text-right">VAT %</th>';
+                            endif;
                             $PDFHTML .= '<th class="text-right">TOTAL</th>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</thead>';
+
+                    $SUBTOTAL = 0;
+                    $VATTOTAL = 0;
+                    $TOTAL = 0;
+                    $DUE = 0;
+                    $DISCOUNTTOTAL = 0;
+                    $DISCOUNTVATTOTAL = 0;
                     if(isset($invoice->items) && $invoice->items->count() > 0):
                         foreach($invoice->items as $item):
                             $units = (!empty($item->units) && $item->units > 0 ? $item->units : 1);
@@ -219,6 +233,10 @@ class InvoiceController extends Controller
                             $vatRate = (!empty($item->vat_rate) && $item->vat_rate > 0 ? $item->vat_rate : 0);
                             $vatAmount = ($unitPrice * $vatRate) / 100;
                             $lineTotal = ($unitPrice * $units) + $vatAmount;
+                            if($item->type == 'Discount'):
+
+                            endif;
+
                             $PDFHTML .= '<tr>';
                                 $PDFHTML .= '<td>';
                                     $PDFHTML .= (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item');
@@ -229,9 +247,11 @@ class InvoiceController extends Controller
                                 $PDFHTML .= '<td class="w-80 text-right font-medium">';
                                     $PDFHTML .= Number::currency($unitPrice, 'GBP');
                                 $PDFHTML .= '</td>';
-                                $PDFHTML .= '<td class="w-80 text-right font-medium">';
-                                    $PDFHTML .= $vatRate.'%';
-                                $PDFHTML .= '</td>';
+                                if($invoice->non_vat_invoice != 1):
+                                    $PDFHTML .= '<td class="w-80 text-right font-medium">';
+                                        $PDFHTML .= $vatRate.'%';
+                                    $PDFHTML .= '</td>';
+                                endif;
                                 $PDFHTML .= '<td class="w-80 text-right font-medium">';
                                     $PDFHTML .= ($item->type == 'Discount' ? '-' : '').Number::currency($lineTotal, 'GBP');
                                 $PDFHTML .= '</td>';
@@ -245,38 +265,37 @@ class InvoiceController extends Controller
                         $PDFHTML .= '<td>';
                             $PDFHTML .= '<table class="invoiceInfoTable">';
                                 $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="v-top" style="width: 200px; padding-right: 30px;">';
-                                        $PDFHTML .= '<div class="font-medium mb-4">Payment Terms</div>';
-                                        $PDFHTML .= '<div class="mb-10">'.(isset($invoice->payment_term) && !empty($invoice->payment_term) ? $invoice->payment_term : '').'</div>';
-                                        $PDFHTML .= '<div class="font-medium mb-4">Notes</div>';
-                                        $PDFHTML .= '<div>'.(isset($invoice->notes) && !empty($invoice->notes) ? $invoice->notes : '').'</div>';
-                                    $PDFHTML .= '</td>';
-                                    $PDFHTML .= '<td class="v-top" style="width: 220px;">';
+                                    $PDFHTML .= '<td class="v-top" style="width: 250px;">';
                                         $PDFHTML .= '<div class="font-medium mb-5">Bank Details</div>';
                                         if(isset($invoice->user->company->bank->bank_name) && !empty($invoice->user->company->bank->bank_name)):
-                                            $PDFHTML .= '<div class="mb-4">';
-                                                $PDFHTML .= '<span class="font-medium text-slate-400 mr-1 inline-block w-120">Bank Name:</span>';
-                                                $PDFHTML .= '<span>'.$invoice->user->company->bank->bank_name.'</span>';
+                                            $PDFHTML .= '<div class="mb-1">';
+                                                $PDFHTML .= '<span class="font-medium text-slate-400 inline-block w-140">Bank Name:</span>';
+                                                $PDFHTML .= '<span class="inline-block">'.$invoice->user->company->bank->bank_name.'</span>';
                                             $PDFHTML .= '</div>';
                                         endif;
                                         if(isset($invoice->user->company->bank->name_on_account) && !empty($invoice->user->company->bank->name_on_account)):
                                             $PDFHTML .= '<div class="mb-1">';
-                                                $PDFHTML .= '<span class="font-medium text-slate-400 mr-1 inline-block w-120">Account Name:</span>';
-                                                $PDFHTML .= '<span>'.$invoice->user->company->bank->name_on_account.'</span>';
+                                                $PDFHTML .= '<span class="font-medium text-slate-400 inline-block w-140">Account Name:</span>';
+                                                $PDFHTML .= '<span class="inline-block">'.$invoice->user->company->bank->name_on_account.'</span>';
                                             $PDFHTML .= '</div>';
                                         endif;
                                         if(isset($invoice->user->company->bank->sort_code) && !empty($invoice->user->company->bank->sort_code)):
                                             $PDFHTML .= '<div class="mb-1">';
-                                                $PDFHTML .= '<span class="font-medium text-slate-400 mr-1 inline-block w-120">Sort Code:</span>';
-                                                $PDFHTML .= '<span>'.$invoice->user->company->bank->sort_code.'</span>';
+                                                $PDFHTML .= '<span class="font-medium text-slate-400 inline-block w-140">Sort Code:</span>';
+                                                $PDFHTML .= '<span class="inline-block">'.$invoice->user->company->bank->sort_code.'</span>';
                                             $PDFHTML .= '</div>';
                                         endif;
                                         if(isset($invoice->user->company->bank->account_number) && !empty($invoice->user->company->bank->account_number)):
                                             $PDFHTML .= '<div class="mb-1">';
-                                                $PDFHTML .= '<span class="font-medium text-slate-400 mr-1 inline-block w-120]">Account Number:</span>';
-                                                $PDFHTML .= '<span>'.$invoice->user->company->bank->account_number.'</span>';
+                                                $PDFHTML .= '<span class="font-medium text-slate-400 inline-block w-140">Account Number:</span>';
+                                                $PDFHTML .= '<span class="inline-block">'.$invoice->user->company->bank->account_number.'</span>';
                                             $PDFHTML .= '</div>';
                                         endif;
+
+                                        $PDFHTML .= '<div class="font-medium mb-4 pt-9">Payment Terms</div>';
+                                        $PDFHTML .= '<div class="mb-10">'.(isset($invoice->payment_term) && !empty($invoice->payment_term) ? $invoice->payment_term : '').'</div>';
+                                        $PDFHTML .= '<div class="font-medium mb-4">Notes</div>';
+                                        $PDFHTML .= '<div>'.(isset($invoice->notes) && !empty($invoice->notes) ? $invoice->notes : '').'</div>';
                                     $PDFHTML .= '</td>';
                                 $PDFHTML .= '</tr>';
                             $PDFHTML .= '</table>';

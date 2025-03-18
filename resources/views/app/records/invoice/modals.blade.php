@@ -20,7 +20,7 @@
                     <x-base.form-input name="price" type="number" step="any" min="0" placeholder="0.00" />
                 </div>
                 <div class="vatWrap">
-                    <x-base.form-label>Vat</x-base.form-label>
+                    <x-base.form-label>VAT %</x-base.form-label>
                     <x-base.form-input name="vat" type="number" placeholder="20" value="0" />
                 </div>
             </div>
@@ -59,7 +59,7 @@
                     <x-base.form-input name="price" type="number" step="any" min="0" placeholder="0.00" />
                 </div>
                 <div class="vatWrap">
-                    <x-base.form-label>Vat</x-base.form-label>
+                    <x-base.form-label>VAT %</x-base.form-label>
                     <x-base.form-input name="vat" type="number" placeholder="20" value="0" />
                 </div>
             </div>
@@ -149,7 +149,7 @@
                 <x-base.form-input step="any" min="1" name="discount_amount" class="w-full" type="number" placeholder="0.0" />
             </div>
             <div class="col-span-12 discountVatField">
-                <x-base.form-label>VAT Rate %</x-base.form-label>
+                <x-base.form-label>VAT %</x-base.form-label>
                 <x-base.form-input step="any" name="discount_vat_rate" class="w-full" type="number" placeholder="20%" />
             </div>
         </x-base.dialog.description>

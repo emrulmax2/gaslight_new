@@ -78,21 +78,16 @@
                                 <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
                             <x-base.button type="button" data-appliance="0" data-id="step_7" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
-                                <x-base.lucide style="display: {{ (isset($gsr->has_coalarm) && $gsr->has_coalarm ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
-                                <x-base.lucide style="display: {{ (isset($gsr->has_coalarm) && $gsr->has_coalarm ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>
-                                CO Alarm(s) <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
-                            </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_8" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
                                 <x-base.lucide style="display: {{ (isset($gsr->has_satisfactory_check) && $gsr->has_satisfactory_check ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
                                 <x-base.lucide style="display: {{ (isset($gsr->has_satisfactory_check) && $gsr->has_satisfactory_check ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>
                                 Safety Checks <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_9" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                            <x-base.button type="button" data-appliance="0" data-id="step_8" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
                                 <x-base.lucide style="display: {{ (isset($gsr->has_comments) && $gsr->has_comments ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
                                 <x-base.lucide style="display: {{ (isset($gsr->has_comments) && $gsr->has_comments ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>  
                                 Comments <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" data-id="step_10" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
+                            <x-base.button type="button" data-appliance="0" data-id="step_9" class="form-wizard-step-item relative pr-[25px] pl-[30px] w-full flex items-center justify-start rounded-[3px] cursor-pointer mb-2 [&.active]:text-success [&.active]:border-success flex-wrap">
                                 <x-base.lucide style="display: {{ (isset($gsr->has_signatures) && $gsr->has_signatures ? 'none' : 'block') }};" class="w-3.5 h-3.5 mr-2 text-danger unsavedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="x-circle"/>    
                                 <x-base.lucide style="display: {{ (isset($gsr->has_signatures) && $gsr->has_signatures ? 'block' : 'none') }};" class="w-3.5 h-3.5 mr-2 text-success savedIcon absolute left-[9px] top-0 bottom-0 my-auto" icon="check-circle"/>  
                                 Signatures <x-base.lucide class="w-4 h-4 absolute right-[5px] top-0 bottom-0 my-auto" icon="chevron-right"/>
@@ -2075,44 +2070,6 @@
                 </fieldset>
                 <fieldset id="step_7" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="text-base font-medium">CO Alarm(s)</h2>
-                        <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
-                    </div>
-                    <form method="post" action="#" class="wizard-step-form" enctype="multipart/form-data" id="coAlarmsForm">
-                        <input type="hidden" name="customer_job_id" value="{{ $job->id }}"/>
-                        <input type="hidden" name="job_form_id" value="{{ $form->id }}"/>
-                        <div class="grid grid-cols-12 gap-x-5 gap-y-3 px-5 pt-5">
-                            <div class="col-span-12">
-                                <x-base.form-switch>
-                                    <x-base.form-switch.label for="cp_alarm_fitted" class="ml-0 font-medium">
-                                        CP Alarm(s) Fitted
-                                    </x-base.form-switch.label>
-                                    <x-base.form-switch.input checked="{{ (isset($gsr->cp_alarm_fitted) && $gsr->cp_alarm_fitted == 1 ? '1' : '0') }}" id="cp_alarm_fitted" name="cp_alarm_fitted" value="1" class="ml-5 mr-0" type="checkbox" />
-                                </x-base.form-switch>
-                            </div>
-                            <div class="col-span-12">
-                                <x-base.form-switch>
-                                    <x-base.form-switch.label for="cp_alarm_satisfactory" class="ml-0 font-medium">
-                                        CP Alarm(s) Tested & Satisfactory
-                                    </x-base.form-switch.label>
-                                    <x-base.form-switch.input checked="{{ (isset($gsr->cp_alarm_satisfactory) && $gsr->cp_alarm_satisfactory == 1 ? '1' : '0') }}" id="cp_alarm_satisfactory" name="cp_alarm_satisfactory" value="1" class="ml-5 mr-0" type="checkbox" />
-                                </x-base.form-switch>
-                            </div>
-                        </div>
-
-                        <div class="mt-5 p-5 flex items-center justify-between">
-                            <x-base.button type="button" data-appliance="0" class="form-wizard-previous-btn" variant="secondary">
-                                <x-base.lucide class="h-5 w-5 mr-2" icon="move-left"/>Previous
-                            </x-base.button>
-                            <x-base.button type="button" data-appliance="0" class="form-wizard-next-btn ml-auto" variant="linkedin" >
-                                Save & Continue<x-base.lucide class="theIcon h-5 w-5 ml-2" icon="move-right"/>
-                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                            </x-base.button>
-                        </div>
-                    </form>
-                </fieldset>
-                <fieldset id="step_8" class="wizard-fieldset intro-y box mb-3">
-                    <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="text-base font-medium">Safety Checks</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
                     </div>
@@ -2333,7 +2290,7 @@
                         </div>
                     </form>
                 </fieldset>
-                <fieldset id="step_9" class="wizard-fieldset intro-y box mb-3">
+                <fieldset id="step_8" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="text-base font-medium">Comments</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
@@ -2393,7 +2350,7 @@
                         </div>
                     </form>
                 </fieldset>
-                <fieldset id="step_10" class="wizard-fieldset intro-y box mb-3">
+                <fieldset id="step_9" class="wizard-fieldset intro-y box mb-3">
                     <div class="wizard-fieldset-header cursor-pointer flex items-center sm:hidden border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="text-base font-medium">Signature</h2>
                         <x-base.lucide class="w-4 h-4 ml-auto" icon="chevron-down"/>
@@ -2419,7 +2376,7 @@
                                 <x-base.form-input value="{{ (isset($gsr->received_by) && !empty($gsr->received_by) ? $gsr->received_by : '') }}" type="text" name="received_by" class="w-full h-[35px] rounded-[3px]" placeholder=""/>
                             </div>
                             <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label>Relation</x-base.form-label>
+                                <x-base.form-label class="mb-1">Relation</x-base.form-label>
                                 <x-base.tom-select class="w-full" name="relation_id" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($relations->count() > 0)
@@ -2429,11 +2386,47 @@
                                     @endif
                                 </x-base.tom-select>
                             </div>
-                            <div class="col-span-12 sm:col-span-12">
-                                <div class="border rounded-[3px] h-[350px] bg-slate-100 rounded-b-none"></div>
-                                <x-base.button type="button" class="w-full flex justify-center items-center rounded-t-none" variant="secondary">
-                                    Undo Signature
-                                </x-base.button>
+                            {{ $signature }}
+                            @if($signature)
+                            <div class="col-span-12 sm:col-span-4">
+                                <x-base.form-label class="mb-0 block w-full">Signature</x-base.form-label>
+                                <img src="{{ $signature }}" alt="signature" class="h-[60px] w-auto inline-block"/>
+                            </div>
+                            @endif
+                            <div class="col-span-12 sm:col-span-12 pt-2">
+                                <div class="gsfSignature border rounded-[3px] h-auto py-10 bg-slate-100 rounded-b-none flex justify-center items-center">
+                                    <x-creagia-signature-pad name='sign'
+                                        border-color="#e5e7eb"
+                                        submit-name="Save"
+                                        clear-name="Clear Signature"
+                                        submit-id="signSaveBtn"
+                                        clear-id="clear"
+                                        pad-classes="w-auto h-48 bg-white mt-0"
+                                    />
+                                    {{--<div class="customeUploads border-2 border-dashed border-slate-500 flex items-center text-center h-[200px] max-h-[200px] sm:w-[70%] rounded-[5px] p-[20px]" style="display: none">
+                                        <label for="signature_file" class="text-center upload-message my-[3em] relative w-full cursor-pointer">
+                                            <div class="customeUploadsContent">
+                                                <span class="text-lg font-medium">
+                                                    Drop files here or click to upload.
+                                                </span><br/>
+                                                <span class="text-gray-600">
+                                                    This is signature file upload. Selected files should<br/>
+                                                    not over <span class="font-medium">2MB</span> and should be image file.
+                                                </span><br/>
+                                            </div>
+                                            <img src="" alt="signature" id="signature_image" class="h-[80px] w-auto inline-block" style="display: none"/>
+                                        </label>
+                                        <input type="file" id="signature_file" name="signature_file" accept="image/*" class="w-0 h-0 opacity-0 absolute left-0 top-0"/>
+                                    </div>--}}
+                                </div>
+                                {{--<div class="gsfSignatureBtns flex">
+                                    <x-base.button type="button" class="signBtns w-[50%] rounded-br-none active flex justify-center items-center rounded-t-none [&.active]:bg-success [&.active]:text-white" variant="secondary">
+                                        Draw Signature
+                                    </x-base.button>
+                                    <x-base.button type="button" class="uploadBtns w-[50%] rounded-bl-none flex justify-center items-center rounded-t-none [&.active]:bg-success [&.active]:text-white" variant="secondary">
+                                        Upload Signature
+                                    </x-base.button>
+                                </div>--}}
                             </div>
                         </div>
 
@@ -2441,7 +2434,7 @@
                             <x-base.button type="button" data-appliance="0" class="form-wizard-previous-btn" variant="secondary">
                                 <x-base.lucide class="h-5 w-5 mr-2" icon="move-left"/>Previous
                             </x-base.button>
-                            <x-base.button type="button" data-appliance="0" class="form-wizard-next-btn ml-auto" variant="linkedin" >
+                            <x-base.button type="button" data-appliance="0" class="form-wizard-final-btn ml-auto" variant="linkedin" >
                                 Save & Continue<x-base.lucide class="theIcon h-5 w-5 ml-2" icon="move-right"/>
                                 <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                             </x-base.button>
@@ -2458,6 +2451,7 @@
 @endsection
 @pushOnce('styles')
     @vite('resources/css/vendors/tabulator.css')
+    @vite('resources/css/custom/signature.css')
 @endPushOnce
 
 @pushOnce('vendors')
@@ -2466,6 +2460,7 @@
     @vite('resources/js/vendors/lucide.js')
     @vite('resources/js/vendors/lodash.js')
     @vite('resources/js/vendors/xlsx.js')
+    @vite('resources/js/vendors/sign-pad.min.js')
 @endPushOnce
 
 @pushOnce('scripts')
