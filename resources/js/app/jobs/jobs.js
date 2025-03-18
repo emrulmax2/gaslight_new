@@ -9,7 +9,7 @@ var jobListTable = (function () {
         let tableContent = new Tabulator("#jobListTable", {
             ajaxURL: route("jobs.list"),
             ajaxParams: { querystr: querystr, status: status, recordparams : recordparams},
-            paginationMode: "remote",
+            pagination: "remote",
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,

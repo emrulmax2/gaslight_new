@@ -5,12 +5,11 @@
 @endsection
 
 @section('subcontent')
-    <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
-        <h2 class="mr-auto text-lg font-medium">Certificates, Jobs, Quotes, and Invoices Numbering</h2>
-        <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
-            <x-base.button as="a" href="{{ route('user.settings') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Settings
+    <div class="intro-y mt-8 flex items-center justify-between">
+        <h2 class="text-lg font-medium">Certificates, Jobs, Quotes, and Invoices Numbering</h2>
+        <div class="flex">
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin" >
+                <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
         </div>
     </div>
