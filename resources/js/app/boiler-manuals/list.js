@@ -19,8 +19,7 @@ var BoilerBrandListTable = (function () {
                     status: status,
                     'boiler_brand_id': boiler_brand_id,
                 },
-                pagination: "remote", // Ensure pagination is set to remote
-                paginationMode: "remote",
+                pagination: "remote",
                 filterMode: "remote",
                 sortMode: "remote",
                 printAsHtml: true,

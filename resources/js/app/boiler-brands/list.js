@@ -16,8 +16,7 @@ var BoilerBrandListTable = (function () {
                     queryStr: querystr,
                     status: status,
                 },
-                pagination: "remote", // Ensure pagination is set to remote
-                paginationMode: "remote",
+                pagination: "remote",
                 filterMode: "remote",
                 sortMode: "remote",
                 printAsHtml: true,

@@ -58,6 +58,8 @@ function updateStartButtonVisibility() {
         } else {
             startStopBtn.classList.remove("hidden");
         }
+    }else{
+        startStopBtn.classList.remove("hidden");
     }
 
 }

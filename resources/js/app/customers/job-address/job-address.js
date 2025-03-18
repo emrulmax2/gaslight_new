@@ -17,7 +17,7 @@ var JobAddressListTable = (function () {
         let tableContent = new Tabulator("#JobAddressListTable", {
             ajaxURL: route("customer.job-addresses.list", { customer_id: customer_id}),
             ajaxParams: { querystr: querystr, status: status },
-            paginationMode: "remote",
+            pagination: "remote",
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,

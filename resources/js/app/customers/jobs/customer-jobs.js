@@ -9,7 +9,7 @@ var customerJobListTable = (function () {
         let tableContent = new Tabulator("#customerJobListTable", {
             ajaxURL: route("customer.jobs.list", { customer_id: customer_id }),
             ajaxParams: { querystr: querystr, status: status, customer_id: customer_id },
-            paginationMode: "remote",
+            pagination: "remote",
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,

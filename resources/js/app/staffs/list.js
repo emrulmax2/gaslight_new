@@ -38,31 +38,35 @@
                     title: 'Sl',
                     field: 'id',
                     headerHozAlign: 'left',
+                    minWidth: 80
                 },
                 {
                     title: 'Name',
                     field: 'name',
                     headerHozAlign: 'left',
+                    minWidth: 180
                 },
                 {
                     title: 'Email',
                     field: 'email',
                     headerHozAlign: 'left',
+                    minWidth: 200
                 },
                 {
                     title: 'Status',
                     field: 'status',
                     headerHozAlign: 'left',
+                    minWidth: 80
                 },
 
                 {
                     title: 'Signature',
                     field: 'signature',
                     headerHozAlign: 'left',
-                    
                     hozAlign: 'left',
                     width: '180',
                     download: false,
+                    minWidth: 180,
                     formatter(cell, formatterParams) {
                         let signatureUrl = cell.getData().signature;
                         if (signatureUrl) {
@@ -99,7 +103,7 @@
                             </div>`);
                         } else {
                             a =
-                                $(`<div class="flex items-center lg:justify-center">
+                                $(`<div class="flex items-center lg:justify-center flex-wrap sm:flex-nowrap gap-2 sm:gap-0">
                                     <a class="flex items-center mr-3 add-sgnature" href="javascript:;">
                                     <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Signature
                                 </a>              
