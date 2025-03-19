@@ -13,9 +13,12 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\CompanyBankDetails;
+use App\Models\FileRecord;
 use App\Models\RegisterBody;
 use App\Models\Staff;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Creagia\LaravelSignPad\Signature;
 
 class CompanyController extends Controller
 {
@@ -59,18 +62,18 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
+
         $validatedData = $request->validated();
         $validatedData['user_id'] = auth()->id();
         $validatedData['gas_safe_registration_no'] = (isset($request->gas_safe_registration_no) && !empty($request->gas_safe_registration_no)) ? $request->gas_safe_registration_no : null;
         
-
         $company = Company::create($validatedData);
         $user = User::find(auth()->user()->id);
         $user->first_login = 0;
         $user->gas_safe_id_card = (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card) ? $request->gas_safe_id_card : null);
         $user->save();
 
-        
+
         $staff = Staff::create([
             'name' => $user->name,
             'email' => $user->email,
@@ -78,9 +81,44 @@ class CompanyController extends Controller
             'status' => 1,
         ]);
 
+
+        if ($request->has('signature_file')) {
+            $file = $request->file('signature_file');
+            $newFilePath = 'signatures/' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+    
+            Storage::disk('public')->put($newFilePath, file_get_contents($file->getRealPath()));
+    
+            $signature = new Signature();
+            $signature->model_type = Staff::class;
+            $signature->model_id = $staff->id;
+            $signature->uuid = Str::uuid();
+            $signature->filename = $newFilePath;
+            $signature->document_filename = null;
+            $signature->certified = false;
+            $signature->from_ips = json_encode([request()->ip()]);
+            $signature->save();
+            
+        } elseif ($request->has('sign') && $request->input('sign') !== null) {
+            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+            $signatureData = base64_decode($signatureData);
+            $imageName = 'signatures/' . Str::uuid() . '.png';
+            Storage::disk('public')->put($imageName, $signatureData);
+
+            $signature = new Signature();
+            $signature->model_type = Staff::class;
+            $signature->model_id = $staff->id;
+            $signature->uuid = Str::uuid();
+            $signature->filename = $imageName;
+            $signature->document_filename = null;
+            $signature->certified = false;
+            $signature->from_ips = json_encode([request()->ip()]);
+            $signature->save();
+        }
+
+
         $company->staffs()->attach($staff->id);
+
         return response()->json(['msg' => 'Company created successfully.', 'red' => route('company.dashboard')], 200);
-        // return response()->json(['message' => 'Company created successfully'], 201);
     }
 
     /**

@@ -2386,7 +2386,6 @@
                                     @endif
                                 </x-base.tom-select>
                             </div>
-                            {{ $signature }}
                             @if($signature)
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label class="mb-0 block w-full">Signature</x-base.form-label>
