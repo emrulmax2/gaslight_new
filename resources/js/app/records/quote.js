@@ -11,15 +11,14 @@
             return confirm( values.length > 1 ? "Are you sure you want to remove these " + values.length + " items?" : 'Are you sure you want to remove "' +values[0] +'"?' );
         },
     };
-    let payment_method_id = new TomSelect(document.getElementById('payment_method_id'), tncTomOptions);
+    //let payment_method_id = new TomSelect(document.getElementById('payment_method_id'), tncTomOptions);
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
-    const addInvoiceItemModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addInvoiceItemModal"));
-    const editInvoiceItemModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#editInvoiceItemModal"));
-    const invoiceDiscountModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceDiscountModal"));
-    const prePaymentInvoiceModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#prePaymentInvoiceModal"));
+    const addQuoteItemModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addQuoteItemModal"));
+    const editQuoteItemModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#editQuoteItemModal"));
+    const quoteDiscountModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#quoteDiscountModal"));
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
@@ -39,79 +38,71 @@
         }
     });
 
-    document.getElementById('addInvoiceItemModal').addEventListener('hide.tw.modal', function(event) {
-        $('#addInvoiceItemModal input').val('');
-        $('#addInvoiceItemModal textarea').val('');
-        $('#addInvoiceItemModal input[name="srial"]').val('0');
+    document.getElementById('addQuoteItemModal').addEventListener('hide.tw.modal', function(event) {
+        $('#addQuoteItemModal input').val('');
+        $('#addQuoteItemModal textarea').val('');
+        $('#addQuoteItemModal input[name="srial"]').val('0');
     });
 
-    document.getElementById('invoiceDiscountModal').addEventListener('hide.tw.modal', function(event) {
-        $('#invoiceDiscountModal .modal-body input').val('');
-        $('#invoiceDiscountModal [name="max_discount"]').val(0);
-        $('#invoiceDiscountModal .dueLeft').html('This invoice has £0 outstanding.');
-        $('#invoiceDiscountModal #removeDiscountBtn').fadeOut();
-    });
-
-    document.getElementById('prePaymentInvoiceModal').addEventListener('hide.tw.modal', function(event) {
-        $('#prePaymentInvoiceModal .modal-body input').val('');
-        $('#prePaymentInvoiceModal [name="max_advance"]').val(0);
-        $('#prePaymentInvoiceModal .dueLeft').html('This invoice has £0 outstanding.');
-        $('#prePaymentInvoiceModal #removeAdvanceBtn').fadeOut();
-        payment_method_id.clear(true);
+    document.getElementById('quoteDiscountModal').addEventListener('hide.tw.modal', function(event) {
+        $('#quoteDiscountModal .modal-body input').val('');
+        $('#quoteDiscountModal [name="max_discount"]').val(0);
+        $('#quoteDiscountModal .dueLeft').html('This quote has £0 outstanding.');
+        $('#quoteDiscountModal #removeDiscountBtn').fadeOut();
     });
 
     /* Init Variables */
-    let isNonVatCheck = $("#nonVatInvoiceCheck").prop('checked') ? true : false;
+    let isNonVatCheck = $("#nonVatQuoteCheck").prop('checked') ? true : false;
     let rowCounter = 2;
-    let invoiceItems = [];
+    let quoteItems = [];
     let prePaymentDetails = {};
     let discountAmountDetails = {};
-    window.onload = calculateInvoice();
+    window.onload = calculateQuote();
     
-    $('#nonVatInvoiceCheck').on('change', function(){
+    $('#nonVatQuoteCheck').on('change', function(){
         isNonVatCheck = $(this).prop('checked') ? true : false;
         if(!isNonVatCheck){
-            $('#invoiceItemsTable').find('.vatCol, .vatField').fadeIn();
+            $('#quoteItemsTable').find('.vatCol, .vatField').fadeIn();
             $('.vatTotalField').fadeIn();
             $('.vatNumberField').fadeIn();
         }else{
-            $('#invoiceItemsTable').find('.vatCol, .vatField').fadeOut();
+            $('#quoteItemsTable').find('.vatCol, .vatField').fadeOut();
             $('.vatTotalField').fadeOut();
             $('.vatNumberField').fadeOut();
         }
 
-        //Recalculate the invoice here.....
-        calculateInvoice();
+        //Recalculate the quote here.....
+        calculateQuote();
     });
 
 
 
     /* BEGIN: Add Item */
-    $('#addInvoiceItem').on('click', function(e){
+    $('#addQuoteItem').on('click', function(e){
         e.preventDefault();
         let $theBtn = $(this);
         let serial = getLastRowId();
 
-        addInvoiceItemModal.show();
-        document.getElementById('addInvoiceItemModal').addEventListener('shown.tw.modal', function(event){
-            $('#addInvoiceItemModal [name="description"]').val('Item Description');
-            $('#addInvoiceItemModal [name="units"]').val(1);
-            $('#addInvoiceItemModal [name="price"]').val(0);
-            $('#addInvoiceItemModal [name="srial"]').val(serial);
+        addQuoteItemModal.show();
+        document.getElementById('addQuoteItemModal').addEventListener('shown.tw.modal', function(event){
+            $('#addQuoteItemModal [name="description"]').val('Item Description');
+            $('#addQuoteItemModal [name="units"]').val(1);
+            $('#addQuoteItemModal [name="price"]').val(0);
+            $('#addQuoteItemModal [name="srial"]').val(serial);
 
             if(!isNonVatCheck){
-                $('#addInvoiceItemModal .vatWrap').fadeIn('fast', function(){
+                $('#addQuoteItemModal .vatWrap').fadeIn('fast', function(){
                     $('input', this).val(20);
                 });
             }else{
-                $('#addInvoiceItemModal .vatWrap').fadeOut('fast', function(){
+                $('#addQuoteItemModal .vatWrap').fadeOut('fast', function(){
                     $('input', this).val(0);
                 });
             }
         });
     });
 
-    $('#addInvoiceItemModal').on('click', '#addInvoiceItemBtn', function(e){
+    $('#addQuoteItemModal').on('click', '#addQuoteItemBtn', function(e){
         e.preventDefault();
         let $theBtn = $(this);
 
@@ -120,76 +111,76 @@
         $('.theLoader', $theBtn).fadeIn();
 
         var formError = 0;
-        formError += ($('#addInvoiceItemModal [name="description"]').val() == '' ? 1 : 0);
-        formError += ($('#addInvoiceItemModal [name="units"]').val() == '' ? 1 : 0);
-        formError += ($('#addInvoiceItemModal [name="price"]').val() == '' ? 1 : 0);
+        formError += ($('#addQuoteItemModal [name="description"]').val() == '' ? 1 : 0);
+        formError += ($('#addQuoteItemModal [name="units"]').val() == '' ? 1 : 0);
+        formError += ($('#addQuoteItemModal [name="price"]').val() == '' ? 1 : 0);
 
         if(formError > 0){
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
 
-            $('#addInvoiceItemModal .modal-body').remove('errorAlert');
-            $('#addInvoiceItemModal .modal-body').prepend('<div class="col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. Description, Units & Price field can not be empty.</div></div>');
+            $('#addQuoteItemModal .modal-body').remove('errorAlert');
+            $('#addQuoteItemModal .modal-body').prepend('<div class="col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. Description, Units & Price field can not be empty.</div></div>');
         
             setTimeout(() => {
-                $('#addInvoiceItemModal .modal-body').remove('errorAlert');
+                $('#addQuoteItemModal .modal-body').remove('errorAlert');
             }, 2000);
         }else{
-            let serial = $('#addInvoiceItemModal [name="srial"]').val() * 1;
-            let description = $('#addInvoiceItemModal [name="description"]').val();
-            let units = parseFloat($('#addInvoiceItemModal [name="units"]').val());
-            let unitPrice = parseFloat($('#addInvoiceItemModal [name="price"]').val());
+            let serial = $('#addQuoteItemModal [name="srial"]').val() * 1;
+            let description = $('#addQuoteItemModal [name="description"]').val();
+            let units = parseFloat($('#addQuoteItemModal [name="units"]').val());
+            let unitPrice = parseFloat($('#addQuoteItemModal [name="price"]').val());
             let price = unitPrice * units;
-            let vatRate = (!isNonVatCheck ? parseFloat($('#addInvoiceItemModal [name="vat"]').val()) : 0);
+            let vatRate = (!isNonVatCheck ? parseFloat($('#addQuoteItemModal [name="vat"]').val()) : 0);
             let vatAmount = (!isNonVatCheck ? (price / 100) * vatRate : 0);
             let lineTotal = price + vatAmount;
 
 
             let html = '';
-                html += '<tr data-id="'+serial+'" class="invoiceItemRow cursor-pointer">';
+                html += '<tr data-id="'+serial+'" class="quoteItemRow cursor-pointer">';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions">';
                         html += '<div class="flex justify-start items-start">';
                             html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 w-4 h-4 mr-3"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
                             html += '<span>'+description+'</span>';
                         html += '</div>';
-                        html += '<input type="hidden" name="inv['+serial+'][descritpion]" class="description" value="'+description+'">';
+                        html += '<input type="hidden" name="qot['+serial+'][descritpion]" class="description" value="'+description+'">';
                     html += '</td>';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-[120px] text-right">';
                         html += units;
-                        html += '<input type="hidden" name="inv['+serial+'][units]" class="unit" value="'+units+'">';
+                        html += '<input type="hidden" name="qot['+serial+'][units]" class="unit" value="'+units+'">';
                     html += '</td>';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-[120px] text-right font-medium">';
                         html += '£'+unitPrice.toFixed(2);
-                        html += '<input type="hidden" name="inv['+serial+'][unit_price]" class="unit_price" value="'+unitPrice+'">';
+                        html += '<input type="hidden" name="qot['+serial+'][unit_price]" class="unit_price" value="'+unitPrice+'">';
                     html += '</td>';
                     html += '<td style="'+(!isNonVatCheck ? '' : 'display: none;')+'" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-[120px] text-right font-medium">';
                         html += vatRate+'%';
-                        html += '<input type="hidden" name="inv['+serial+'][vat_rate]" class="vat_rate" value="'+vatRate+'">';
-                        html += '<input type="hidden" name="inv['+serial+'][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
+                        html += '<input type="hidden" name="qot['+serial+'][vat_rate]" class="vat_rate" value="'+vatRate+'">';
+                        html += '<input type="hidden" name="qot['+serial+'][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
                     html += '</td>';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-[120px] text-right font-medium">';
                         html += '<span class="line_total_html">£'+lineTotal.toFixed(2)+'</span>';
-                        html += '<input type="hidden" name="inv['+serial+'][line_total]" class="line_total" value="'+lineTotal+'">';
+                        html += '<input type="hidden" name="qot['+serial+'][line_total]" class="line_total" value="'+lineTotal+'">';
                     html += '</td>';
                 html += '</tr>';
 
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
-            addInvoiceItemModal.hide();
+            addQuoteItemModal.hide();
 
             console.log(html)
-            $('#invoiceItemsTable tbody').append(html);
+            $('#quoteItemsTable tbody').append(html);
         
-            calculateInvoice();
+            calculateQuote();
         }
 
     })
     /* END: Add Item */
 
     /* BEGIN: Edit Item */
-    $('#invoiceItemsTable').on('click', '.invoiceItemRow', function(e){
+    $('#quoteItemsTable').on('click', '.quoteItemRow', function(e){
         e.preventDefault();
         let $theRow = $(this);
         let serial = $theRow.attr('data-id');
@@ -201,26 +192,26 @@
         let vat_amount = $('.vat_amount', $theRow).val();
         let line_total = $('.line_total', $theRow).val();
 
-        editInvoiceItemModal.show();
-        document.getElementById('editInvoiceItemModal').addEventListener('shown.tw.modal', function(event){
-            $('#editInvoiceItemModal [name="description"]').val(description);
-            $('#editInvoiceItemModal [name="units"]').val(unit);
-            $('#editInvoiceItemModal [name="price"]').val(unit_price);
-            $('#editInvoiceItemModal [name="srial"]').val(serial);
+        editQuoteItemModal.show();
+        document.getElementById('editQuoteItemModal').addEventListener('shown.tw.modal', function(event){
+            $('#editQuoteItemModal [name="description"]').val(description);
+            $('#editQuoteItemModal [name="units"]').val(unit);
+            $('#editQuoteItemModal [name="price"]').val(unit_price);
+            $('#editQuoteItemModal [name="srial"]').val(serial);
 
             if(!isNonVatCheck){
-                $('#editInvoiceItemModal .vatWrap').fadeIn('fast', function(){
+                $('#editQuoteItemModal .vatWrap').fadeIn('fast', function(){
                     $('input', this).val(vat_rate);
                 });
             }else{
-                $('#editInvoiceItemModal .vatWrap').fadeOut('fast', function(){
+                $('#editQuoteItemModal .vatWrap').fadeOut('fast', function(){
                     $('input', this).val(0);
                 });
             }
         });
     });
 
-    $('#editInvoiceItemModal').on('click', '#updateInvoiceItemBtn', function(e){
+    $('#editQuoteItemModal').on('click', '#updateQuoteItemBtn', function(e){
         e.preventDefault();
         let $theBtn = $(this);
 
@@ -229,28 +220,28 @@
         $('.theLoader', $theBtn).fadeIn();
 
         var formError = 0;
-        formError += ($('#editInvoiceItemModal [name="description"]').val() == '' ? 1 : 0);
-        formError += ($('#editInvoiceItemModal [name="units"]').val() == '' ? 1 : 0);
-        formError += ($('#editInvoiceItemModal [name="price"]').val() == '' ? 1 : 0);
+        formError += ($('#editQuoteItemModal [name="description"]').val() == '' ? 1 : 0);
+        formError += ($('#editQuoteItemModal [name="units"]').val() == '' ? 1 : 0);
+        formError += ($('#editQuoteItemModal [name="price"]').val() == '' ? 1 : 0);
 
         if(formError > 0){
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
 
-            $('#editInvoiceItemModal .modal-body').remove('errorAlert');
-            $('#editInvoiceItemModal .modal-body').prepend('<div class="col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. Description, Units & Price field can not be empty.</div></div>');
+            $('#editQuoteItemModal .modal-body').remove('errorAlert');
+            $('#editQuoteItemModal .modal-body').prepend('<div class="col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. Description, Units & Price field can not be empty.</div></div>');
         
             setTimeout(() => {
-                $('#editInvoiceItemModal .modal-body').remove('errorAlert');
+                $('#editQuoteItemModal .modal-body').remove('errorAlert');
             }, 2000);
         }else{
-            let serial = $('#editInvoiceItemModal [name="srial"]').val();
-            let description = $('#editInvoiceItemModal [name="description"]').val();
-            let units = parseFloat($('#editInvoiceItemModal [name="units"]').val());
-            let unitPrice = parseFloat($('#editInvoiceItemModal [name="price"]').val());
+            let serial = $('#editQuoteItemModal [name="srial"]').val();
+            let description = $('#editQuoteItemModal [name="description"]').val();
+            let units = parseFloat($('#editQuoteItemModal [name="units"]').val());
+            let unitPrice = parseFloat($('#editQuoteItemModal [name="price"]').val());
             let price = unitPrice * units;
-            let vatRate = (!isNonVatCheck ? parseFloat($('#editInvoiceItemModal [name="vat"]').val()) : 0);
+            let vatRate = (!isNonVatCheck ? parseFloat($('#editQuoteItemModal [name="vat"]').val()) : 0);
             let vatAmount = (!isNonVatCheck ? (price / 100) * vatRate : 0);
             let lineTotal = price + vatAmount;
 
@@ -261,34 +252,34 @@
                         html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 w-4 h-4 mr-3"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
                         html += '<span>'+description+'</span>';
                     html += '</div>';
-                    html += '<input type="hidden" name="inv['+serial+'][descritpion]" class="description" value="'+description+'">';
+                    html += '<input type="hidden" name="qot['+serial+'][descritpion]" class="description" value="'+description+'">';
                 html += '</td>';
                 html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-[120px] text-right">';
                     html += units;
-                    html += '<input type="hidden" name="inv['+serial+'][units]" class="unit" value="'+units+'">';
+                    html += '<input type="hidden" name="qot['+serial+'][units]" class="unit" value="'+units+'">';
                 html += '</td>';
                 html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-[120px] text-right font-medium">';
                     html += '£'+unitPrice.toFixed(2);
-                    html += '<input type="hidden" name="inv['+serial+'][unit_price]" class="unit_price" value="'+unitPrice+'">';
+                    html += '<input type="hidden" name="qot['+serial+'][unit_price]" class="unit_price" value="'+unitPrice+'">';
                 html += '</td>';
                 html += '<td style="'+(!isNonVatCheck ? '' : 'display: none;')+'" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-[120px] text-right font-medium">';
                     html += vatRate+'%';
-                    html += '<input type="hidden" name="inv['+serial+'][vat_rate]" class="vat_rate" value="'+vatRate+'">';
-                    html += '<input type="hidden" name="inv['+serial+'][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
+                    html += '<input type="hidden" name="qot['+serial+'][vat_rate]" class="vat_rate" value="'+vatRate+'">';
+                    html += '<input type="hidden" name="qot['+serial+'][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
                 html += '</td>';
                 html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-[120px] text-right font-medium">';
                     html += '<span class="line_total_html">£'+lineTotal.toFixed(2)+'</span>';
-                    html += '<input type="hidden" name="inv['+serial+'][line_total]" class="line_total" value="'+lineTotal+'">';
+                    html += '<input type="hidden" name="qot['+serial+'][line_total]" class="line_total" value="'+lineTotal+'">';
                 html += '</td>';
 
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
-            editInvoiceItemModal.hide();
+            editQuoteItemModal.hide();
 
-            $('#invoiceItemsTable tbody tr[data-id="'+serial+'"]').html(html);
+            $('#quoteItemsTable tbody tr[data-id="'+serial+'"]').html(html);
         
-            calculateInvoice();
+            calculateQuote();
         }
 
     })
@@ -300,23 +291,23 @@
         let $theBtn = $(this);
         let DueAmount = $('[name="due_price"]').val() * 1;
         let DueAmountHtml = '£'+DueAmount.toFixed(2);
-        let DiscountExist = ($('#invoiceItemsTable tbody tr.invoiceDiscountRow').length > 0 ? true : false);
+        let DiscountExist = ($('#quoteItemsTable tbody tr.quoteDiscountRow').length > 0 ? true : false);
 
         if(DiscountExist){
-            $('#invoiceItemsTable tbody tr.invoiceDiscountRow').trigger('click');
+            $('#quoteItemsTable tbody tr.quoteDiscountRow').trigger('click');
         }else if(DueAmount > 0 && !DiscountExist){
-            let theLabel = 'This invoice has '+DueAmountHtml+' outstanding.'
-            invoiceDiscountModal.show();
-            document.getElementById('invoiceDiscountModal').addEventListener('shown.tw.modal', function(event){
-                $('#invoiceDiscountModal .dueLeft').html(theLabel);
-                $('#invoiceDiscountModal [name="discount_amount"]').val(DueAmount.toFixed(2));
-                $('#invoiceDiscountModal [name="max_discount"]').val(DueAmount.toFixed(2));
+            let theLabel = 'This quote has '+DueAmountHtml+' outstanding.'
+            quoteDiscountModal.show();
+            document.getElementById('quoteDiscountModal').addEventListener('shown.tw.modal', function(event){
+                $('#quoteDiscountModal .dueLeft').html(theLabel);
+                $('#quoteDiscountModal [name="discount_amount"]').val(DueAmount.toFixed(2));
+                $('#quoteDiscountModal [name="max_discount"]').val(DueAmount.toFixed(2));
                 if(!isNonVatCheck){
-                    $('#invoiceDiscountModal .discountVatField').fadeIn('fast', function(){
+                    $('#quoteDiscountModal .discountVatField').fadeIn('fast', function(){
                         $('input', this).val(20);
                     });
                 }else{
-                    $('#invoiceDiscountModal .discountVatField').fadeOut('fast', function(){
+                    $('#quoteDiscountModal .discountVatField').fadeOut('fast', function(){
                         $('input', this).val(0);
                     });
                 }
@@ -325,7 +316,7 @@
             warningModal.show();
             document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
                 $("#warningModal .warningModalTitle").html("Oops!");
-                $("#warningModal .warningModalDesc").html('This invoice does not have any due.');
+                $("#warningModal .warningModalDesc").html('This quote does not have any due.');
             });
 
             setTimeout(() => {
@@ -338,80 +329,80 @@
     $('#addDiscountModalBtn').on('click', function(e){
         e.preventDefault();
         let $theBtn = $(this);
-        let DiscountExist = ($('#invoiceItemsTable tbody tr.invoiceDiscountRow').length > 0 ? true : false);
+        let DiscountExist = ($('#quoteItemsTable tbody tr.quoteDiscountRow').length > 0 ? true : false);
 
         $theBtn.siblings('button').attr('disabled', 'disabled');
         $theBtn.attr('disabled', 'disabled');
         $('.theLoader', $theBtn).fadeIn();
 
         var formError = 0;
-        formError += ($('#invoiceDiscountModal [name="discount_amount"]').val() == '' ? 1 : 0);
-        formError += (($('#invoiceDiscountModal [name="discount_amount"]').val() * 1) > ($('#invoiceDiscountModal [name="max_discount"]').val() * 1) ? 1 : 0);
+        formError += ($('#quoteDiscountModal [name="discount_amount"]').val() == '' ? 1 : 0);
+        formError += (($('#quoteDiscountModal [name="discount_amount"]').val() * 1) > ($('#quoteDiscountModal [name="max_discount"]').val() * 1) ? 1 : 0);
 
         if(formError > 0){
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
 
-            $('#invoiceDiscountModal .modal-body').remove('errorAlert');
-            $('#invoiceDiscountModal .modal-body').prepend('<div class="errorAlert col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. Discount can nto empty or grater than the outstanding amount.</div></div>');
+            $('#quoteDiscountModal .modal-body').remove('errorAlert');
+            $('#quoteDiscountModal .modal-body').prepend('<div class="errorAlert col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. Discount can nto empty or grater than the outstanding amount.</div></div>');
         
             setTimeout(() => {
-                $('#invoiceDiscountModal .modal-body').remove('errorAlert');
+                $('#quoteDiscountModal .modal-body').remove('errorAlert');
             }, 2000);
         }else{
             let units = 1;
-            let unitPrice = parseFloat($('#invoiceDiscountModal [name="discount_amount"]').val());
+            let unitPrice = parseFloat($('#quoteDiscountModal [name="discount_amount"]').val());
             let price = unitPrice * units;
-            let vatRate = (!isNonVatCheck ? parseFloat($('#invoiceDiscountModal [name="discount_vat_rate"]').val()) : 0);
+            let vatRate = (!isNonVatCheck ? parseFloat($('#quoteDiscountModal [name="discount_vat_rate"]').val()) : 0);
             let vatAmount = (!isNonVatCheck ? (price / 100) * vatRate : 0);
             let lineTotal = price + vatAmount;
 
 
             let html = '';
-                html += (!DiscountExist ? '<tr class="invoiceDiscountRow cursor-pointer">' : '');
+                html += (!DiscountExist ? '<tr class="quoteDiscountRow cursor-pointer">' : '');
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions">';
                         html += '<div class="flex justify-start items-start">';
                             html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 w-4 h-4 mr-3"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
                             html += '<span>Discount</span>';
                         html += '</div>';
-                        html += '<input type="hidden" name="inv[discount][descritpion]" class="description" value="Discount">';
+                        html += '<input type="hidden" name="qot[discount][descritpion]" class="description" value="Discount">';
                     html += '</td>';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-[120px] text-right">';
                         html += units;
-                        html += '<input type="hidden" name="inv[discount][units]" class="unit" value="'+units+'">';
+                        html += '<input type="hidden" name="qot[discount][units]" class="unit" value="'+units+'">';
                     html += '</td>';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-[120px] text-right font-medium">';
                         html += '£'+unitPrice.toFixed(2);
-                        html += '<input type="hidden" name="inv[discount][unit_price]" class="unit_price" value="'+unitPrice+'">';
+                        html += '<input type="hidden" name="qot[discount][unit_price]" class="unit_price" value="'+unitPrice+'">';
                     html += '</td>';
                     html += '<td style="'+(!isNonVatCheck ? '' : 'display: none;')+'" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-[120px] text-right font-medium">';
                         html += vatRate+'%';
-                        html += '<input type="hidden" name="inv[discount][vat_rate]" class="vat_rate" value="'+vatRate+'">';
-                        html += '<input type="hidden" name="inv[discount][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
+                        html += '<input type="hidden" name="qot[discount][vat_rate]" class="vat_rate" value="'+vatRate+'">';
+                        html += '<input type="hidden" name="qot[discount][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
                     html += '</td>';
                     html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-[120px] text-right font-medium">';
                         html += '<span class="line_total_html">-£'+lineTotal.toFixed(2)+'</span>';
-                        html += '<input type="hidden" name="inv[discount][line_total]" class="line_total" value="'+lineTotal+'">';
+                        html += '<input type="hidden" name="qot[discount][line_total]" class="line_total" value="'+lineTotal+'">';
                     html += '</td>';
                 html += (!DiscountExist ? '</tr>' : '');
 
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
-            invoiceDiscountModal.hide();
+            quoteDiscountModal.hide();
 
             if(DiscountExist){
-                $('#invoiceItemsTable tbody tr.invoiceDiscountRow').html(html);
+                $('#quoteItemsTable tbody tr.quoteDiscountRow').html(html);
             }else{
-                $('#invoiceItemsTable tbody').append(html);
+                $('#quoteItemsTable tbody').append(html);
             }
         
-            calculateInvoice();
+            calculateQuote();
         }
     });
 
-    $('#invoiceItemsTable').on('click', '.invoiceDiscountRow', function(e){
+    $('#quoteItemsTable').on('click', '.quoteDiscountRow', function(e){
         e.preventDefault();
         let $theRow = $(this);
 
@@ -424,33 +415,33 @@
 
         let DueAmount = ($('[name="due_price"]').val() * 1 + unit_price);
         let DueAmountHtml = '£'+DueAmount.toFixed(2);
-        let theLabel = 'This invoice has '+DueAmountHtml+' outstanding.'
+        let theLabel = 'This quote has '+DueAmountHtml+' outstanding.'
 
-        invoiceDiscountModal.show();
-        document.getElementById('invoiceDiscountModal').addEventListener('shown.tw.modal', function(event){
-            $('#invoiceDiscountModal .dueLeft').html(theLabel);
-            $('#invoiceDiscountModal [name="discount_amount"]').val(unit_price);
-            $('#invoiceDiscountModal [name="max_discount"]').val(DueAmount);
+        quoteDiscountModal.show();
+        document.getElementById('quoteDiscountModal').addEventListener('shown.tw.modal', function(event){
+            $('#quoteDiscountModal .dueLeft').html(theLabel);
+            $('#quoteDiscountModal [name="discount_amount"]').val(unit_price);
+            $('#quoteDiscountModal [name="max_discount"]').val(DueAmount);
             if(!isNonVatCheck){
-                $('#invoiceDiscountModal .discountVatField').fadeIn('fast', function(){
+                $('#quoteDiscountModal .discountVatField').fadeIn('fast', function(){
                     $('input', this).val(vat_rate);
                 });
             }else{
-                $('#invoiceDiscountModal .discountVatField').fadeOut('fast', function(){
+                $('#quoteDiscountModal .discountVatField').fadeOut('fast', function(){
                     $('input', this).val(vat_rate);
                 });
             }
-            $('#invoiceDiscountModal #removeDiscountBtn').fadeIn();
+            $('#quoteDiscountModal #removeDiscountBtn').fadeIn();
         });
     });
 
-    $('#invoiceDiscountModal #removeDiscountBtn').on('click', function(e){
+    $('#quoteDiscountModal #removeDiscountBtn').on('click', function(e){
         e.preventDefault();
 
-        invoiceDiscountModal.hide();
-        $('#invoiceItemsTable tbody tr.invoiceDiscountRow').remove();
+        quoteDiscountModal.hide();
+        $('#quoteItemsTable tbody tr.quoteDiscountRow').remove();
     
-        calculateInvoice();
+        calculateQuote();
     });
     /* END: Discount Item */
 
@@ -469,32 +460,32 @@
 
             let DueAmount = ($('[name="due_price"]').val() * 1) + AdvanceAmount;
             let DueAmountHtml = '£'+DueAmount.toFixed(2);
-            let theLabel = 'This invoice has '+DueAmountHtml+' outstanding.'
+            let theLabel = 'This quote has '+DueAmountHtml+' outstanding.'
 
-            prePaymentInvoiceModal.show();
-            document.getElementById('prePaymentInvoiceModal').addEventListener('shown.tw.modal', function(event){
-                $('#prePaymentInvoiceModal .dueLeft').html(theLabel);
+            prePaymentQuoteModal.show();
+            document.getElementById('prePaymentQuoteModal').addEventListener('shown.tw.modal', function(event){
+                $('#prePaymentQuoteModal .dueLeft').html(theLabel);
 
-                $('#prePaymentInvoiceModal [name="advance_amount"]').val(AdvanceAmount);
-                $('#prePaymentInvoiceModal [name="advance_pay_date"]').val(AdvancePayDate);
-                $('#prePaymentInvoiceModal [name="max_advance"]').val(DueAmount);
+                $('#prePaymentQuoteModal [name="advance_amount"]').val(AdvanceAmount);
+                $('#prePaymentQuoteModal [name="advance_pay_date"]').val(AdvancePayDate);
+                $('#prePaymentQuoteModal [name="max_advance"]').val(DueAmount);
                 payment_method_id.addItem(AdvanceMethodId);
-                $('#prePaymentInvoiceModal #removeAdvanceBtn').fadeIn();
+                $('#prePaymentQuoteModal #removeAdvanceBtn').fadeIn();
             });
         }else if(DueAmount > 0 && !AdvanceExist){
-            let theLabel = 'This invoice has '+DueAmountHtml+' outstanding.'
-            prePaymentInvoiceModal.show();
-            document.getElementById('prePaymentInvoiceModal').addEventListener('shown.tw.modal', function(event){
-                $('#prePaymentInvoiceModal .dueLeft').html(theLabel);
-                $('#prePaymentInvoiceModal [name="advance_amount"]').val(DueAmount);
-                $('#prePaymentInvoiceModal [name="advance_pay_date"]').val(getTodayDate());
-                $('#prePaymentInvoiceModal [name="max_advance"]').val(DueAmount);
+            let theLabel = 'This quote has '+DueAmountHtml+' outstanding.'
+            prePaymentQuoteModal.show();
+            document.getElementById('prePaymentQuoteModal').addEventListener('shown.tw.modal', function(event){
+                $('#prePaymentQuoteModal .dueLeft').html(theLabel);
+                $('#prePaymentQuoteModal [name="advance_amount"]').val(DueAmount);
+                $('#prePaymentQuoteModal [name="advance_pay_date"]').val(getTodayDate());
+                $('#prePaymentQuoteModal [name="max_advance"]').val(DueAmount);
             });
         }else{
             warningModal.show();
             document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
                 $("#warningModal .warningModalTitle").html("Oops!");
-                $("#warningModal .warningModalDesc").html('This invoice does not have any due.');
+                $("#warningModal .warningModalDesc").html('This quote does not have any due.');
             });
 
             setTimeout(() => {
@@ -512,31 +503,31 @@
         $('.theLoader', $theBtn).fadeIn();
 
         var formError = 0;
-        formError += ($('#prePaymentInvoiceModal [name="advance_amount"]').val() == '' ? 1 : 0);
-        formError += ($('#prePaymentInvoiceModal [name="payment_method_id"]').val() == '' ? 1 : 0);
-        formError += ($('#prePaymentInvoiceModal [name="advance_pay_date"]').val() == '' ? 1 : 0);
-        formError += ($('#prePaymentInvoiceModal [name="advance_amount"]').val() > $('#prePaymentInvoiceModal [name="max_advance"]').val() ? 1 : 0);
+        formError += ($('#prePaymentQuoteModal [name="advance_amount"]').val() == '' ? 1 : 0);
+        formError += ($('#prePaymentQuoteModal [name="payment_method_id"]').val() == '' ? 1 : 0);
+        formError += ($('#prePaymentQuoteModal [name="advance_pay_date"]').val() == '' ? 1 : 0);
+        formError += ($('#prePaymentQuoteModal [name="advance_amount"]').val() > $('#prePaymentQuoteModal [name="max_advance"]').val() ? 1 : 0);
 
         if(formError > 0){
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
 
-            $('#prePaymentInvoiceModal .modal-body').remove('errorAlert');
-            $('#prePaymentInvoiceModal .modal-body').prepend('<div class="errorAlert col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. All fields are required and Amount can not grater than the outstanding amount.</div></div>');
+            $('#prePaymentQuoteModal .modal-body').remove('errorAlert');
+            $('#prePaymentQuoteModal .modal-body').prepend('<div class="errorAlert col-span-12"><div role="alert" class="alert relative border rounded-md px-5 py-4 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg><strong>Oops!&nbsp; Form validation error found. All fields are required and Amount can not grater than the outstanding amount.</div></div>');
         
             setTimeout(() => {
-                $('#prePaymentInvoiceModal .modal-body').remove('errorAlert');
+                $('#prePaymentQuoteModal .modal-body').remove('errorAlert');
             }, 2000);
         }else{
-            let amount = $('#prePaymentInvoiceModal [name="advance_amount"]').val() * 1;
-            let method_id = $('#prePaymentInvoiceModal [name="payment_method_id"]').val();
-            let pay_date = $('#prePaymentInvoiceModal [name="advance_pay_date"]').val();
+            let amount = $('#prePaymentQuoteModal [name="advance_amount"]').val() * 1;
+            let method_id = $('#prePaymentQuoteModal [name="payment_method_id"]').val();
+            let pay_date = $('#prePaymentQuoteModal [name="advance_pay_date"]').val();
 
             $theBtn.siblings('button').removeAttr('disabled');
             $theBtn.removeAttr('disabled');
             $('.theLoader', $theBtn).fadeOut();
-            prePaymentInvoiceModal.hide();
+            prePaymentQuoteModal.hide();
 
             $('.paidToDateField').addClass('hasPayment').fadeIn();
             $('#inv_advance_amount_html').html('£'+amount.toFixed(2));
@@ -545,7 +536,7 @@
             $('#inv_advance_date').val(pay_date);
 
         
-            calculateInvoice();
+            calculateQuote();
         }
     });
 
@@ -553,28 +544,28 @@
         e.preventDefault();
         let $theBtn = $(this);
 
-        prePaymentInvoiceModal.hide();
+        prePaymentQuoteModal.hide();
         $('#inv_advance_amount_html').html('£0.00');
         $('#inv_advance_amount').val('0');
         $('#inv_payment_method_id').val('0');
         $('#inv_advance_date').val('');
         $('.paidToDateField').removeClass('hasPayment').fadeOut();
     
-        calculateInvoice();
+        calculateQuote();
     })
     /* END: Pre Payment Item */
 
     function getLastRowId(){
-        let $theTable = $('#invoiceItemsTable');
-        let serial = parseInt($theTable.find('.invoiceItemRow').last().attr('data-id'), 10);
+        let $theTable = $('#quoteItemsTable');
+        let serial = parseInt($theTable.find('.quoteItemRow').last().attr('data-id'), 10);
 
         return (serial ? serial + 1 : 1);
     }
 
-    function updateInvoiceRows(){
-        let $theTable = $('#invoiceItemsTable');
+    function updateQuoteRows(){
+        let $theTable = $('#quoteItemsTable');
 
-        $theTable.find('.invoiceItemRow').each(function(){
+        $theTable.find('.quoteItemRow').each(function(){
             let $theRow = $(this);
 
             let description = $('.description', $theRow).val();
@@ -588,7 +579,7 @@
             $('.line_total', $theRow).val(lineTotal);
         });
 
-        $theTable.find('.invoiceDiscountRow').each(function(){
+        $theTable.find('.quoteDiscountRow').each(function(){
             let $theRow = $(this);
 
             let unit = $('.unit', $theRow).val() * 1;
@@ -602,10 +593,10 @@
         });
     }
 
-    function calculateInvoice(){
-        updateInvoiceRows();
+    function calculateQuote(){
+        updateQuoteRows();
 
-        let $theTable = $('#invoiceItemsTable');
+        let $theTable = $('#quoteItemsTable');
 
         let subTotal = 0;
         let vatTotal = 0;
@@ -615,7 +606,7 @@
         let DiscountVatTotal = 0;
 
         /* Calculate Rows */
-        $theTable.find('.invoiceItemRow').each(function(){
+        $theTable.find('.quoteItemRow').each(function(){
             let $theRow = $(this);
 
             let description = $('.description', $theRow).val();
@@ -631,7 +622,7 @@
             
         });
         
-        $theTable.find('.invoiceDiscountRow').each(function(){
+        $theTable.find('.quoteDiscountRow').each(function(){
             let $theRow = $(this);
 
             let unit = $('.unit', $theRow).val() * 1;
@@ -647,11 +638,12 @@
             vatTotal = (!isNonVatCheck ? vatTotal - DiscountVatTotal : vatTotal);
         });
 
-        let AdvanceAmount = ($('.paidToDateField').hasClass('hasPayment') ? parseFloat($('#inv_advance_amount').val()) : 0);
+        //let AdvanceAmount = ($('.paidToDateField').hasClass('hasPayment') ? parseFloat($('#inv_advance_amount').val()) : 0);
         
 
         Total = (!isNonVatCheck ? subTotal + vatTotal : subTotal);
-        Due = Total - AdvanceAmount;
+        //Due = Total - AdvanceAmount;
+        Due = Total;
 
         $('.subtotal_price').html('£'+subTotal.toFixed(2));
         $('input[name="subtotal_price"]').val(subTotal);  
@@ -678,10 +670,10 @@
         return dd+'-'+mm+'-'+yyyy;
     }
 
-    /* BEGIN: Save Invoice */
-    $('#JobInvoiceForm').on('submit', function(e){
+    /* BEGIN: Save Quote */
+    $('#JobQuoteForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('JobInvoiceForm');
+        const form = document.getElementById('JobQuoteForm');
         let $theForm = $(this);
         let type = $theForm.find('[name="submit_type"]').val();
 
@@ -692,7 +684,7 @@
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('invoice.store'),
+            url: route('quote.store'),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
@@ -736,6 +728,65 @@
             }
         });
     })
-    /* END: Save Invoice */
+    /* END: Save Quote */
+
+    /* BEGIN: Quote To Invoice */
+    $('#convertQuotToInvBtn').on('click', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        let quote_id = $theBtn.attr('data-id');
+
+        $('.theLoader', $theBtn).fadeIn();
+        $theBtn.addClass('active');
+        $theBtn.siblings('button').attr('disabled', 'disabled');
+
+        axios({
+            method: "post",
+            url: route('quote.convert.to.invoice'),
+            data: { quote_id : quote_id},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+                $('.theLoader', $theBtn).fadeOut();
+                $theBtn.removeClass('active');
+                $theBtn.siblings('button').removeAttr('disabled');
+
+            if (response.status == 200) {
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                });
+
+                setTimeout(() => {
+                    successModal.hide();
+                    if(response.data.red){
+                        window.location.href = response.data.red;
+                    }
+                }, 1500);
+            }
+        }).catch(error => {
+            $('.theLoader', $theBtn).fadeOut();
+            $theBtn.removeClass('active');
+            $theBtn.siblings('button').removeAttr('disabled');
+
+            if (error.response) {
+                if (error.response.status == 422) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    })
+    /* END: Quote To Invoice */
 
 })();

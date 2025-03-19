@@ -202,6 +202,7 @@ export default defineConfig({
                 
                 "resources/js/app/records/homewoner_gass_safety_record.js",
                 "resources/js/app/records/invoice.js",
+                "resources/js/app/records/quote.js",
 
             ],
             refresh: true,

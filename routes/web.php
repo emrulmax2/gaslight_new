@@ -40,6 +40,7 @@ use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\Records\InvoiceController;
+use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Models\BoilerBrand;
 
@@ -264,8 +265,12 @@ Route::middleware(Authenticate::class)->group(function() {
     });
     
     Route::controller(InvoiceController::class)->group(function(){
-        //Route::post('invoice/approve-and-send-email', 'approveAndSendEmail')->name('invoice.approve.and.send.email');
         Route::post('records/invoice/store', 'store')->name('invoice.store');
+    });
+    
+    Route::controller(QuoteController::class)->group(function(){
+        Route::post('records/quote/store', 'store')->name('quote.store');
+        Route::post('records/quote/convert-to-invoice', 'convertToInvoice')->name('quote.convert.to.invoice');
     });
     
     Route::controller(HomeOwnerGasSafetyController::class)->group(function(){

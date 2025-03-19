@@ -8,19 +8,18 @@
     const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatesignature-modal"));
     // Tabulator
     if ($("#staffListTable").length) {
-        let user =
-        $('#staffListTable').attr('data-user') != ''
-            ? $('#staffListTable').attr('data-user')
-            : '0';
-        let queryStr = $('#query-Eng').val() != '' ? $('#query-Eng').val() : '';
-        let status = $('#status-Eng').val() != '' ? $('#status-Eng').val() : '1';
+        let user = $('#staffListTable').attr('data-user') != '' ? $('#staffListTable').attr('data-user') : '0';
+        let queryField = $('#tabulator-html-filter-field').val() != '' ? $('#tabulator-html-filter-field').val() : '';
+        let queryType = $('#tabulator-html-filter-type').val() != '' ? $('#tabulator-html-filter-type').val() : '';
+        let queryValue = $('#tabulator-html-filter-value').val() != '' ? $('#tabulator-html-filter-value').val() : '';
         // Setup Tabulator
         const tableData = new Tabulator("#staffListTable", {
             ajaxURL: route('staff.list'),
             ajaxParams: {
                 user_id: user,
-                queryStr: queryStr,
-                status: status,
+                queryField: queryField,
+                queryType: queryType,
+                queryValue: queryValue
             },
             ajaxFiltering: true,
             ajaxSorting: true,
@@ -68,6 +67,7 @@
                     download: false,
                     minWidth: 180,
                     formatter(cell, formatterParams) {
+                        console.log(cell)
                         let signatureUrl = cell.getData().signature;
                         if (signatureUrl) {
                             let a = $(`<div class="flex items-center lg:justify-center"> 

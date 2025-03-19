@@ -31,17 +31,17 @@
             <div class="intro-y col-span-2 hidden 2xl:block">
                 <div class="sticky top-0">
                     <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
-                        <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-2 approveAndEmailBtn" variant="linkedin">
-                            <x-base.lucide value="3" onclick="this.form.submit_type.value = this.value" class="formSubmits submit_3 mr-2 h-4 w-4" icon="mail" />
+                        <x-base.button value="3" onclick="this.form.submit_type.value = this.value" type="submit" class="text-white w-full mb-2 formSubmits submit_3" variant="linkedin">
+                            <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
                             Approve & Email
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
-                        <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits submit_2 w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
+                        <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits submit_2 w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="eye-off" />
                             Approve & Preview
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
-                        <x-base.button type="button" id="addPrePaymentBtn" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none hover:bg-[#4ab3f4] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
+                        <x-base.button type="button" id="addPrePaymentBtn" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#4ab3f4] [&.active]:text-white hover:bg-[#4ab3f4] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
                             Add Pre-Payment
                         </x-base.button>
