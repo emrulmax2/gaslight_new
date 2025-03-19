@@ -28,7 +28,7 @@
     </div>
     <form method="post" action="#" id="JobInvoiceForm">
         <div class="grid grid-cols-11 gap-x-6 pb-20 mt-5">
-            <div class="intro-y col-span-2 hidden 2xl:block">
+            <div class="intro-y col-span-12 max-sm:mb-5 sm:col-span-2">
                 <div class="sticky top-0">
                     <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
                         <x-base.button value="3" onclick="this.form.submit_type.value = this.value" type="submit" class="text-white w-full mb-2 formSubmits submit_3" variant="linkedin">
@@ -64,10 +64,10 @@
                     <input type="hidden" value="1" name="submit_type"/>
                 </div>
             </div>
-            <div class="intro-y col-span-11 2xl:col-span-9">
+            <div class="intro-y col-span-12 sm:col-span-9">
                 <div class="intro-y box overflow-hidden">
                     <div class="border-b border-slate-200/60 text-center dark:border-darkmode-400 sm:text-left">
-                        <div class="w-full flex justify-between">
+                        <div class="w-full flex justify-start sm:justify-between flex-row">
                             <div class="px-8 py-10 sm:px-8 sm:py-8">
                                 <div class="text-3xl font-semibold text-primary">
                                     <img class="w-28" src="{{ Vite::asset('resources/images/gas_safe_register.png') }}" alt="Gas Safe Register Logo">
