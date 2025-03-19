@@ -72,7 +72,7 @@ class RecordController extends Controller
             $data['gsra2'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 2)->get()->first();
             $data['gsra3'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 3)->get()->first();
             $data['gsra4'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 4)->get()->first();
-            $data['signature'] = $GasSafetyRecord->signature ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
+            $data['signature'] = isset($GasSafetyRecord->signature) ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
         endif;
 
 
