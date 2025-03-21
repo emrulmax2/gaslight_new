@@ -67,8 +67,8 @@
             <div class="intro-y col-span-12 sm:col-span-9">
                 <div class="intro-y box overflow-hidden">
                     <div class="border-b border-slate-200/60 text-center dark:border-darkmode-400 sm:text-left">
-                        <div class="w-full flex justify-start sm:justify-between flex-row">
-                            <div class="px-8 py-10 sm:px-8 sm:py-8">
+                        <div class="w-full flex justify-between flex-row py-5 px-5 sm:px-8 sm:py-8">
+                            <div class=" text-left">
                                 <div class="text-3xl font-semibold text-primary">
                                     <img class="w-28" src="{{ Vite::asset('resources/images/gas_safe_register.png') }}" alt="Gas Safe Register Logo">
                                 </div>
@@ -80,7 +80,7 @@
                                     {!! (isset($job->customer->full_address_html) ? $job->customer->full_address_html : '') !!}
                                 </div>
                             </div>
-                            <div class="px-5 py-10 sm:px-8 sm:py-8 text-right">
+                            <div class="text-right max-sm:max-w-[50%]">
                                 <div class="text-3xl font-semibold">Invoice</div>
                                 <div class="text-xl font-semibold text-primary">Ref: {{ $invoice->invoice_number }}</div>
                                 <div class="mt-2">
@@ -108,15 +108,15 @@
 
                                 </div>
                                 <div class="mt-2 flex justify-end items-center gap-1">
-                                    <span class="font-bold">Date Issued:</span>
-                                    <x-base.litepicker name="issued_date" id="date_issued" value="{{ !empty($invoice->issued_date) ? date('d-m-Y', strtotime($invoice->issued_date)) : date('d-m-Y') }}" class="block w-32 text-right" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off" />
+                                    <span class="font-bold max-sm:hidden">Date Issued:</span>
+                                    <x-base.litepicker name="issued_date" id="date_issued" value="{{ !empty($invoice->issued_date) ? date('d-m-Y', strtotime($invoice->issued_date)) : date('d-m-Y') }}" class="block w-28 sm:w-32 text-right" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off" />
 
                                 </div>
                                 <div class="mt-2 flex justify-end items-center gap-1">
-                                    <span class="font-bold">Job Ref No:</span>
-                                    <x-base.form-input class="block w-32 text-right" name="reference_no" type="text" value="{{ (isset($invoice->reference_no) ? $invoice->reference_no : '') }}" />
+                                    <span class="font-bold max-sm:hidden">Job Ref No:</span>
+                                    <x-base.form-input class="block w-28 sm:w-32 text-right" name="reference_no" type="text" value="{{ (isset($invoice->reference_no) ? $invoice->reference_no : '') }}" />
                                 </div>
-                                <div class="mt-10 lg:ml-auto lg:mt-0 lg:text-right">
+                                <div class="mt-5 sm:mt-10 lg:ml-auto lg:mt-0 lg:text-right">
                                     <div class="mt-2">
                                         <span class="font-bold text-xl">Job Address</span>
                                     </div>
@@ -127,15 +127,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="px-5 py-2 sm:px-8 sm:py-8">
+                    <div class="px-5 py-5 sm:px-8 sm:py-8">
                         <div class="overflow-x-auto">
                             <x-base.table bordered sm id="invoiceItemsTable">
-                                <x-base.table.thead>
+                                <x-base.table.thead class="max-sm:hidden">
                                     <x-base.table.tr>
                                         <x-base.table.th class="description whitespace-nowrap text-left">DESCRIPTION</x-base.table.th>
                                         <x-base.table.th class="units whitespace-nowrap text-right">UNITS</x-base.table.th>
                                         <x-base.table.th class="price whitespace-nowrap text-right">PRICE</x-base.table.th>
-                                        <x-base.table.th class="vatField whitespace-nowrap text-right" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'table-cell' }};">VAT %</x-base.table.th>
+                                        <x-base.table.th class="vatField whitespace-nowrap text-right {{ $invoice->non_vat_invoice == 1 ? 'hidden' : 'table-cell max-sm:block' }}">VAT %</x-base.table.th>
                                         <x-base.table.th class="lineTotal whitespace-nowrap text-right">LINE TOTAL</x-base.table.th>
                                     </x-base.table.tr>
                                 </x-base.table.thead>
@@ -153,27 +153,27 @@
                                                 $class = ($item->type == 'Discount' ? 'invoiceDiscountRow' : 'invoiceItemRow');
                                             @endphp
                                             <x-base.table.tr class="{{ $class }} cursor-pointer" data-id="{{ $serial }}" >
-                                                <x-base.table.td class="descriptions">
+                                                <x-base.table.td class="descriptions max-sm:block max-sm:w-full">
                                                     <div class="flex justify-start items-start">
                                                         <x-base.lucide class="w-4 h-4 mr-3" icon="check-circle" />
                                                         <span>{{ (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item') }}</span>
                                                     </div>
                                                     <input type="hidden" name="inv[{{ $key }}][descritpion]" class="description" value="{{ (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item') }}"/>
                                                 </x-base.table.td>
-                                                <x-base.table.td class="units w-[120px] text-right">
+                                                <x-base.table.td data-th="UNITS" class="units w-full sm:w-[120px] text-left sm:text-right max-sm:block">
                                                     {{ $units }}
                                                     <input type="hidden" name="inv[{{ $key }}][units]" class="unit" value="{{ $units }}"/>
                                                 </x-base.table.td>
-                                                <x-base.table.td class="prices w-[120px] text-right font-medium">
+                                                <x-base.table.td data-th="PRICE" class="prices w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">
                                                     {{ Number::currency($unitPrice, 'GBP') }}
                                                     <input type="hidden" name="inv[{{ $key }}][unit_price]" class="unit_price" value="{{ $unitPrice }}"/>
                                                 </x-base.table.td>
-                                                <x-base.table.td class="vatCol w-[120px] text-right font-medium" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'table-cell' }};">
+                                                <x-base.table.td data-th="VAT %" class="vatCol w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block {{ $invoice->non_vat_invoice == 1 ? 'hidden' : 'table-cell max-sm:block' }}" >
                                                     {{ $vatRate.'%' }}
                                                     <input type="hidden" name="inv[{{ $key }}][vat_rate]" class="vat_rate" value="{{ $vatRate }}"/>
                                                     <input type="hidden" name="inv[{{ $key }}][vat_amount]" class="vat_amount" value="{{ $vatAmount }}"/>
                                                 </x-base.table.td>
-                                                <x-base.table.td class="lineTotal w-[120px] text-right font-medium">
+                                                <x-base.table.td data-th="LINE TOTAL" class="lineTotal w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">
                                                     <span class="line_total_html">{{ $item->type == 'Discount' ? '-' : ''}}{{ Number::currency($lineTotal, 'GBP') }}</span>
                                                     <input type="hidden" name="inv[{{ $key }}][line_total]" class="line_total" value="{{ $lineTotal }}"/>
                                                 </x-base.table.td>
@@ -189,27 +189,27 @@
                                             $lineTotal = ($unitPrice * $units) + $vatAmount;
                                         @endphp
                                         <x-base.table.tr class="invoiceItemRow cursor-pointer" data-id="1" >
-                                            <x-base.table.td class="descriptions">
+                                            <x-base.table.td class="descriptions max-sm:block max-sm:w-full">
                                                 <div class="flex justify-start items-start">
                                                     <x-base.lucide class="w-4 h-4 mr-3" icon="check-circle" />
                                                     <span>{{ (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item') }}</span>
                                                 </div>
                                                 <input type="hidden" name="inv[1][descritpion]" class="description" value="{{ (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item') }}"/>
                                             </x-base.table.td>
-                                            <x-base.table.td class="units w-[120px] text-right">
+                                            <x-base.table.td data-th="UNITS" class="units w-full sm:w-[120px] text-left sm:text-right max-sm:block">
                                                 {{ $units }}
                                                 <input type="hidden" name="inv[1][units]" class="unit" value="{{ $units }}"/>
                                             </x-base.table.td>
-                                            <x-base.table.td class="prices w-[120px] text-right font-medium">
+                                            <x-base.table.td data-th="PRICE" class="prices w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">
                                                 {{ Number::currency($unitPrice, 'GBP') }}
                                                 <input type="hidden" name="inv[1][unit_price]" class="unit_price" value="{{ $unitPrice }}"/>
                                             </x-base.table.td>
-                                            <x-base.table.td class="vatCol w-[120px] text-right font-medium" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'table-cell' }};">
+                                            <x-base.table.td data-th="VAT %" class="vatCol w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block {{ $invoice->non_vat_invoice == 1 ? 'hidden' : 'table-cell max-sm:block' }}" >
                                                 {{ $vatRate.'%' }}
                                                 <input type="hidden" name="inv[1][vat_rate]" class="vat_rate" value="{{ $vatRate }}"/>
                                                 <input type="hidden" name="inv[1][vat_amount]" class="vat_amount" value="{{ $vatAmount }}"/>
                                             </x-base.table.td>
-                                            <x-base.table.td class="lineTotal w-[120px] text-right font-medium">
+                                            <x-base.table.td data-th="LINE TOTAL" class="lineTotal w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">
                                                 <span class="line_total_html">{{ Number::currency($lineTotal, 'GBP') }}</span>
                                                 <input type="hidden" name="inv[1][line_total]" class="line_total" value="{{ $lineTotal }}"/>
                                             </x-base.table.td>
@@ -223,34 +223,34 @@
                         </div>
                     </div>
                     <div class="flex flex-col-reverse px-5 pb-10 sm:flex-row sm:px-8 sm:pb-8">
-                        <div class="mt-10 text-center sm:mt-0 sm:text-left w-3/5">
-                            <div class="grid grid-cols-12 gap-4">
+                        <div class="mt-10 text-center sm:mt-0 sm:text-left w-full sm:w-3/5">
+                            <div class="grid grid-cols-12 gap-4 max-sm:text-left">
                                 <div class="col-span-12 sm:col-span-6">
-                                    <x-base.form-label class="mb-1">Payment Terms</x-base.form-label>
+                                    <x-base.form-label class="mb-1 max-sm:text-left">Payment Terms</x-base.form-label>
                                     <x-base.form-textarea rows="2" name="payment_term" class="w-full">{{ (isset($invoice->payment_term) ? $invoice->payment_term : '') }}</x-base.form-textarea>
                                 </div>
                                 <div class="col-span-12 sm:col-span-6 sm:pl-10">
                                     <x-base.form-label class="mb-1">Bank Details:</x-base.form-label>
                                     @if(isset($company->bank->bank_name) && !empty($company->bank->bank_name))
-                                    <div class="mb-1">
+                                    <div class="mb-1 max-sm:text-left">
                                         <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Bank Name:</span>
                                         <span>{{ $company->bank->bank_name}}</span>
                                     </div>
                                     @endif
                                     @if(isset($company->bank->name_on_account) && !empty($company->bank->name_on_account))
-                                    <div class="mb-1">
+                                    <div class="mb-1 max-sm:text-left">
                                         <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Account Name:</span>
                                         <span>{{ $company->bank->name_on_account}}</span>
                                     </div>
                                     @endif
                                     @if(isset($company->bank->sort_code) && !empty($company->bank->sort_code))
-                                    <div class="mb-1">
+                                    <div class="mb-1 max-sm:text-left">
                                         <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Sort Code:</span>
                                         <span>{{ $company->bank->sort_code}}</span>
                                     </div>
                                     @endif
                                     @if(isset($company->bank->account_number) && !empty($company->bank->account_number))
-                                    <div class="mb-1">
+                                    <div class="mb-1 max-sm:text-left">
                                         <span class="font-medium text-slate-400 mr-1 inline-flex w-[120px]">Account Number:</span>
                                         <span>{{ $company->bank->account_number}}</span>
                                     </div>
@@ -262,10 +262,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="calculation text-center sm:ml-auto sm:text-right">
+                        <div class="calculation sm:ml-auto text-right">
                             <div class="mt-2 font-medium text-md">
                                 <span>Subtotal:</span>
-                                <span class="w-[80px] inline-flex justify-end subtotal_price">£0.00</span>
+                                <span class="w-[80px] inline-flex justify-end subtotal_price max-sm:ml-auto">£0.00</span>
                                 <input type="hidden" name="sub_total" value="0"/>
                             </div>
                             <div class="mt-2 font-medium text-md vatTotalField" style="display: {{ $invoice->non_vat_invoice == 1 ? 'none' : 'block' }};">

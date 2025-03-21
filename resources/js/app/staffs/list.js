@@ -1,17 +1,16 @@
-(function () {
-    "use strict";
-
-
+    ("use strict");
     const el = document.querySelector("#edituser-modal");
     const editUserModal = tailwind.Modal.getOrCreateInstance(el);
 
     const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatesignature-modal"));
-    // Tabulator
-    if ($("#staffListTable").length) {
+
+    var staffListTable = (function () {
+        var _tableGen = function () {
         let user = $('#staffListTable').attr('data-user') != '' ? $('#staffListTable').attr('data-user') : '0';
         let queryField = $('#tabulator-html-filter-field').val() != '' ? $('#tabulator-html-filter-field').val() : '';
         let queryType = $('#tabulator-html-filter-type').val() != '' ? $('#tabulator-html-filter-type').val() : '';
         let queryValue = $('#tabulator-html-filter-value').val() != '' ? $('#tabulator-html-filter-value').val() : '';
+        let status = $('#status').val() != '' ? $('#status').val() : '1';
         // Setup Tabulator
         const tableData = new Tabulator("#staffListTable", {
             ajaxURL: route('staff.list'),
@@ -19,7 +18,8 @@
                 user_id: user,
                 queryField: queryField,
                 queryType: queryType,
-                queryValue: queryValue
+                queryValue: queryValue,
+                status: status
             },
             ajaxFiltering: true,
             ajaxSorting: true,
@@ -67,7 +67,6 @@
                     download: false,
                     minWidth: 180,
                     formatter(cell, formatterParams) {
-                        console.log(cell)
                         let signatureUrl = cell.getData().signature;
                         if (signatureUrl) {
                             let a = $(`<div class="flex items-center lg:justify-center"> 
@@ -197,63 +196,43 @@
             });
         });
 
-        // Filter function
-        function filterHTMLForm() {
-            let field = $("#tabulator-html-filter-field").val();
-            let type = $("#tabulator-html-filter-type").val();
-            let value = $("#tabulator-html-filter-value").val();
-            tableData.setFilter(field, type, value);
-        }
+    };
+    return {
+        init: function () {
+            _tableGen();
+        },
+    };
+})();
 
-        // On submit filter form
-        $("#tabulator-html-filter-form")[0].addEventListener(
-            "keypress",
-            function (event) {
-                let keycode = event.keyCode ? event.keyCode : event.which;
-                if (keycode == "13") {
-                    event.preventDefault();
-                    filterHTMLForm();
-                }
-            }
-        );
-
-        // On click go button
-        $("#tabulator-html-filter-go").on("click", function (event) {
-            filterHTMLForm();
-        });
-
-        // On reset filter form
-        $("#tabulator-html-filter-reset").on("click", function (event) {
-            $("#tabulator-html-filter-field").val("name");
-            $("#tabulator-html-filter-type").val("like");
-            $("#tabulator-html-filter-value").val("");
-            filterHTMLForm();
-        });
-
-        // Export
-        $("#tabulator-export-csv").on("click", function (event) {
-            tableData.download("csv", "data.csv");
-        });
-
-        $("#tabulator-export-json").on("click", function (event) {
-            tableData.download("json", "data.json");
-        });
-
-        $("#tabulator-export-xlsx").on("click", function (event) {
-            tableData.download("xlsx", "data.xlsx", {
-                sheetName: "Products",
-            });
-        });
-
-        $("#tabulator-export-html").on("click", function (event) {
-            tableData.download("html", "data.html", {
-                style: true,
-            });
-        });
-
-        // Print
-        $("#tabulator-print").on("click", function (event) {
-            tableData.print();
-        });
+(function () {
+    if ($("#staffListTable").length) {
+        staffListTable.init();
     }
+
+    function filterStaffListTable() {
+        staffListTable.init();
+    }
+
+      // On submit filter form
+      $("#tabulator-html-filter-form").on("keypress", function (event) {
+            let keycode = event.keyCode ? event.keyCode : event.which;
+            if (keycode == "13") {
+                event.preventDefault();
+                filterStaffListTable();
+            }
+        }
+    );
+
+    // On click go button
+    $("#tabulator-html-filter-go").on("click", function (event) {
+        filterStaffListTable();
+    });
+
+    // On reset filter form
+    $("#tabulator-html-filter-reset").on("click", function (event) {
+        $("#tabulator-html-filter-field").val("name");
+        $("#tabulator-html-filter-type").val("like");
+        $("#tabulator-html-filter-value").val("");
+        filterStaffListTable();
+    });
 })();

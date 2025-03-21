@@ -45,11 +45,23 @@ class GasSafetyRecordAppliance extends Model
 
     protected $dates = ['deleted_at'];
 
+    public function gsr(){
+        return $this->belongsTo(GasSafetyRecord::class, 'gas_safety_record_id');
+    }
+
+    public function location(){
+        return $this->belongsTo(ApplianceLocation::class, 'appliance_location_id');
+    }
+
     public function type(){
         return $this->belongsTo(ApplianceType::class, 'appliance_type_id');
     }
 
     public function make(){
         return $this->belongsTo(BoilerBrand::class, 'boiler_brand_id');
+    }
+
+    public function flue(){
+        return $this->belongsTo(ApplianceFlueType::class, 'appliance_flue_type_id');
     }
 }

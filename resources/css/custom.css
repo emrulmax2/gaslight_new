@@ -251,6 +251,14 @@
     .form-wizard .wizard-fieldset.show .wizard-step-form{
         display: block;
     }
+    .wizard-step-form .gsfSignature canvas{
+        width: 316px;
+        height: 210px;
+    }
+    .wizard-step-form .gsfSignature .e-signpad > div{
+        height: 36px;
+        overflow: hidden;
+    }
 }
 /* Wizard Form Styling End */
 .radioItem  label{
@@ -277,6 +285,9 @@
     visibility: hidden;
     width: 0;
     height: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
 }
 .gsfSignature .sign-pad-button-clear{
     margin: 0;
@@ -293,4 +304,72 @@
 .gsfSignatureBtns button.active:hover{
     background: #259E94 !important;
     opacity: .8;
+}
+@media (max-width: 768px){
+    #invoiceItemsTable .vatCol.hidden,
+    #invoiceItemsTable .vatField.hidden,
+    #quoteItemsTable .vatCol.hidden,
+    #quoteItemsTable .vatField.hidden{
+        display: none !important;
+    }
+    #invoiceItemsTable tbody tr td,
+    #quoteItemsTable tbody tr td{
+        border-bottom-width: 0;
+        border-top-width: 0;
+    }
+    #invoiceItemsTable tbody tr td:first-child,
+    #quoteItemsTable tbody tr td:first-child{
+        border-top-width: 1px;
+        border-bottom-width: 1px;
+    }
+    #invoiceItemsTable tbody tr:last-child td:last-child,
+    #quoteItemsTable tbody tr:last-child td:last-child{
+        border-bottom-width: 1px;
+    }
+    #invoiceItemsTable tbody tr td:not(:first-child):before ,
+    #quoteItemsTable tbody tr td:not(:first-child):before {
+        content: attr(data-th) ": ";
+        font-weight: 500;
+        width: 110px;
+        display: inline-block;
+    }
+    #invoiceItemsTable tbody tr:nth-child(even),
+    #quoteItemsTable tbody tr:nth-child(even){
+        background-color: #f1f5f9;
+    }
+}
+
+.w-\[105px\]{
+    width: 105px;
+}
+.w-\[110px\]{
+    width: 110px;
+}
+.w-\[115px\]{
+    width: 115px;
+}
+.h-\[29px\]{
+    height: 29px;
+}
+.h-\[94px\]{
+    height: 94px;
+}
+
+.border-b-1{
+    border-bottom-width: 1px;
+}
+.border-l-sec{
+    border-left-color: #1d6a87 !important;
+}
+.border-r-sec{
+    border-right-color: #1d6a87 !important;
+}
+.border-b-sec{
+    border-bottom-color: #1d6a87 !important;
+}
+.border-t-sec{
+    border-top-color: #1d6a87 !important;
+}
+.bg-light-2{
+    background-color: #D4EFFB;
 }

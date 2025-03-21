@@ -8,11 +8,16 @@
             href="{{ route('company.dashboard') }}"
         >
             <img
-                class="w-6"
-                src="{{ Vite::asset('resources/images/logo.svg') }}"
-                alt="Icewall Tailwind Admin Dashboard Template"
+                class="w-auto h-[65px] hidden sm:block"
+                src="{{ Vite::asset('resources/images/logo_1.png') }}"
+                alt="Gas Engineer APP"
             />
-            <span class="ml-3 text-lg text-white max-sm:hidden"> Icewall </span>
+            <img
+                class="w-auto h-[50px] sm:hidden"
+                src="{{ Vite::asset('resources/images/logo_3.png') }}"
+                alt="Gas Engineer APP"
+            />
+            {{--<span class="ml-3 text-lg text-white max-sm:hidden"> Icewall </span>--}}
         </a>
         <!-- END: Logo -->
         <!-- BEGIN: Breadcrumb --> 

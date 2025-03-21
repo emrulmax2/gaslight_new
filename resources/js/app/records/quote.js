@@ -62,11 +62,11 @@
     $('#nonVatQuoteCheck').on('change', function(){
         isNonVatCheck = $(this).prop('checked') ? true : false;
         if(!isNonVatCheck){
-            $('#quoteItemsTable').find('.vatCol, .vatField').fadeIn();
+            $('#quoteItemsTable').find('.vatCol, .vatField').removeClass('hidden').addClass('table-cell');
             $('.vatTotalField').fadeIn();
             $('.vatNumberField').fadeIn();
         }else{
-            $('#quoteItemsTable').find('.vatCol, .vatField').fadeOut();
+            $('#quoteItemsTable').find('.vatCol, .vatField').addClass('hidden').removeClass('table-cell');
             $('.vatTotalField').fadeOut();
             $('.vatNumberField').fadeOut();
         }
@@ -139,27 +139,27 @@
 
             let html = '';
                 html += '<tr data-id="'+serial+'" class="quoteItemRow cursor-pointer">';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions">';
+                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions max-sm:block max-sm:w-full">';
                         html += '<div class="flex justify-start items-start">';
                             html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 w-4 h-4 mr-3"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
                             html += '<span>'+description+'</span>';
                         html += '</div>';
                         html += '<input type="hidden" name="qot['+serial+'][descritpion]" class="description" value="'+description+'">';
                     html += '</td>';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-[120px] text-right">';
+                    html += '<td data-th="UNITS" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-full sm:w-[120px] text-left sm:text-right max-sm:block">';
                         html += units;
                         html += '<input type="hidden" name="qot['+serial+'][units]" class="unit" value="'+units+'">';
                     html += '</td>';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-[120px] text-right font-medium">';
+                    html += '<td data-th="PRICE" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">';
                         html += '£'+unitPrice.toFixed(2);
                         html += '<input type="hidden" name="qot['+serial+'][unit_price]" class="unit_price" value="'+unitPrice+'">';
                     html += '</td>';
-                    html += '<td style="'+(!isNonVatCheck ? '' : 'display: none;')+'" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-[120px] text-right font-medium">';
+                    html += '<td data-th="VAT %" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block '+(!isNonVatCheck ? 'table-cell max-sm:block' : 'hidden')+'">';
                         html += vatRate+'%';
                         html += '<input type="hidden" name="qot['+serial+'][vat_rate]" class="vat_rate" value="'+vatRate+'">';
                         html += '<input type="hidden" name="qot['+serial+'][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
                     html += '</td>';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-[120px] text-right font-medium">';
+                    html += '<td data-th="LINE TOTAL" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">';
                         html += '<span class="line_total_html">£'+lineTotal.toFixed(2)+'</span>';
                         html += '<input type="hidden" name="qot['+serial+'][line_total]" class="line_total" value="'+lineTotal+'">';
                     html += '</td>';
@@ -247,27 +247,27 @@
 
 
             let html = '';
-                html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions">';
+                html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions max-sm:block max-sm:w-full">';
                     html += '<div class="flex justify-start items-start">';
                         html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 w-4 h-4 mr-3"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
                         html += '<span>'+description+'</span>';
                     html += '</div>';
                     html += '<input type="hidden" name="qot['+serial+'][descritpion]" class="description" value="'+description+'">';
                 html += '</td>';
-                html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-[120px] text-right">';
+                html += '<td data-th="UNITS" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-full sm:w-[120px] text-left sm:text-right max-sm:block">';
                     html += units;
                     html += '<input type="hidden" name="qot['+serial+'][units]" class="unit" value="'+units+'">';
                 html += '</td>';
-                html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-[120px] text-right font-medium">';
+                html += '<td data-th="PRICE" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">';
                     html += '£'+unitPrice.toFixed(2);
                     html += '<input type="hidden" name="qot['+serial+'][unit_price]" class="unit_price" value="'+unitPrice+'">';
                 html += '</td>';
-                html += '<td style="'+(!isNonVatCheck ? '' : 'display: none;')+'" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-[120px] text-right font-medium">';
+                html += '<td data-th="VAT %" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol vatCol w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block '+(!isNonVatCheck ? 'table-cell max-sm:block' : 'hidden')+'">';
                     html += vatRate+'%';
                     html += '<input type="hidden" name="qot['+serial+'][vat_rate]" class="vat_rate" value="'+vatRate+'">';
                     html += '<input type="hidden" name="qot['+serial+'][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
                 html += '</td>';
-                html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-[120px] text-right font-medium">';
+                html += '<td data-th="LINE TOTAL" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">';
                     html += '<span class="line_total_html">£'+lineTotal.toFixed(2)+'</span>';
                     html += '<input type="hidden" name="qot['+serial+'][line_total]" class="line_total" value="'+lineTotal+'">';
                 html += '</td>';
@@ -361,27 +361,27 @@
 
             let html = '';
                 html += (!DiscountExist ? '<tr class="quoteDiscountRow cursor-pointer">' : '');
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions">';
+                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 descriptions max-sm:block max-sm:w-full">';
                         html += '<div class="flex justify-start items-start">';
                             html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 w-4 h-4 mr-3"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
                             html += '<span>Discount</span>';
                         html += '</div>';
                         html += '<input type="hidden" name="qot[discount][descritpion]" class="description" value="Discount">';
                     html += '</td>';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-[120px] text-right">';
+                    html += '<td data-th="UNITS" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 units w-full sm:w-[120px] text-left sm:text-right max-sm:block">';
                         html += units;
                         html += '<input type="hidden" name="qot[discount][units]" class="unit" value="'+units+'">';
                     html += '</td>';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-[120px] text-right font-medium">';
+                    html += '<td data-th="PRICE" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 prices w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">';
                         html += '£'+unitPrice.toFixed(2);
                         html += '<input type="hidden" name="qot[discount][unit_price]" class="unit_price" value="'+unitPrice+'">';
                     html += '</td>';
-                    html += '<td style="'+(!isNonVatCheck ? '' : 'display: none;')+'" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-[120px] text-right font-medium">';
+                    html += '<td data-th="VAT %" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 vatCol w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block  '+(!isNonVatCheck ? 'table-cell max-sm:block' : 'hidden')+'">';
                         html += vatRate+'%';
                         html += '<input type="hidden" name="qot[discount][vat_rate]" class="vat_rate" value="'+vatRate+'">';
                         html += '<input type="hidden" name="qot[discount][vat_amount]" class="vat_amount" value="'+vatAmount+'">';
                     html += '</td>';
-                    html += '<td class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-[120px] text-right font-medium">';
+                    html += '<td data-th="LINE TOTAL" class="border-b dark:border-darkmode-300 border-l border-r border-t px-4 py-2 lineTotal w-full sm:w-[120px] text-left sm:text-right font-medium max-sm:block">';
                         html += '<span class="line_total_html">-£'+lineTotal.toFixed(2)+'</span>';
                         html += '<input type="hidden" name="qot[discount][line_total]" class="line_total" value="'+lineTotal+'">';
                     html += '</td>';

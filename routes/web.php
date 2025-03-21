@@ -280,6 +280,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('records/store-satisfactory-check', 'storeSatisfactoryCheck')->name('records.store.satisfactory.check');
         Route::post('records/store-comments', 'storeComments')->name('records.store.comments');
         Route::post('records/store-signatures', 'storeSignatures')->name('records.store.signatures');
+
+        Route::get('records/{record}/show/{gsr}', 'show')->name('records.gsr.view');
+        Route::get('records/{record}/store/{gsr}', 'store')->name('records.gsr.store');
     });
 });
 
