@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Records;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
@@ -10,6 +11,7 @@ use App\Models\CustomerProperty;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
 use App\Models\JobForm;
+use App\Models\JobFormPrefixMumbering;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +19,43 @@ use Illuminate\Support\Str;
 
 class HomeOwnerGasSafetyController extends Controller
 {
+    public function show($record, GasSafetyRecord $gsr){
+        $user_id = auth()->user()->id;
+        $gsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
+        $form = JobForm::where('slug', $record)->get()->first();
+
+        if(empty($gsr->certificate_number)):
+            $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
+            $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+            $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+            $userLastCertificate = GasSafetyRecord::where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $lastCertificateNo = (isset($userLastCertificate->certificate_number) && !empty($userLastCertificate->certificate_number) ? $userLastCertificate->certificate_number : '');
+
+            $cerSerial = $starting_form;
+            if(!empty($lastCertificateNo)):
+                preg_match("/(\d+)/", $lastCertificateNo, $certificateNumbers);
+                $cerSerial = (int) $certificateNumbers[1] + 1;
+            endif;
+            $certificateNumber = $prifix.str_pad($cerSerial, 6, '0', STR_PAD_LEFT);
+            GasSafetyRecord::where('id', $gsr->id)->update(['certificate_number' => $certificateNumber]);
+        endif;
+
+        return view('app.records.'.$record.'.show', [
+            'title' => 'Records - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Record', 'href' => 'javascript:void(0);'],
+                ['label' => $form->name, 'href' => 'javascript:void(0);'],
+            ],
+            'form' => $form,
+            'gsr' => $gsr,
+            'gsra1' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 1)->get()->first(),
+            'gsra2' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 2)->get()->first(),
+            'gsra3' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 3)->get()->first(),
+            'gsra4' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 4)->get()->first(),
+            'signature' => $gsr->signature ? Storage::disk('public')->url($gsr->signature->filename) : ''
+        ]);
+    }
+
     public function storeJobAddress(Request $request){
         $customer_job_id = $request->customer_job_id;
         $job_form_id = $request->job_form_id;
@@ -43,7 +82,6 @@ class HomeOwnerGasSafetyController extends Controller
 
         return response()->json(['msg' => 'Job address successfully updated.'], 200);
     }
-
 
     public function storeCustomer(Request $request){
         $customer_job_id = $request->customer_job_id;
@@ -230,6 +268,15 @@ class HomeOwnerGasSafetyController extends Controller
             $signature->save();
         endif;
 
-        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1, 'red' => route('records', [$form->slug, $customer_job_id])], 200);
+        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1, 'red' => route('records.gsr.view', [$form->slug, $gasSafetyRecord->id])], 200);
+    }
+
+    public function store(Request $request){
+        $gsr_id = $request->gsr_id;
+        $customer_job_id = $request->customer_job_id;
+        $job_form_id = $request->job_form_id;
+        $submit_type = $request->submit_type;
+
+        
     }
 }

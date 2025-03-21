@@ -115,46 +115,46 @@
                 </div>
                 <div class="flex flex-col gap-3 mt-10 xl:flex-row xl:items-center">
                     <div class="flex items-center">
-                        {{--<div class="image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
+                        <div class="image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[0]['photo']) }}"
+                                src="{{ isset($users[0]['photo']) ? Vite::asset($users[0]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
-                                content="{{ $users[0]['name'] }}"
+                                content="{{ isset($users[0]['name']) ? $users[0]['name'] : '' }}"
                             />
                         </div>
                         <div class="-ml-3 image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[1]['photo']) }}"
+                                src="{{ isset($users[1]['photo']) ? Vite::asset($users[1]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
-                                content="{{ $users[1]['name'] }}"
+                                content="{{ isset($users[1]['name']) ? $users[1]['name'] : '' }}"
                             />
                         </div>
                         <div class="-ml-3 image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[0]['photo']) }}"
+                                src="{{ isset($users[0]['photo']) ? Vite::asset($users[0]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
-                                content="{{ $users[0]['name'] }}"
+                                content="{{ isset($users[0]['name']) ? $users[0]['name'] : '' }}"
                             />
                         </div>
                         <div class="-ml-3 image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ Vite::asset($users[1]['photo']) }}"
+                                src="{{ isset($users[1]['photo']) ? Vite::asset($users[1]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
-                                content="{{ $users[1]['name'] }}"
+                                content="{{ isset($users[1]['name']) ? $users[1]['name'] : '' }}"
                             />
-                        </div>--}}
+                        </div>
                     </div>
-                    {{-- <div class="text-base text-white/70 xl:ml-2 2xl:ml-3">
+                    <div class="text-base text-white/70 xl:ml-2 2xl:ml-3">
                         Over 1k+ strong and growing! Your journey begins here.
-                    </div> --}}
+                    </div>
                 </div>
             </div>
         </div>
