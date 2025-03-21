@@ -85,8 +85,7 @@
                     <label class="w-full sm:w-auto font-medium">Field</label>
                     <x-base.form-select class="w-full sm:w-auto 2xl:w-full" id="tabulator-html-filter-field">
                         <option value="name">Name</option>
-                        <option value="category">Category</option>
-                        <option value="remaining_stock">Remaining Stock</option>
+                        <option value="email">Email</option>
                     </x-base.form-select>
                 </div>
                 
@@ -106,6 +105,13 @@
                 <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                     <label class="w-full sm:w-auto font-medium">Value</label>
                     <x-base.form-input class="w-full sm:w-40 2xl:w-full" id="tabulator-html-filter-value" type="text" placeholder="Search..." />
+                </div>
+                <div class="items-center lg:mr-4 hidden sm:flex">
+                    <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">Status </label>
+                    <x-base.form-select class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full" id="status" >
+                        <option value="1">Active</option>
+                        <option value="2">Archive</option>
+                    </x-base.form-select>
                 </div>
         
                 <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">

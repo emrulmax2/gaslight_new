@@ -82,7 +82,21 @@ class StaffController extends Controller
 
         $staff = Staff::find($request->edit_id);
 
+        $existingSignature = Signature::where('model_type', Staff::class)
+            ->where('model_id', $staff->id)
+            ->first();
+
         if($request->input('sign') !== null) {
+
+            if ($existingSignature) {
+                $filePath = storage_path('app/public/' . $existingSignature->filename);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+                $existingSignature->delete();
+            }
+
+
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
             $signatureData = base64_decode($signatureData);
             $imageName = 'signatures/' . Str::uuid() . '.png';
@@ -147,7 +161,10 @@ class StaffController extends Controller
      */
     public function edit(Staff $staff)
     {
-        $staff->signature;
+        $staff->load(['signature' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
+
         $signature = $staff->signature ? Storage::disk('public')->url($staff->signature->filename) : '';
 
         return view('app.staffs.edit', compact('staff','signature'));
@@ -204,8 +221,11 @@ class StaffController extends Controller
        
         $user = User::findOrFail($request->user_id);
 
+        $queryField = isset($request->queryField) ? $request->queryField : 'name';
+        $queryType = isset($request->queryType) ? $request->queryType : 'like';
+        $queryValue = isset($request->queryValue) ? $request->queryValue : '';
+        $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
 
-        $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
         
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
         $sorts = [];
@@ -217,13 +237,23 @@ class StaffController extends Controller
                 ->leftJoin('companies', 'company_staff.company_id', '=', 'companies.id')
                 ->select('staff.*', 'companies.company_name as company_name','companies.id as company_id')
                 ->orderByRaw(implode(',', $sorts));
-        if(!empty($queryStr)):
-            $query->where('name','LIKE','%'.$queryStr.'%');
+
+        if (!empty($queryField)):
+            if ($queryType === 'like') {
+                $query->where($queryField, 'LIKE', '%' . $queryValue . '%');
+            } else {
+                $query->where($queryField, $queryType, $queryValue);
+            }
         endif;
         $query->where(function($query) use ($user) {
             $query->where('companies.id', $user->company->id);
                   //->orWhereNull('companies.id');
         });
+
+        if($status == 2):
+            $query->onlyTrashed();
+        endif;
+
         $total_rows = $query->count();
         $page = (isset($request->page) && $request->page > 0 ? $request->page : 0);
         $perpage = (isset($request->size) && $request->size == 'true' ? $total_rows : ($request->size > 0 ? $request->size : 10));

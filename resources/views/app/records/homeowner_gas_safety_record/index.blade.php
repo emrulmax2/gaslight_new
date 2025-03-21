@@ -2137,7 +2137,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_gip_sgtt_na" name="satisfactory_gas_tightness_test" {{ (isset($gsr->satisfactory_gas_tightness_test) && $gsr->satisfactory_gas_tightness_test == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_gip_sgtt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_gip_sgtt_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2163,7 +2163,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_gip_ebs_na" name="equipotential_bonding_satisfactory" {{ (isset($gsr->equipotential_bonding_satisfactory) && $gsr->equipotential_bonding_satisfactory == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_gip_ebs_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_gip_ebs_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2192,7 +2192,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_gip_acoaf_na" name="co_alarm_fitted" {{ (isset($gsr->co_alarm_fitted) && $gsr->co_alarm_fitted == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_gip_acoaf_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_gip_acoaf_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2218,7 +2218,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_gip_acoid_na" name="co_alarm_in_date" {{ (isset($gsr->co_alarm_in_date) && $gsr->co_alarm_in_date == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_gip_acoid_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_gip_acoid_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2244,7 +2244,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_gip_tcoas_na" name="co_alarm_test_satisfactory" {{ (isset($gsr->co_alarm_test_satisfactory) && $gsr->co_alarm_test_satisfactory == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_gip_tcoas_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_gip_tcoas_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2270,7 +2270,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_gip_saf_na" name="smoke_alarm_fitted" {{ (isset($gsr->smoke_alarm_fitted) && $gsr->smoke_alarm_fitted == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_gip_saf_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_gip_saf_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2330,7 +2330,7 @@
                                     </div>
                                     <div class="radioItem mr-[3px]">
                                         <input id="app_4_hfcbpb_na" name="flue_cap_put_back" {{ (isset($gsr->flue_cap_put_back) && $gsr->flue_cap_put_back == 'N/A' ? 'Checked' : '') }} value="N/A" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                        <x-base.button as="label" for="app_4_hfcbpb_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
+                                        <x-base.button as="label" for="app_4_hfcbpb_na" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="pending">
                                             <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
                                             N/A
                                         </x-base.button>
@@ -2393,7 +2393,7 @@
                             </div>
                             @endif
                             <div class="col-span-12 sm:col-span-12 pt-2">
-                                <div class="gsfSignature border rounded-[3px] h-auto py-10 bg-slate-100 rounded-b-none flex justify-center items-center">
+                                <div class="gsfSignature border rounded-[3px] h-auto py-0 sm:py-10 bg-slate-100 rounded-b-none flex justify-center items-center">
                                     <x-creagia-signature-pad name='sign'
                                         border-color="#e5e7eb"
                                         submit-name="Save"

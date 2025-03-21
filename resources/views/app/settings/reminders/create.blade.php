@@ -5,12 +5,11 @@
 @endsection
 
 @section('subcontent')
-    <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
-        <h2 class="mr-auto text-lg font-medium">{{ $form->name }} Email</h2>
-        <div class="mt-4 flex w-full sm:mt-0 sm:w-auto">
-            <x-base.button as="a" href="{{ route('user.settings.reminder.templates') }}" class="shadow-md" variant="primary" >
-                <x-base.lucide class="mr-2 h-4 w-4" icon="arrow-left-circle" />
-                Back To List
+    <div class="intro-y mt-8 flex items-center justify-between">
+        <h2 class="text-lg font-medium">{{ $form->name }} Email</h2>
+        <div class="flex">
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin" >
+                <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
         </div>
     </div>
@@ -35,6 +34,10 @@
                         <x-base.form-label for="subject">Subject</x-base.form-label>
                         <x-base.form-input value="{{ (isset($template->subject) ? $template->subject : '') }}" name="subject" class="w-full" type="text" placeholder="{{ $form->name }} for job at [jobaddr1] [jobaddr2]" />
                         <div class="acc__input-error error-subject text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="flex justify-between">
+                        <label for="editEditor" class="form-label">Description <span class="text-danger">*</span></label>
+                        @include('app.settings.reminders.letter-tags')
                     </div>
                     <div class="mb-5">
                         <div class="editor" id="theEditor">{!! (isset($template->content) ? $template->content : '') !!}</div>
@@ -108,6 +111,7 @@
     @vite('resources/js/vendors/axios.js')
     @vite('resources/js/vendors/lucide.js')
     @vite('resources/js/vendors/ckeditor/classic.js')
+    @vite('resources/js/vendors/toastify.js')
 @endPushOnce
 
 @pushOnce('scripts')

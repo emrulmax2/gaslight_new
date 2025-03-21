@@ -13,12 +13,13 @@ class GasSafetyRecord extends Model implements CanBeSigned
 {
     use HasFactory, SoftDeletes, RequiresSignature;
 
-    protected $appends = ['has_coalarm', 'has_satisfactory_check', 'has_comments', 'has_signatures'];
+    protected $appends = ['has_satisfactory_check', 'has_comments', 'has_signatures'];
     
     protected $fillable = [
         'customer_id',
         'customer_job_id',
         'job_form_id',
+        'certificate_number',
         'cp_alarm_fitted',
         'cp_alarm_satisfactory',
         'satisfactory_visual_inspaction',
@@ -44,6 +45,30 @@ class GasSafetyRecord extends Model implements CanBeSigned
     ];
 
     protected $dates = ['deleted_at'];
+
+    public function customer(){
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function job(){
+        return $this->belongsTo(CustomerJob::class, 'customer_job_id');
+    }
+
+    public function form(){
+        return $this->belongsTo(JobForm::class, 'job_form_id');
+    }
+
+    public function appliance(){
+        return $this->hasMany(GasSafetyRecordAppliance::class, 'gas_safety_record_id', 'id')->orderBy('id', 'ASC');
+    }
+
+    public function relation(){
+        return $this->belongsTo(Relation::class, 'relation_id', 'id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
 
     public function setInspectionDateAttribute($value) {  
         $this->attributes['inspection_date'] =  (!empty($value) ? date('Y-m-d', strtotime($value)) : null);

@@ -10,7 +10,7 @@ class Customer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $appends = ['full_name', 'full_address', 'full_address_html'];
+    protected $appends = ['full_name', 'full_address', 'full_address_html', 'pdf_address'];
     
     protected $fillable = [
         'title_id',
@@ -44,9 +44,19 @@ class Customer extends Model
         $address = '';
         $address .= $this->address_line_1.' '.$this->address_line_2.', ';
         $address .= (!empty($this->city) ? $this->city.', ' : '');
-        $address .= (!empty($this->postal_code) ? $this->postal_code.', ' : '');
-        $address .= (!empty($this->state) ? $this->state.', ' : '');
-        $address .= (!empty($this->country) ? $this->country : '');
+        $address .= (!empty($this->postal_code) ? $this->postal_code : '');
+        //$address .= (!empty($this->state) ? $this->state.', ' : '');
+        //$address .= (!empty($this->country) ? $this->country : '');
+        return $address;
+    }
+
+    public function getPdfAddressAttribute(){
+        $address = '';
+        $address .= $this->address_line_1.' '.$this->address_line_2.', ';
+        $address .= (!empty($this->city) ? $this->city : '');
+        //$address .= (!empty($this->postal_code) ? $this->postal_code.', ' : '');
+        //$address .= (!empty($this->state) ? $this->state.' ' : '');
+        //$address .= (!empty($this->country) ? $this->country : '');
         return $address;
     }
 
@@ -54,9 +64,9 @@ class Customer extends Model
         $address = '';
         $address .= $this->address_line_1.' '.$this->address_line_2.',<br/> ';
         $address .= (!empty($this->city) ? $this->city.', ' : '');
-        $address .= (!empty($this->postal_code) ? $this->postal_code.',<br/> ' : '');
-        $address .= (!empty($this->state) ? $this->state.',<br/> ' : '');
-        $address .= (!empty($this->country) ? $this->country : '');
+        $address .= (!empty($this->postal_code) ? $this->postal_code : '');
+        //$address .= (!empty($this->state) ? $this->state.',<br/> ' : '');
+        //$address .= (!empty($this->country) ? $this->country : '');
         return $address;
     }
 

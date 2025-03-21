@@ -43,11 +43,14 @@ var JobAddressListTable = (function () {
                     vertAlign: 'middle',
                     minWidth: 200,
                     formatter(cell, formatterParams) {
-                        var html = '<div class="flex items-start mb-1">';
-                        html += '<span class="sm:hidden mr-2"><i data-lucide="user" class="w-4 h-4"></i></span>';
+                        const borderClass = 'border-b lg:border-b-0 border-slate-200 pb-2';
+                        var html = `<div class="${borderClass}">`;
+                        html += '<div class="flex items-start mb-1">';
+                        html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>';
                         html += '<div>';
-                        html += '<div class="font-medium whitespace-nowrap">'+cell.getData().full_name+'</div>';
+                        html += '<div class="font-medium whitespace-normal">'+cell.getData().full_name+'</div>';
                         html += (cell.getData().mobile != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+cell.getData().mobile+'</div>' : '');
+                        html += '</div>';
                         html += '</div>';
                         html += '</div>';
                         return html;
@@ -59,6 +62,15 @@ var JobAddressListTable = (function () {
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     minWidth: 200,
+                    formatter(cell, formatterParams) {
+                        var html = '<div class="flex items-start mb-1">';
+                        html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin w-4 h-4"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
+                        html += '<div>';
+                        html += '<div class="text-slate-500 text-xs whitespace-normal">'+cell.getData().address+'</div>';
+                        html += '</div>';
+                        html += '</div>';
+                        return html;
+                    }
                 },
                 // {
                 //     title: "Actions",

@@ -4,6 +4,7 @@
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -54,8 +55,6 @@
         }).then(response => {
             $('#saveEmailTemplatesBtn', $theForm).removeAttr('disabled');
             $("#saveEmailTemplatesBtn .theLoader").fadeOut();
-            console.log(response.data.mst);
-            return false;
 
             if (response.status == 200) {
                 successModal.show();
@@ -167,5 +166,24 @@
             });
         }
     })
+
+
+    if($('.emailTags').length > 0){
+        $(document).on('click', '.emailTags a.dropdown-item', function(e){
+            var theText = $(this).text();
+            navigator.clipboard.writeText(theText);
+            Toastify({
+                node: $("#coppiedNodeEl")
+                    .clone()
+                    .removeClass("hidden")[0],
+                duration: 2000,
+                newWindow: true,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+            }).showToast();
+        });
+    }
 
 })()
