@@ -12,6 +12,7 @@ use App\Models\Company;
 use App\Models\CustomerJob;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
+use App\Models\GasWarningClassification;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JobForm;
@@ -72,6 +73,18 @@ class RecordController extends Controller
             $data['gsra2'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 2)->get()->first();
             $data['gsra3'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 3)->get()->first();
             $data['gsra4'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 4)->get()->first();
+            $data['signature'] = isset($GasSafetyRecord->signature) ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
+        elseif($record == 'gas_warning_notice'): 
+            $GasSafetyRecord = GasSafetyRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gsr_id = (isset($GasSafetyRecord->id) && $GasSafetyRecord->id > 0 ? $GasSafetyRecord->id : 0);
+            $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flue_types'] = ApplianceFlueType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['classifications'] = GasWarningClassification::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gsr'] = $GasSafetyRecord;
+            $data['gsra1'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 1)->get()->first();
             $data['signature'] = isset($GasSafetyRecord->signature) ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
         endif;
 

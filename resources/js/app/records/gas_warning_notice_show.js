@@ -53,14 +53,14 @@
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
                     $("#successModal .successModalDesc").html(response.data.msg);
-                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', '');
                 });
+                if(type == 3){
+                    window.open(response.data.pdf);
+                }
 
                 setTimeout(() => {
                     successModal.hide();
-                    if(response.data.red){
-                        window.location.href = response.data.red
-                    }
                 }, 1500);
             }
         }).catch(error => {
