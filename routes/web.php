@@ -37,6 +37,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\Records\InvoiceController;
@@ -243,6 +244,9 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(RecordController::class)->group(function() {
         Route::get('create-records', 'index')->name('records.create');
         Route::get('records/{record}/{job}', 'records')->name('records');
+
+        Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.address');
+        Route::post('records/store-customer', 'storeCustomer')->name('records.store.customer');
     });
     
     Route::controller(InvoiceController::class)->group(function(){
@@ -255,8 +259,6 @@ Route::middleware(Authenticate::class)->group(function() {
     });
     
     Route::controller(HomeOwnerGasSafetyController::class)->group(function(){
-        Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.address');
-        Route::post('records/store-customer', 'storeCustomer')->name('records.store.customer');
         Route::post('records/store-appliance', 'storeAppliance')->name('records.store.appliance');
         Route::post('records/store-satisfactory-check', 'storeSatisfactoryCheck')->name('records.store.satisfactory.check');
         Route::post('records/store-comments', 'storeComments')->name('records.store.comments');
@@ -264,6 +266,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/{record}/show/{gsr}', 'show')->name('records.gsr.view');
         Route::post('records/{record}/store/{gsr}', 'store')->name('records.gsr.store');
+    });
+    
+    Route::controller(GasWarningNoticeController::class)->group(function(){
+        Route::post('records/gas-warning-notice/store-appliance', 'storeAppliance')->name('records.gwn.store.appliance');
+        Route::post('records/gas-warning-notice/store-signatures', 'storeSignatures')->name('records.gwn.store.signatures');
+
+        //Route::get('records/{record}/show/{gsr}', 'show')->name('records.gsr.view');
+        //Route::post('records/{record}/store/{gsr}', 'store')->name('records.gsr.store');
     });
 });
 

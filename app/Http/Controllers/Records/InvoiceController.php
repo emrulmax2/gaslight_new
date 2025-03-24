@@ -367,7 +367,7 @@ class InvoiceController extends Controller
         $user_id = auth()->user()->id;
         $invoice = Invoice::with('items', 'job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($invoice_id);
         $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
-        $customerEmail = (isset($quote->customer->contact->email) && !empty($quote->customer->contact->email) ? $quote->customer->contact->email : '');
+        $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
         if(!empty($customerEmail)):
             $isNonVatCheck = ($invoice->vat_registerd == 1 ? true : false);
             $template = JobFormEmailTemplate::where('user_id', $user_id)->where('job_form_id', $job_form_id)->get()->first();
@@ -385,7 +385,7 @@ class InvoiceController extends Controller
                 'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
                 'smtp_port' => env('MAIL_PORT', '587'),
                 'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
-                'smtp_password' => env('MAIL_PASSWORD', 'churchill1'),
+                'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
                 'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),

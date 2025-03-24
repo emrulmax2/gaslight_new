@@ -9,10 +9,15 @@ use App\Models\ApplianceMake;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
 use App\Models\Company;
+use App\Models\Customer;
+use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
 use App\Models\GasWarningClassification;
+use App\Models\GasWarningNotice;
+use App\Models\GasWarningNoticeAppliance;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JobForm;
@@ -24,6 +29,7 @@ use App\Models\Relation;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Creagia\LaravelSignPad\Signature;
+use Illuminate\Http\Request;
 
 class RecordController extends Controller
 {
@@ -75,17 +81,17 @@ class RecordController extends Controller
             $data['gsra4'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 4)->get()->first();
             $data['signature'] = isset($GasSafetyRecord->signature) ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
         elseif($record == 'gas_warning_notice'): 
-            $GasSafetyRecord = GasSafetyRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
-            $gsr_id = (isset($GasSafetyRecord->id) && $GasSafetyRecord->id > 0 ? $GasSafetyRecord->id : 0);
+            $gasWarningNotice = GasWarningNotice::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gwn_id = (isset($gasWarningNotice->id) && $gasWarningNotice->id > 0 ? $gasWarningNotice->id : 0);
             $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
             $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['flue_types'] = ApplianceFlueType::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['classifications'] = GasWarningClassification::where('active', 1)->orderBy('name', 'ASC')->get();
-            $data['gsr'] = $GasSafetyRecord;
-            $data['gsra1'] = GasSafetyRecordAppliance::with('make', 'type')->where('gas_safety_record_id', $gsr_id)->where('appliance_serial', 1)->get()->first();
-            $data['signature'] = isset($GasSafetyRecord->signature) ? Storage::disk('public')->url($GasSafetyRecord->signature->filename) : '';
+            $data['gwn'] = $gasWarningNotice;
+            $data['gwna1'] = GasWarningNoticeAppliance::with('make', 'type')->where('gas_warning_notice_id', $gwn_id)->where('appliance_serial', 1)->get()->first();
+            $data['signature'] = isset($gasWarningNotice->signature) ? Storage::disk('public')->url($gasWarningNotice->signature->filename) : '';
         endif;
 
 
@@ -204,5 +210,58 @@ class RecordController extends Controller
                 return [];
             endif;
         endif;
+    }
+
+    public function storeJobAddress(Request $request){
+        $customer_job_id = $request->customer_job_id;
+        $job_form_id = $request->job_form_id;
+
+        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
+        $form = JobForm::find($job_form_id);
+
+        $data = [
+            'address_line_1' => (!empty($request->job_address_line_1) ? $request->job_address_line_1 : null),
+            'address_line_2' => (!empty($request->job_address_line_2) ? $request->job_address_line_2 : null),
+            'postal_code' => (!empty($request->job_postal_code) ? $request->job_postal_code : null),
+            'state' => (!empty($request->job_state) ? $request->job_state : null),
+            'city' => (!empty($request->job_city) ? $request->job_city : null),
+            'country' => (!empty($request->job_country) ? $request->job_country : null),
+            'latitude' => (!empty($request->job_latitude) ? $request->job_latitude : null),
+            'longitude' => (!empty($request->job_longitude) ? $request->job_longitude : null),
+            'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
+            'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
+            'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
+
+            'updated_by' => auth()->user()->id,
+        ];
+        $jobAddress = CustomerProperty::where('id', $job->customer_property_id)->update($data);
+
+        return response()->json(['msg' => 'Job address successfully updated.'], 200);
+    }
+
+    public function storeCustomer(Request $request){
+        $customer_job_id = $request->customer_job_id;
+        $job_form_id = $request->job_form_id;
+
+        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
+        $form = JobForm::find($job_form_id);
+
+        $data = [
+            'company_name' => (!empty($request->customer_company) ? $request->customer_company : null),
+            'address_line_1' => (!empty($request->customer_address_line_1) ? $request->customer_address_line_1 : null),
+            'address_line_2' => (!empty($request->customer_address_line_2) ? $request->customer_address_line_2 : null),
+            'city' => (!empty($request->customer_city) ? $request->customer_city : null),
+            'state' => (!empty($request->customer_state) ? $request->customer_state : null),
+            'postal_code' => (!empty($request->customer_postal_code) ? $request->customer_postal_code : null),
+            'country' => (!empty($request->customer_country) ? $request->customer_country : null),
+            'latitude' => (!empty($request->customer_latitude) ? $request->customer_latitude : null),
+            'longitude' => (!empty($request->customer_longitude) ? $request->customer_longitude : null),
+
+            'updated_by' => auth()->user()->id,
+        ];
+        $customer = Customer::where('id', $job->customer_id)->update($data);
+        $customerContact = CustomerContactInformation::where('customer_id', $job->customer_id)->update(['phone' => (!empty($request->customer_phone) ? $request->customer_phone : null), 'updated_by' => auth()->user()->id]);
+
+        return response()->json(['msg' => 'Customer Details successfully updated.'], 200);
     }
 }
