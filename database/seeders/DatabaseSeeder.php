@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         $this->callIfNotSeeded(ApplianceTypeSeeder::class);
         $this->callIfNotSeeded(BoilerBrandsSeeder::class);
         $this->callIfNotSeeded(RelationSeeder::class);
+        $this->callIfNotSeeded(GasWarningClassificationSeeder::class);
     }
 
     /**
