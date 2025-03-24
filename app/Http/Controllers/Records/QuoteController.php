@@ -392,7 +392,7 @@ class QuoteController extends Controller
                 'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
                 'smtp_port' => env('MAIL_PORT', '587'),
                 'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
-                'smtp_password' => env('MAIL_PASSWORD', 'churchill1'),
+                'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
                 'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),

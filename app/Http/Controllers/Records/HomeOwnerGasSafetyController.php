@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Records;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GCEMailerJob;
+use App\Mail\GCESendMail;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
@@ -11,6 +13,7 @@ use App\Models\CustomerProperty;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
 use App\Models\JobForm;
+use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Http\Request;
@@ -57,59 +60,6 @@ class HomeOwnerGasSafetyController extends Controller
             'signature' => $gsr->signature ? Storage::disk('public')->url($gsr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
-    }
-
-    public function storeJobAddress(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-
-        $data = [
-            'address_line_1' => (!empty($request->job_address_line_1) ? $request->job_address_line_1 : null),
-            'address_line_2' => (!empty($request->job_address_line_2) ? $request->job_address_line_2 : null),
-            'postal_code' => (!empty($request->job_postal_code) ? $request->job_postal_code : null),
-            'state' => (!empty($request->job_state) ? $request->job_state : null),
-            'city' => (!empty($request->job_city) ? $request->job_city : null),
-            'country' => (!empty($request->job_country) ? $request->job_country : null),
-            'latitude' => (!empty($request->job_latitude) ? $request->job_latitude : null),
-            'longitude' => (!empty($request->job_longitude) ? $request->job_longitude : null),
-            'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
-            'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
-            'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
-
-            'updated_by' => auth()->user()->id,
-        ];
-        $jobAddress = CustomerProperty::where('id', $job->customer_property_id)->update($data);
-
-        return response()->json(['msg' => 'Job address successfully updated.'], 200);
-    }
-
-    public function storeCustomer(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-
-        $data = [
-            'company_name' => (!empty($request->customer_company) ? $request->customer_company : null),
-            'address_line_1' => (!empty($request->customer_address_line_1) ? $request->customer_address_line_1 : null),
-            'address_line_2' => (!empty($request->customer_address_line_2) ? $request->customer_address_line_2 : null),
-            'city' => (!empty($request->customer_city) ? $request->customer_city : null),
-            'state' => (!empty($request->customer_state) ? $request->customer_state : null),
-            'postal_code' => (!empty($request->customer_postal_code) ? $request->customer_postal_code : null),
-            'country' => (!empty($request->customer_country) ? $request->customer_country : null),
-            'latitude' => (!empty($request->customer_latitude) ? $request->customer_latitude : null),
-            'longitude' => (!empty($request->customer_longitude) ? $request->customer_longitude : null),
-
-            'updated_by' => auth()->user()->id,
-        ];
-        $customer = Customer::where('id', $job->customer_id)->update($data);
-        $customerContact = CustomerContactInformation::where('customer_id', $job->customer_id)->update(['phone' => (!empty($request->customer_phone) ? $request->customer_phone : null), 'updated_by' => auth()->user()->id]);
-
-        return response()->json(['msg' => 'Customer Details successfully updated.'], 200);
     }
 
     public function storeAppliance(Request $request){
@@ -254,21 +204,23 @@ class HomeOwnerGasSafetyController extends Controller
         ]);
         
         if($request->input('sign') !== null):
-            $gasSafetyRecord->deleteSignature();
-            
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
             $signatureData = base64_decode($signatureData);
-            $imageName = 'signatures/' . Str::uuid() . '.png';
-            Storage::disk('public')->put($imageName, $signatureData);
-            $signature = new Signature();
-            $signature->model_type = GasSafetyRecord::class;
-            $signature->model_id = $gasSafetyRecord->id;
-            $signature->uuid = Str::uuid();
-            $signature->filename = $imageName;
-            $signature->document_filename = null;
-            $signature->certified = false;
-            $signature->from_ips = json_encode([request()->ip()]);
-            $signature->save();
+            if(strlen($signatureData) > 2621):
+                $gasSafetyRecord->deleteSignature();
+                
+                $imageName = 'signatures/' . Str::uuid() . '.png';
+                Storage::disk('public')->put($imageName, $signatureData);
+                $signature = new Signature();
+                $signature->model_type = GasSafetyRecord::class;
+                $signature->model_id = $gasSafetyRecord->id;
+                $signature->uuid = Str::uuid();
+                $signature->filename = $imageName;
+                $signature->document_filename = null;
+                $signature->certified = false;
+                $signature->from_ips = json_encode([request()->ip()]);
+                $signature->save();
+            endif;
         endif;
 
         return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1, 'red' => route('records.gsr.view', [$form->slug, $gasSafetyRecord->id])], 200);
@@ -279,15 +231,20 @@ class HomeOwnerGasSafetyController extends Controller
         $customer_job_id = $request->customer_job_id;
         $job_form_id = $request->job_form_id;
         $submit_type = $request->submit_type;
+        $gsr = GasSafetyRecord::find($gsr_id);
 
         $red = '';
-        $pdf = '';
+        $pdf = Storage::disk('public')->url('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$gsr->certificate_number.'.pdf');
         $message = '';
         $pdf = $this->generatePdf($gsr_id);
         if($submit_type == 2):
+            $data = [];
+            $data['status'] = 'Approved';
 
-        elseif($submit_type == 3):
-
+            GasSafetyRecord::where('id', $gsr_id)->update($data);
+            
+            $email = $this->sendEmail($gsr_id, $job_form_id);
+            $message = (!$email ? 'Gas Safety Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Gas Safety Certificate has been approved and a copy of the certificate mailed to the customer');
         else:
             $data = [];
             $data['status'] = 'Approved';
@@ -1055,5 +1012,50 @@ class HomeOwnerGasSafetyController extends Controller
         Storage::disk('public')->put('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName, $content );
 
         return Storage::disk('public')->url('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName, $content);
+    }
+
+    public function sendEmail($gsr_id, $job_form_id){
+        $user_id = auth()->user()->id;
+        $gsr = GasSafetyRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gsr_id);
+        $customerName = (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '');
+        $customerEmail = (isset($gsr->customer->contact->email) && !empty($gsr->customer->contact->email) ? $gsr->customer->contact->email : '');
+        if(!empty($customerEmail)):
+            $template = JobFormEmailTemplate::where('user_id', $user_id)->where('job_form_id', $job_form_id)->get()->first();
+            $subject = (isset($template->subject) && !empty($template->subject) ? $template->subject : 'Gas Safety Record');
+            $content = (isset($template->content) && !empty($template->content) ? $template->subjcontentect : '');
+            if($content == ''):
+                $content .= 'Hi '.$customerName.',<br/><br/>';
+                $content .= 'Please check attachment for details.<br/><br/>';
+                $content .= 'Thanks & Regards<br/>';
+                $content .= 'Gas Safety Engineer';
+            endif;
+            
+            $sendTo = [$customerEmail];
+            $configuration = [
+                'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
+                'smtp_port' => env('MAIL_PORT', '587'),
+                'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
+                'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
+                'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+                
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),
+                'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+
+            ];
+
+            $fileName = $gsr->certificate_number.'.pdf';
+            $attachmentFiles = [];
+            $attachmentFiles[] = [
+                "pathinfo" => 'gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName,
+                "nameinfo" => $fileName,
+                "mimeinfo" => 'application/pdf',
+                "disk" => 'public'
+            ];
+
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles));
+            return true;
+        else:
+            return false;
+        endif;
     }
 }
