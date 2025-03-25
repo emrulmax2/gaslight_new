@@ -37,6 +37,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\GasServiceRecordController;
 use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
@@ -44,6 +45,7 @@ use App\Http\Controllers\Records\InvoiceController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Models\BoilerBrand;
+use App\Models\GasServiceRecord;
 
 /*
 |--------------------------------------------------------------------------
@@ -259,21 +261,29 @@ Route::middleware(Authenticate::class)->group(function() {
     });
     
     Route::controller(HomeOwnerGasSafetyController::class)->group(function(){
-        Route::post('records/store-appliance', 'storeAppliance')->name('records.store.appliance');
-        Route::post('records/store-satisfactory-check', 'storeSatisfactoryCheck')->name('records.store.satisfactory.check');
-        Route::post('records/store-comments', 'storeComments')->name('records.store.comments');
-        Route::post('records/store-signatures', 'storeSignatures')->name('records.store.signatures');
+        Route::post('records/homeowner_gas_safety_record/store-appliance', 'storeAppliance')->name('records.store.appliance');
+        Route::post('records/homeowner_gas_safety_record/store-satisfactory-check', 'storeSatisfactoryCheck')->name('records.store.satisfactory.check');
+        Route::post('records/homeowner_gas_safety_record/store-comments', 'storeComments')->name('records.store.comments');
+        Route::post('records/homeowner_gas_safety_record/store-signatures', 'storeSignatures')->name('records.store.signatures');
 
-        Route::get('records/{record}/show/{gsr}', 'show')->name('records.gsr.view');
-        Route::post('records/{record}/store/{gsr}', 'store')->name('records.gsr.store');
+        Route::get('records/homeowner_gas_safety_record/show/{gsr}', 'show')->name('records.gsr.view');
+        Route::post('records/homeowner_gas_safety_record/store/{gsr}', 'store')->name('records.gsr.store');
     });
     
     Route::controller(GasWarningNoticeController::class)->group(function(){
         Route::post('records/gas-warning-notice/store-appliance', 'storeAppliance')->name('records.gwn.store.appliance');
         Route::post('records/gas-warning-notice/store-signatures', 'storeSignatures')->name('records.gwn.store.signatures');
 
-        //Route::get('records/{record}/show/{gsr}', 'show')->name('records.gsr.view');
-        //Route::post('records/{record}/store/{gsr}', 'store')->name('records.gsr.store');
+        Route::get('records/gas-warning-notice/show/{gsr}', 'show')->name('records.gas.warning.notice.show');
+        Route::post('records/gas-warning-notice/store/{gsr}', 'store')->name('records.gas.warning.notice.store');
+    });
+    
+    Route::controller(GasServiceRecordController::class)->group(function(){
+        Route::post('records/gas-service-record/store-appliance', 'storeAppliance')->name('records.gsr.store.appliance');
+        Route::post('records/gas-service-record/store-signatures', 'storeSignatures')->name('records.gsr.store.signatures');
+
+        Route::get('records/gas-service-record/show/{gsr}', 'show')->name('records.gas.service.show');
+        Route::post('records/gas-service-record/store/{gsr}', 'store')->name('records.gas.service.store');
     });
 });
 

@@ -10,7 +10,7 @@
     </div>
     <form method="post" action="#" id="gasSafetyRecordForm">
         <div class="grid grid-cols-11 gap-x-6 pb-20 mt-5">
-            <div class="intro-y col-span-12 max-sm:mb-5 sm:col-span-2">
+            <div class="intro-y col-span-12 max-sm:mt-5 sm:col-span-2 order-2 sm:order-1">
                 <div class="sticky top-0">
                     <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
                         <x-base.button as="a" href="{{ route('records', [$form->slug, $gsr->customer_job_id]) }}" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
@@ -27,18 +27,20 @@
                             Approve & Email
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
+                        @if(!empty($thePdf))
                         <x-base.button as="a" href="{{ $thePdf }}" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="download" />
                             Download
                         </x-base.button>
+                        @endif
                     </div>
                     <input type="hidden" value="1" name="submit_type"/>
                 </div>
             </div>
-            <div class="intro-y col-span-12 sm:col-span-9">
+            <div class="intro-y col-span-12 sm:col-span-9 order-1 sm:order-2">
                 <div class="intro-y box p-5">
                     @if(!empty($thePdf))
-                        <object data="{{ $thePdf }}" type="application/pdf" style="width: 100%; height: 98vh;">
+                        <object class="pdfViewer" data="{{ $thePdf }}" type="application/pdf">
                             <embed src="{{ $thePdf }}" type="application/pdf">
                                 <p>This browser does not support PDFs. Please download the PDF to view it: <a target="_blank" href="{{ $thePdf }}">Download PDF</a>.</p>
                             </embed>

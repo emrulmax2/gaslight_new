@@ -373,3 +373,14 @@
 .bg-light-2{
     background-color: #D4EFFB;
 }
+
+.pdfViewer{
+    width: 100%; 
+    height: 98vh;
+}
+@media (max-width: 768px){
+    .pdfViewer{
+        height: 40vh;
+        max-height: 100vh;
+    }
+}

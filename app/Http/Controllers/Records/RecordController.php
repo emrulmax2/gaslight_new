@@ -15,6 +15,8 @@ use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
+use App\Models\GasServiceRecord;
+use App\Models\GasServiceRecordAppliance;
 use App\Models\GasWarningClassification;
 use App\Models\GasWarningNotice;
 use App\Models\GasWarningNoticeAppliance;
@@ -92,6 +94,18 @@ class RecordController extends Controller
             $data['gwn'] = $gasWarningNotice;
             $data['gwna1'] = GasWarningNoticeAppliance::with('make', 'type')->where('gas_warning_notice_id', $gwn_id)->where('appliance_serial', 1)->get()->first();
             $data['signature'] = isset($gasWarningNotice->signature) ? Storage::disk('public')->url($gasWarningNotice->signature->filename) : '';
+        elseif($record == 'gas_service_record'): 
+            $gasServiceRecord = GasServiceRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gwn_id = (isset($gasServiceRecord->id) && $gasServiceRecord->id > 0 ? $gasServiceRecord->id : 0);
+            $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flue_types'] = ApplianceFlueType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['classifications'] = GasWarningClassification::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gsr'] = $gasServiceRecord;
+            $data['gsra1'] = GasServiceRecordAppliance::with('make', 'type')->where('gas_service_record_id', $gwn_id)->where('appliance_serial', 1)->get()->first();
+            $data['signature'] = isset($gasServiceRecord->signature) ? Storage::disk('public')->url($gasServiceRecord->signature->filename) : '';
         endif;
 
 

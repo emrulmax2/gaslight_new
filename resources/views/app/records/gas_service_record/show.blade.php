@@ -8,7 +8,7 @@
     <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
         <h2 class="mr-auto text-lg font-medium">{{ $form->name }}</h2>
     </div>
-    <form method="post" action="#" id="gasWarningNoticeForm">
+    <form method="post" action="#" id="gasServiceRecordForm">
         <div class="grid grid-cols-11 gap-x-6 pb-20 mt-5">
             <div class="intro-y col-span-12 max-sm:mt-5 sm:col-span-2 order-2 sm:order-1">
                 <div class="sticky top-0">
@@ -40,7 +40,7 @@
             <div class="intro-y col-span-12 sm:col-span-9 order-1 sm:order-2">
                 <div class="intro-y box p-5">
                     @if(!empty($thePdf))
-                        <object class="pdfViewer" data="{{ $thePdf }}" type="application/pdf">
+                        <object data="{{ $thePdf }}" type="application/pdf" style="width: 100%; height: 98vh;">
                             <embed src="{{ $thePdf }}" type="application/pdf">
                                 <p>This browser does not support PDFs. Please download the PDF to view it: <a target="_blank" href="{{ $thePdf }}">Download PDF</a>.</p>
                             </embed>
@@ -55,7 +55,7 @@
             <input id="customer_job_id" name="customer_job_id" type="hidden" value="{{ $gsr->customer_job_id }}" />
             <input id="customer_id" name="customer_id" type="hidden" value="{{ $gsr->customer_id }}" />
             <input id="job_form_id" name="job_form_id" type="hidden" value="{{ $form->id }}" />
-            <input id="gwn_id" name="gwn_id" type="hidden" value="{{ $gsr->id }}" />
+            <input id="gsr_id" name="gsr_id" type="hidden" value="{{ $gsr->id }}" />
             <input id="form_slug" name="form_slug" type="hidden" value="{{ $form->slug }}" />
         </div>
     </form>
@@ -77,5 +77,5 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/records/gas_warning_notice_show.js')
+    @vite('resources/js/app/records/gas_service_record_show.js')
 @endPushOnce

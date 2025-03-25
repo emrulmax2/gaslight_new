@@ -23,10 +23,11 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class HomeOwnerGasSafetyController extends Controller
 {
-    public function show($record, GasSafetyRecord $gsr){
+    public function show(GasSafetyRecord $gsr){
         $user_id = auth()->user()->id;
         $gsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
-        $form = JobForm::where('slug', $record)->get()->first();
+        $form = JobForm::find($gsr->job_form_id);
+        $record = $form->slug;
 
         if(empty($gsr->certificate_number)):
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
@@ -223,7 +224,7 @@ class HomeOwnerGasSafetyController extends Controller
             endif;
         endif;
 
-        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1, 'red' => route('records.gsr.view', [$form->slug, $gasSafetyRecord->id])], 200);
+        return response()->json(['msg' => 'Customer Details successfully updated.', 'saved' => 1, 'red' => route('records.gsr.view', $gasSafetyRecord->id)], 200);
     }
 
     public function store(Request $request){
@@ -355,6 +356,7 @@ class HomeOwnerGasSafetyController extends Controller
                                 .pb-0{padding-bottom: 0;}
                                 .pl-0{padding-left: 0;}
                                 .p-0{padding: 0;}
+                                .p-25{padding: 0.625rem;}
                                 .p-3{padding: 0.75rem;}
                                 .p-5{padding: 1.25rem;}
                                 .py-05{padding-top: 0.125rem;padding-bottom: 0.125rem;}
@@ -414,7 +416,7 @@ class HomeOwnerGasSafetyController extends Controller
 
             $PDFHTML .= '<body>';
 
-                $PDFHTML .= '<div class="header bg-primary p-3">';
+                $PDFHTML .= '<div class="header bg-primary p-25">';
                     $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
                         $PDFHTML .= '<tbody>';
                             $PDFHTML .= '<tr>';
@@ -982,7 +984,7 @@ class HomeOwnerGasSafetyController extends Controller
                                                         $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>';
-                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->job->property->occupant_name) && !empty($gsr->job->property->occupant_name) ? $gsr->job->property->occupant_name : (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '')).'</td>';
+                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->received_by) && !empty($gsr->received_by) ? $gsr->received_by : (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '')).'</td>';
                                                         $PDFHTML .= '</tr>';
                                                     $PDFHTML .= '</tbody>';
                                                 $PDFHTML .= '</table>';
@@ -993,7 +995,7 @@ class HomeOwnerGasSafetyController extends Controller
                                             $PDFHTML .= '</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</x-base.table>';
+                                $PDFHTML .= '</table>';
 
                             $PDFHTML .= '</td>';
                         $PDFHTML .= '</tr>';
@@ -1005,13 +1007,16 @@ class HomeOwnerGasSafetyController extends Controller
 
 
         $fileName = $gsr->certificate_number.'.pdf';
+        if (Storage::disk('public')->exists('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName)) {
+            Storage::disk('public')->delete('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName);
+        }
         $pdf = Pdf::loadHTML($PDFHTML)->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
             ->setPaper('a4', 'landscape') //portrait landscape
             ->setWarnings(false);
         $content = $pdf->output();
         Storage::disk('public')->put('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName, $content );
 
-        return Storage::disk('public')->url('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName, $content);
+        return Storage::disk('public')->url('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName);
     }
 
     public function sendEmail($gsr_id, $job_form_id){
@@ -1045,12 +1050,14 @@ class HomeOwnerGasSafetyController extends Controller
 
             $fileName = $gsr->certificate_number.'.pdf';
             $attachmentFiles = [];
-            $attachmentFiles[] = [
-                "pathinfo" => 'gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName,
-                "nameinfo" => $fileName,
-                "mimeinfo" => 'application/pdf',
-                "disk" => 'public'
-            ];
+            if (Storage::disk('public')->exists('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName)):
+                $attachmentFiles[] = [
+                    "pathinfo" => 'gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName,
+                    "nameinfo" => $fileName,
+                    "mimeinfo" => 'application/pdf',
+                    "disk" => 'public'
+                ];
+            endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles));
             return true;
