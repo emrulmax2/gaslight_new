@@ -131,7 +131,7 @@ Route::middleware(SuperAdminAuthenticate::class)->group(function() {
 Route::get('/impersonate-stop', [ImpersonateController::class, 'stopImpersonate'])->name('impersonate.stop');
 
 Route::controller(RegisteredUserController::class)->middleware(loggedin::class)->group(function() {
-    Route::get('register', 'index')->name('register');
+    Route::get('register', 'index')->name('register.index');
     Route::post('register', 'store')->name('register');
 });
 
