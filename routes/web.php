@@ -37,6 +37,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\GasBreakdownRecordController;
 use App\Http\Controllers\Records\GasServiceRecordController;
 use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
@@ -284,6 +285,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-service-record/show/{gsr}', 'show')->name('records.gas.service.show');
         Route::post('records/gas-service-record/store/{gsr}', 'store')->name('records.gas.service.store');
+    });
+    
+    Route::controller(GasBreakdownRecordController::class)->group(function(){
+        Route::post('records/gas-breakdown-record/store-appliance', 'storeAppliance')->name('records.gas.breakdown.store.appliance');
+        Route::post('records/gas-breakdown-record/store-signatures', 'storeSignatures')->name('records.gas.breakdown.store.signatures');
+
+        Route::get('records/gas-breakdown-record/show/{gbr}', 'show')->name('records.gas.breakdown.record.show');
+        Route::post('records/gas-breakdown-record/store/{gbr}', 'store')->name('records.gas.breakdown.record.store');
     });
 });
 

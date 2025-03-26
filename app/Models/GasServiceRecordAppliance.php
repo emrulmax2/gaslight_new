@@ -94,7 +94,7 @@ class GasServiceRecordAppliance extends Model
     protected $dates = ['deleted_at'];
 
     public function gsr(){
-        return $this->belongsTo(GasServiceRecord::class, 'gas_safety_record_id');
+        return $this->belongsTo(GasServiceRecord::class, 'gas_service_record_id');
     }
 
     public function location(){

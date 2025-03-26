@@ -251,10 +251,10 @@
     .form-wizard .wizard-fieldset.show .wizard-step-form{
         display: block;
     }
-    .wizard-step-form .gsfSignature canvas{
+    /* .wizard-step-form .gsfSignature canvas{
         width: 316px;
         height: 210px;
-    }
+    } */
     .wizard-step-form .gsfSignature .e-signpad > div{
         height: 36px;
         overflow: hidden;
