@@ -99,7 +99,7 @@
                         <div class="flex items-start justify-start mb-1">
                             <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="user" />
                             <span class="font-medium text-slate-500">
-                                {{ $job->customer->full_name }}
+                                {{ $job->customer->customer_full_name }}
                             </span>
                         </div>
                         <div class="flex items-start justify-start mb-1">
@@ -132,7 +132,7 @@
                         <div class="flex items-start justify-start mb-1">
                             <x-base.lucide class="mr-3 h-4 w-4 text-warning" icon="user" />
                             <span class="font-medium text-slate-500">
-                                {{ (isset($job->property->customer->full_name) && !empty($job->property->customer->full_name) ? $job->property->customer->full_name : '') }}
+                                {{ (isset($job->property->customer->customer_full_name) && !empty($job->property->customer->customer_full_name) ? $job->property->customer->customer_full_name : '') }}
                             </span>
                         </div>
                         <div class="flex items-start justify-start mb-1">

@@ -10,12 +10,11 @@ class Customer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $appends = ['full_name', 'full_address', 'full_address_html', 'pdf_address'];
+    protected $appends = ['customer_full_name','full_address', 'full_address_html', 'pdf_address'];
     
     protected $fillable = [
         'title_id',
-        'first_name',
-        'last_name',
+        'full_name',
         'company_name',
         'vat_no',
         'address_line_1',
@@ -36,8 +35,8 @@ class Customer extends Model
 
     protected $dates = ['deleted_at'];
 
-    public function getFullNameAttribute(){
-        return (isset($this->title->name) && !empty($this->title->name) ? $this->title->name.' ' : '').$this->first_name . ' ' . $this->last_name;
+    public function getCustomerFullNameAttribute(){
+        return (isset($this->title->name) && !empty($this->title->name) ? $this->title->name.' ' : '').$this->full_name;
     }
 
     public function getFullAddressAttribute(){

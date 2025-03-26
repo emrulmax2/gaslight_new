@@ -1301,6 +1301,8 @@
                                         submit-id="signSaveBtn"
                                         clear-id="clear"
                                         pad-classes="w-auto h-48 bg-white mt-0"
+                                        width="600" 
+                                        height="300"
                                     />
                                 </div>
                             </div>

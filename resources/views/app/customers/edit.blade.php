@@ -39,21 +39,11 @@
                                     </x-base.tom-select>
                                 </div>
                             </div>
-    
-                            <!-- First Name Field -->
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
-                                    <x-base.form-label for="first_name">First Name</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->first_name) ? $customer->first_name : '' }}" name="first_name" id="first_name" class="w-full" type="text" placeholder="First Name" />
-                                </div>
-                            </div>
-    
-                            <!-- Last Name Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="last_name">Last Name <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->last_name) ? $customer->last_name : '' }}" name="last_name" id="last_name" class="w-full" type="text" placeholder="Last Name" />
-                                    <div class="acc__input-error error-last_name text-danger text-xs mt-1"></div>
+                                    <x-base.form-label for="full_name">Full Name <span class="text-danger">*</span></x-base.form-label>
+                                    <x-base.form-input value="{{ isset($customer->full_name) ? $customer->full_name : '' }}" name="full_name" id="full_name" class="w-full" type="text" placeholder="Last Name" />
+                                    <div class="acc__input-error error-full_name text-danger text-xs mt-1"></div>
                                 </div>
                             </div>
     

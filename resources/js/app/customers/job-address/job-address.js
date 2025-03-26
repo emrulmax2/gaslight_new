@@ -38,7 +38,7 @@ var JobAddressListTable = (function () {
                 },
                 {
                     title: 'Customer',
-                    field: 'full_name',
+                    field: 'customer_full_name',
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     minWidth: 200,
@@ -48,7 +48,7 @@ var JobAddressListTable = (function () {
                         html += '<div class="flex items-start mb-1">';
                         html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>';
                         html += '<div>';
-                        html += '<div class="font-medium whitespace-normal">'+cell.getData().full_name+'</div>';
+                        html += '<div class="font-medium whitespace-normal">'+cell.getData().customer_full_name+'</div>';
                         html += (cell.getData().mobile != '' ? '<div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">'+cell.getData().mobile+'</div>' : '');
                         html += '</div>';
                         html += '</div>';

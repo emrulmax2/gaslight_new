@@ -80,6 +80,7 @@ class GasServiceRecordAppliance extends Model
         'gas_tightness_detail',
         'expansion_vassel_checked',
         'expansion_vassel_checked_detail',
+        
         'other_regulations',
         'other_regulations_detail',
         'is_safe_to_use',

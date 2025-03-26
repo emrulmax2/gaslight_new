@@ -35,9 +35,9 @@ class CalendarController extends Controller
                 $start = date('Y-m-d H:i:s', strtotime($list->date.' '.$slotStart));
                 $end = date('Y-m-d H:i:s', strtotime($list->date.' '.$slotEnd));
 
-                $titleHtml = (isset($list->job->customer->full_name) && !empty($list->job->customer->full_name) ? '<div class="font-medium mb-1">'.$list->job->customer->full_name.'</div>' : '');
+                $titleHtml = (isset($list->job->customer->customer_full_name) && !empty($list->job->customer->customer_full_name) ? '<div class="font-medium mb-1">'.$list->job->customer->customer_full_name.'</div>' : '');
                 $titleHtml .= (isset($list->job->property->full_address) && !empty($list->job->property->full_address) ? '<div class="text-xs text-slate-500 whitespace-normal break-words">'.$list->job->property->full_address.'</div>' : '');
-                $events[$i]['title'] = (isset($list->job->customer->full_name) && !empty($list->job->customer->full_name) ? $list->job->customer->full_name : '');
+                $events[$i]['title'] = (isset($list->job->customer->customer_full_name) && !empty($list->job->customer->customer_full_name) ? $list->job->customer->customer_full_name : '');
                 $events[$i]['start'] = $start;
                 $events[$i]['end'] = $end;
                 $events[$i]['allDay'] = 0;

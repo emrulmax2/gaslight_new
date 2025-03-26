@@ -245,8 +245,7 @@ class GasWarningNoticeController extends Controller
         $logoPath = resource_path('images/gas_safe_register_dark.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
-        $signaturePath = $gwn->signature ? storage_path('app/public/' . $gwn->signature->filename) : '';
-        $signatureBase64 = (!empty($signaturePath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($signaturePath)) : '');
+        $signatureBase64 = (Storage::disk('public')->exists($gwn->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gwn->signature->filename)) : '');
 
         $report_title = 'Certificate of '.$gwn->certificate_number;
         $PDFHTML = '';
@@ -741,7 +740,7 @@ class GasWarningNoticeController extends Controller
                             $PDFHTML .= '</td>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</tbody>';
-                $PDFHTML .= '</x-base.table>';
+                $PDFHTML .= '</table>';
 
             $PDFHTML .= '</body>';
         $PDFHTML .= '</html>';
