@@ -78,7 +78,7 @@ class JobController extends Controller
                     'url' => $theUrl,
                     'customer_id' => $list->customer_id,
                     'description' => $list->description,
-                    'full_name' => (isset($list->customer->full_name) ? $list->customer->full_name : ''),
+                    'customer_full_name' => (isset($list->customer->customer_full_name) ? $list->customer->customer_full_name : ''),
                     'address_line_1' => (isset($list->property->address_line_1) && !empty($list->property->address_line_1) ? $list->property->address_line_1 : ''),
                     'address_line_2' => (isset($list->property->address_line_2) && !empty($list->property->address_line_2) ? $list->property->address_line_2 : ''),
                     'city' => (isset($list->property->city) && !empty($list->property->city) ? $list->property->city : ''),
@@ -108,7 +108,7 @@ class JobController extends Controller
             'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
-            'customers' => Customer::with('title')->where('created_by', auth()->user()->id)->orderBy('first_name', 'asc')->get(),
+            'customers' => Customer::with('title')->where('created_by', auth()->user()->id)->orderBy('full_name', 'asc')->get(),
             'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get()
         ]);
     }
@@ -144,7 +144,7 @@ class JobController extends Controller
                 'msg' => 'Job successfully created.',
                 'record' => $request->record,
                 'red' => isset(request()->record) && !empty(request()->record) 
-                    ? route('jobs.show', ['job' => $job->id, 'record' => request()->record])
+                    ? route('records', ['record' => request()->record,'job' => $job->id])
                     : route('jobs.show', $job->id)
             ], 200);
         else:
@@ -248,21 +248,21 @@ class JobController extends Controller
 
         $html = '';
         if($allCustomer):
-            $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id)->orderBy('last_name')->get();
+            $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id)->orderBy('full_name')->get();
         else:
             $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id)->where(function($q) use($queryStr){
-                        $q->where('first_name','LIKE','%'.$queryStr.'%')->orWhere('last_name','LIKE','%'.$queryStr.'%')
+                        $q->where('full_name','LIKE','%'.$queryStr.'%')
                             ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
                             ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                             ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
-                    })->orderBy('last_name')->get();
+                    })->orderBy('full_name')->get();
         endif;
         if($query->count() > 0):
             $html .= '<div class="py-2 px-5 text-xs font-semibold bg-slate-100 rounded-md rounded-bl-none rounded-br-none">'.($query->count() == 1 ? $query->count().' result' : $query->count().' results').' found</div>';
                 $html .= '<div class="results px-5 py-4" style="max-height: 250px; overflow-y: auto;">';
                     $i = 1;
                     foreach($query as $customer):
-                        $html .= '<div data-id="'.$customer->id.'" data-of="customer" data-title="'.$customer->full_name.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
+                        $html .= '<div data-id="'.$customer->id.'" data-of="customer" data-title="'.$customer->customer_full_name.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
                             $html .= '<div>';
                                 $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
                                     $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user h-4 w-4 stroke-[1.3] text-primary"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
@@ -272,7 +272,7 @@ class JobController extends Controller
                             $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
                                 $html .= '<div>';
                                     $html .= '<div class="whitespace-nowrap font-medium">';
-                                        $html .= $customer->full_name;
+                                        $html .= $customer->customer_full_name;
                                     $html .= '</div>';
                                     $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
                                         $html .= $customer->address_line_1.' '.$customer->address_line_2.' '.$customer->city.', '.$customer->postal_code;

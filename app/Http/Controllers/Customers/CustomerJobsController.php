@@ -77,7 +77,7 @@ class CustomerJobsController extends Controller
                     'sl' => $i,
                     'customer_id' => $list->customer_id,
                     'description' => $list->description,
-                    'full_name' => (isset($list->customer->full_name) ? $list->customer->full_name : ''),
+                    'customer_full_name' => (isset($list->customer->customer_full_name) ? $list->customer->customer_full_name : ''),
                     'address_line_1' => (isset($list->property->address_line_1) && !empty($list->property->address_line_1) ? $list->property->address_line_1 : ''),
                     'address_line_2' => (isset($list->property->address_line_2) && !empty($list->property->address_line_2) ? $list->property->address_line_2 : ''),
                     'city' => (isset($list->property->city) && !empty($list->property->city) ? $list->property->city : ''),

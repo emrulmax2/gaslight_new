@@ -25,7 +25,7 @@
                         </div>
                        <div class="p-5">
                         <div class="mb-3">
-                            Name: <span class="font-medium">{{ $customer->full_name }}</span>
+                            Name: <span class="font-medium">{{ $customer->customer_full_name }}</span>
                         </div>
                         <div class="mb-3">
                             Email: <span class="font-medium">{{ $customer_contact_info->email }}</span>

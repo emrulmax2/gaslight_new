@@ -9,8 +9,6 @@
             </x-base.notification>
             <x-base.menu.items class="w-72 sm:w-96 emailTags overflow-y-auto h-60">
                 <x-base.menu.header>Customer Tags</x-base.menu.header>
-                <x-base.menu.item>[DATA=customers]first_name[/DATA]</x-base.menu.item>
-                <x-base.menu.item>[DATA=customers]last_name[/DATA]</x-base.menu.item>
                 <x-base.menu.item>[DATA=customers]full_name[/DATA]</x-base.menu.item>
                 <x-base.menu.item>[DATA=customers]company_name[/DATA]</x-base.menu.item>
                 <x-base.menu.item>[DATA=customers]full_address[/DATA]</x-base.menu.item>

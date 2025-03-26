@@ -41,8 +41,7 @@ class JobAddressController extends Controller
                     ->orWhere('city','LIKE','%'.$queryStr.'%')
                     ->orWhere('country','LIKE','%'.$queryStr.'%')
                     ->orWhereHas('customer', function($q) use($queryStr){
-                        $q->where('first_name','LIKE','%'.$queryStr.'%')
-                            ->orWhere('last_name','LIKE','%'.$queryStr.'%');
+                        $q->where('full_name','LIKE','%'.$queryStr.'%');
                     })
                     ->orWhereHas('contact', function($q) use($queryStr){
                         $q->where('mobile','LIKE','%'.$queryStr.'%');
@@ -117,7 +116,7 @@ class JobAddressController extends Controller
         $query = Customer::with('title', 'contact')->orderByRaw(implode(',', $sorts))->where('created_by', auth()->user()->id);
         if(!empty($queryStr)):
             $query->where(function($q) use($queryStr){
-                $q->where('first_name','LIKE','%'.$queryStr.'%')->orWhere('last_name','LIKE','%'.$queryStr.'%')
+                $q->where('full_name','LIKE','%'.$queryStr.'%')
                     ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
                     ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                     ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
@@ -148,8 +147,7 @@ class JobAddressController extends Controller
                     'id' => $list->id,
                     'sl' => $i,
                     'full_name' => $list->full_name,
-                    'first_name' => $list->first_name,
-                    'last_name' => $list->last_name,
+                    'customer_full_name' => $list->customer_full_name,
                     'company_name' => $list->company_name,
                     'vat_no' => $list->vat_no,
                     'email' => (isset($list->contact->email) && !empty($list->contact->email) ? $list->contact->email : ''),
@@ -182,8 +180,7 @@ class JobAddressController extends Controller
     public function customers_store(CustomerCreateRequest $request){
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
-            'first_name' => (!empty($request->first_name) ? $request->first_name : null),
-            'last_name' => $request->first_name,
+            'full_name' => (!empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),

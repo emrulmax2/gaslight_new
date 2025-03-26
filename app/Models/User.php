@@ -10,10 +10,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Passport\HasApiTokens;
+use Creagia\LaravelSignPad\Concerns\RequiresSignature;
+use Creagia\LaravelSignPad\Contracts\CanBeSigned;
 
-class User extends Authenticatable implements MustVerifyEmail
+
+class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
 {
-    use HasFactory, Notifiable, Impersonate, HasApiTokens;
+    use HasFactory, Notifiable, Impersonate,RequiresSignature, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.

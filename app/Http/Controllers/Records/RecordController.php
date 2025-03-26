@@ -261,6 +261,7 @@ class RecordController extends Controller
         $form = JobForm::find($job_form_id);
 
         $data = [
+            'full_name' => (!empty($request->customer_name) ? $request->customer_name : (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : null)),
             'company_name' => (!empty($request->customer_company) ? $request->customer_company : null),
             'address_line_1' => (!empty($request->customer_address_line_1) ? $request->customer_address_line_1 : null),
             'address_line_2' => (!empty($request->customer_address_line_2) ? $request->customer_address_line_2 : null),
