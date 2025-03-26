@@ -13,6 +13,8 @@ use App\Models\Customer;
 use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
+use App\Models\GasBreakdownRecord;
+use App\Models\GasBreakdownRecordAppliance;
 use App\Models\GasSafetyRecord;
 use App\Models\GasSafetyRecordAppliance;
 use App\Models\GasServiceRecord;
@@ -106,6 +108,18 @@ class RecordController extends Controller
             $data['gsr'] = $gasServiceRecord;
             $data['gsra1'] = GasServiceRecordAppliance::with('make', 'type')->where('gas_service_record_id', $gwn_id)->where('appliance_serial', 1)->get()->first();
             $data['signature'] = isset($gasServiceRecord->signature) ? Storage::disk('public')->url($gasServiceRecord->signature->filename) : '';
+        elseif($record == 'gas_breakdown_record'): 
+            $gasBreakdownRecord = GasBreakdownRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gbr_id = (isset($gasBreakdownRecord->id) && $gasBreakdownRecord->id > 0 ? $gasBreakdownRecord->id : 0);
+            $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flue_types'] = ApplianceFlueType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['classifications'] = GasWarningClassification::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gbr'] = $gasBreakdownRecord;
+            $data['gbra1'] = GasBreakdownRecordAppliance::with('make', 'type')->where('gas_breakdown_record_id', $gbr_id)->where('appliance_serial', 1)->get()->first();
+            $data['signature'] = isset($gasBreakdownRecord->signature) ? Storage::disk('public')->url($gasBreakdownRecord->signature->filename) : '';
         endif;
 
 

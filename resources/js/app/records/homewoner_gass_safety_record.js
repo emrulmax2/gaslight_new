@@ -342,6 +342,10 @@ import INTAddressLookUps from '../../address_lookup.js';
 
             $allStepBtns.eq(theFieldSetIndex).addClass('active');
             $parentfieldSet.addClass('show');
+
+            if($parentfieldSet.find('.e-signpad').length > 0){
+                resizeCanvasOverwrite();
+            }
         }
     });
 
@@ -428,6 +432,22 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('.form-wizard').find('.form-wizard-step-item').eq(nextFormIndex).addClass('active');
     });
 
+    let resizeCanvasOverwrite = () => {
+        document.querySelectorAll('.wizard-fieldset.show .e-signpad').forEach(function(eSignpad) {
+        let canvas = eSignpad.querySelector('canvas'),
+            submit = eSignpad.querySelector('.sign-pad-button-submit'),
+            clear = eSignpad.querySelector('.sign-pad-button-clear');
+            
+        if (window.innerWidth < 768 && (canvas.width > window.innerWidth || canvas.width < 300)) {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+            canvas.width = canvas.parentNode.parentElement.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            clear.click();
+        }
+    });
+
     // Signature Toggle
     /*$('.gsfSignatureBtns .signBtns').on('click', function(e){
         e.preventDefault();
@@ -495,5 +515,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         }
         fr.readAsDataURL(src.files[0]);
     };*/
+}
 
 })();

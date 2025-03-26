@@ -11,12 +11,12 @@
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin"><x-base.lucide class="h-4 w-4" icon="home" /></x-base.button>
         </div>
     </div>
-    <form method="post" action="#" id="gasWarningNoticeForm">
+    <form method="post" action="#" id="gasBreakdownRecordForm">
         <div class="grid grid-cols-11 gap-x-6 pb-20 mt-5">
             <div class="intro-y col-span-12 max-sm:mt-5 sm:col-span-2 order-2 sm:order-1">
                 <div class="sticky top-0">
                     <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
-                        <x-base.button as="a" href="{{ route('records', [$form->slug, $gsr->customer_job_id]) }}" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
+                        <x-base.button as="a" href="{{ route('records', [$form->slug, $gbr->customer_job_id]) }}" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="Pencil" />
                             Edit
                         </x-base.button>
@@ -43,7 +43,7 @@
             <div class="intro-y col-span-12 sm:col-span-9 order-1 sm:order-2">
                 <div class="intro-y box p-5">
                     @if(!empty($thePdf))
-                        <object class="pdfViewer" data="{{ $thePdf }}" type="application/pdf">
+                        <object data="{{ $thePdf }}" type="application/pdf" style="width: 100%; height: 98vh;">
                             <embed src="{{ $thePdf }}" type="application/pdf">
                                 <p>This browser does not support PDFs. Please download the PDF to view it: <a target="_blank" href="{{ $thePdf }}">Download PDF</a>.</p>
                             </embed>
@@ -55,10 +55,10 @@
                     @endif
                 </div>
             </div>
-            <input id="customer_job_id" name="customer_job_id" type="hidden" value="{{ $gsr->customer_job_id }}" />
-            <input id="customer_id" name="customer_id" type="hidden" value="{{ $gsr->customer_id }}" />
+            <input id="customer_job_id" name="customer_job_id" type="hidden" value="{{ $gbr->customer_job_id }}" />
+            <input id="customer_id" name="customer_id" type="hidden" value="{{ $gbr->customer_id }}" />
             <input id="job_form_id" name="job_form_id" type="hidden" value="{{ $form->id }}" />
-            <input id="gwn_id" name="gwn_id" type="hidden" value="{{ $gsr->id }}" />
+            <input id="gbr_id" name="gbr_id" type="hidden" value="{{ $gbr->id }}" />
             <input id="form_slug" name="form_slug" type="hidden" value="{{ $form->slug }}" />
         </div>
     </form>
@@ -80,5 +80,5 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/records/gas_warning_notice_show.js')
+    @vite('resources/js/app/records/gas_breakdown_record_show.js')
 @endPushOnce

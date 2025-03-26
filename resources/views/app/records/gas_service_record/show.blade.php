@@ -5,8 +5,11 @@
 @endsection
 
 @section('subcontent')
-    <div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
+    <div class="intro-y mt-8 flex items-center flex-row">
         <h2 class="mr-auto text-lg font-medium">{{ $form->name }}</h2>
+        <div class="flex mt-0 w-auto">
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin"><x-base.lucide class="h-4 w-4" icon="home" /></x-base.button>
+        </div>
     </div>
     <form method="post" action="#" id="gasServiceRecordForm">
         <div class="grid grid-cols-11 gap-x-6 pb-20 mt-5">
