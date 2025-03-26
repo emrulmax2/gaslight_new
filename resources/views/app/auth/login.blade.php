@@ -28,7 +28,7 @@
                         Don't have an account?
                         <a
                             class="font-medium text-primary"
-                            href="{{ route('register') }}"
+                            href="{{ route('register.index') }}"
                         >
                             Sign Up
                         </a>
