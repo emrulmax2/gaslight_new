@@ -37,7 +37,7 @@ class CustomerController extends Controller
         $query = Customer::with('title', 'contact')->orderByRaw(implode(',', $sorts))->where('created_by', auth()->user()->id);
         if(!empty($queryStr)):
             $query->where(function($q) use($queryStr){
-                $q->where('first_name','LIKE','%'.$queryStr.'%')->orWhere('last_name','LIKE','%'.$queryStr.'%')
+                $q->where('full_name','LIKE','%'.$queryStr.'%')
                     ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
                     ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                     ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
@@ -68,8 +68,7 @@ class CustomerController extends Controller
                     'id' => $list->id,
                     'sl' => $i,
                     'full_name' => $list->full_name,
-                    'first_name' => $list->first_name,
-                    'last_name' => $list->last_name,
+                    'customer_full_name' => $list->customer_full_name,
                     'company_name' => $list->company_name,
                     'vat_no' => $list->vat_no,
                     'email' => (isset($list->contact->email) && !empty($list->contact->email) ? $list->contact->email : ''),
@@ -102,8 +101,7 @@ class CustomerController extends Controller
     public function store(CustomerCreateRequest $request){
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
-            'first_name' => (!empty($request->first_name) ? $request->first_name : null),
-            'last_name' => (isset($request->last_name) && !empty($request->last_name) ? $request->last_name : null),
+            'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
@@ -173,8 +171,7 @@ class CustomerController extends Controller
 
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
-            'first_name' => (!empty($request->first_name) ? $request->first_name : null),
-            'last_name' => (isset($request->last_name) && !empty($request->last_name) ? $request->last_name : null),
+            'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
@@ -222,17 +219,17 @@ class CustomerController extends Controller
 
         $html = '';
         $query = Customer::with('title', 'contact')->where(function($q) use($queryStr){
-                    $q->where('first_name','LIKE','%'.$queryStr.'%')->orWhere('last_name','LIKE','%'.$queryStr.'%')
+                    $q->where('full_name','LIKE','%'.$queryStr.'%')
                         ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
                         ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                         ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
-                })->orderBy('last_name')->get();
+                })->orderBy('full_name')->get();
         if($query->count() > 0):
             $html .= '<div class="py-2 px-5 text-xs font-semibold bg-slate-100 rounded-md rounded-bl-none rounded-br-none">'.($query->count() == 1 ? $query->count().' result' : $query->count().' results').' found</div>';
                 $html .= '<div class="results px-5 py-4" style="max-height: 250px; overflow-y: auto;">';
                     $i = 1;
                     foreach($query as $customer):
-                        $html .= '<div data-id="'.$customer->id.'" data-title="'.$customer->full_name.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
+                        $html .= '<div data-id="'.$customer->id.'" data-title="'.$customer->customer_full_name.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
                             $html .= '<div>';
                                 $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
                                     $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user h-4 w-4 stroke-[1.3] text-primary"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
@@ -242,7 +239,7 @@ class CustomerController extends Controller
                             $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
                                 $html .= '<div>';
                                     $html .= '<div class="whitespace-nowrap font-medium">';
-                                        $html .= $customer->full_name;
+                                        $html .= $customer->customer_full_name;
                                     $html .= '</div>';
                                     $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
                                         $html .= $customer->address_line_1.' '.$customer->address_line_2.' '.$customer->city.', '.$customer->postal_code;

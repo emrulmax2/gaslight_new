@@ -270,6 +270,9 @@ import INTAddressLookUps from '../../address_lookup.js';
         let $allStepBtns = $('.form-wizard-steps .form-wizard-step-item');
         let $allFieldSets = $('.form-wizard .wizard-fieldset');
         
+        if($parentfieldSet.find('.e-signpad').length > 0){
+            resizeCanvasOverwrite();
+        }
         if($parentfieldSet.hasClass('show')){
             $allStepBtns.eq(theFieldSetIndex).removeClass('active');
             $parentfieldSet.removeClass('show');
@@ -422,6 +425,24 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('.form-wizard').find('.form-wizard-step-item').eq(nextFormIndex).addClass('active');
     });
 
+    let resizeCanvasOverwrite = () => {
+        document.querySelectorAll('.e-signpad').forEach(function(eSignpad) {
+            let canvas = eSignpad.querySelector('canvas'),
+                submit = eSignpad.querySelector('.sign-pad-button-submit'),
+                clear = eSignpad.querySelector('.sign-pad-button-cleart');
     
+            if (canvas.width > window.innerWidth) {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    
+    
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                clear.addEventListener('click', e => {
+                    //console.log('Cleared');
+                });
+            }
+        });
+    }
 
 })();

@@ -46,8 +46,7 @@ class CustomerJobAddressController extends Controller
                     ->orWhere('city','LIKE','%'.$queryStr.'%')
                     ->orWhere('country','LIKE','%'.$queryStr.'%')
                     ->orWhereHas('customer', function($q) use($queryStr){
-                        $q->where('first_name','LIKE','%'.$queryStr.'%')
-                            ->orWhere('last_name','LIKE','%'.$queryStr.'%');
+                        $q->where('full_name','LIKE','%'.$queryStr.'%');
                     })
                     ->orWhereHas('contact', function($q) use($queryStr){
                         $q->where('mobile','LIKE','%'.$queryStr.'%');
@@ -86,7 +85,7 @@ class CustomerJobAddressController extends Controller
                 $data[] = [
                     'id' => $list->id,
                     'sl' => $i,
-                    'full_name' => $list->customer->full_name,
+                    'customer_full_name' => $list->customer->customer_full_name,
                     'mobile' => isset($list->contact->mobile) ? $list->contact->mobile : '',
                     'customer_id' => $list->customer_id,
                     'address' => $list->full_address,

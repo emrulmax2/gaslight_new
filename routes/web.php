@@ -296,7 +296,8 @@ Route::controller(FileUploadController::class)->group(function() {
 Route::controller(ProfileController::class)->group(function() {
     Route::get('profile', 'index')->name('profile');
     Route::post('profile/update', 'update')->name('profile.update');
-    
+    Route::post('profile-draw-signature/','drawSignatureStore')->name('profile.draw-signature'); 
+    Route::post('profile-signature-upload/','fileUploadStore')->name('profile.upload-signature');
 });
 
 
