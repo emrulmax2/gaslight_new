@@ -8,11 +8,11 @@ git pull origin main
 # Install/update composer dependencies
 composer install --no-interaction
 
-export PATH=/opt/cpanel/ea-nodejs16/bin/:$PATH
+export PATH=/opt/cpanel/ea-nodejs22/bin/:$PATH
 # Install NPM dependencies and build assets
-# npm install
-# npm run build
-# rm -rf node_modules
+ npm install
+ npm run build
+ rm -rf node_modules
 
 # Run database migrations
 php artisan migrate --force
