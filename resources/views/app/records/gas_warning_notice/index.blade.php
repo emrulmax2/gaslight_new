@@ -87,27 +87,12 @@
                                 <x-base.form-input value="{{ (isset($job->property->postal_code) ? $job->property->postal_code : '') }}" name="job_postal_code" class="w-full postal_code h-[35px] rounded-[3px]" type="text" placeholder="Post Code" />
                                 <div class="acc__input-error error-postal_code text-danger text-xs mt-1"></div>
                             </div>
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label class="mb-1">Landline</x-base.form-label>
-                                <x-base.form-input value="{{ (isset($job->customer->landline) ? $job->customer->landline : '') }}" name="landline" class="w-full postal_code h-[35px] rounded-[3px]" type="text" placeholder="landline" />
-                                <div class="acc__input-error error-landline text-danger text-xs mt-1"></div>
-                            </div>
-                            <div class="col-span-12">
-                                <x-base.form-label class="mb-1">Unique property Reference number (UPRN)</x-base.form-label>
-                                <x-base.form-input value="{{ (isset($job->customer->unique_property_reference_no) ? $job->customer->unique_property_reference_no : '') }}" name="unique_property_reference_no" class="w-full postal_code h-[35px] rounded-[3px]" type="text" placeholder="Unique property Reference number" />
-                                <div class="acc__input-error error-unique_property_reference_no text-danger text-xs mt-1"></div>
-                            </div>
                             <x-base.form-input name="job_country" id="country" class="w-full country" type="hidden" value="{{ (isset($job->property->country) ? $job->property->country : '') }}" />
                             <x-base.form-input name="job_latitude" class="w-full latitude" type="hidden" value="{{ (isset($job->property->latitude) ? $job->property->latitude : '') }}" />
                             <x-base.form-input name="job_longitude" class="w-full longitude" type="hidden" value="{{ (isset($job->property->longitude) ? $job->property->longitude : '') }}" />
 
                             <div class="col-span-12">
                                 <div class="border-t border-slate-200 mb-4 mt-4"></div>
-                            </div>
-
-                            <div class="col-span-12">
-                                <x-base.form-label for="title">Title</x-base.form-label>
-                                <x-base.form-input value="{{ (isset($job->property->title) ? $job->property->title : '') }}" name="title" id="title" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Title" />
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label for="occupant_name">Occupant's Name</x-base.form-label>
@@ -277,8 +262,8 @@
                                 <x-base.form-input value="{{ (isset($gwna1->serial_no) ? $gwna1->serial_no : '') }}" name="app[1][serial_no]" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Serial Number" />
                             </div>
                             <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label>Type</x-base.form-label>
-                                <x-base.tom-select class="w-full applianceType" name="app[1][gas_warning_classification_id]" data-placeholder="Please Select">
+                                <x-base.form-label>Classifications</x-base.form-label>
+                                <x-base.tom-select class="w-full" name="app[1][gas_warning_classification_id]" data-placeholder="Please Select">
                                     <option value="">Please Select</option>
                                     @if($classifications->count() > 0)
                                         @foreach($classifications as $option)

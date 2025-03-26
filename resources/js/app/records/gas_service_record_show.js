@@ -25,12 +25,12 @@
         }
     });
 
-    $('#gasWarningNoticeForm').on('submit', function(e){
+    $('#gasServiceRecordForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('gasWarningNoticeForm');
+        const form = document.getElementById('gasServiceRecordForm');
         let $theForm = $(this);
         let type = $theForm.find('[name="submit_type"]').val();
-        let gwn_id = $theForm.find('#gwn_id').val();
+        let gsr_id = $theForm.find('#gsr_id').val();
 
         $('.formSubmits', $theForm).attr('disabled', 'disabled');
         $('.formSubmits.submit_'+type+' .theLoader', $theForm).fadeIn();
@@ -39,7 +39,7 @@
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('records.gas.warning.notice.store', gwn_id),
+            url: route('records.gas.service.store', gsr_id),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {

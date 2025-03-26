@@ -71,9 +71,9 @@ import INTAddressLookUps from '../../address_lookup.js';
         }else if(parentFieldset.index() == 1){
             url = route('records.store.customer');
         }else if(parentFieldset.index() == 2){
-            url = route('records.gwn.store.appliance');
+            url = route('records.gsr.store.appliance');
         }else if(parentFieldset.index() == 3){
-            url = route('records.gwn.store.signatures');
+            url = route('records.gsr.store.signatures');
         }
 
         if(url != ''){
@@ -173,7 +173,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('.form-wizard-final-btn .theLoader', $form).fadeIn();
 
         let form_data = new FormData(form);
-        let url = route('records.gwn.store.signatures');
+        let url = route('records.gsr.store.signatures');
 
         $.ajax({
             method: 'POST',
@@ -280,14 +280,15 @@ import INTAddressLookUps from '../../address_lookup.js';
                 let form_data = new FormData(form);
                 let url;
                 
+                
                 if(parentFieldset.index() == 0){
                     url = route('records.store.job.address');
                 }else if(parentFieldset.index() == 1){
                     url = route('records.store.customer');
                 }else if(parentFieldset.index() == 2){
-                    url = route('records.gwn.store.appliance');
+                    url = route('records.gsr.store.appliance');
                 }else if(parentFieldset.index() == 3){
-                    url = route('records.gwn.store.signatures');
+                    url = route('records.gsr.store.signatures');
                 }
 
                 if(url != ''){

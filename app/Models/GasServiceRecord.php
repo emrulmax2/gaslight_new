@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Creagia\LaravelSignPad\Concerns\RequiresSignature;
 use Creagia\LaravelSignPad\Contracts\CanBeSigned;
 
-class GasWarningNotice extends Model implements CanBeSigned
+class GasServiceRecord extends Model
 {
     use HasFactory, SoftDeletes, RequiresSignature;
 
@@ -43,7 +43,7 @@ class GasWarningNotice extends Model implements CanBeSigned
     }
 
     public function appliance(){
-        return $this->hasMany(GasWarningNoticeAppliance::class, 'gas_warning_notice_id', 'id')->orderBy('id', 'ASC');
+        return $this->hasMany(GasServiceRecord::class, 'gas_service_record_id', 'id')->orderBy('id', 'ASC');
     }
 
     public function relation(){
