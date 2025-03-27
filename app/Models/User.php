@@ -34,6 +34,8 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
         'gas_safe_id_card',
         'oil_registration_number',
         'installer_ref_no',
+        'parent_id',
+        'role'
     ];
 
     /**
@@ -63,6 +65,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
     public function company()
     {
         return $this->hasOne(Company::class);
+    }
+
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_staff', 'user_id', 'company_id');
     }
 
     

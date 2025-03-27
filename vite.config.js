@@ -210,6 +210,8 @@ export default defineConfig({
                 "resources/js/app/records/gas_service_record_show.js",
                 "resources/js/app/records/gas_breakdown_record.js",
                 "resources/js/app/records/gas_breakdown_record_show.js",
+                "resources/js/app/users/users.js",
+                "resources/js/app/records/gas_boiler_system_commissioning_checklist.js",
 
             ],
             refresh: true,

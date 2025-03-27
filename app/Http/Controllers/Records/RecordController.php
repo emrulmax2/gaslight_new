@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ApplianceFlueType;
 use App\Models\ApplianceLocation;
 use App\Models\ApplianceMake;
+use App\Models\ApplianceTimeTemperatureHeating;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
 use App\Models\Company;
@@ -22,6 +23,8 @@ use App\Models\GasServiceRecordAppliance;
 use App\Models\GasWarningClassification;
 use App\Models\GasWarningNotice;
 use App\Models\GasWarningNoticeAppliance;
+use App\Models\GasBoilerSystemCommissioningChecklist;
+use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JobForm;
@@ -120,6 +123,15 @@ class RecordController extends Controller
             $data['gbr'] = $gasBreakdownRecord;
             $data['gbra1'] = GasBreakdownRecordAppliance::with('make', 'type')->where('gas_breakdown_record_id', $gbr_id)->where('appliance_serial', 1)->get()->first();
             $data['signature'] = isset($gasBreakdownRecord->signature) ? Storage::disk('public')->url($gasBreakdownRecord->signature->filename) : '';
+        elseif($record == 'gas_boiler_system_commissioning_checklist'): 
+            $gasBoilerSCC = GasBoilerSystemCommissioningChecklist::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gbscc_id = (isset($gasBoilerSCC->id) && $gasBoilerSCC->id > 0 ? $gasBoilerSCC->id : 0);
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['timerTemp'] = ApplianceTimeTemperatureHeating::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gbscc'] = $gasBoilerSCC;
+            $data['gbscca1'] = GasBoilerSystemCommissioningChecklistAppliance::with('make', 'temperature')->where('gas_boiler_system_commissioning_checklist_id', $gbscc_id)->where('appliance_serial', 1)->get()->first();
+            $data['signature'] = isset($gasBoilerSCC->signature) ? Storage::disk('public')->url($gasBoilerSCC->signature->filename) : '';
         endif;
 
 

@@ -37,6 +37,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\GasBoilerSystemCommissioningChecklistController;
 use App\Http\Controllers\Records\GasBreakdownRecordController;
 use App\Http\Controllers\Records\GasServiceRecordController;
 use App\Http\Controllers\Records\GasWarningNoticeController;
@@ -45,6 +46,7 @@ use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\Records\InvoiceController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
+use App\Http\Controllers\UserManagementController;
 use App\Models\BoilerBrand;
 use App\Models\GasServiceRecord;
 
@@ -293,6 +295,31 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-breakdown-record/show/{gbr}', 'show')->name('records.gas.breakdown.record.show');
         Route::post('records/gas-breakdown-record/store/{gbr}', 'store')->name('records.gas.breakdown.record.store');
+    });
+    
+    Route::controller(UserManagementController::class)->group(function() {
+        Route::get('users', 'index')->name('users.index'); 
+        Route::get('users/list', 'list')->name('users.list'); 
+        Route::get('users/create', 'create')->name('users.create'); 
+        Route::post('users/store', 'store')->name('users.store');
+        Route::get('users/show/{user}', 'edit')->name('users.edit');
+        Route::put('users/update/{user_id}', 'update')->name('users.update');
+        Route::delete('users/destroy/{user_id}', 'destroy')->name('users.destroy'); 
+        Route::post('users/restore/{user_id}', 'restore')->name('users.restore');
+
+        Route::post('users-draw-signature/{user_id}','drawSignatureStore')->name('users.draw-signature'); 
+        Route::post('users-signature-upload/{user_id}','fileUploadStore')->name('users.upload-signature'); 
+
+        Route::post('users/get-details', 'getDetails')->name('users.get.details');
+        Route::post('users/search', 'search')->name('users.search');
+    });
+    
+    Route::controller(GasBoilerSystemCommissioningChecklistController::class)->group(function(){
+        Route::post('records/gas-boiler-system-commissioning-checklist/store-appliance', 'storeAppliance')->name('records.gas.bscc.store.appliance');
+        Route::post('records/gas-boiler-system-commissioning-checklist/store-signatures', 'storeSignatures')->name('records.gas.bscc.store.signatures');
+
+        Route::get('records/gas-boiler-system-commissioning-checklist/show/{gbscc}', 'show')->name('records.gas.bscc.record.show');
+        Route::post('records/gas-boiler-system-commissioning-checklist/store/{gbscc}', 'store')->name('records.gas.bscc.record.store');
     });
 });
 

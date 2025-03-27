@@ -85,28 +85,10 @@ var jobListTable = (function () {
                         return (address != '' ? '<div class="text-slate-500 text-xs whitespace-normal flex justify-start items-start">'+theIcon+address+'</div>' : '');
                     },
                     cellClick:function(e, cell){
-                        let url = route('jobs.show', cell.getData().id);
-                        let urlParams = new URLSearchParams(window.location.search);
-                        let recordParam = urlParams.get('record');
-
-                        if(recordParam){
-                            url += '?record='+recordParam;
-                        }
-
-                        window.location.href = url;
-                        console.log('click')
+                        window.location.href = cell.getData().url;
                     },
                     cellTap:function(e, cell){
-                         let url = route('jobs.show', cell.getData().id);
-                        let urlParams = new URLSearchParams(window.location.search);
-                        let recordParam = urlParams.get('record');
-
-                        if(recordParam){
-                            url += '?record='+recordParam;
-                        }
-                        
-                        window.location.href = url;
-                        console.log('tap')
+                        window.location.href = cell.getData().url;
                     }
                 },
                 {

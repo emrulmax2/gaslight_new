@@ -21,6 +21,8 @@ class GasBreakdownRecordAppliance extends Model
         'serial_no',
         
         'performance_analyser_ratio',
+        'performance_co',
+        'performance_co2',
         'opt_correctly',
         'conf_safety_standards',
         'notice_exlained',
