@@ -4,21 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Company;
-use App\Fakers\Countries;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\CompanyBankDetails;
-use App\Models\FileRecord;
 use App\Models\RegisterBody;
-use App\Models\Staff;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Creagia\LaravelSignPad\Signature;
+use Illuminate\Validation\ValidationException;
 
 class CompanyController extends Controller
 {
@@ -32,10 +26,7 @@ class CompanyController extends Controller
         if (!$user) {
             return redirect()->route('login')->with('error', 'Please log in first.');
         }
-    
-        // Retrieve the user's company
         $company = Company::with('companyBankDetails')->where('user_id', $user->id)->first();
-        // Retrieve bank details for the user's company
         return view('app.company.index', [
             'company' => $company,
             'registerBodies' => RegisterBody::where('active', 1)->get()
@@ -64,23 +55,24 @@ class CompanyController extends Controller
     {
 
         $validatedData = $request->validated();
-        $validatedData['user_id'] = auth()->id();
+
+        $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+        $decodedData = base64_decode($signatureData, true);
+
+        if (!$request->has('signature_file') && strlen($decodedData) <= 2621) {
+            throw ValidationException::withMessages([
+                'signature' => ['Either a signature file or drawn signature is required.']
+            ]);
+        }
+
+        $validatedData['user_id'] = Auth::user()->id;
         $validatedData['gas_safe_registration_no'] = (isset($request->gas_safe_registration_no) && !empty($request->gas_safe_registration_no)) ? $request->gas_safe_registration_no : null;
+        $validatedData['gas_safe_id_card'] = (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card)) ? $request->gas_safe_id_card : null;
         
-        $company = Company::create($validatedData);
-        $user = User::find(auth()->user()->id);
+        Company::create($validatedData);
+        $user = User::find(Auth::user()->id);
         $user->first_login = 0;
-        $user->gas_safe_id_card = (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card) ? $request->gas_safe_id_card : null);
         $user->save();
-
-
-        $staff = Staff::create([
-            'name' => $user->name,
-            'email' => $user->email,
-            'password' => $user->password, 
-            'status' => 1,
-        ]);
-
 
         if ($request->has('signature_file')) {
             $file = $request->file('signature_file');
@@ -89,8 +81,8 @@ class CompanyController extends Controller
             Storage::disk('public')->put($newFilePath, file_get_contents($file->getRealPath()));
     
             $signature = new Signature();
-            $signature->model_type = Staff::class;
-            $signature->model_id = $staff->id;
+            $signature->model_type = User::class;
+            $signature->model_id = $user->id;
             $signature->uuid = Str::uuid();
             $signature->filename = $newFilePath;
             $signature->document_filename = null;
@@ -105,8 +97,8 @@ class CompanyController extends Controller
             Storage::disk('public')->put($imageName, $signatureData);
 
             $signature = new Signature();
-            $signature->model_type = Staff::class;
-            $signature->model_id = $staff->id;
+            $signature->model_type = User::class;
+            $signature->model_id = $user->id;
             $signature->uuid = Str::uuid();
             $signature->filename = $imageName;
             $signature->document_filename = null;
@@ -114,9 +106,6 @@ class CompanyController extends Controller
             $signature->from_ips = json_encode([request()->ip()]);
             $signature->save();
         }
-
-
-        $company->staffs()->attach($staff->id);
 
         return response()->json(['msg' => 'Company created successfully.', 'red' => route('company.dashboard')], 200);
     }

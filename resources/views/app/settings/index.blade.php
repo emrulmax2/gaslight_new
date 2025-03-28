@@ -45,6 +45,26 @@
                 <div  class="relative zoom-in before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']">
                     <div class="p-5 box ">
                         <div class="flex flex-col items-center pt-5">
+                            <div class="flex items-center justify-center w-16 h-16 border-4 rounded-full border-white/70 bg-primary">
+                                <x-base.lucide class="h-8 w-8 stroke-[1.5] text-white" icon="users" />
+                            </div>
+                            <div class="mt-5 text-base font-medium text-center">
+                                Manage Users
+                            </div>
+                            <div class="mt-0.5 px-8 text-center text-slate-500">
+                                Enable or disable users, and manage their login credentials and access permissions.
+                            </div>
+                            <x-base.button class="w-full mt-7" type="button" rounded variant="primary" as="a" href="{{ route('users.index') }}">
+                                Manage
+                            </x-base.button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- <div id="settings2" class="flex flex-col col-span-12 gap-x-6 gap-y-10 md:col-span-4 xl:col-span-3">
+                <div  class="relative zoom-in before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']">
+                    <div class="p-5 box ">
+                        <div class="flex flex-col items-center pt-5">
                             <div
                                 class="flex items-center justify-center w-16 h-16 border-4 rounded-full border-white/70 bg-primary">
                                 <x-base.lucide
@@ -70,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             
             <div id="settings3" class="flex flex-col col-span-12 gap-x-6 gap-y-10 md:col-span-4 xl:col-span-3">
                 <div  class="relative zoom-in before:box before:absolute before:inset-x-3 before:mt-3 before:h-full before:bg-slate-50 before:content-['']">
@@ -143,10 +163,10 @@
                 location.href = route('company.index');
             }
 
-            async function ManageUsers() {
+          //  async function ManageUsers() {
                 // Reset state
-                location.href = route('staff.index');
-            }
+          //      location.href = route('staff.index');
+          //  }
 
 
 
@@ -155,9 +175,9 @@
             })
 
 
-            $('#manage-staffs').on('click', function() {
-                ManageUsers()
-            })
+           // $('#manage-staffs').on('click', function() {
+          //      ManageUsers()
+          //  })
         })()
     </script>
 @endPushOnce

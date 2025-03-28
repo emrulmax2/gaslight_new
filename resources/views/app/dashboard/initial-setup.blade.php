@@ -216,6 +216,7 @@
                         Upload Signature
                     </x-base.button>
                 </div>
+                <span class="text-danger block text-center error-signature"></span>
             </div>
         </div>    
         <div class="intro-y col-span-12 lg:col-span-3">

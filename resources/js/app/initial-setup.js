@@ -33,6 +33,9 @@ import INTAddressLookUps from '../address_lookup.js';
     $(document).on('click', '#companySetupBtn', function(e){
         e.preventDefault();
         $('.gsfSignature .sign-pad-button-submit').trigger('click');
+        setTimeout(() => {
+            $('#step1-form').trigger('submit');
+        }, 100);
     });
 
 
