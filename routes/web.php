@@ -39,6 +39,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\Records\GasBoilerSystemCommissioningChecklistController;
 use App\Http\Controllers\Records\GasBreakdownRecordController;
+use App\Http\Controllers\Records\GasPowerFlushRecordController;
 use App\Http\Controllers\Records\GasServiceRecordController;
 use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
@@ -320,6 +321,16 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-boiler-system-commissioning-checklist/show/{gbscc}', 'show')->name('records.gas.bscc.record.show');
         Route::post('records/gas-boiler-system-commissioning-checklist/store/{gbscc}', 'store')->name('records.gas.bscc.record.store');
+    });
+    
+    Route::controller(GasPowerFlushRecordController::class)->group(function(){
+        Route::post('records/power_flush_record/store-checklist', 'storeChecklist')->name('records.gas.power.flush.store.checklist');
+        Route::post('records/power_flush_record/store-radiators', 'storeRadiators')->name('records.gas.power.flush.store.radiators');
+        Route::post('records/power_flush_record/store-signatures', 'storeSignatures')->name('records.gas.power.flush.store.signatures');
+        Route::delete('records/power_flush_record/destroy-rediator/{gpfrr}', 'destroyRediator')->name('records.gas.power.flush.record.delete.rediator');
+
+        Route::get('records/power_flush_record/show/{gpfr}', 'show')->name('records.gas.power.flush.record.show');
+        Route::post('records/power_flush_record/store/{gpfr}', 'store')->name('records.gas.power.flush.record.store');
     });
 });
 

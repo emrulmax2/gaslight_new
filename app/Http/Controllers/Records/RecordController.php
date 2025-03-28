@@ -9,6 +9,7 @@ use App\Models\ApplianceMake;
 use App\Models\ApplianceTimeTemperatureHeating;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
+use App\Models\Color;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
@@ -25,13 +26,21 @@ use App\Models\GasWarningNotice;
 use App\Models\GasWarningNoticeAppliance;
 use App\Models\GasBoilerSystemCommissioningChecklist;
 use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
+use App\Models\GasPowerFlushRecord;
+use App\Models\GasPowerFlushRecordChecklist;
+use App\Models\GasPowerFlushRecordRediator;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JobForm;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\PaymentMethod;
+use App\Models\PowerflushCirculatorPumpLocation;
+use App\Models\PowerflushCylinderType;
+use App\Models\PowerflushPipeworkType;
+use App\Models\PowerflushSystemType;
 use App\Models\Quote;
 use App\Models\QuoteItem;
+use App\Models\RadiatorType;
 use App\Models\Relation;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
@@ -46,7 +55,7 @@ class RecordController extends Controller
             'breadcrumbs' => [
                 ['label' => 'Create Records', 'href' => 'javascript:void(0);'],
             ],
-            'forms' => JobForm::with('childs')->where('parent_id', 0)->orderBy('id', 'ASC')->get()
+            'forms' => JobForm::with('childs')->where('parent_id', 0)->where('active', 1)->orderBy('id', 'ASC')->get()
         ]);
     }
 
@@ -132,6 +141,24 @@ class RecordController extends Controller
             $data['gbscc'] = $gasBoilerSCC;
             $data['gbscca1'] = GasBoilerSystemCommissioningChecklistAppliance::with('make', 'temperature')->where('gas_boiler_system_commissioning_checklist_id', $gbscc_id)->where('appliance_serial', 1)->get()->first();
             $data['signature'] = isset($gasBoilerSCC->signature) ? Storage::disk('public')->url($gasBoilerSCC->signature->filename) : '';
+        elseif($record == 'power_flush_record'):
+            $gasePowerFlashRecord = GasPowerFlushRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gpfr_id = (isset($gasePowerFlashRecord->id) && $gasePowerFlashRecord->id > 0 ? $gasePowerFlashRecord->id : 0);
+            $data['flush_types'] = PowerflushSystemType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flush_cylinder'] = PowerflushCylinderType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flush_pipework'] = PowerflushPipeworkType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flush_pump_location'] = PowerflushCirculatorPumpLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['radiator_type'] = RadiatorType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['color'] = Color::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['classifications'] = GasWarningClassification::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gpfr'] = $gasePowerFlashRecord;
+            $data['gpfrc'] = GasPowerFlushRecordChecklist::with('make', 'type')->where('gas_power_flush_record_id', $gpfr_id)->get()->first();
+            $data['gpfrr'] = GasPowerFlushRecordRediator::where('gas_power_flush_record_id', $gpfr_id)->orderBy('id', 'ASC')->get();
+            $data['signature'] = isset($gasePowerFlashRecord->signature) ? Storage::disk('public')->url($gasePowerFlashRecord->signature->filename) : '';
         endif;
 
 
