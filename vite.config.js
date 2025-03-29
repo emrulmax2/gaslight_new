@@ -214,7 +214,6 @@ export default defineConfig({
                 "resources/js/app/records/gas_boiler_system_commissioning_checklist.js",
                 "resources/js/app/records/power_flush_record.js",
                 "resources/js/app/records/power_flush_record_show.js",
-
             ],
             refresh: true,
         }),
