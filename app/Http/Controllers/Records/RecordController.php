@@ -10,6 +10,7 @@ use App\Models\ApplianceTimeTemperatureHeating;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
 use App\Models\Color;
+use App\Models\CommissionDecommissionWorkType;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
@@ -26,6 +27,8 @@ use App\Models\GasWarningNotice;
 use App\Models\GasWarningNoticeAppliance;
 use App\Models\GasBoilerSystemCommissioningChecklist;
 use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
+use App\Models\GasCommissionDecommissionRecord;
+use App\Models\GasCommissionDecommissionRecordAppliance;
 use App\Models\GasPowerFlushRecord;
 use App\Models\GasPowerFlushRecordChecklist;
 use App\Models\GasPowerFlushRecordRediator;
@@ -159,6 +162,14 @@ class RecordController extends Controller
             $data['gpfrc'] = GasPowerFlushRecordChecklist::with('make', 'type')->where('gas_power_flush_record_id', $gpfr_id)->get()->first();
             $data['gpfrr'] = GasPowerFlushRecordRediator::where('gas_power_flush_record_id', $gpfr_id)->orderBy('id', 'ASC')->get();
             $data['signature'] = isset($gasePowerFlashRecord->signature) ? Storage::disk('public')->url($gasePowerFlashRecord->signature->filename) : '';
+        elseif($record == 'installation_commissioning_decommissioning_record'):
+            $gasComDecRecord = GasCommissionDecommissionRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gcdr_id = (isset($gasComDecRecord->id) && $gasComDecRecord->id > 0 ? $gasComDecRecord->id : 0);
+            $data['worktype'] = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gcdr'] = $gasComDecRecord;
+            $data['gcdra1'] = GasCommissionDecommissionRecordAppliance::with('gcdrawt')->where('gas_commission_decommission_record_id', $gcdr_id)->where('appliance_serial', 1)->get()->first();
+            $data['signature'] = isset($gasComDecRecord->signature) ? Storage::disk('public')->url($gasComDecRecord->signature->filename) : '';
         endif;
 
 

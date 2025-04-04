@@ -268,6 +268,7 @@ class HomeOwnerGasSafetyController extends Controller
         $logoPath = resource_path('images/gas_safe_register_dark.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
+        $userSignBase64 = (isset($gsr->user->signature) && Storage::disk('public')->exists($gsr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gsr->user->signature->filename)) : '');
         $signatureBase64 = ($gsr->signature && Storage::disk('public')->exists($gsr->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gsr->signature->filename)) : '');
 
         $report_title = 'Certificate of '.$gsr->certificate_number;
@@ -953,7 +954,11 @@ class HomeOwnerGasSafetyController extends Controller
                                                     $PDFHTML .= '<tbody>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>';
-                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top"></td>';
+                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">';
+                                                                if($userSignBase64):
+                                                                    $PDFHTML .= '<img src="'.$userSignBase64.'" alt="signature" class="h-50px w-auto inline-block"/>';
+                                                                endif;
+                                                            $PDFHTML .= '</td>';
                                                         $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>';

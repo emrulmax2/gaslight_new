@@ -39,6 +39,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\Records\GasBoilerSystemCommissioningChecklistController;
 use App\Http\Controllers\Records\GasBreakdownRecordController;
+use App\Http\Controllers\Records\GasCommissionDecommissionRecordController;
 use App\Http\Controllers\Records\GasPowerFlushRecordController;
 use App\Http\Controllers\Records\GasServiceRecordController;
 use App\Http\Controllers\Records\GasWarningNoticeController;
@@ -331,6 +332,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/power_flush_record/show/{gpfr}', 'show')->name('records.gas.power.flush.record.show');
         Route::post('records/power_flush_record/store/{gpfr}', 'store')->name('records.gas.power.flush.record.store');
+    });
+    
+    Route::controller(GasCommissionDecommissionRecordController::class)->group(function(){
+        Route::post('records/installation-commissioning-decommissioning-record/store-appliance', 'storeAppliance')->name('records.gcdr.store.appliance');
+        Route::post('records/installation-commissioning-decommissioning-record/store-signatures', 'storeSignatures')->name('records.gcdr.store.signatures');
+
+        Route::get('records/installation-commissioning-decommissioning-record/show/{gcdr}', 'show')->name('records.gcdr.show');
+        Route::post('records/installation-commissioning-decommissioning-record/store/{gcdr}', 'store')->name('records.gcdr.store');
     });
 });
 

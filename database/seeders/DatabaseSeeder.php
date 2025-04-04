@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
         $this->callIfNotSeeded(PowerflushPipeworkTypeSeeder::class);
         $this->callIfNotSeeded(PowerflushSystemTypeSeeder::class);
         $this->callIfNotSeeded(RadiatorTypeSeeder::class);
+        $this->callIfNotSeeded(CommissionDecommissionWorkType::class);
     }
 
     /**
