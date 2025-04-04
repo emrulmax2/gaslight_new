@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreignId('appliance_location_id')->nullable()->index('fkgloc_ind')->constrained('appliance_locations', 'id', 'fkgloc_id')->cascadeOnDelete();
             $table->string('serial_no', 50)->nullable();
             $table->foreignId('powerflush_cylinder_type_id')->nullable()->index('fkgpfct_ind')->constrained('powerflush_cylinder_types', 'id', 'fkgpfct_id')->cascadeOnDelete();
-            $table->foreignId('powerflush_pipework_type_id')->nullable()->index('fkgppw_ind')->constrained('powerflush_pipework_type_id', 'id', 'fkgppw_id')->cascadeOnDelete();
+            $table->foreignId('powerflush_pipework_type_id')->index('fkgppw_ind')->constrained('powerflush_pipework_type_id', 'id', 'fkgppw_id')->cascadeOnDelete();
             $table->string('twin_radiator_vlv_fitted', 50)->nullable();
             $table->string('completely_warm_on_fired', 50)->nullable();
             $table->string('circulation_for_all_readiators', 50)->nullable();
