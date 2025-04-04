@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('gas_power_flush_record_rediators', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('gas_power_flush_record_id')->index('fkgpfrc_ind')->constrained('gas_power_flush_records', 'id', 'fkgpfrc_id')->cascadeOnDelete();
+            $table->foreignId('gas_power_flush_record_id')->index('fkgpfr_rediators_ind')->constrained('gas_power_flush_records', 'id', 'fkgpfrc_rediators_id')->cascadeOnDelete();
             
             $table->string('rediator_location')->nullable();
             $table->string('tmp_b_top', 50)->nullable();
