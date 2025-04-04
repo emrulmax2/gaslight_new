@@ -28,9 +28,9 @@ return new class extends Migration
             $table->string('completely_warm_on_fired', 50)->nullable();
             $table->string('circulation_for_all_readiators', 50)->nullable();
             $table->string('suffifiently_sound', 50)->nullable();
-            $table->foreignId('powerflush_circulator_pump_location_id')->nullable()->index('fkpcpl_ind')->constrained('powerflush_circulator_pump_location_id', 'id', 'fkpcpl_id')->cascadeOnDelete();
+            $table->foreignId('powerflush_circulator_pump_location_id')->nullable()->index('fkpcpl_ind')->constrained('powerflush_circulator_pump_locations', 'id', 'fkpcpl_id')->cascadeOnDelete();
             $table->string('number_of_radiators', 50)->nullable();
-            $table->foreignId('radiator_type_id')->nullable()->index('fkgrdt_ind')->constrained('radiator_type_id', 'id', 'fkgrdt_id')->cascadeOnDelete();
+            $table->foreignId('radiator_type_id')->nullable()->index('fkgrdt_ind')->constrained('radiator_types', 'id', 'fkgrdt_id')->cascadeOnDelete();
             $table->string('getting_warm', 50)->nullable();
             $table->string('are_trvs_fitted', 50)->nullable();
             $table->string('sign_of_neglect', 50)->nullable();
