@@ -412,11 +412,9 @@ class GasCommissionDecommissionRecordController extends Controller
                                     $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
-                                    $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Service/Maintenance Record</h1>';
+                                    $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Installation / Commissioning / Decommissioning Record</h1>';
                                     $PDFHTML .= '<div class="text-white text-12px leading-1-3">';
-                                        $PDFHTML .= 'This record can be used to document the outcomes of the checks and tests required by The Gas Safety (Installation and Use) Regulations. 
-                                                    Some of the outcomes are as a result of visual inspection only and are recorded where appropriate. Unless specifically recorded no detailed 
-                                                    inspection of the flue lining construction or integrity has been performed.
+                                        $PDFHTML .= 'This Safety Record can be used to document the outcomes of the checks and tests required by The Gas Safety (Installation and Use) regulations.
                                                     Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
                                     $PDFHTML .= '</div>';
                                 $PDFHTML .= '</td>';
