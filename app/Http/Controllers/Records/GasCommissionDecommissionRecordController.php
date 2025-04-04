@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Records;
 use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
+use App\Models\CommissionDecommissionWorkType;
 use App\Models\CustomerJob;
-use App\Models\GasWarningNotice;
-use App\Models\GasWarningNoticeAppliance;
+use App\Models\GasCommissionDecommissionRecord;
+use App\Models\GasCommissionDecommissionRecordAppliance;
+use App\Models\GasCommissionDecommissionRecordApplianceWorkType;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
@@ -17,19 +19,19 @@ use Illuminate\Support\Str;
 use Creagia\LaravelSignPad\Signature;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class GasWarningNoticeController extends Controller
+class GasCommissionDecommissionRecordController extends Controller
 {
-    public function show(GasWarningNotice $gsr){
+    public function show(GasCommissionDecommissionRecord $gcdr){
         $user_id = auth()->user()->id;
-        $gsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
-        $form = JobForm::find($gsr->job_form_id);
+        $gcdr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
+        $form = JobForm::find($gcdr->job_form_id);
         $record = $form->slug;
 
-        if(empty($gsr->certificate_number)):
+        if(empty($gcdr->certificate_number)):
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
             $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
             $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
-            $userLastCertificate = GasWarningNotice::where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $userLastCertificate = GasCommissionDecommissionRecord::where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
             $lastCertificateNo = (isset($userLastCertificate->certificate_number) && !empty($userLastCertificate->certificate_number) ? $userLastCertificate->certificate_number : '');
 
             $cerSerial = $starting_form;
@@ -38,10 +40,10 @@ class GasWarningNoticeController extends Controller
                 $cerSerial = (int) $certificateNumbers[1] + 1;
             endif;
             $certificateNumber = $prifix.str_pad($cerSerial, 6, '0', STR_PAD_LEFT);
-            GasWarningNotice::where('id', $gsr->id)->update(['certificate_number' => $certificateNumber]);
+            GasCommissionDecommissionRecord::where('id', $gcdr->id)->update(['certificate_number' => $certificateNumber]);
         endif;
 
-        $thePdf = $this->generatePdf($gsr->id);
+        $thePdf = $this->generatePdf($gcdr->id);
         return view('app.records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
@@ -49,9 +51,9 @@ class GasWarningNoticeController extends Controller
                 ['label' => $form->name, 'href' => 'javascript:void(0);'],
             ],
             'form' => $form,
-            'gsr' => $gsr,
-            'gsra1' => GasWarningNoticeAppliance::where('gas_warning_notice_id', $gsr->id)->where('appliance_serial', 1)->get()->first(),
-            'signature' => $gsr->signature ? Storage::disk('public')->url($gsr->signature->filename) : '',
+            'gcdr' => $gcdr,
+            'gcdra1' => GasCommissionDecommissionRecordAppliance::where('gas_commission_decommission_record_id', $gcdr->id)->where('appliance_serial', 1)->get()->first(),
+            'signature' => $gcdr->signature ? Storage::disk('public')->url($gcdr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
     }
@@ -66,7 +68,7 @@ class GasWarningNoticeController extends Controller
         $form = JobForm::find($job_form_id);
         $user_id = auth()->user()->id;
 
-        $gasWarningNotice = GasWarningNotice::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+        $gasComDecRecord = GasCommissionDecommissionRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
             'customer_id' => $job->customer_id,
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
@@ -75,40 +77,38 @@ class GasWarningNoticeController extends Controller
             'updated_by' => $user_id,
         ]);
         $saved = 0;
-        if($gasWarningNotice->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
+        if($gasComDecRecord->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
+            $existAppliances = $gasComDecRecAppliance = GasCommissionDecommissionRecordAppliance::where('gas_commission_decommission_record_id', $gasComDecRecord->id)->pluck('id')->unique()->toArray();
+            if(!empty($existAppliances)):
+                GasCommissionDecommissionRecordApplianceWorkType::whereIn('gas_commission_decommission_record_appliance_id', $existAppliances)->forceDelete();
+            endif;
             $theAppliance = $appliance[$serial];
-            $appliance_location_id = (isset($theAppliance['appliance_location_id']) && !empty($theAppliance['appliance_location_id']) ? $theAppliance['appliance_location_id'] : null);
-            if(!empty($appliance_location_id)):
-                $gasAppliance = GasWarningNoticeAppliance::updateOrCreate(['gas_warning_notice_id' => $gasWarningNotice->id, 'appliance_serial' => $serial], [
-                    'gas_safety_record_id' => $gasWarningNotice->id,
+            $workTypes = (isset($theAppliance['work_type']) && !empty($theAppliance['work_type']) ? $theAppliance['work_type'] : []);
+            if(!empty($workTypes)):
+                $gasComDecRecAppliance = GasCommissionDecommissionRecordAppliance::updateOrCreate(['gas_commission_decommission_record_id' => $gasComDecRecord->id, 'appliance_serial' => $serial], [
+                    'gas_commission_decommission_record_id' => $gasComDecRecord->id,
                     'appliance_serial' => $serial,
-                    'appliance_location_id' => (isset($theAppliance['appliance_location_id']) && !empty($theAppliance['appliance_location_id']) ? $theAppliance['appliance_location_id'] : null),
-                    'boiler_brand_id' => (isset($theAppliance['boiler_brand_id']) && !empty($theAppliance['boiler_brand_id']) ? $theAppliance['boiler_brand_id'] : null),
-                    'model' => (isset($theAppliance['model']) && !empty($theAppliance['model']) ? $theAppliance['model'] : null),
-                    'appliance_type_id' => (isset($theAppliance['appliance_type_id']) && !empty($theAppliance['appliance_type_id']) ? $theAppliance['appliance_type_id'] : null),
-                    'serial_no' => (isset($theAppliance['serial_no']) && !empty($theAppliance['serial_no']) ? $theAppliance['serial_no'] : null),
-                    'gc_no' => (isset($theAppliance['gc_no']) && !empty($theAppliance['gc_no']) ? $theAppliance['gc_no'] : null),
-                    'gas_warning_classification_id' => (isset($theAppliance['gas_warning_classification_id']) && !empty($theAppliance['gas_warning_classification_id']) ? $theAppliance['gas_warning_classification_id'] : null),
-                    
-                    'gas_escape_issue' => (isset($theAppliance['gas_escape_issue']) && !empty($theAppliance['gas_escape_issue']) ? $theAppliance['gas_escape_issue'] : null),
-                    'pipework_issue' => (isset($theAppliance['pipework_issue']) && !empty($theAppliance['pipework_issue']) ? $theAppliance['pipework_issue'] : null),
-                    'ventilation_issue' => (isset($theAppliance['ventilation_issue']) && !empty($theAppliance['ventilation_issue']) ? $theAppliance['ventilation_issue'] : null),
-                    'meter_issue' => (isset($theAppliance['meter_issue']) && !empty($theAppliance['meter_issue']) ? $theAppliance['meter_issue'] : null),
-                    'chimeny_issue' => (isset($theAppliance['chimeny_issue']) && !empty($theAppliance['chimeny_issue']) ? $theAppliance['chimeny_issue'] : null),
-                    'fault_details' => (isset($theAppliance['fault_details']) && !empty($theAppliance['fault_details']) ? $theAppliance['fault_details'] : null),
-                    'action_taken' => (isset($theAppliance['action_taken']) && !empty($theAppliance['action_taken']) ? $theAppliance['action_taken'] : null),
-                    'actions_required' => (isset($theAppliance['actions_required']) && !empty($theAppliance['actions_required']) ? $theAppliance['actions_required'] : null),
-                    'reported_to_hse' => (isset($theAppliance['reported_to_hse']) && !empty($theAppliance['reported_to_hse']) ? $theAppliance['reported_to_hse'] : null),
-                    'reported_to_hde' => (isset($theAppliance['reported_to_hde']) && !empty($theAppliance['reported_to_hde']) ? $theAppliance['reported_to_hde'] : null),
-                    'left_on_premisies' => (isset($theAppliance['left_on_premisies']) && !empty($theAppliance['left_on_premisies']) ? $theAppliance['left_on_premisies'] : null),
+                    'details_work_carried_out' => (isset($theAppliance['details_work_carried_out']) && !empty($theAppliance['details_work_carried_out']) ? $theAppliance['details_work_carried_out'] : null),
+                    'details_work_required' => (isset($theAppliance['details_work_required']) && !empty($theAppliance['details_work_required']) ? $theAppliance['details_work_required'] : null),
+                    'is_safe_to_use' => (isset($theAppliance['is_safe_to_use']) && !empty($theAppliance['is_safe_to_use']) ? $theAppliance['is_safe_to_use'] : null),
+                    'have_labels_affixed' => (isset($theAppliance['have_labels_affixed']) && !empty($theAppliance['have_labels_affixed']) ? $theAppliance['have_labels_affixed'] : null),
                     
                     'created_by' => $user_id,
                     'updated_by' => $user_id,
                 ]);
+                if($gasComDecRecAppliance->id):
+                    foreach($workTypes as $wt):
+                        $theType = GasCommissionDecommissionRecordApplianceWorkType::create([
+                            'gas_commission_decommission_record_appliance_id' => $gasComDecRecAppliance->id,
+                            'commission_decommission_work_type_id' => $wt,
+                            'created_by' => $user_id,
+                        ]);
+                    endforeach;
+                endif;
                 $saved = 1;
             endif;
 
-            return response()->json(['msg' => 'Appliance '.$serial.' Details successfully updated.', 'saved' => $saved], 200);
+            return response()->json(['msg' => 'Appliance Details successfully updated.', 'saved' => $saved], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
         endif;
@@ -123,7 +123,7 @@ class GasWarningNoticeController extends Controller
         $user_id = auth()->user()->id;
 
         
-        $gasWarningNotice = GasWarningNotice::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+        $gasComDecRecord = GasCommissionDecommissionRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
             'customer_id' => $job->customer_id,
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
@@ -141,13 +141,13 @@ class GasWarningNoticeController extends Controller
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
             $signatureData = base64_decode($signatureData);
             if(strlen($signatureData) > 2621):
-                $gasWarningNotice->deleteSignature();
+                $gasComDecRecord->deleteSignature();
                 
                 $imageName = 'signatures/' . Str::uuid() . '.png';
                 Storage::disk('public')->put($imageName, $signatureData);
                 $signature = new Signature();
-                $signature->model_type = GasWarningNotice::class;
-                $signature->model_id = $gasWarningNotice->id;
+                $signature->model_type = GasCommissionDecommissionRecord::class;
+                $signature->model_id = $gasComDecRecord->id;
                 $signature->uuid = Str::uuid();
                 $signature->filename = $imageName;
                 $signature->document_filename = null;
@@ -157,44 +157,44 @@ class GasWarningNoticeController extends Controller
             endif;
         endif;
 
-        return response()->json(['msg' => 'Gas Warning Notice Successfully Saved.', 'saved' => 1, 'red' => route('records.gas.warning.notice.show', $gasWarningNotice->id)], 200);
+        return response()->json(['msg' => 'Installation / Commissioning / Decommissioning Record Successfully Saved.', 'saved' => 1, 'red' => route('records.gcdr.show', $gasComDecRecord->id)], 200);
     }
 
     public function store(Request $request){
-        $gwn_id = $request->gwn_id;
+        $gcdr_id = $request->gcdr_id;
         $customer_job_id = $request->customer_job_id;
         $job_form_id = $request->job_form_id;
         $submit_type = $request->submit_type;
-        $gwn = GasWarningNotice::find($gwn_id);
+        $gcdr = GasCommissionDecommissionRecord::find($gcdr_id);
 
         $red = '';
-        $pdf = Storage::disk('public')->url('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$gwn->certificate_number.'.pdf');
+        $pdf = Storage::disk('public')->url('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$gcdr->certificate_number.'.pdf');
         $message = '';
-        $pdf = $this->generatePdf($gwn_id);
+        $pdf = $this->generatePdf($gcdr_id);
         if($submit_type == 2):
             $data = [];
             $data['status'] = 'Approved';
 
-            GasWarningNotice::where('id', $gwn_id)->update($data);
+            GasCommissionDecommissionRecord::where('id', $gcdr_id)->update($data);
             
-            $email = $this->sendEmail($gwn_id, $job_form_id);
-            $message = (!$email ? 'Gas Warning Noteice Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Gas Warning Noteice Certificate has been approved and a copy of the certificate mailed to the customer');
+            $email = $this->sendEmail($gcdr_id, $job_form_id);
+            $message = (!$email ? 'Installation / Commissioning / Decommissioning Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Installation / Commissioning / Decommissioning Certificate has been approved and a copy of the certificate mailed to the customer');
         else:
             $data = [];
             $data['status'] = 'Approved';
 
-            GasWarningNotice::where('id', $gwn_id)->update($data);
-            $message = 'Homewoner Gas Warning Noteice Certificate successfully approved.';
+            GasCommissionDecommissionRecord::where('id', $gcdr_id)->update($data);
+            $message = 'Installation / Commissioning / Decommissioning Certificate successfully approved.';
         endif;
 
         return response()->json(['msg' => $message, 'red' => route('company.dashboard'), 'pdf' => $pdf]);
     }
 
-    public function sendEmail($gwn_id, $job_form_id){
+    public function sendEmail($gcdr_id, $job_form_id){
         $user_id = auth()->user()->id;
-        $gwn = GasWarningNotice::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gwn_id);
-        $customerName = (isset($gwn->customer->full_name) && !empty($gwn->customer->full_name) ? $gwn->customer->full_name : '');
-        $customerEmail = (isset($gwn->customer->contact->email) && !empty($gwn->customer->contact->email) ? $gwn->customer->contact->email : '');
+        $gcdr = GasCommissionDecommissionRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gcdr_id);
+        $customerName = (isset($gcdr->customer->full_name) && !empty($gcdr->customer->full_name) ? $gcdr->customer->full_name : '');
+        $customerEmail = (isset($gcdr->customer->contact->email) && !empty($gcdr->customer->contact->email) ? $gcdr->customer->contact->email : '');
         if(!empty($customerEmail)):
             $template = JobFormEmailTemplate::where('user_id', $user_id)->where('job_form_id', $job_form_id)->get()->first();
             $subject = (isset($template->subject) && !empty($template->subject) ? $template->subject : 'Gas Safety Record');
@@ -219,11 +219,11 @@ class GasWarningNoticeController extends Controller
 
             ];
 
-            $fileName = $gwn->certificate_number.'.pdf';
+            $fileName = $gcdr->certificate_number.'.pdf';
             $attachmentFiles = [];
-            if (Storage::disk('public')->exists('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName)):
+            if (Storage::disk('public')->exists('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName)):
                 $attachmentFiles[] = [
-                    "pathinfo" => 'gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName,
+                    "pathinfo" => 'gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName,
                     "nameinfo" => $fileName,
                     "mimeinfo" => 'application/pdf',
                     "disk" => 'public'
@@ -237,18 +237,20 @@ class GasWarningNoticeController extends Controller
         endif;
     }
 
-    public function generatePdf($gsr_id) {
+    public function generatePdf($gcdr_id) {
         $user_id = auth()->user()->id;
-        $gwn = GasWarningNotice::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gsr_id);
-        $gwna1 = GasWarningNoticeAppliance::where('gas_warning_notice_id', $gwn->id)->where('appliance_serial', 1)->get()->first();
+        $gcdr = GasCommissionDecommissionRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gcdr_id);
+        $gcdra1 = GasCommissionDecommissionRecordAppliance::where('gas_commission_decommission_record_id', $gcdr->id)->where('appliance_serial', 1)->get()->first();
+        $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
 
         $logoPath = resource_path('images/gas_safe_register_dark.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
-        $userSignBase64 = (isset($gwn->user->signature) && Storage::disk('public')->exists($gwn->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gwn->user->signature->filename)) : '');
-        $signatureBase64 = ($gwn->signature && Storage::disk('public')->exists($gwn->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gwn->signature->filename)) : '');
+        $userSignBase64 = (isset($gcdr->user->signature) && Storage::disk('public')->exists($gcdr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gcdr->user->signature->filename)) : '');
+        $signatureBase64 = ($gcdr->signature && Storage::disk('public')->exists($gcdr->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gcdr->signature->filename)) : '');
+        
 
-        $report_title = 'Certificate of '.$gwn->certificate_number;
+        $report_title = 'Certificate of '.$gcdr->certificate_number;
         $PDFHTML = '';
         $PDFHTML .= '<html>';
             $PDFHTML .= '<head>';
@@ -285,6 +287,7 @@ class GasWarningNoticeController extends Controller
                                 .leading-none {line-height: 1;}
                                 .leading-1-3{line-height: 1.3;}
                                 .leading-1-2{line-height: 1.2;}
+                                .leading-1-1{line-height: 1.1;}
                                 .leading-1-5{line-height: 1.5;}
                                 .tracking-normal {letter-spacing: 0em;}
                                 .text-primary{color: #164e63;}
@@ -340,6 +343,7 @@ class GasWarningNoticeController extends Controller
                                 .p-3{padding: 0.75rem;}
                                 .p-5{padding: 1.25rem;}
                                 .py-05{padding-top: 0.125rem;padding-bottom: 0.125rem;}
+                                .py-025{padding-top: 0.0625rem;padding-bottom: 0.0625rem;}
                                 .py-1{padding-top: 0.25rem;padding-bottom: 0.25rem;}
                                 .py-1-5{padding-top: 0.375rem;padding-bottom: 0.375rem;}
                                 .py-2{padding-top: 0.5rem;padding-bottom: 0.5rem;}
@@ -400,7 +404,6 @@ class GasWarningNoticeController extends Controller
             $PDFHTML .= '</head>';
 
             $PDFHTML .= '<body>';
-
                 $PDFHTML .= '<div class="header bg-primary p-25">';
                     $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
                         $PDFHTML .= '<tbody>';
@@ -409,17 +412,17 @@ class GasWarningNoticeController extends Controller
                                     $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
-                                    $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">';
-                                        $PDFHTML .= '<span class="bg-danger inline-block py-1 px-2 mr-1">Danger Do Not Use</span>';
-                                        $PDFHTML .= '<span class="bg-warning inline-block py-1 px-2">Warning Notice</span>';
-                                    $PDFHTML .= '</h1>';
+                                    $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Service/Maintenance Record</h1>';
                                     $PDFHTML .= '<div class="text-white text-12px leading-1-3">';
-                                        $PDFHTML .= 'Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
+                                        $PDFHTML .= 'This record can be used to document the outcomes of the checks and tests required by The Gas Safety (Installation and Use) Regulations. 
+                                                    Some of the outcomes are as a result of visual inspection only and are recorded where appropriate. Unless specifically recorded no detailed 
+                                                    inspection of the flue lining construction or integrity has been performed.
+                                                    Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
                                     $PDFHTML .= '</div>';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col2 align-middle text-center">';
                                     $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gwn->certificate_number.'</div>';
+                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gcdr->certificate_number.'</div>';
                                 $PDFHTML .= '</td>';
                             $PDFHTML .= '</tr>';
                         $PDFHTML .= '</tbody>';
@@ -452,15 +455,15 @@ class GasWarningNoticeController extends Controller
                                                         $PDFHTML .= '<tbody>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Engineer</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gwn->user->name) && !empty($gwn->user->name) ? $gwn->user->name : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gcdr->user->name) && !empty($gcdr->user->name) ? $gcdr->user->name : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">GAS SAFE REG.</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->user->company->gas_safe_registration_no) && !empty($gwn->user->company->gas_safe_registration_no) ? $gwn->user->company->gas_safe_registration_no : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->user->company->gas_safe_registration_no) && !empty($gcdr->user->company->gas_safe_registration_no) ? $gcdr->user->company->gas_safe_registration_no : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">ID CARD NO.</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->user->gas_safe_id_card) && !empty($gwn->user->gas_safe_id_card) ? $gwn->user->gas_safe_id_card : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->user->gas_safe_id_card) && !empty($gcdr->user->gas_safe_id_card) ? $gcdr->user->gas_safe_id_card : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>';
@@ -474,19 +477,19 @@ class GasWarningNoticeController extends Controller
                                                         $PDFHTML .= '<tbody>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->user->company->company_name) && !empty($gwn->user->company->company_name) ? $gwn->user->company->company_name : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->user->company->company_name) && !empty($gcdr->user->company->company_name) ? $gcdr->user->company->company_name : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gwn->user->company->pdf_address) && !empty($gwn->user->company->pdf_address) ? $gwn->user->company->pdf_address : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gcdr->user->company->pdf_address) && !empty($gcdr->user->company->pdf_address) ? $gcdr->user->company->pdf_address : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">TEL NO.</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->user->company->company_phone) && !empty($gwn->user->company->company_phone) ? $gwn->user->company->company_phone : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->user->company->company_phone) && !empty($gcdr->user->company->company_phone) ? $gcdr->user->company->company_phone : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Email</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->user->company->company_email) && !empty($gwn->user->company->company_email) ? $gwn->user->company->company_email : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->user->company->company_email) && !empty($gcdr->user->company->company_email) ? $gcdr->user->company->company_email : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '</tbody>';
                                                     $PDFHTML .= '</table>';
@@ -500,15 +503,15 @@ class GasWarningNoticeController extends Controller
                                         $PDFHTML .= '<tbody>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->job->property->occupant_name) && !empty($gwn->job->property->occupant_name) ? $gwn->job->property->occupant_name : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->job->property->occupant_name) && !empty($gcdr->job->property->occupant_name) ? $gcdr->job->property->occupant_name : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gwn->job->property->pdf_address) && !empty($gwn->job->property->pdf_address) ? $gwn->job->property->pdf_address : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gcdr->job->property->pdf_address) && !empty($gcdr->job->property->pdf_address) ? $gcdr->job->property->pdf_address : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->job->property->postal_code) && !empty($gwn->job->property->postal_code) ? $gwn->job->property->postal_code : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->job->property->postal_code) && !empty($gcdr->job->property->postal_code) ? $gcdr->job->property->postal_code : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>';
@@ -522,19 +525,19 @@ class GasWarningNoticeController extends Controller
                                         $PDFHTML .= '<tbody>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->customer->full_name) && !empty($gwn->customer->full_name) ? $gwn->customer->full_name : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->customer->full_name) && !empty($gcdr->customer->full_name) ? $gcdr->customer->full_name : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company Name</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px leading-none align-middle">'.(isset($gwn->customer->company_name) && !empty($gwn->customer->company_name) ? $gwn->customer->company_name : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->customer->company_name) && !empty($gcdr->customer->company_name) ? $gcdr->customer->company_name : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gwn->customer->pdf_address) && !empty($gwn->customer->pdf_address) ? $gwn->customer->pdf_address : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gcdr->customer->pdf_address) && !empty($gcdr->customer->pdf_address) ? $gcdr->customer->pdf_address : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gwn->customer->postal_code) && !empty($gwn->customer->postal_code) ? $gwn->customer->postal_code : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gcdr->customer->postal_code) && !empty($gcdr->customer->postal_code) ? $gcdr->customer->postal_code : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                         $PDFHTML .= '</tbody>';
                                     $PDFHTML .= '</table>';
@@ -544,146 +547,78 @@ class GasWarningNoticeController extends Controller
                     $PDFHTML .= '</table>';
                 $PDFHTML .= '</div>';
 
-                $PDFHTML .= '<table class="p-0 border-none mt-1-5">';
-                    $PDFHTML .= '<tbody>';
-                        $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="w-col7 pr-1 pl-0 pb-0 pt-0 align-top">';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="7" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'THE GAS APPLIANCE / GAS INSTALLATION';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Location';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Model';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Make';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Type';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Serial No.';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'GC No.';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Classification';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->location->name) && !empty($gwna1->location->name) ? $gwna1->location->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->model) && !empty($gwna1->model) ? $gwna1->model : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->make->name) && !empty($gwna1->make->name) ? $gwna1->make->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->type->name) && !empty($gwna1->type->name) ? $gwna1->type->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->serial_no) && !empty($gwna1->serial_no) ? $gwna1->serial_no : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->gc_no) && !empty($gwna1->gc_no) ? $gwna1->gc_no : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gwna1->classification->name) && !empty($gwna1->classification->name) ? $gwna1->classification->name : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
-                            $PDFHTML .= '<td class="w-col5 pl-1 pr-0 pb-0 pt-0 align-top">';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="5" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'ISSUES';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Gas Escape Issue';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Pipework Issue';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Ventilation Issue';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Meter Issue';
-                                            $PDFHTML .= '</th>';
-                                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">';
-                                                $PDFHTML .= 'Chimney Issue';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->gas_escape_issue) && !empty($gwna1->gas_escape_issue) ? $gwna1->gas_escape_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->pipework_issue) && !empty($gwna1->pipework_issue) ? $gwna1->pipework_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->ventilation_issue) && !empty($gwna1->ventilation_issue) ? $gwna1->ventilation_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->meter_issue) && !empty($gwna1->meter_issue) ? $gwna1->meter_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->chimeny_issue) && !empty($gwna1->chimeny_issue) ? $gwna1->chimeny_issue : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
-                        $PDFHTML .= '</tr>';
-                    $PDFHTML .= '</tbody>';
-                $PDFHTML .= '</table>';
+
                 $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
                     $PDFHTML .= '<thead>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">';
-                                $PDFHTML .= 'Details of faults';
+                            $PDFHTML .= '<th colspan="'.($worktypes->count() > 0 ? $worktypes->count() : 1).'" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">';
+                                $PDFHTML .= 'Work Type';
                             $PDFHTML .= '</th>';
-                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">';
-                                $PDFHTML .= 'Actions Taken';
+                        $PDFHTML .= '</tr>';
+                        if($worktypes->count() > 0):
+                            $PDFHTML .= '<tr>';
+                                foreach($worktypes as $wtp):
+                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">';
+                                        $PDFHTML .= $wtp->name;
+                                    $PDFHTML .= '</th>';
+                                endforeach;
+                            $PDFHTML .= '</tr>';
+                        endif;
+                    $PDFHTML .= '</thead>';
+                    $PDFHTML .= '<tbody>';
+                        if($worktypes->count() > 0):
+                            $PDFHTML .= '<tr>';
+                                foreach($worktypes as $wtp):
+                                    $gcdraw1t = GasCommissionDecommissionRecordApplianceWorkType::where('gas_commission_decommission_record_appliance_id', $gcdra1->id)->where('commission_decommission_work_type_id', $wtp->id)->get()->first();
+                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-13px tracking-normal text-center leading-1-2 border-b border-r">';
+                                        $PDFHTML .= (isset($gcdraw1t->id) && $gcdraw1t->id > 0 ? '<div style="font-family: DejaVu Sans, sans-serif; font-weight: normal;">✔</div>' : '<div style="font-family: DejaVu Sans, sans-serif; font-weight: normal;">✗</div>');
+                                    $PDFHTML .= '</td>';
+                                endforeach;
+                            $PDFHTML .= '</tr>';
+                        endif;
+                    $PDFHTML .= '</tbody>';
+                $PDFHTML .= '</table>';
+
+                $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
+                    $PDFHTML .= '<thead>';
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<th class="whitespace-nowrap border-primary border-b-white border-b-1 border-r border-r-sec bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">';
+                                $PDFHTML .= 'Detailed description of the work car';
                             $PDFHTML .= '</th>';
-                            $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">';
-                                $PDFHTML .= 'Actions Required';
+                            $PDFHTML .= '<th class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">';
+                                $PDFHTML .= 'Description of additional work required';
                             $PDFHTML .= '</th>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</thead>';
                     $PDFHTML .= '<tbody>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-80px align-top">'.(isset($gwna1->fault_details) && !empty($gwna1->fault_details) ? $gwna1->fault_details : '').'</td>';
-                            $PDFHTML .= '<td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-80px align-top">'.(isset($gwna1->action_taken) && !empty($gwna1->action_taken) ? $gwna1->action_taken : '').'</td>';
-                            $PDFHTML .= '<td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-80px align-top">'.(isset($gwna1->actions_required) && !empty($gwna1->actions_required) ? $gwna1->actions_required : '').'</td>';
+                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">'.(isset($gcdra1->details_work_carried_out) && !empty($gcdra1->details_work_carried_out) ? $gcdra1->details_work_carried_out : '').'</td>';
+                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">'.(isset($gcdra1->details_work_required) && !empty($gcdra1->details_work_required) ? $gcdra1->details_work_required : '').'</td>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</tbody>';
                 $PDFHTML .= '</table>';
 
-                $PDFHTML .= '<table class="p-0 border-none mt-1-5">';
+                $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
+                    $PDFHTML .= '<thead>';
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<th class="whitespace-nowrap border-primary border-b-white border-b-1 border-r border-r-sec bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">';
+                                $PDFHTML .= 'Is the gas installation/appliance(s) safe to use';
+                            $PDFHTML .= '</th>';
+                            $PDFHTML .= '<th class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">';
+                                $PDFHTML .= 'Have warning labels been affixed?';
+                            $PDFHTML .= '</th>';
+                        $PDFHTML .= '</tr>';
+                    $PDFHTML .= '</thead>';
                     $PDFHTML .= '<tbody>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">';
-                            $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                $PDFHTML .= '<tbody>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px uppercase px-2 py-1 leading-none align-middle">Reported to HSE under RIDDOR 11(1) (Gas Incident)</td>';
-                                        $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">'.(isset($gwna1->reported_to_hse) && !empty($gwna1->reported_to_hse) ? $gwna1->reported_to_hse : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                $PDFHTML .= '</tbody>';
-                            $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
-                            $PDFHTML .= '<td class="w-half pl-1 pr-0 pb-0 pt-0 align-top">';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px uppercase px-2 py-1 leading-none align-middle">Reported to HSE under RIDDOR 11(2) (Dangerous Gas Fitting)</td>';
-                                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">'.(isset($gwna1->reported_to_hde) && !empty($gwna1->reported_to_hde) ? $gwna1->reported_to_hde : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
-                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">'.(isset($gcdra1->is_safe_to_use) && !empty($gcdra1->is_safe_to_use) ? $gcdra1->is_safe_to_use : '').'</td>';
+                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">'.(isset($gcdra1->have_labels_affixed) && !empty($gcdra1->have_labels_affixed) ? $gcdra1->have_labels_affixed : '').'</td>';
+                        $PDFHTML .= '</tr>';
                     $PDFHTML .= '</tbody>';
                 $PDFHTML .= '</table>';
 
-                $inspectionDeate = (isset($gwn->inspection_date) && !empty($gwn->inspection_date) ? date('d-m-Y', strtotime($gwn->inspection_date)) : date('d-m-Y'));
-                $nextInspectionDate = (isset($gwn->next_inspection_date) && !empty($gwn->next_inspection_date) ? date('d-m-Y', strtotime($gwn->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
+                $inspectionDeate = (isset($gcdr->inspection_date) && !empty($gcdr->inspection_date) ? date('d-m-Y', strtotime($gcdr->inspection_date)) : date('d-m-Y'));
+                $nextInspectionDate = (isset($gcdr->next_inspection_date) && !empty($gcdr->next_inspection_date) ? date('d-m-Y', strtotime($gcdr->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
                 
                 $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
                     $PDFHTML .= '<thead>';
@@ -708,7 +643,7 @@ class GasWarningNoticeController extends Controller
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>';
-                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gwn->user->name) && !empty($gwn->user->name) ? $gwn->user->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gcdr->user->name) && !empty($gcdr->user->name) ? $gcdr->user->name : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Date of Issue</td>';
@@ -730,11 +665,11 @@ class GasWarningNoticeController extends Controller
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Received By</td>';
-                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gwn->relation->name) && !empty($gwn->relation->name) ? $gwn->relation->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gcdr->relation->name) && !empty($gcdr->relation->name) ? $gcdr->relation->name : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>';
-                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gwn->received_by) && !empty($gwn->received_by) ? $gwn->received_by : (isset($gwn->customer->full_name) && !empty($gwn->customer->full_name) ? $gwn->customer->full_name : '')).'</td>';
+                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gcdr->received_by) && !empty($gcdr->received_by) ? $gcdr->received_by : (isset($gcdr->customer->full_name) && !empty($gcdr->customer->full_name) ? $gcdr->customer->full_name : '')).'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -747,20 +682,21 @@ class GasWarningNoticeController extends Controller
                     $PDFHTML .= '</tbody>';
                 $PDFHTML .= '</table>';
 
+
             $PDFHTML .= '</body>';
         $PDFHTML .= '</html>';
 
 
-        $fileName = $gwn->certificate_number.'.pdf';
-        if (Storage::disk('public')->exists('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName)) {
-            Storage::disk('public')->delete('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName);
+        $fileName = $gcdr->certificate_number.'.pdf';
+        if (Storage::disk('public')->exists('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName)) {
+            Storage::disk('public')->delete('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName);
         }
         $pdf = Pdf::loadHTML($PDFHTML)->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
             ->setPaper('a4', 'landscape') //portrait landscape
             ->setWarnings(false);
         $content = $pdf->output();
-        Storage::disk('public')->put('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName, $content );
+        Storage::disk('public')->put('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName, $content );
 
-        return Storage::disk('public')->url('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName);
+        return Storage::disk('public')->url('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName);
     }
 }

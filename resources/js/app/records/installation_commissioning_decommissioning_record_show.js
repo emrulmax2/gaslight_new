@@ -25,12 +25,12 @@
         }
     });
 
-    $('#gasPowerFlushRecordForm').on('submit', function(e){
+    $('#gasComDecRecordForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('gasPowerFlushRecordForm');
+        const form = document.getElementById('gasComDecRecordForm');
         let $theForm = $(this);
         let type = $theForm.find('[name="submit_type"]').val();
-        let gpfr_id = $theForm.find('#gpfr_id').val();
+        let gcdr_id = $theForm.find('#gcdr_id').val();
 
         $('.formSubmits', $theForm).attr('disabled', 'disabled');
         $('.formSubmits.submit_'+type+' .theLoader', $theForm).fadeIn();
@@ -39,7 +39,7 @@
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('records.gas.power.flush.record.store', gpfr_id),
+            url: route('records.gcdr.store', gcdr_id),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {

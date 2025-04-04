@@ -308,6 +308,7 @@ class GasPowerFlushRecordController extends Controller
         $logoPath = resource_path('images/gas_safe_register_dark.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
+        $userSignBase64 = (isset($gpfr->user->signature) && Storage::disk('public')->exists($gpfr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gpfr->user->signature->filename)) : '');
         $signatureBase64 = ($gpfr->signature && Storage::disk('public')->exists($gpfr->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gpfr->signature->filename)) : '');
         
 
@@ -355,6 +356,7 @@ class GasPowerFlushRecordController extends Controller
                                 .text-slate-400{color: #94a3b8;}
                                 .text-white{color: #FFF;}
                                 .uppercase {text-transform: uppercase;}
+                                .capitalize{text-transform: capitalize;}
                                 .whitespace-nowrap{white-space: nowrap;}
                                 
                                 .w-auto{width: auto;}
@@ -369,6 +371,8 @@ class GasPowerFlushRecordController extends Controller
                                 .w-col5{width: 41.666666%;}
                                 .w-col7{width: 58.333333%;}
                                 .w-col8{width: 66.666666%;}
+                                .w-col10-half{width: 41.666666%}
+                                .w-col10-8by-1{width: 10.416666%}
                                 .w-col9{width: 75%;}
                                 .w-col3{width: 25%;}
                                 .w-32 {width: 8rem;}
@@ -433,6 +437,8 @@ class GasPowerFlushRecordController extends Controller
                                 .mb-0{margin-bottom: 0;}
                                 .m-2{margin: .5rem;}
                                 .mr-1{margin-right: .25rem;}
+                                .ml-1{margin-left: .25rem;}
+                                .ml-2{margin-left: .50rem;}
 
                                 .bg-danger{ background: #b91c1c; }
                                 .bg-warning{ background: #f59e0b; }
@@ -455,6 +461,8 @@ class GasPowerFlushRecordController extends Controller
                                 .border-r-sec{border-right-color: #1d6a87 !important;}
                                 .border-b-sec{border-bottom-color: #1d6a87 !important;}
                                 .border-t-sec{border-top-color: #1d6a87 !important;}
+                                .border-t-white{border-top-color: #164e63 !important;}
+                                .border-t-primary{border-top-color: #FFF !important;}
                                 .border-slate-200 {border-color: #e2e8f0;}
                                 .border-primary{border-color: #164e63;}
                                 .border-b-white{border-bottom-color: #FFF;}
@@ -602,259 +610,169 @@ class GasPowerFlushRecordController extends Controller
                     $PDFHTML .= '</table>';
                 $PDFHTML .= '</div>';
 
-                /*$PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
-                    $PDFHTML .= '<thead>';
-                        $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                $PDFHTML .= 'Appliance Details';
-                            $PDFHTML .= '</th>';
-                        $PDFHTML .= '</tr>';
-                    $PDFHTML .= '</thead>';
+                $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
                     $PDFHTML .= '<tbody>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left font-medium leading-1-2 border-b border-r">Make</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->make->name) && !empty($gbscca1->make->name) ? $gbscca1->make->name : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left font-medium leading-1-2 border-b border-r">Model</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->model) && !empty($gbscca1->model) ? $gbscca1->model : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left font-medium leading-1-2 border-b border-r">Serial No</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->serial_no) && !empty($gbscca1->serial_no) ? $gbscca1->serial_no : '').'</td>';
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Type of System</td>';
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->systemType->name) && !empty($gpfrc->systemType->name) ? $gpfrc->systemType->name : '').'</td>';
+                        
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Pipework</td>';
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->pipework) && !empty($gpfrc->pipework) ? $gpfrc->pipework : '').'</td>';
+                        
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Serial Number</td>';
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->serial_no) && !empty($gpfrc->serial_no) ? $gpfrc->serial_no : '').'</td>';
                         $PDFHTML .= '</tr>';
-                    $PDFHTML .= '</tbody>';
-                $PDFHTML .= '</table>';
-                $PDFHTML .= '<table class="p-0 border-none mt-1-5">';
-                    $PDFHTML .= '<tbody>';
+
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="w-col4 pr-1 pl-0 pb-0 pt-0 align-top">';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="2" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'Controls';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Time and temp control to heating</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->temperature->name) && !empty($gbscca1->temperature->name) ? $gbscca1->temperature->name : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Time and temp control to hot water</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->tmp_control_hot_water) && !empty($gbscca1->tmp_control_hot_water) ? $gbscca1->tmp_control_hot_water : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';    
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Heating zone valves</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->heating_zone_vlv) && !empty($gbscca1->heating_zone_vlv) ? $gbscca1->heating_zone_vlv : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';    
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Hot water zone valves</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->hot_water_zone_vlv) && !empty($gbscca1->hot_water_zone_vlv) ? $gbscca1->hot_water_zone_vlv : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';     
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Thermostatic radiator valves</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->therm_radiator_vlv) && !empty($gbscca1->therm_radiator_vlv) ? $gbscca1->therm_radiator_vlv : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>'; 
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Automatic bypass to system</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->bypass_to_system) && !empty($gbscca1->bypass_to_system) ? $gbscca1->bypass_to_system : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';     
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Boiler interlock</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->boiler_interlock) && !empty($gbscca1->boiler_interlock) ? $gbscca1->boiler_interlock : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="2" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'Combination boilers only';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">is the installation in a hard water area (above 200ppm)</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->is_in_hard_water_area) && !empty($gbscca1->is_in_hard_water_area) ? $gbscca1->is_in_hard_water_area : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">If yes and if required by the manufacturer, has the water scale reducer been fitted</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->is_scale_reducer_fitted) && !empty($gbscca1->is_scale_reducer_fitted) ? $gbscca1->is_scale_reducer_fitted : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';    
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">What type of scale reducer has been fitted</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->what_reducer_fitted) && !empty($gbscca1->what_reducer_fitted) ? $gbscca1->what_reducer_fitted : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
-                            $PDFHTML .= '<td class="w-col4 pl-1 pr-0 pb-0 pt-0 align-top">';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="2" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'All Systems';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">The system has been flushed and cleaned in accordance with BS7593 and boiler manufacturer\'s instructions</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->flushed_and_cleaned) && !empty($gbscca1->flushed_and_cleaned) ? $gbscca1->flushed_and_cleaned : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">What cleaner was used</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->clearner_name) && !empty($gbscca1->clearner_name) ? $gbscca1->clearner_name : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">What inhibitor was used</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->inhibitor_quantity) && !empty($gbscca1->inhibitor_quantity) ? 'Quantity: '.$gbscca1->inhibitor_quantity : '').(isset($gbscca1->inhibitor_amount) && !empty($gbscca1->inhibitor_amount) ? ' Liters: '.$gbscca1->inhibitor_amount : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Has a primary water system filter been installed</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->primary_ws_filter_installed) && !empty($gbscca1->primary_ws_filter_installed) ? $gbscca1->primary_ws_filter_installed : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="2" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'Domestic hot water mode';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Gas Rate '.(isset($gbscca1->dom_gas_rate_unit) && !empty($gbscca1->dom_gas_rate_unit) ? '('.$gbscca1->dom_gas_rate_unit.')' : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->dom_gas_rate) && !empty($gbscca1->dom_gas_rate) ? $gbscca1->dom_gas_rate : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Burner operating pressure (or inlet pressure) at maximum rate '.(isset($gbscca1->dom_burner_opt_pressure_unit) && !empty($gbscca1->dom_burner_opt_pressure_unit) ? '('.$gbscca1->dom_burner_opt_pressure_unit.')' : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->dom_burner_opt_pressure) && !empty($gbscca1->dom_burner_opt_pressure) ? $gbscca1->dom_burner_opt_pressure : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Cold water inlet temperature (°C)</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->dom_cold_water_temp) && !empty($gbscca1->dom_cold_water_temp) ? $gbscca1->dom_cold_water_temp : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Hot water has been checked at all outlets</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->dom_checked_outlet) && !empty($gbscca1->dom_checked_outlet) ? $gbscca1->dom_checked_outlet : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Water flow rate (l/min)</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->dom_water_flow_rate) && !empty($gbscca1->dom_water_flow_rate) ? $gbscca1->dom_water_flow_rate : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">&nbsp;</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4"></td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
-                            $PDFHTML .= '<td class="w-col4 pl-1 pr-0 pb-0 pt-0 align-top">';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="2" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'Central heating mode';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Gas Rate '.(isset($gbscca1->gas_rate_unit) && !empty($gbscca1->gas_rate_unit) ? $gbscca1->gas_rate_unit : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->gas_rate) && !empty($gbscca1->gas_rate) ? $gbscca1->gas_rate : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Central heating output left at factory setting</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->cho_factory_setting) && !empty($gbscca1->cho_factory_setting) ? $gbscca1->cho_factory_setting : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Burner operating pressure (or inlet pressure) at maximum rate '.(isset($gbscca1->burner_opt_pressure_unit) && !empty($gbscca1->burner_opt_pressure_unit) ? '('.$gbscca1->burner_opt_pressure_unit.')' : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->burner_opt_pressure) && !empty($gbscca1->burner_opt_pressure) ? $gbscca1->burner_opt_pressure : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Central heating flow temperature (°C)</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->centeral_heat_flow_temp) && !empty($gbscca1->centeral_heat_flow_temp) ? $gbscca1->centeral_heat_flow_temp : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Central heating return temperature (°C)</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->centeral_heat_return_temp) && !empty($gbscca1->centeral_heat_return_temp) ? $gbscca1->centeral_heat_return_temp : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                                    $PDFHTML .= '<thead>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<th colspan="2" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                                $PDFHTML .= 'Condensing boilers only';
-                                            $PDFHTML .= '</th>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</thead>';
-                                    $PDFHTML .= '<tbody>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">The condensate drain has been installed in accordance with the manufacturer\'s instructions and/or BS5546/BS6798</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->con_drain_installed) && !empty($gbscca1->con_drain_installed) ? $gbscca1->con_drain_installed : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Point of Termination</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->point_of_termination) && !empty($gbscca1->point_of_termination) ? $gbscca1->point_of_termination : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Method of Disposal</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">'.(isset($gbscca1->dispsal_method) && !empty($gbscca1->dispsal_method) ? $gbscca1->dispsal_method : '').'</td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">&nbsp;</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4"></td>';
-                                        $PDFHTML .= '</tr>';
-                                        $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">&nbsp;</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4"></td>';
-                                        $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '</tbody>';
-                                $PDFHTML .= '</table>';
-                            $PDFHTML .= '</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Boiler</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->make->name) && !empty($gpfrc->make->name) ? $gpfrc->make->name : '').'</td>';
+                        
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Type of Boiler</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->type->name) && !empty($gpfrc->type->name) ? $gpfrc->type->name : '').'</td>';
+                        
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Type of Water Cylinder</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->cylinder->name) && !empty($gpfrc->cylinder->name) ? $gpfrc->cylinder->name : '').'</td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Radiators</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->radiators) && !empty($gpfrc->radiators) ? $gpfrc->radiators : '').'</td>';
+                        
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Location of Boiler</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->location->name) && !empty($gpfrc->location->name) ? $gpfrc->location->name : '').'</td>';
+                        
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Type of Pipework</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal w-col2 align-middle">'.(isset($gpfrc->pipeworkType->name) && !empty($gpfrc->pipeworkType->name) ? $gpfrc->pipeworkType->name : '').'</td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">If microbore system</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Are twin entry radiator valves fitted: <span class="ml-1 font-medium">'.(isset($gpfrc->twin_radiator_vlv_fitted) && !empty($gpfrc->twin_radiator_vlv_fitted) ? $gpfrc->twin_radiator_vlv_fitted : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="3">If so, are all radiators completely warm when boiler fired: <span class="ml-1 font-medium">'.(isset($gpfrc->completely_warm_on_fired) && !empty($gpfrc->completely_warm_on_fired) ? $gpfrc->completely_warm_on_fired : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">If single pipe system</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="5">Is there circulation (heat) to all radiators: <span class="ml-1 font-medium">'.(isset($gpfrc->circulation_for_all_readiators) && !empty($gpfrc->circulation_for_all_readiators) ? $gpfrc->circulation_for_all_readiators : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-nowrap font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle" rowspan="3">If elderly steel pipework</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Is system sufficiently sound to power flush: <span class="ml-1 font-medium">'.(isset($gpfrc->suffifiently_sound) && !empty($gpfrc->suffifiently_sound) ? $gpfrc->suffifiently_sound : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Location of system circulator pump: <span class="ml-1 font-medium">'.(isset($gpfrc->pumpLocation->name) && !empty($gpfrc->pumpLocation->name) ? $gpfrc->pumpLocation->name : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle">Number of radiators: <span class="ml-1 font-medium">'.(isset($gpfrc->number_of_radiators) && !empty($gpfrc->number_of_radiators) ? $gpfrc->number_of_radiators : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Radiator Type: <span class="ml-1 font-medium">'.(isset($gpfrc->rediatorType->name) && !empty($gpfrc->rediatorType->name) ? $gpfrc->rediatorType->name : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Are they getting warm: <span class="ml-1 font-medium">'.(isset($gpfrc->getting_warm) && !empty($gpfrc->getting_warm) ? $gpfrc->getting_warm : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle">Are TRV\'s fitted: <span class="ml-1 font-medium">'.(isset($gpfrc->are_trvs_fitted) && !empty($gpfrc->are_trvs_fitted) ? $gpfrc->are_trvs_fitted : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Any obvious signs of neglect/leak: <span class="ml-1 font-medium">'.(isset($gpfrc->sign_of_neglect) && !empty($gpfrc->sign_of_neglect) ? $gpfrc->sign_of_neglect : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="3">Do all thermostic radiator valves (TRV\'s) open fully: <span class="ml-1 font-medium">'.(isset($gpfrc->radiator_open_fully) && !empty($gpfrc->radiator_open_fully) ? $gpfrc->radiator_open_fully : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Are there zone valves / Where are they located</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Number of valves: <span class="ml-1 font-medium">'.(isset($gpfrc->number_of_valves) && !empty($gpfrc->number_of_valves) ? $gpfrc->number_of_valves : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="3">Location: <span class="ml-1 font-medium">'.(isset($gpfrc->valves_located) && !empty($gpfrc->valves_located) ? $gpfrc->valves_located : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle" rowspan="2">F & E Tank</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Location: <span class="ml-1 font-medium">'.(isset($gpfrc->fe_tank_location) && !empty($gpfrc->fe_tank_location) ? $gpfrc->fe_tank_location : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Checked: <span class="ml-1 font-medium">'.(isset($gpfrc->fe_tank_checked) && !empty($gpfrc->fe_tank_checked) ? $gpfrc->fe_tank_checked : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle">Condition: <span class="ml-1 font-medium">'.(isset($gpfrc->fe_tank_condition) && !empty($gpfrc->fe_tank_condition) ? $gpfrc->fe_tank_condition : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">Color of heating system water, as run from bottom of radiator: <span class="ml-1 font-medium">'.(isset($gpfrc->color->name) && !empty($gpfrc->color->name) ? $gpfrc->color->name : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="3">Visual inspection of system water before PowerFlush: <span class="ml-1 font-medium">'.(isset($gpfrc->beforeColor->name) && !empty($gpfrc->beforeColor->name) ? $gpfrc->beforeColor->name : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Test Parameter</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-primary border-l border-l-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">pH</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-primary border-l border-l-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">chloride (ppm)</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-primary border-l border-l-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Hardness</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-primary border-l border-l-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle" colspan="2">Inhibitor (ppm molybdate)</td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">Mains water</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->mw_ph) && !empty($gpfrc->mw_ph) ? $gpfrc->mw_ph : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->mw_chloride) && !empty($gpfrc->mw_chloride) ? $gpfrc->mw_chloride : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->mw_hardness) && !empty($gpfrc->mw_hardness) ? $gpfrc->mw_hardness : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2"><span class="font-medium">'.(isset($gpfrc->mw_inhibitor) && !empty($gpfrc->mw_inhibitor) ? $gpfrc->mw_inhibitor : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">System water before PowerFlush</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->bpf_ph) && !empty($gpfrc->bpf_ph) ? $gpfrc->bpf_ph : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->bpf_chloride) && !empty($gpfrc->bpf_chloride) ? $gpfrc->bpf_chloride : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->bpf_hardness) && !empty($gpfrc->bpf_hardness) ? $gpfrc->bpf_hardness : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2"><span class="font-medium">'.(isset($gpfrc->bpf_inhibitor) && !empty($gpfrc->bpf_inhibitor) ? $gpfrc->bpf_inhibitor : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">System water after PowerFlush</td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->apf_ph) && !empty($gpfrc->apf_ph) ? $gpfrc->apf_ph : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->apf_chloride) && !empty($gpfrc->apf_chloride) ? $gpfrc->apf_chloride : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle"><span class="font-medium">'.(isset($gpfrc->apf_hardness) && !empty($gpfrc->apf_hardness) ? $gpfrc->apf_hardness : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2"><span class="font-medium">'.(isset($gpfrc->apf_inhibitor) && !empty($gpfrc->apf_inhibitor) ? $gpfrc->apf_inhibitor : '').'</span></td>';
+                        $PDFHTML .= '</tr>';
+
+                        $PDFHTML .= '<tr>';
+                            $PDFHTML .= '<td class="border-primary border-t border-t-sec whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle">TDS Readings</td>';
+                            $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle">Mains Water: <span class="ml-1 font-medium">'.(isset($gpfrc->mw_tds_reading) && !empty($gpfrc->mw_tds_reading) ? $gpfrc->mw_tds_reading.' ppm' : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">System water before flush: <span class="ml-1 font-medium">'.(isset($gpfrc->bf_tds_reading) && !empty($gpfrc->bf_tds_reading) ? $gpfrc->bf_tds_reading.' ppm' : '').'</span></td>';
+                            $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle" colspan="2">System water after flush: <span class="ml-1 font-medium">'.(isset($gpfrc->af_tds_reading) && !empty($gpfrc->af_tds_reading) ? $gpfrc->af_tds_reading.' ppm' : '').'</span></td>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</tbody>';
                 $PDFHTML .= '</table>';
 
-                $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
-                    $PDFHTML .= '<thead>';
-                        $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<th colspan="10" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
-                                $PDFHTML .= 'All installations';
-                            $PDFHTML .= '</th>';
-                        $PDFHTML .= '</tr>';
-                    $PDFHTML .= '</thead>';
+                $PDFHTML .= '<table class="table table-sm bordered border-primary">';
                     $PDFHTML .= '<tbody>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">Min. ratio</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">CO at min. rate</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">CO/CO at min. rate</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">Max. ratio</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">CO at max. rate</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">CO/CO at max. rate</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">The heating and hot water system complies with the appropriate Building Regulations</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">The boiler and associated products have been installed and commissioned in accordance with the manufacturer\'s instructions</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">The operation of the boiler system controls have been demonstrated to and understood by the customer</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">The manufacturer\'s literature, including Benchmark Checklist and Service Record, has been explained and left with the customer</td>';
+                            $PDFHTML .= '<td class="border-primary whitespace-normal font-medium bg-primary text-white text-11px capitalize px-2 py-05 leading-none tracking-normal w-col2 align-middle"> System water after</td>';
+                            $PDFHTML .= '<td class="border-primary border-l border-l-sec whitespace-normal font-medium bg-primary text-white text-11px text-center capitalize px-2 py-05 leading-none tracking-normal align-middle" colspan="4">Temperature before powerflus in °C</td>';
+                            $PDFHTML .= '<td class="border-primary border-l border-l-sec whitespace-normal font-medium bg-primary text-white text-11px text-center capitalize px-2 py-05 leading-none tracking-normal align-middle" colspan="4">Temperature After powerflus in °C</td>';
                         $PDFHTML .= '</tr>';
+
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->min_ratio) && !empty($gbscca1->min_ratio) ? $gbscca1->min_ratio : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->min_co) && !empty($gbscca1->min_co) ? $gbscca1->min_co : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->min_co2) && !empty($gbscca1->min_co2) ? $gbscca1->min_co2 : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->max_ratio) && !empty($gbscca1->max_ratio) ? $gbscca1->max_ratio : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->max_co) && !empty($gbscca1->max_co) ? $gbscca1->max_co : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->max_co2) && !empty($gbscca1->max_co2) ? $gbscca1->max_co2 : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->app_building_regulation) && !empty($gbscca1->app_building_regulation) ? $gbscca1->app_building_regulation : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->commissioned_man_ins) && !empty($gbscca1->commissioned_man_ins) ? $gbscca1->commissioned_man_ins : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->demonstrated_understood) && !empty($gbscca1->demonstrated_understood) ? $gbscca1->demonstrated_understood : '').'</td>';
-                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r">'.(isset($gbscca1->literature_including) && !empty($gbscca1->literature_including) ? $gbscca1->literature_including : '').'</td>';
+                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col2">&nbsp;</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Top</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Bottom</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Left</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Right</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Top</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Bottom</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Left</td>';
+                            $PDFHTML .= '<td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Right</td>';
                         $PDFHTML .= '</tr>';
+                        if($gpfrr->count() > 0):
+                            $s = 1;
+                            foreach($gpfrr as $rad):
+                                $PDFHTML .= '<tr>';
+                                    $PDFHTML .= '<td class="border-primary border-t whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col2">#'.$s.'&nbsp;'.(isset($rad->rediator_location) && !empty($rad->rediator_location) ? $rad->rediator_location : 'Radiator').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_b_top) && !empty($rad->tmp_b_top) ? $rad->tmp_b_top : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_b_bottom) && !empty($rad->tmp_b_bottom) ? $rad->tmp_b_bottom : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_b_left) && !empty($rad->tmp_b_left) ? $rad->tmp_b_left : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_b_right) && !empty($rad->tmp_b_right) ? $rad->tmp_b_right : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_a_top) && !empty($rad->tmp_a_top) ? $rad->tmp_a_top : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_a_bottom) && !empty($rad->tmp_a_bottom) ? $rad->tmp_a_bottom : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_a_left) && !empty($rad->tmp_a_left) ? $rad->tmp_a_left : '').'</td>';
+                                    $PDFHTML .= '<td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">'.(isset($rad->tmp_a_right) && !empty($rad->tmp_a_right) ? $rad->tmp_a_right : '').'</td>';
+                                $PDFHTML .= '</tr>';
+
+                                $s++;
+                            endforeach;
+                        endif;
                     $PDFHTML .= '</tbody>';
                 $PDFHTML .= '</table>';
+
 
                 $inspectionDeate = (isset($gpfr->inspection_date) && !empty($gpfr->inspection_date) ? date('d-m-Y', strtotime($gpfr->inspection_date)) : date('d-m-Y'));
                 $nextInspectionDate = (isset($gpfr->next_inspection_date) && !empty($gpfr->next_inspection_date) ? date('d-m-Y', strtotime($gpfr->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
@@ -862,19 +780,23 @@ class GasPowerFlushRecordController extends Controller
                 $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
                     $PDFHTML .= '<thead>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<th colspan="'.($gbscca1->is_next_inspection == 'Applicable' ? '3' : '2').'" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">';
+                            $PDFHTML .= '<th colspan="3" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">';
                                 $PDFHTML .= 'SIGNATURES';
                             $PDFHTML .= '</th>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</thead>';
                     $PDFHTML .= '<tbody>';
                         $PDFHTML .= '<tr>';
-                            $PDFHTML .= '<td class="w-'.($gbscca1->is_next_inspection == 'Applicable' ? '41-percent' : 'half').' p-0 border-primary align-top border-b-0">';
+                            $PDFHTML .= '<td class="w-41-percent p-0 border-primary align-top border-b-0">';
                                 $PDFHTML .= '<table class="table border-none">';
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>';
-                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top"></td>';
+                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">';
+                                                if($userSignBase64):
+                                                    $PDFHTML .= '<img src="'.$userSignBase64.'" alt="signature" class="h-50px w-auto inline-block"/>';
+                                                endif;
+                                            $PDFHTML .= '</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>';
@@ -887,7 +809,7 @@ class GasPowerFlushRecordController extends Controller
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
                             $PDFHTML .= '</td>';
-                            $PDFHTML .= '<td class="w-'.($gbscca1->is_next_inspection == 'Applicable' ? '41-percent' : 'half').' p-0 border-primary align-top border-b-0">';
+                            $PDFHTML .= '<td class="w-41-percent p-0 border-primary align-top border-b-0">';
                                 $PDFHTML .= '<table class="table border-none">';
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
@@ -909,15 +831,14 @@ class GasPowerFlushRecordController extends Controller
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
                             $PDFHTML .= '</td>';
-                            if($gbscca1->is_next_inspection == 'Applicable'):
-                                $PDFHTML .= '<td class="w-20-percent p-0 border-primary border-b-0 align-middle bg-light-2 text-primary text-center px-3">';
-                                    $PDFHTML .= '<div class="text-primary uppercase font-medium text-12px leading-none mb-1 px-2">Next Inspection Date</div>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-col9 text-center rounded-none h-30px text-12px font-medium">'.$nextInspectionDate.'</div>';
-                                $PDFHTML .= '</td>';
-                            endif;
+                            $PDFHTML .= '<td class="w-20-percent p-0 border-primary border-b-0 align-middle bg-light-2 text-primary text-center px-3">';
+                                $PDFHTML .= '<div class="text-primary uppercase font-medium text-12px leading-none mb-1 px-2">Next Inspection Date</div>';
+                                $PDFHTML .= '<div class="inline-block bg-white w-col9 text-center rounded-none h-30px text-12px font-medium">'.$nextInspectionDate.'</div>';
+                            $PDFHTML .= '</td>';
                         $PDFHTML .= '</tr>';
                     $PDFHTML .= '</tbody>';
-                $PDFHTML .= '</table>';*/
+                $PDFHTML .= '</table>';
+
 
             $PDFHTML .= '</body>';
         $PDFHTML .= '</html>';
