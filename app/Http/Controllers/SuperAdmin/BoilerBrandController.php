@@ -38,7 +38,7 @@ class BoilerBrandController extends Controller
             'name' => $request->input('name')
         ]);
         
-        return response()->json(['message' => 'Staff created successfully'], 201);
+        return response()->json(['message' => 'Staff created successfully', 'red' => ''], 201);
     }
 
     /**
@@ -145,7 +145,7 @@ class BoilerBrandController extends Controller
             endforeach;
         endif;
         
-        return response()->json(['last_page' => $last_page, 'data' => $data , 'current_page' => $page*1], 200);
+        return response()->json(['last_page' => $last_page, 'data' => $data , 'current_page' => $page * 1], 200);
     }
 
 }

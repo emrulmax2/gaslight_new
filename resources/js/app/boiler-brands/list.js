@@ -95,7 +95,7 @@ var BoilerBrandListTable = (function () {
                     },
                 ],
                 ajaxResponse:function(url, params, response){
-                    return response;
+                    return response.data;
                 },
                 renderComplete() {
                     createIcons({

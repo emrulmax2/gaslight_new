@@ -404,5 +404,8 @@ import INTAddressLookUps from './address_lookup.js';
         } else {
             vatNumberInput.classList.add("hidden");
         }
-    })
+    });
+
+
+    
 })();

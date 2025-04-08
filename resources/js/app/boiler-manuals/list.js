@@ -114,9 +114,7 @@ var BoilerBrandListTable = (function () {
                     },
                 ],
                 ajaxResponse:function(url, params, response){
-                    //console.log("Pagination Data:", response); // Log the response to check pagination data
-        
-                    return response;
+                    return response.data;
                 },
                 renderComplete() {
                     createIcons({
