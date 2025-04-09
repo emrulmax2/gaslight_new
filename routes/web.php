@@ -137,11 +137,13 @@ Route::get('/impersonate-stop', [ImpersonateController::class, 'stopImpersonate'
 Route::controller(RegisteredUserController::class)->middleware(loggedin::class)->group(function() {
     Route::get('register', 'index')->name('register.index');
     Route::post('register', 'store')->name('register');
+    Route::post('register/validate-referral', 'validateReferral')->name('register.validate.referral');
 });
 
 Route::middleware(Authenticate::class)->group(function() {
     Route::controller(Dashboard::class)->group(function () {
         Route::get('/', 'index')->name('company.dashboard')->middleware(CheckFirstLogin::class);
+        Route::post('send-invitation-sms', 'sendInvitationSms')->name('company.dashboard.send.invitation.sms');
     });
 
     Route::controller(BoilerBrandAndManualPageController::class)->group(function() {

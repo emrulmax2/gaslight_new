@@ -8,6 +8,25 @@
     const addNewModal = tailwind.Modal.getOrCreateInstance(document.getElementById('addnew-modal'));
     const editModal = tailwind.Modal.getOrCreateInstance(document.getElementById('edit-modal'));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+
+    document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
+        $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+    });
+
+    $('#successModal .agreeWith').on('click', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        if($theBtn.attr('data-action') == 'RELOAD'){
+            if($theBtn.attr('data-redirect') != ''){
+                window.location.href = $theBtn.attr('data-redirect');
+            }else{
+                window.location.reload();
+            }
+        }else{
+            successModal.hide();
+        }
+    });
+
     // Show modal
     $("#add-new").on("click", function () {
         const el = document.querySelector("#addnew-modal");
@@ -17,8 +36,6 @@
     $('#createForm').on('submit', function(e) {
         e.preventDefault();
         const form = document.getElementById('createForm');
-        //const form2 = document.getElementById('addStaffForm');
-
 
         let $theForm = $(this);
         
@@ -26,33 +43,28 @@
         $("#userSaveBtn .theLoader").fadeIn();
 
         let formData = new FormData(form);
-        
-        // const form2Data = new FormData(form2);
-
-        // for (const [key, value] of form2Data.entries()) {
-        //     formData.append(key, value);
-        // }
-        
         axios({
             method: "post",
-            url: route('superadmin.boiler-manual.store'),
+            url: route('superadmin.boiler-brand.store'),
             data: formData,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             $('#userSaveBtn', $theForm).removeAttr('disabled');
             $("#userSaveBtn .theLoader").fadeOut();
-            console.log(response.data);
+            
             if (response.status == 201) {
+                addNewModal.hide();
+
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
                     $("#successModal .successModalDesc").html(response.data.message);
-                    //$("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
                 });
 
                 setTimeout(() => {
                     successModal.hide();
-                    location.reload();
+                    window.location.reload();
                 }, 1500);
             }
         }).catch(error => {
@@ -86,40 +98,34 @@
     $('#updateForm').on('submit', function(e) {
         e.preventDefault();
         const form = document.getElementById('updateForm');
-        //const form2 = document.getElementById('addStaffForm');
-
-
         let $theForm = $(this);
         
         $('#UpdateBtn', $theForm).attr('disabled');
         $("#UpdateBtn .theLoader").fadeIn();
 
         let formData = new FormData(form);
-        
-        // const form2Data = new FormData(form2);
-
-        // for (const [key, value] of form2Data.entries()) {
-        //     formData.append(key, value);
-        // }
         let $editId =  $('#edit-modal input[name="id"]').val();
         axios({
             method: "post",
-            url: route('superadmin.boiler-manual.update',$editId),
+            url: route('superadmin.boiler-brand.update', $editId),
             data: formData,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             $('#UpdateBtn', $theForm).removeAttr('disabled');
             $("#UpdateBtn .theLoader").fadeOut();
             if (response.status == 204 ) {
+                editModal.hide();
+                
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
                     $("#successModal .successModalDesc").html(response.data.message);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
                 });
 
                 setTimeout(() => {
                     successModal.hide();
-                    location.reload();
+                    window.location.reload();
                 }, 1500);
             }
         }).catch(error => {

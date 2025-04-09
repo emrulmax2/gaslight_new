@@ -72,5 +72,10 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
         return $this->belongsToMany(Company::class, 'company_staff', 'user_id', 'company_id');
     }
 
+    public function referral()
+    {
+        return $this->hasOne(UserReferralCode::class, 'user_id');
+    }
+
     
 }

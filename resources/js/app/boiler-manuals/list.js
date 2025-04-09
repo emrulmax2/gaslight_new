@@ -70,9 +70,13 @@ var BoilerBrandListTable = (function () {
                         hozAlign:"center",
                         download: false,
                         formatter(cell, formatterParams) {
+                            let dwonload = '';
+                            if(cell.getData().document_url != ''){
+                                dwonload += '<a target="_blank" class="flex items-center text-success mr-3" href="'+cell.getData().document_url+'"><i data-lucide="cloud-download" class="w-4 h-4 mr-1"></i> Download</a>'
+                            }
                             let a =
                                 $(`<div class="flex items-center lg:justify-center">
-                                                 
+                                       `+dwonload+`          
                                     <a class="flex items-center mr-3 edit" href="javascript:;">
                                 <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                             </a>
@@ -108,15 +112,13 @@ var BoilerBrandListTable = (function () {
                             });
 
                         
-
+                        
                         return a[0];
                         },
                     },
                 ],
                 ajaxResponse:function(url, params, response){
-                    //console.log("Pagination Data:", response); // Log the response to check pagination data
-        
-                    return response;
+                    return response.data;
                 },
                 renderComplete() {
                     createIcons({

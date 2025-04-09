@@ -50,7 +50,7 @@
                         />
                         
                         <div id="error-name" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
-                        <x-base.form-label class="mt-5">Email*</x-base.form-label>
+                        <x-base.form-label class="mt-3">Email*</x-base.form-label>
                         <x-base.form-input
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
                             type="text"
@@ -59,7 +59,7 @@
                         />
                         <div id="error-email" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
 
-                        {{--<x-base.form-label class="mt-5">Role*</x-base.form-label>
+                        {{--<x-base.form-label class="mt-3">Role*</x-base.form-label>
                         <x-base.tom-select
                             class="block rounded-[1rem] border-slate-300/80 px-2 py-1.5"
                             data-placeholder="Please Select your Role"
@@ -71,7 +71,7 @@
                         </x-base.tom-select>
                         <div id="error-role" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>--}}
 
-                        <x-base.form-label class="mt-5">Password*</x-base.form-label>
+                        <x-base.form-label class="mt-3">Password*</x-base.form-label>
                         <div class="relative">
                         <x-base.form-input
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
@@ -98,7 +98,7 @@
                         >
                             What is a secure password?
                         </a>
-                        <x-base.form-label class="mt-5">Password Confirmation*</x-base.form-label>
+                        <x-base.form-label class="mt-3">Password Confirmation*</x-base.form-label>
                         <div class="relative">
                             <x-base.form-input
                                 class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
@@ -111,6 +111,17 @@
                                 <i id="togglePasswordConfirmationIcon" data-lucide="eye-off"></i>
                             </span>
                         </div>
+
+                        <x-base.form-label class="mt-3">Referral Code</x-base.form-label>
+                        <x-base.form-input
+                            class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
+                            type="text"
+                            placeholder=""
+                            name="referral_code"
+                            id="referral_code"
+                        />
+                        <div id="error-referral_code" class="referral_code__input-error text-danger mt-2 dark:text-orange-400"></div>
+
                         <div class="mt-5 flex items-center text-xs text-slate-500 sm:text-sm">
                             <x-base.form-check.input
                                 class="mr-2 border"
@@ -347,12 +358,72 @@
 
             $('#register-form').on('keyup', function(e) {
                 if (e.keyCode === 13) {
-                    register()
+                    if($('#register-form #referral_code').val() != ''){
+                        $('.register-text').addClass('hidden');
+                        $('#btn-register .register__loading').removeClass('hidden');
+                        $.ajax({
+                            type: 'POST',
+                            data: {referral_code : $('#register-form #referral_code').val()},
+                            url: route('register.validate.referral'),
+                            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                            async: false,
+                            success: function(data) {
+                                $('.register-text').removeClass('hidden');
+                                $('#btn-register .register__loading').addClass('hidden');
+                                if(data.suc == 1){
+                                    register();
+                                }else{
+                                    $('#register-form').find('#referral_code').val('').addClass('border-danger')
+                                    $('#register-form').find('.referral_code__input-error').html('Invalid referral code.');
+
+                                    setTimeout(() => {
+                                        $('#register-form').find('#referral_code').removeClass('border-danger')
+                                        $('#register-form').find('.referral_code__input-error').html('');
+                                    }, 2000);
+                                }
+                            },
+                            error:function(e){
+                                console.log('Error');
+                            }
+                        });
+                    }else{
+                        register();
+                    }
                 }
             })
 
             $('#btn-register').on('click', function() {
-                register()
+                if($('#register-form #referral_code').val() != ''){
+                    $('.register-text').addClass('hidden');
+                    $('#btn-register .register__loading').removeClass('hidden');
+                    $.ajax({
+                        type: 'POST',
+                        data: {referral_code : $('#register-form #referral_code').val()},
+                        url: route('register.validate.referral'),
+                        headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                        async: false,
+                        success: function(data) {
+                            $('.register-text').removeClass('hidden');
+                            $('#btn-register .register__loading').addClass('hidden');
+                            if(data.suc == 1){
+                                register();
+                            }else{
+                                $('#register-form').find('#referral_code').val('').addClass('border-danger')
+                                $('#register-form').find('.referral_code__input-error').html('Invalid referral code.');
+
+                                setTimeout(() => {
+                                    $('#register-form').find('#referral_code').removeClass('border-danger')
+                                    $('#register-form').find('.referral_code__input-error').html('');
+                                }, 2000);
+                            }
+                        },
+                        error:function(e){
+                            console.log('Error');
+                        }
+                    });
+                }else{
+                    register();
+                }
             })
 
             $('#password').on('input', function() {
