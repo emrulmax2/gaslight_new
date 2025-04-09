@@ -34,7 +34,7 @@ class BoilerManualController extends Controller
      */
     public function store(Request $request)
     {
-        BoilerManual::create([
+        $boilerManual = BoilerManual::create([
             'boiler_brand_id' => $request->input('boiler_brand_id'),
             'gc_no' => $request->input('gc_no'),
             'url' => $request->input('url'),
@@ -42,8 +42,15 @@ class BoilerManualController extends Controller
             'fuel_type' => $request->input('fuel_type'),
             'year_of_manufacture' => $request->input('year_of_manufacture'),
         ]);
+        if($boilerManual->id && $request->hasFile('document')):
+            $document = $request->file('document');
+            $documentName = $boilerManual->id.'_'.$document->getClientOriginalName();
+            $path = $document->storeAs('boiler_manual/'.$boilerManual->id, $documentName, 'public');
+
+            BoilerManual::where('id', $boilerManual->id)->update(['document' => $documentName]);
+        endif;
         
-        return response()->json(['message' => 'Boiler Manual created successfully'], 201);
+        return response()->json(['message' => 'Boiler Manual created successfully', 'red' => ''], 201);
     }
 
     /**
@@ -67,16 +74,27 @@ class BoilerManualController extends Controller
      */
     public function update(Request $request, BoilerManual $boilerManual)
     {
+        $documentName = $boilerManual->document;
+        if($request->hasFile('document')):
+            if (!empty($documentName) && Storage::disk('public')->exists('boiler_manual/'.$boilerManual->id.'/'.$documentName)):
+                Storage::disk('public')->delete('boiler_manual/'.$boilerManual->id.'/'.$documentName);
+            endif;
+            $document = $request->file('document');
+            $documentName = $boilerManual->id.'_'.$document->getClientOriginalName();
+            $path = $document->storeAs('boiler_manual/'.$boilerManual->id, $documentName, 'public');
+        endif;
+
         $boilerManual->boiler_brand_id = $request->input('boiler_brand_id');
         $boilerManual->gc_no = $request->input('gc_no');
         $boilerManual->url = $request->input('url');
         $boilerManual->model = $request->input('model');
         $boilerManual->fuel_type = $request->input('fuel_type');
         $boilerManual->year_of_manufacture = $request->input('year_of_manufacture');
+        $boilerManual->document = $documentName;
         $boilerManual->save();
 
         if($boilerManual->wasChanged()) {
-            return response()->json(['message' => 'Boiler Manual updated successfully'], 200);
+            return response()->json(['message' => 'Boiler Manual updated successfully', 'red' => ''], 200);
         } else {
             return response()->json(['message' => 'Boiler Manual Couldn\'t Updated'], 304);
         }
@@ -142,6 +160,10 @@ class BoilerManualController extends Controller
         if(!empty($Query)):
             $i = 1;
             foreach($Query as $list):
+                $document_url = '';
+                if (!empty($list->document) && Storage::disk('public')->exists('boiler_manual/'.$list->id.'/'.$list->document)):
+                    $document_url = Storage::disk('public')->url('boiler_manual/'.$list->id.'/'.$list->document);
+                endif;
                 $data[] = [
                     'id' => $list->id,
                     'sl' => $i,
@@ -150,6 +172,7 @@ class BoilerManualController extends Controller
                     'model' => $list->model,
                     'fuel_type' => $list->fuel_type,
                     'year_of_manufacture' => $list->year_of_manufacture,
+                    'document_url' => $document_url,
                     'created_at' => $list->created_at,
                     'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
                 ];
