@@ -46,6 +46,7 @@ class DatabaseSeeder extends Seeder
         $this->callIfNotSeeded(RadiatorTypeSeeder::class);
         $this->callIfNotSeeded(CommissionDecommissionWorkTypeSeeder::class);
         $this->callIfNotSeeded(PricingPackageSeeder::class);
+        $this->callIfNotSeeded(JobFormNewRows2Seeder::class);
     }
 
     /**

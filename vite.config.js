@@ -218,6 +218,8 @@ export default defineConfig({
                 "resources/js/app/records/installation_commissioning_decommissioning_record_show.js",
 
                 "resources/js/app/dashboard.js",
+                "resources/js/app/records/unvented_hot_water_cylinders.js",
+                "resources/js/app/records/unvented_hot_water_cylinders_show.js",
             ],
             refresh: true,
         }),

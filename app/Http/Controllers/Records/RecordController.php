@@ -32,6 +32,9 @@ use App\Models\GasCommissionDecommissionRecordAppliance;
 use App\Models\GasPowerFlushRecord;
 use App\Models\GasPowerFlushRecordChecklist;
 use App\Models\GasPowerFlushRecordRediator;
+use App\Models\GasUnventedHotWaterCylinderRecord;
+use App\Models\GasUnventedHotWaterCylinderRecordInspection;
+use App\Models\GasUnventedHotWaterCylinderRecordSystem;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JobForm;
@@ -170,6 +173,14 @@ class RecordController extends Controller
             $data['gcdr'] = $gasComDecRecord;
             $data['gcdra1'] = GasCommissionDecommissionRecordAppliance::with('gcdrawt')->where('gas_commission_decommission_record_id', $gcdr_id)->where('appliance_serial', 1)->get()->first();
             $data['signature'] = isset($gasComDecRecord->signature) ? Storage::disk('public')->url($gasComDecRecord->signature->filename) : '';
+        elseif($record == 'unvented_hot_water_cylinders'):
+            $gasUnventedHWCRecord = GasUnventedHotWaterCylinderRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $guhwcr_id = (isset($gasUnventedHWCRecord->id) && $gasUnventedHWCRecord->id > 0 ? $gasUnventedHWCRecord->id : 0);
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['guhwcr'] = $gasUnventedHWCRecord;
+            $data['guhwcrs'] = GasUnventedHotWaterCylinderRecordSystem::with('guhwcr')->where('gas_unvented_hot_water_cylinder_record_id', $guhwcr_id)->orderBy('id', 'DESC')->get()->first();
+            $data['guhwcri'] = GasUnventedHotWaterCylinderRecordInspection::with('guhwcr')->where('gas_unvented_hot_water_cylinder_record_id', $guhwcr_id)->orderBy('id', 'DESC')->get()->first();
+            $data['signature'] = isset($gasUnventedHWCRecord->signature) ? Storage::disk('public')->url($gasUnventedHWCRecord->signature->filename) : '';
         endif;
 
 

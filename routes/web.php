@@ -42,6 +42,7 @@ use App\Http\Controllers\Records\GasBreakdownRecordController;
 use App\Http\Controllers\Records\GasCommissionDecommissionRecordController;
 use App\Http\Controllers\Records\GasPowerFlushRecordController;
 use App\Http\Controllers\Records\GasServiceRecordController;
+use App\Http\Controllers\Records\GasUnventedHotWaterCylinderRecordController;
 use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
@@ -342,6 +343,15 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/installation-commissioning-decommissioning-record/show/{gcdr}', 'show')->name('records.gcdr.show');
         Route::post('records/installation-commissioning-decommissioning-record/store/{gcdr}', 'store')->name('records.gcdr.store');
+    });
+    
+    Route::controller(GasUnventedHotWaterCylinderRecordController::class)->group(function(){
+        Route::post('records/unvented-hot-water-cylinders/store-system', 'storeSystem')->name('records.guhwcr.store.system');
+        Route::post('records/unvented-hot-water-cylinders/store-inspection', 'storeInspection')->name('records.guhwcr.store.inspection');
+        Route::post('records/unvented-hot-water-cylinders/store-signatures', 'storeSignatures')->name('records.guhwcr.store.signatures');
+
+        Route::get('records/unvented-hot-water-cylinders/show/{guhwcr}', 'show')->name('records.guhwcr.show');
+        Route::post('records/unvented-hot-water-cylinders/store/{guhwcr}', 'store')->name('records.guhwcr.store');
     });
 });
 
