@@ -71,7 +71,6 @@ class GasWarningNoticeController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         $saved = 0;
@@ -102,7 +101,6 @@ class GasWarningNoticeController extends Controller
                     'reported_to_hde' => (isset($theAppliance['reported_to_hde']) && !empty($theAppliance['reported_to_hde']) ? $theAppliance['reported_to_hde'] : null),
                     'left_on_premisies' => (isset($theAppliance['left_on_premisies']) && !empty($theAppliance['left_on_premisies']) ? $theAppliance['left_on_premisies'] : null),
                     
-                    'created_by' => $user_id,
                     'updated_by' => $user_id,
                 ]);
                 $saved = 1;
@@ -133,7 +131,6 @@ class GasWarningNoticeController extends Controller
             'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
             'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         

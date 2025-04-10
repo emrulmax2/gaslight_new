@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class GasSafetyRecordAppliance extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function booted(){
+        static::creating(function ($thisModel) {
+            $thisModel->created_by = auth()->user()->id;
+        });
+    }
     
     protected $fillable = [
         'gas_safety_record_id',

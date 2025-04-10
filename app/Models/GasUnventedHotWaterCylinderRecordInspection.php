@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class GasUnventedHotWaterCylinderRecordInspection extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function booted(){
+        static::creating(function ($thisModel) {
+            $thisModel->created_by = auth()->user()->id;
+        });
+    }
     
     protected $fillable = [
         'gas_unvented_hot_water_cylinder_record_id',

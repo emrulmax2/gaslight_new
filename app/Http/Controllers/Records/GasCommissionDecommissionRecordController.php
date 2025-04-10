@@ -73,7 +73,6 @@ class GasCommissionDecommissionRecordController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         $saved = 0;
@@ -93,15 +92,13 @@ class GasCommissionDecommissionRecordController extends Controller
                     'is_safe_to_use' => (isset($theAppliance['is_safe_to_use']) && !empty($theAppliance['is_safe_to_use']) ? $theAppliance['is_safe_to_use'] : null),
                     'have_labels_affixed' => (isset($theAppliance['have_labels_affixed']) && !empty($theAppliance['have_labels_affixed']) ? $theAppliance['have_labels_affixed'] : null),
                     
-                    'created_by' => $user_id,
                     'updated_by' => $user_id,
                 ]);
                 if($gasComDecRecAppliance->id):
                     foreach($workTypes as $wt):
                         $theType = GasCommissionDecommissionRecordApplianceWorkType::create([
                             'gas_commission_decommission_record_appliance_id' => $gasComDecRecAppliance->id,
-                            'commission_decommission_work_type_id' => $wt,
-                            'created_by' => $user_id,
+                            'commission_decommission_work_type_id' => $wt
                         ]);
                     endforeach;
                 endif;
@@ -133,7 +130,6 @@ class GasCommissionDecommissionRecordController extends Controller
             'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
             'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         

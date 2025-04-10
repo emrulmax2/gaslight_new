@@ -71,7 +71,6 @@ class GasPowerFlushRecordController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
 
@@ -122,7 +121,6 @@ class GasPowerFlushRecordController extends Controller
                 'bf_tds_reading' => (isset($request->bf_tds_reading) && !empty($request->bf_tds_reading) ? $request->bf_tds_reading : null),
                 'af_tds_reading' => (isset($request->af_tds_reading) && !empty($request->af_tds_reading) ? $request->af_tds_reading : null),
 
-                'created_by' => $user_id,
                 'updated_by' => $user_id,
             ]);
 
@@ -146,7 +144,6 @@ class GasPowerFlushRecordController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
 
@@ -164,9 +161,7 @@ class GasPowerFlushRecordController extends Controller
                     'tmp_a_top' => (isset($rediator['tmp_a_top']) && !empty($rediator['tmp_a_top']) ? $rediator['tmp_a_top'] : null),
                     'tmp_a_bottom' => (isset($rediator['tmp_a_bottom']) && !empty($rediator['tmp_a_bottom']) ? $rediator['tmp_a_bottom'] : null),
                     'tmp_a_left' => (isset($rediator['tmp_a_left']) && !empty($rediator['tmp_a_left']) ? $rediator['tmp_a_left'] : null),
-                    'tmp_a_right' => (isset($rediator['tmp_a_right']) && !empty($rediator['tmp_a_right']) ? $rediator['tmp_a_right'] : null),
-
-                    'created_by' => $user_id
+                    'tmp_a_right' => (isset($rediator['tmp_a_right']) && !empty($rediator['tmp_a_right']) ? $rediator['tmp_a_right'] : null)
                 ]);
             endforeach;
 
@@ -195,7 +190,6 @@ class GasPowerFlushRecordController extends Controller
             'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
             'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         

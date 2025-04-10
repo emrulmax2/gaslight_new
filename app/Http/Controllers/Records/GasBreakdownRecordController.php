@@ -72,7 +72,6 @@ class GasBreakdownRecordController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         $saved = 0;
@@ -114,7 +113,6 @@ class GasBreakdownRecordController extends Controller
                     'improvement_recommended' => (isset($theAppliance['improvement_recommended']) && !empty($theAppliance['improvement_recommended']) ? $theAppliance['improvement_recommended'] : null),
                     'enginner_comments' => (isset($theAppliance['enginner_comments']) && !empty($theAppliance['enginner_comments']) ? $theAppliance['enginner_comments'] : null),
                     
-                    'created_by' => $user_id,
                     'updated_by' => $user_id,
                 ]);
                 $saved = 1;
@@ -145,7 +143,6 @@ class GasBreakdownRecordController extends Controller
             'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
             'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         

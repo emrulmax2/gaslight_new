@@ -62,19 +62,22 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
     }
 
     //company relationship
-    public function company()
-    {
+    public function company(){
         return $this->hasOne(Company::class);
     }
 
-    public function companies()
-    {
+    public function companies(){
         return $this->belongsToMany(Company::class, 'company_staff', 'user_id', 'company_id');
     }
 
     public function referral()
     {
         return $this->hasOne(UserReferralCode::class, 'user_id');
+    }
+
+    public function userpackage()
+    {
+        return $this->hasOne(UserPricingPackage::class, 'user_id')->where('active', 1)->latestOfMany();
     }
 
     

@@ -78,7 +78,6 @@ class HomeOwnerGasSafetyController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         $saved = 0;
@@ -115,7 +114,6 @@ class HomeOwnerGasSafetyController extends Controller
                     'appliance_serviced' => (isset($theAppliance['appliance_serviced']) && !empty($theAppliance['appliance_serviced']) ? $theAppliance['appliance_serviced'] : null),
                     'appliance_safe_to_use' => (isset($theAppliance['appliance_safe_to_use']) && !empty($theAppliance['appliance_safe_to_use']) ? $theAppliance['appliance_safe_to_use'] : null),
                     
-                    'created_by' => $user_id,
                     'updated_by' => $user_id,
                 ]);
                 $saved = 1;
@@ -149,7 +147,6 @@ class HomeOwnerGasSafetyController extends Controller
             'co_alarm_test_satisfactory' => (isset($request->co_alarm_test_satisfactory) && !empty($request->co_alarm_test_satisfactory) ? $request->co_alarm_test_satisfactory : null),
             'smoke_alarm_fitted' => (isset($request->smoke_alarm_fitted) && !empty($request->smoke_alarm_fitted) ? $request->smoke_alarm_fitted : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
 
@@ -174,7 +171,6 @@ class HomeOwnerGasSafetyController extends Controller
             'details_work_carried_out' => (isset($request->details_work_carried_out) && !empty($request->details_work_carried_out) ? $request->details_work_carried_out : null),
             'flue_cap_put_back' => (isset($request->flue_cap_put_back) && !empty($request->flue_cap_put_back) ? $request->flue_cap_put_back : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
 
@@ -200,7 +196,6 @@ class HomeOwnerGasSafetyController extends Controller
             'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
             'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         

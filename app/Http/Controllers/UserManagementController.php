@@ -19,6 +19,7 @@ class UserManagementController extends Controller
 
     public function index()
     {
+        
         return view('app.users.index', [
             'title' => 'Users List - Gas Certificate App',
             'users' => User::all(),
@@ -51,14 +52,6 @@ class UserManagementController extends Controller
 
     public function drawSignatureStore(Request $request)
     {
-
-        // $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
-        // $decodedData = base64_decode($signatureData, true);
-        // if (!$request->has('signature_file') && strlen($decodedData) <= 2621) {
-        //     throw ValidationException::withMessages([
-        //         'signature' => 'Signature can not be blank.'
-        //     ]);
-        // }
   
         $user = User::find($request->edit_id);
 
@@ -196,8 +189,8 @@ class UserManagementController extends Controller
 
     public function list(Request $request)
     {
-       
         $user = Auth::user();
+        $user_company_id = (isset($user->companies[0]->id) && $user->companies[0]->id > 0 ? $user->companies[0]->id : 0);
 
         $queryField = isset($request->queryField) ? $request->queryField : 'name';
         $queryType = isset($request->queryType) ? $request->queryType : 'like';
@@ -214,6 +207,7 @@ class UserManagementController extends Controller
         $query = User::leftJoin('company_staff', 'users.id', '=', 'company_staff.user_id')
                 ->leftJoin('companies', 'company_staff.company_id', '=', 'companies.id')
                 ->select('users.*', 'companies.company_name as company_name','companies.id as company_id')
+                ->where('company_staff.company_id', $user_company_id)
                 ->orderByRaw(implode(',', $sorts));
 
         
@@ -267,6 +261,10 @@ class UserManagementController extends Controller
                         'installer_ref_no' => $list->installer_ref_no,
                         'visibility_control' => $user->parent_id,
                         'signature' => $list->signature ? Storage::disk('public')->url($list->signature->filename) : null,
+                        'package_id' => (isset($list->userpackage->pricing_package_id) && !empty($list->userpackage->pricing_package_id) ? $list->userpackage->pricing_package_id : ''),
+                        'package' => (isset($list->userpackage->package->title) && !empty($list->userpackage->package->title) ? $list->userpackage->package->title : ''),
+                        'package_start' => (isset($list->userpackage->start) && !empty($list->userpackage->start) ? date('jS F, Y', strtotime($list->userpackage->start)) : ''),
+                        'package_end' => (isset($list->userpackage->end) && !empty($list->userpackage->end) ? date('jS F, Y', strtotime($list->userpackage->end)) : ''),
                     ];
                     $i++;
                 

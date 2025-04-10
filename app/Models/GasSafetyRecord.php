@@ -13,6 +13,12 @@ class GasSafetyRecord extends Model implements CanBeSigned
 {
     use HasFactory, SoftDeletes, RequiresSignature;
 
+    protected static function booted(){
+        static::creating(function ($thisModel) {
+            $thisModel->created_by = auth()->user()->id;
+        });
+    }
+
     protected $appends = ['has_satisfactory_check', 'has_comments', 'has_signatures'];
     
     protected $fillable = [

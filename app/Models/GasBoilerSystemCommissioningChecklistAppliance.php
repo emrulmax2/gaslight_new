@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class GasBoilerSystemCommissioningChecklistAppliance extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function booted(){
+        static::creating(function ($thisModel) {
+            $thisModel->created_by = auth()->user()->id;
+        });
+    }
     
     protected $fillable = [
         'gas_boiler_system_commissioning_checklist_id',
