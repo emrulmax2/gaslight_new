@@ -71,7 +71,6 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
             'customer_job_id' => $customer_job_id,
             'job_form_id' => $job_form_id,
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         $saved = 0;
@@ -128,7 +127,6 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
                 'literature_including' => (isset($theAppliance['literature_including']) && !empty($theAppliance['literature_including']) ? $theAppliance['literature_including'] : null),
                 'is_next_inspection' => (isset($theAppliance['is_next_inspection']) && !empty($theAppliance['is_next_inspection']) ? $theAppliance['is_next_inspection'] : null),
                 
-                'created_by' => $user_id,
                 'updated_by' => $user_id,
             ]);
             $saved = 1;
@@ -158,7 +156,6 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
             'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
             'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
             
-            'created_by' => $user_id,
             'updated_by' => $user_id,
         ]);
         

@@ -26,6 +26,7 @@ use App\Http\Controllers\Customers\CustomerJobsController;
 use App\Http\Controllers\Customers\JobController;
 use App\Http\Controllers\Customers\PropertyController;
 use App\Http\Controllers\Customers\JobDocumentController;
+use App\Http\Controllers\Drafts\RecordAndDraftController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Jobs\JobController as JobsJobController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\Records\GasBoilerSystemCommissioningChecklistController;
 use App\Http\Controllers\Records\GasBreakdownRecordController;
 use App\Http\Controllers\Records\GasCommissionDecommissionRecordController;
+use App\Http\Controllers\Records\GasJobSheetController;
 use App\Http\Controllers\Records\GasPowerFlushRecordController;
 use App\Http\Controllers\Records\GasServiceRecordController;
 use App\Http\Controllers\Records\GasUnventedHotWaterCylinderRecordController;
@@ -153,6 +155,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('boiler-manuals/{id}', 'boilerBrandManualByBoilerBrandId')->name('boiler-manuals.show');
 
     });
+    
     Route::controller(UserSettings::class)->group(function () {
         Route::get('/settings', 'index')->name('user.settings');
     });
@@ -352,6 +355,20 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/unvented-hot-water-cylinders/show/{guhwcr}', 'show')->name('records.guhwcr.show');
         Route::post('records/unvented-hot-water-cylinders/store/{guhwcr}', 'store')->name('records.guhwcr.store');
+    });
+    
+    Route::controller(GasJobSheetController::class)->group(function(){
+        Route::post('records/job-sheet/store-details', 'storeDetails')->name('records.gjsr.store.details');
+        Route::post('records/job-sheet/store-signatures', 'storeSignatures')->name('records.gjsr.store.signatures');
+
+        Route::get('records/job-sheet/show/{gjsr}', 'show')->name('records.gjsr.show');
+        Route::post('records/job-sheet/store/{gjsr}', 'store')->name('records.gjsr.store');
+        Route::delete('records/job-sheet/destroy-document/{gjsrd}', 'destroyDocument')->name('records.gjsr.destroy.document'); 
+    });
+
+    Route::controller(RecordAndDraftController::class)->group(function() {
+        Route::get('records-and-drafts', 'index')->name('records-and-drafts');
+        Route::get('records-and-drafts/list', 'list')->name('records-and-drafts.list');
     });
 });
 

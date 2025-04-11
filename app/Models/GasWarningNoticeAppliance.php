@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class GasWarningNoticeAppliance extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function booted(){
+        static::creating(function ($thisModel) {
+            $thisModel->created_by = auth()->user()->id;
+        });
+    }
     
     protected $fillable = [
         'gas_warning_notice_id',

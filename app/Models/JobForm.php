@@ -35,6 +35,6 @@ class JobForm extends Model
     protected $dates = ['deleted_at'];
 
     public function childs(){
-        return $this->hasMany(JobForm::class, 'parent_id', 'id');
+        return $this->hasMany(JobForm::class, 'parent_id', 'id')->orderBy('roder', 'ASC');
     }
 }

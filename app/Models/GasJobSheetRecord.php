@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Creagia\LaravelSignPad\Concerns\RequiresSignature;
 use Creagia\LaravelSignPad\Contracts\CanBeSigned;
 
-class GasBreakdownRecord extends Model
+class GasJobSheetRecord extends Model
 {
     use HasFactory, SoftDeletes, RequiresSignature;
 
@@ -25,7 +25,6 @@ class GasBreakdownRecord extends Model
         'job_form_id',
         'certificate_number',
         'inspection_date',
-        'next_inspection_date',
         'received_by',
         'relation_id',
         'status',
@@ -48,8 +47,12 @@ class GasBreakdownRecord extends Model
         return $this->belongsTo(JobForm::class, 'job_form_id');
     }
 
-    public function appliance(){
-        return $this->hasMany(GasBreakdownRecordAppliance::class, 'gas_breakdown_record_id', 'id')->orderBy('id', 'ASC');
+    public function details(){
+        return $this->hasOne(GasJobSheetRecordDetail::class, 'gas_job_sheet_record_id', 'id');
+    }
+
+    public function documents(){
+        return $this->hasMany(GasJobSheetRecordDocument::class, 'gas_job_sheet_record_id', 'id');
     }
 
     public function relation(){
@@ -68,17 +71,9 @@ class GasBreakdownRecord extends Model
         return (!empty($value) ? date('d-m-Y', strtotime($value)) : '');
     }
 
-    public function setNextInspectionDateAttribute($value) {  
-        $this->attributes['next_inspection_date'] =  (!empty($value) ? date('Y-m-d', strtotime($value)) : null);
-    }
-
-    public function getNextInspectionDateAttribute($value) {
-        return (!empty($value) ? date('d-m-Y', strtotime($value)) : '');
-    }
-
     public function getHasSignaturesAttribute(){
         return (
-            !empty($this->inspection_date) || !empty($this->next_inspection_date) || !empty($this->received_by) || !empty($this->relation_id)
+            !empty($this->inspection_date) || !empty($this->received_by) || !empty($this->relation_id)
             ? true 
             : false
         );

@@ -29,6 +29,9 @@ use App\Models\GasBoilerSystemCommissioningChecklist;
 use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
 use App\Models\GasCommissionDecommissionRecord;
 use App\Models\GasCommissionDecommissionRecordAppliance;
+use App\Models\GasJobSheetRecord;
+use App\Models\GasJobSheetRecordDetail;
+use App\Models\GasJobSheetRecordDocument;
 use App\Models\GasPowerFlushRecord;
 use App\Models\GasPowerFlushRecordChecklist;
 use App\Models\GasPowerFlushRecordRediator;
@@ -181,6 +184,14 @@ class RecordController extends Controller
             $data['guhwcrs'] = GasUnventedHotWaterCylinderRecordSystem::with('guhwcr')->where('gas_unvented_hot_water_cylinder_record_id', $guhwcr_id)->orderBy('id', 'DESC')->get()->first();
             $data['guhwcri'] = GasUnventedHotWaterCylinderRecordInspection::with('guhwcr')->where('gas_unvented_hot_water_cylinder_record_id', $guhwcr_id)->orderBy('id', 'DESC')->get()->first();
             $data['signature'] = isset($gasUnventedHWCRecord->signature) ? Storage::disk('public')->url($gasUnventedHWCRecord->signature->filename) : '';
+        elseif($record == 'job_sheet'):        
+            $gasJobSheetRecord = GasJobSheetRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();            
+            $gjsr_id = (isset($gasJobSheetRecord->id) && $gasJobSheetRecord->id > 0 ? $gasJobSheetRecord->id : 0);
+            $data['relations'] = Relation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['gjsr'] = $gasJobSheetRecord;
+            $data['gjsrd'] = GasJobSheetRecordDetail::where('gas_job_sheet_record_id', $gjsr_id)->get()->first();
+            $data['gjsrdc'] = GasJobSheetRecordDocument::where('gas_job_sheet_record_id', $gjsr_id)->orderBy('id', 'ASC')->get();
+            $data['signature'] = isset($gasJobSheetRecord->signature) ? Storage::disk('public')->url($gasJobSheetRecord->signature->filename) : '';
         endif;
 
 

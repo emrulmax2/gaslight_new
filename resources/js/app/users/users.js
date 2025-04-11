@@ -54,6 +54,23 @@ var usersListTable = (function () {
                 headerHozAlign: 'left',
                 minWidth: 80
             },
+            {
+                title: 'Pricing Package',
+                field: 'package_id',
+                headerHozAlign: 'left',
+                formatter(cell, formatterParams) {
+                    let html = '';
+                    if(cell.getData().package_id > 0){
+                        html += '<div class="whitespace-nowrap font-medium">'+cell.getData().package+'</div>';
+                        html += '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                            html += (cell.getData().package_start != '' ? cell.getData().package_start : '');
+                            html += (cell.getData().package_end != '' ? ' - '+cell.getData().package_end : '');
+                        html += '</div>';
+                    }
+
+                    return html;
+                },
+            },
 
             {
                 title: 'Signature',

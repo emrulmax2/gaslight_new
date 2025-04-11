@@ -24,4 +24,12 @@ class UserPricingPackage extends Model
 
 
     protected $dates = ['deleted_at'];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function package(){
+        return $this->belongsTo(PricingPackage::class, 'pricing_package_id');
+    }
 }

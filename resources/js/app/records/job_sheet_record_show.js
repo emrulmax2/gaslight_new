@@ -25,12 +25,12 @@
         }
     });
 
-    $('#gasUnventedHotWaterCylinderRecordForm').on('submit', function(e){
+    $('#gasJobSheetRecordForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('gasUnventedHotWaterCylinderRecordForm');
+        const form = document.getElementById('gasJobSheetRecordForm');
         let $theForm = $(this);
         let type = $theForm.find('[name="submit_type"]').val();
-        let guhwcr_id = $theForm.find('#guhwcr_id').val();
+        let gjsr_id = $theForm.find('#gjsr_id').val();
 
         $('.formSubmits', $theForm).attr('disabled', 'disabled');
         $('.formSubmits.submit_'+type+' .theLoader', $theForm).fadeIn();
@@ -39,7 +39,7 @@
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('records.guhwcr.store', guhwcr_id),
+            url: route('records.gjsr.store', gjsr_id),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
