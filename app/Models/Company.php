@@ -48,9 +48,14 @@ class Company extends Model
         endif;
     }
 
-    public function staffs()
+    // public function staffs()
+    // {
+    //     return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');
+    // }
+
+    public function users()
     {
-        return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');
+        return $this->belongsToMany(User::class, 'company_staff', 'company_id', 'user_id');
     }
 
     public function companyBankDetails()
