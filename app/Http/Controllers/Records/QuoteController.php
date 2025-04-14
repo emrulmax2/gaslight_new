@@ -208,7 +208,7 @@ class QuoteController extends Controller
                                 $PDFHTML .= '</div>';
                             endif;
                             $PDFHTML .= '<div class="titleLabel pt-10">Job Address</div>';
-                            $PDFHTML .= '<div class="companyAddress">'.(isset($quote->user->company->full_address_html) ? $quote->user->company->full_address_html : '').'</div>';
+                            $PDFHTML .= '<div class="companyAddress">'.(isset($quote->job->property->full_address_html) ? $quote->job->property->full_address_html : '').'</div>';
                         $PDFHTML .= '</td>';
                     $PDFHTML .= '</tr>';
                 $PDFHTML .= '</table>';
@@ -239,7 +239,7 @@ class QuoteController extends Controller
                             $unitPrice = (!empty($item->unit_price) && $item->unit_price > 0 ? $item->unit_price : 0);
                             $vatRate = (!empty($item->vat_rate) && $item->vat_rate > 0 ? $item->vat_rate : 0);
                             $vatAmount = ($unitPrice * $vatRate) / 100;
-                            $lineTotal = ($unitPrice * $units) + $vatAmount;
+                            $lineTotal = ($quote->non_vat_quote != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
                             if($item->type == 'Discount'):
                                 $DISCOUNTTOTAL += ($unitPrice * $units);
                                 $DISCOUNTVATTOTAL += $vatAmount;
@@ -271,10 +271,45 @@ class QuoteController extends Controller
                     endif;
                     $SUBTOTAL = $SUBTOTAL - $DISCOUNTTOTAL;
                     $VATTOTAL = $VATTOTAL - $DISCOUNTVATTOTAL;
-                    $TOTAL = (!$isNonVatCheck ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL);
+                    $TOTAL = ($quote->non_vat_quote != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL);
                     $DUE = $TOTAL - $ADVANCEAMOUNT;
                 $PDFHTML .= '</table>';
 
+                $PDFHTML .= '<table class="pdfSummaryTable">';
+                    $PDFHTML .= '<tr>';
+                        $PDFHTML .= '<td>&nbsp;</td>';
+                        $PDFHTML .= '<td class="calculationColumns v-top">';
+                            $PDFHTML .= '<table class="calculationTable">';
+                                $PDFHTML .= '<tr>';
+                                    $PDFHTML .= '<th>Subtotal:</th>';
+                                    $PDFHTML .= '<th>'.Number::currency($SUBTOTAL, 'GBP').'</th>';
+                                $PDFHTML .= '</tr>';
+                                if($quote->non_vat_quote != 1):
+                                    $PDFHTML .= '<tr>';
+                                        $PDFHTML .= '<th>VAT Total:</th>';
+                                        $PDFHTML .= '<th>'.Number::currency($VATTOTAL, 'GBP').'</th>';
+                                    $PDFHTML .= '</tr>';
+                                endif;
+                                $PDFHTML .= '<tr class="totalRow">';
+                                    $PDFHTML .= '<th>Total:</th>';
+                                    $PDFHTML .= '<th>'.Number::currency($TOTAL, 'GBP').'</th>';
+                                $PDFHTML .= '</tr>';
+                                if($ADVANCEAMOUNT > 0):
+                                    $PDFHTML .= '<tr class="advanceRow">';
+                                        $PDFHTML .= '<th>Paid to Date:</th>';
+                                        $PDFHTML .= '<th>'.Number::currency($ADVANCEAMOUNT, 'GBP').'</th>';
+                                    $PDFHTML .= '</tr>';
+                                endif;
+                                $PDFHTML .= '<tr>';
+                                    $PDFHTML .= '<th>Due:</th>';
+                                    $PDFHTML .= '<th>'.Number::currency($DUE, 'GBP').'</th>';
+                                $PDFHTML .= '</tr>';
+                            $PDFHTML .= '</table>';
+                        $PDFHTML .= '</td>';
+                    $PDFHTML .= '</tr>';
+                $PDFHTML .= '</table>';
+
+                $PDFHTML .= '<div style="clear: both; width: 100%; height: 1px; margin-bottom: 40px;"></div>';
                 $PDFHTML .= '<table class="pdfSummaryTable">';
                     $PDFHTML .= '<tr>';
                         $PDFHTML .= '<td>';
@@ -324,34 +359,7 @@ class QuoteController extends Controller
                                 $PDFHTML .= '</tr>';
                             $PDFHTML .= '</table>';
                         $PDFHTML .= '</td>';
-                        $PDFHTML .= '<td class="calculationColumns">';
-                            $PDFHTML .= '<table class="calculationTable">';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th>Subtotal:</th>';
-                                    $PDFHTML .= '<th>'.Number::currency($SUBTOTAL, 'GBP').'</th>';
-                                $PDFHTML .= '</tr>';
-                                if(!$isNonVatCheck):
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<th>VAT Total:</th>';
-                                        $PDFHTML .= '<th>'.Number::currency($VATTOTAL, 'GBP').'</th>';
-                                    $PDFHTML .= '</tr>';
-                                endif;
-                                $PDFHTML .= '<tr class="totalRow">';
-                                    $PDFHTML .= '<th>Total:</th>';
-                                    $PDFHTML .= '<th>'.Number::currency($TOTAL, 'GBP').'</th>';
-                                $PDFHTML .= '</tr>';
-                                if($ADVANCEAMOUNT > 0):
-                                    $PDFHTML .= '<tr class="advanceRow">';
-                                        $PDFHTML .= '<th>Paid to Date:</th>';
-                                        $PDFHTML .= '<th>'.Number::currency($ADVANCEAMOUNT, 'GBP').'</th>';
-                                    $PDFHTML .= '</tr>';
-                                endif;
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th>Due:</th>';
-                                    $PDFHTML .= '<th>'.Number::currency($DUE, 'GBP').'</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</table>';
-                        $PDFHTML .= '</td>';
+                        $PDFHTML .= '<td>&nbsp;</td>';
                     $PDFHTML .= '</tr>';
                 $PDFHTML .= '</table>';
 

@@ -9,7 +9,8 @@ var customerJobListTable = (function () {
         let tableContent = new Tabulator("#customerJobListTable", {
             ajaxURL: route("customer.jobs.list", { customer_id: customer_id }),
             ajaxParams: { querystr: querystr, status: status, customer_id: customer_id },
-            pagination: "remote",
+            pagination: true,
+            paginationMode:"remote",
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,
@@ -114,9 +115,9 @@ var customerJobListTable = (function () {
                     },
                 },
             ],
-            ajaxResponse:function(url, params, response){
-                return response.data;
-            },
+            // ajaxResponse:function(url, params, response){
+            //     return response.data;
+            // },
             renderComplete() {
                 createIcons({
                     icons,

@@ -9,7 +9,8 @@ var customerListTable = (function () {
         let tableContent = new Tabulator("#customerListTable", {
             ajaxURL: route("customers.list"),
             ajaxParams: { querystr: querystr, status: status },
-            pagination: "remote",
+            pagination: true,
+            paginationMode:"remote",
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,
@@ -108,9 +109,9 @@ var customerListTable = (function () {
                     },
                 },*/
             ],
-            ajaxResponse: function(url, params, response){
-                return response.data;
-            },
+            // ajaxResponse: function(url, params, response){
+            //     return response.data;
+            // },
             renderComplete() {
                 createIcons({
                     icons,

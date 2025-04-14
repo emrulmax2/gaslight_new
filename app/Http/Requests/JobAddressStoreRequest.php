@@ -23,7 +23,7 @@ class JobAddressStoreRequest extends FormRequest
     {
         return [
             'address_line_1' => 'required',
-            'address_line_2' => 'required',
+            //'address_line_2' => 'required',
             'postal_code' => 'required',
             'city' => 'required',
         ];

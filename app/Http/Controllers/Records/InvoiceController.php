@@ -182,7 +182,7 @@ class InvoiceController extends Controller
                         $PDFHTML .= '</td>';
                         $PDFHTML .= '<td class="invoiceDetails text-right v-top">';
                             $PDFHTML .= '<div class="invoiceTitle font-bold">Invoice</div>';
-                            $PDFHTML .= '<div class="invoiceRef font-bold text-primary">Ref: '.$invoice->invoice_number.'</div>';
+                            $PDFHTML .= '<div class="invoiceRef font-bold text-primary">'.$invoice->invoice_number.'</div>';
                             $PDFHTML .= '<div class="titleLabel mb-8">'.$invoice->user->company->company_name.'</div>';
                             $PDFHTML .= '<div class="companyAddress">'.(isset($invoice->user->company->full_address_html) ? $invoice->user->company->full_address_html : '').'</div>';
                             if(isset($invoice->user->company->company_email) && !empty($invoice->user->company->company_email)):
@@ -210,7 +210,7 @@ class InvoiceController extends Controller
                                 $PDFHTML .= '</div>';
                             endif;
                             $PDFHTML .= '<div class="titleLabel pt-10">Job Address</div>';
-                            $PDFHTML .= '<div class="companyAddress">'.(isset($invoice->user->company->full_address_html) ? $invoice->user->company->full_address_html : '').'</div>';
+                            $PDFHTML .= '<div class="companyAddress">'.(isset($invoice->job->property->full_address_html) ? $invoice->job->property->full_address_html : '').'</div>';
                         $PDFHTML .= '</td>';
                     $PDFHTML .= '</tr>';
                 $PDFHTML .= '</table>';
@@ -241,7 +241,7 @@ class InvoiceController extends Controller
                             $unitPrice = (!empty($item->unit_price) && $item->unit_price > 0 ? $item->unit_price : 0);
                             $vatRate = (!empty($item->vat_rate) && $item->vat_rate > 0 ? $item->vat_rate : 0);
                             $vatAmount = ($unitPrice * $vatRate) / 100;
-                            $lineTotal = ($unitPrice * $units) + $vatAmount;
+                            $lineTotal = ($invoice->non_vat_invoice != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
                             if($item->type == 'Discount'):
                                 $DISCOUNTTOTAL += ($unitPrice * $units);
                                 $DISCOUNTVATTOTAL += $vatAmount;
@@ -273,17 +273,52 @@ class InvoiceController extends Controller
                     endif;
                     $SUBTOTAL = $SUBTOTAL - $DISCOUNTTOTAL;
                     $VATTOTAL = $VATTOTAL - $DISCOUNTVATTOTAL;
-                    $TOTAL = (!$isNonVatCheck ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL);
+                    $TOTAL = ($invoice->non_vat_invoice != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL);
                     $DUE = $TOTAL - $ADVANCEAMOUNT;
                 $PDFHTML .= '</table>';
 
                 $PDFHTML .= '<table class="pdfSummaryTable">';
                     $PDFHTML .= '<tr>';
+                        $PDFHTML .= '<td>&nbsp;</td>';
+                        $PDFHTML .= '<td class="calculationColumns">';
+                            $PDFHTML .= '<table class="calculationTable">';
+                                $PDFHTML .= '<tr>';
+                                    $PDFHTML .= '<th>Subtotal:</th>';
+                                    $PDFHTML .= '<th>'.Number::currency($SUBTOTAL, 'GBP').'</th>';
+                                $PDFHTML .= '</tr>';
+                                if($invoice->non_vat_invoice != 1):
+                                    $PDFHTML .= '<tr>';
+                                        $PDFHTML .= '<th>VAT Total:</th>';
+                                        $PDFHTML .= '<th>'.Number::currency($VATTOTAL, 'GBP').'</th>';
+                                    $PDFHTML .= '</tr>';
+                                endif;
+                                $PDFHTML .= '<tr class="totalRow">';
+                                    $PDFHTML .= '<th>Total:</th>';
+                                    $PDFHTML .= '<th>'.Number::currency($TOTAL, 'GBP').'</th>';
+                                $PDFHTML .= '</tr>';
+                                if($ADVANCEAMOUNT > 0):
+                                    $PDFHTML .= '<tr class="advanceRow">';
+                                        $PDFHTML .= '<th>Paid to Date:</th>';
+                                        $PDFHTML .= '<th>'.Number::currency($ADVANCEAMOUNT, 'GBP').'</th>';
+                                    $PDFHTML .= '</tr>';
+                                endif;
+                                $PDFHTML .= '<tr>';
+                                    $PDFHTML .= '<th>Due:</th>';
+                                    $PDFHTML .= '<th>'.Number::currency($DUE, 'GBP').'</th>';
+                                $PDFHTML .= '</tr>';
+                            $PDFHTML .= '</table>';
+                        $PDFHTML .= '</td>';
+                    $PDFHTML .= '</tr>';
+                $PDFHTML .= '</table>';
+                $PDFHTML .= '<div style="clear: both; width: 100%; height: 1px; margin-bottom: 40px;"></div>';
+
+                $PDFHTML .= '<table class="pdfSummaryTable">';
+                    $PDFHTML .= '<tr>';
                         $PDFHTML .= '<td>';
+                            $PDFHTML .= '<div class="font-medium mb-5">Please make the payment using the following bank details</div>';
                             $PDFHTML .= '<table class="invoiceInfoTable">';
                                 $PDFHTML .= '<tr>';
                                     $PDFHTML .= '<td class="v-top" style="width: 250px;">';
-                                        $PDFHTML .= '<div class="font-medium mb-5">Bank Details</div>';
                                         if(isset($invoice->user->company->bank->bank_name) && !empty($invoice->user->company->bank->bank_name)):
                                             $PDFHTML .= '<div class="mb-1">';
                                                 $PDFHTML .= '<span class="font-medium text-slate-400 inline-block w-140">Bank Name:</span>';
@@ -308,6 +343,10 @@ class InvoiceController extends Controller
                                                 $PDFHTML .= '<span class="inline-block">'.$invoice->user->company->bank->account_number.'</span>';
                                             $PDFHTML .= '</div>';
                                         endif;
+                                        $PDFHTML .= '<div class="mb-1">';
+                                            $PDFHTML .= '<span class="font-medium text-slate-400 inline-block w-140">Payment Ref:</span>';
+                                            $PDFHTML .= '<span class="inline-block">'.$invoice->invoice_number.'</span>';
+                                        $PDFHTML .= '</div>';
 
                                         $PDFHTML .= '<div class="font-medium mb-4 pt-9">Payment Terms</div>';
                                         $PDFHTML .= '<div class="mb-10">'.(isset($invoice->payment_term) && !empty($invoice->payment_term) ? $invoice->payment_term : '').'</div>';
@@ -317,41 +356,14 @@ class InvoiceController extends Controller
                                 $PDFHTML .= '</tr>';
                             $PDFHTML .= '</table>';
                         $PDFHTML .= '</td>';
-                        $PDFHTML .= '<td class="calculationColumns">';
-                            $PDFHTML .= '<table class="calculationTable">';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th>Subtotal:</th>';
-                                    $PDFHTML .= '<th>'.Number::currency($SUBTOTAL, 'GBP').'</th>';
-                                $PDFHTML .= '</tr>';
-                                if(!$isNonVatCheck):
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<th>VAT Total:</th>';
-                                        $PDFHTML .= '<th>'.Number::currency($VATTOTAL, 'GBP').'</th>';
-                                    $PDFHTML .= '</tr>';
-                                endif;
-                                $PDFHTML .= '<tr class="totalRow">';
-                                    $PDFHTML .= '<th>Total:</th>';
-                                    $PDFHTML .= '<th>'.Number::currency($TOTAL, 'GBP').'</th>';
-                                $PDFHTML .= '</tr>';
-                                if($ADVANCEAMOUNT > 0):
-                                    $PDFHTML .= '<tr class="advanceRow">';
-                                        $PDFHTML .= '<th>Paid to Date:</th>';
-                                        $PDFHTML .= '<th>'.Number::currency($ADVANCEAMOUNT, 'GBP').'</th>';
-                                    $PDFHTML .= '</tr>';
-                                endif;
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th>Due:</th>';
-                                    $PDFHTML .= '<th>'.Number::currency($DUE, 'GBP').'</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</table>';
-                        $PDFHTML .= '</td>';
+                        $PDFHTML .= '<td>&nbsp;</td>';
                     $PDFHTML .= '</tr>';
                 $PDFHTML .= '</table>';
 
             $PDFHTML .= '</body>';
         $PDFHTML .= '</html>';
 
-
+        
         $fileName = $invoice->invoice_number.'.pdf';
         $pdf = Pdf::loadHTML($PDFHTML)->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
             ->setPaper('a4', 'portrait')

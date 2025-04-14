@@ -22,7 +22,8 @@ var usersListTable = (function () {
         ajaxSorting: true,
         printAsHtml: true,
         printStyled: true,
-        pagination: 'remote',
+        pagination: true,
+        paginationMode:"remote",
         paginationSize: 30,
         paginationSizeSelector: [true, 30,50,100],
         layout: 'fitColumns',
@@ -157,9 +158,9 @@ var usersListTable = (function () {
                 }
             },
         ],
-        ajaxResponse:function(url, params, response){
-            return response.data;
-        },
+        // ajaxResponse:function(url, params, response){
+        //     return response.data;
+        // },
         renderComplete() {
             createIcons({
                 icons,
