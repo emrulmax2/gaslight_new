@@ -17,9 +17,11 @@ var BoilerBrandListTable = (function () {
                 ajaxParams: {
                     queryStr: querystr,
                     status: status,
-                    'boiler_brand_id': boiler_brand_id,
+                    'boiler_brand_id': boiler_brand_id
                 },
-                pagination: "remote",
+                pagination: true,
+                paginationMode:"remote",
+
                 filterMode: "remote",
                 sortMode: "remote",
                 printAsHtml: true,
@@ -117,9 +119,9 @@ var BoilerBrandListTable = (function () {
                         },
                     },
                 ],
-                ajaxResponse:function(url, params, response){
-                    return response.data;
-                },
+                // ajaxResponse:function(url, params, response){
+                //     return response.data;
+                // },
                 renderComplete() {
                     createIcons({
                         icons,

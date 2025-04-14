@@ -64,11 +64,11 @@ var customerListTable = (function () {
                     minWidth: 220,
                     formatter(cell, formatterParams) { 
                         let address = '';
-                        address += (cell.getData().address_line_1 != '' ? cell.getData().address_line_1+' ' : '');
-                        address += (cell.getData().address_line_2 != '' ? cell.getData().address_line_2+', ' : '');
-                        address += (cell.getData().city != '' ? cell.getData().city+', ' : '');
-                        address += (cell.getData().state != '' ? cell.getData().state+', ' : '');
-                        address += (cell.getData().postal_code != '' ? cell.getData().postal_code : '');
+                        address += (cell.getData().address_line_1 != null ? cell.getData().address_line_1+' ' : '');
+                        address += (cell.getData().address_line_2 != null ? cell.getData().address_line_2+', ' : '');
+                        address += (cell.getData().city != null ? cell.getData().city+', ' : '');
+                        address += (cell.getData().state != null ? cell.getData().state+', ' : '');
+                        address += (cell.getData().postal_code != null ? cell.getData().postal_code : '');
                 
                         var html = '<div class="block whitespace-normal">';
                         html += '<div class="flex items-start">';

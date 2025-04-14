@@ -99,7 +99,7 @@ class BoilerBrandController extends Controller
 
     public function list(Request $request) {
 
-        $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
+        $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
         $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
 
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));

@@ -14,9 +14,11 @@ var BoilerBrandListTable = (function () {
                 ajaxURL: route('superadmin.boiler-brand.list'),
                 ajaxParams: {
                     queryStr: querystr,
-                    status: status,
+                    status: status
                 },
-                pagination: "remote",
+
+                pagination: true,
+                paginationMode:"remote",
                 filterMode: "remote",
                 sortMode: "remote",
                 printAsHtml: true,
@@ -26,6 +28,7 @@ var BoilerBrandListTable = (function () {
                 layout: "fitColumns",
                 responsiveLayout: "collapse",
                 placeholder: "No matching records found",
+
                 columns: [
                     
                     {
@@ -94,9 +97,9 @@ var BoilerBrandListTable = (function () {
                         },
                     },
                 ],
-                ajaxResponse:function(url, params, response){
-                    return response.data;
-                },
+                // ajaxResponse:function(url, params, response){
+                //     return response.data;
+                // },
                 renderComplete() {
                     createIcons({
                         icons,
