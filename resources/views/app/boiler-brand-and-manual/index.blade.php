@@ -87,13 +87,13 @@
                                                 innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar-days" class="lucide lucide-calendar-days stroke-1.5 h-5 w-5 text-success"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>';
                                             innerHtml += '</span>';
                                             innerHtml += '<div>';
-                                                innerHtml += '<div class="text-gray-500 text-xs">Model Name</div>';
+                                                innerHtml += '<div class="text-gray-500 text-xs">Model</div>';
                                                 innerHtml += '<div class="model-name font-medium text-base">'+manual.model+'</div>';
                                             innerHtml += '</div>';
                                         innerHtml += '</div>';
                                     innerHtml += '</div>';
                                     if(manual.year_of_manufacture != null){
-                                        innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                        innerHtml += '<div class="col-span-6 sm:col-span-3">';
                                             innerHtml += '<div class="flex justify-start items-start">';
                                                 innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
                                                     innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar-days" class="lucide lucide-calendar-days stroke-1.5 h-5 w-5 text-success"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>';
@@ -106,7 +106,7 @@
                                         innerHtml += '</div>';
                                     }
                                     if(manual.fuel_type != null){
-                                        innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                        innerHtml += '<div class="col-span-6 sm:col-span-3">';
                                             innerHtml += '<div class="flex justify-start items-start">';
                                                 innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
                                                     innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 h-5 w-5 text-success"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
@@ -119,7 +119,7 @@
                                         innerHtml += '</div>';
                                     }
                                     if(manual.gc_no != null){
-                                        innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                        innerHtml += '<div class="col-span-6 sm:col-span-3">';
                                             innerHtml += '<div class="flex justify-start items-start">';
                                                 innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
                                                     innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 h-5 w-5 text-success"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';

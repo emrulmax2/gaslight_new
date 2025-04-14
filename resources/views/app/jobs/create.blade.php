@@ -28,7 +28,7 @@
                         <div class="mb-3">
                             <x-base.form-label for="customer_property_id">Customer <span class="text-danger">*</span></x-base.form-label>
                             <div class="relative searchWrap" data-type="customer">
-                                <x-base.form-input autocomplete="off" name="search_input" class="w-full search_input address_name" type="text" placeholder="Search Customer..." />
+                                <x-base.form-input autocomplete="off" name="search_input" class="w-full search_input" type="text" placeholder="Search Customer..." />
                                 <x-base.form-input name="customer_id" id="customer_id" class="w-full the_id_input" type="hidden" value="0" />
                                 <div class="searchResultCotainter absolute left-0 top-full shadow bg-white border rounded-md w-full z-50" style="display: none;">
                                     <div class="resultWrap">

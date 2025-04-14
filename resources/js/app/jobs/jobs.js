@@ -9,7 +9,9 @@ var jobListTable = (function () {
         let tableContent = new Tabulator("#jobListTable", {
             ajaxURL: route("jobs.list"),
             ajaxParams: { querystr: querystr, status: status, recordparams : recordparams},
-            pagination: "remote",
+            pagination: true,
+            paginationMode:"remote",
+
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,
@@ -156,9 +158,9 @@ var jobListTable = (function () {
                     },
                 },
             ],
-            ajaxResponse:function(url, params, response){
-                return response.data;
-            },
+            // ajaxResponse:function(url, params, response){
+            //     return response.data;
+            // },
             renderComplete() {
                 createIcons({
                     icons,
