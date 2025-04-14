@@ -29,7 +29,7 @@ Route::prefix('/v1')->group(function() {
     Route::middleware('auth:api')->group(function() {
 
         // Example: Fetch user dashboard
-        Route::get('/dashboard', [DashboardController::class,'index']);
+        Route::get('/dashboard', [DashboardController::class,'index'])->name('api.user.dashboard');
         // 
         // Example: Fetch user profile
         Route::get('/profile', [UserController::class, 'profile']);
