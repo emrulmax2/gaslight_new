@@ -75,59 +75,67 @@
                         </div>
                     `;
                 } else {
+                    $('#search-box').removeClass('hidden');
+                    let innerHtml = '';
                     boilerBrandsManual.forEach(manual => {
-                        $('#search-box').removeClass('hidden');
-                        let theDownloadBtn = '';
-                        if(manual.pdf_url != ''){
-                            theDownloadBtn = '<a target="_blank" href="'+manual.pdf_url+'" class="transition duration-200 border shadow-sm inline-flex items-center justify-center py-2 px-3 rounded-md font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&amp;:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success bg-opacity-20 border-opacity-5 text-success dark:border-success dark:border-opacity-20 [&amp;:hover:not(:disabled)]:bg-opacity-10 [&amp;:hover:not(:disabled)]:border-opacity-10 w-auto">\
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="cloud-download" class="lucide lucide-cloud-download stroke-1.5 mr-2 h-4 w-4"><path d="M12 13v8l-4-4"></path><path d="m12 21 4-4"></path><path d="M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284"></path></svg>\
-                                                Download Manual</a>';
-                        }
-                        boilerBrandsContainer.innerHTML += `
-                            <div id="${manual.model}" class="containerItems col-span-12 sm:col-span-6 xl:col-span-4 mb-3">
-                                <div class="intro-y box p-5">
-                                    <div class="grid grid-cols-12 gap-x-4 gap-y-2">
-                                        <div class="col-span-12 sm:col-span-3">
-                                            <div class="flex justify-start items-start">
-                                                <span class="bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">
-                                                    <x-base.lucide class="h-5 w-5 text-success" icon="calendar-days" />
-                                                </span>
-                                                <div>
-                                                    <div class="text-gray-500 text-xs">Year: ${manual.year_of_manufacture}</div>
-                                                    <div class="model-name font-medium text-base">${manual.model}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-span-12 sm:col-span-3">
-                                            <div class="flex justify-start items-start">
-                                                <span class="bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">
-                                                    <x-base.lucide class="h-5 w-5 text-success" icon="check-circle" />
-                                                </span>
-                                                <div>
-                                                    <div class="text-gray-600 text-xs">Fuel Type</div>
-                                                    <div class="text-base font-medium">${manual.fuel_type}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-span-12 sm:col-span-3">
-                                            <div class="flex justify-start items-start">
-                                                <span class="bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">
-                                                    <x-base.lucide class="h-5 w-5 text-success" icon="check-circle" />
-                                                </span>
-                                                <div>
-                                                    <div class="text-gray-600 text-xs">GC No</div>
-                                                    <div class="text-base font-medium">${manual.gc_no}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-span-12 sm:col-span-3 text-right">
-                                            ${theDownloadBtn}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        innerHtml += '<a href="'+(manual.pdf_url != '' ? manual.pdf_url : 'javascript:void(0);')+'" id="'+manual.model+'" class="containerItems block mb-3">';
+                            innerHtml += '<div class="intro-y box p-5">';
+                                innerHtml += '<div class="grid grid-cols-12 gap-x-4 gap-y-2">';
+                                    innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                        innerHtml += '<div class="flex justify-start items-start">';
+                                            innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
+                                                innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar-days" class="lucide lucide-calendar-days stroke-1.5 h-5 w-5 text-success"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>';
+                                            innerHtml += '</span>';
+                                            innerHtml += '<div>';
+                                                innerHtml += '<div class="text-gray-500 text-xs">Model Name</div>';
+                                                innerHtml += '<div class="model-name font-medium text-base">'+manual.model+'</div>';
+                                            innerHtml += '</div>';
+                                        innerHtml += '</div>';
+                                    innerHtml += '</div>';
+                                    if(manual.year_of_manufacture != null){
+                                        innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                            innerHtml += '<div class="flex justify-start items-start">';
+                                                innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
+                                                    innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar-days" class="lucide lucide-calendar-days stroke-1.5 h-5 w-5 text-success"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>';
+                                                innerHtml += '</span>';
+                                                innerHtml += '<div>';
+                                                    innerHtml += '<div class="text-gray-500 text-xs">Year of Manufacture</div>';
+                                                    innerHtml += '<div class="model-name font-medium text-base">'+manual.year_of_manufacture+'</div>';
+                                                innerHtml += '</div>';
+                                            innerHtml += '</div>';
+                                        innerHtml += '</div>';
+                                    }
+                                    if(manual.fuel_type != null){
+                                        innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                            innerHtml += '<div class="flex justify-start items-start">';
+                                                innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
+                                                    innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 h-5 w-5 text-success"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
+                                                innerHtml += '</span>';
+                                                innerHtml += '<div>';
+                                                    innerHtml += '<div class="text-gray-600 text-xs">Fuel Type</div>';
+                                                    innerHtml += '<div class="text-base font-medium">'+manual.fuel_type+'</div>';
+                                                innerHtml += '</div>';
+                                            innerHtml += '</div>';
+                                        innerHtml += '</div>';
+                                    }
+                                    if(manual.gc_no != null){
+                                        innerHtml += '<div class="col-span-12 sm:col-span-3">';
+                                            innerHtml += '<div class="flex justify-start items-start">';
+                                                innerHtml += '<span class="max-sm:hidden bg-success bg-opacity-10 inline-flex w-[45px] h-[45px] rounded-full items-center justify-center mr-3" style="flex: 0 0 auto;">';
+                                                    innerHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle stroke-1.5 h-5 w-5 text-success"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>';
+                                                innerHtml += '</span>';
+                                                innerHtml += '<div>';
+                                                    innerHtml += '<div class="text-gray-600 text-xs">GC No</div>';
+                                                    innerHtml += '<div class="text-base font-medium">'+manual.gc_no+'</div>';
+                                                innerHtml += '</div>';
+                                            innerHtml += '</div>';
+                                        innerHtml += '</div>';
+                                    }
+                                innerHtml += '</div>';
+                            innerHtml += '</div>';
+                        innerHtml += '</a>';
                     });
+                    boilerBrandsContainer.innerHTML += innerHtml;
                 }
                 brandContainer.classList.remove('hidden');
 
