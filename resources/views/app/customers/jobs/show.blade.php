@@ -27,7 +27,7 @@
                     <div class="p-5">
                         <div class="mb-3">
                             <x-base.form-label for="description">Job description</x-base.form-label>
-                            <x-base.form-input value="{{ (!empty($job->description) ? $job->description : '') }}" name="description" id="description" class="w-full" type="text" placeholder="Short Description" />
+                            <x-base.form-input value="{{ (!empty($job->description) ? $job->description : '') }}" name="description" id="description" class="w-full cap-fullname" type="text" placeholder="Short Description" />
                         </div>
                         <div class="mb-3">
                             <x-base.form-label for="details">Job Details</x-base.form-label>
