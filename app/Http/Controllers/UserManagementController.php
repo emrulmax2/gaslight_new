@@ -83,10 +83,10 @@ class UserManagementController extends Controller
                 $signature->certified = false;
                 $signature->from_ips = json_encode([request()->ip()]);
                 $signature->save();
-                return response()->json(['message' => 'Signature created successfully'], 201);
+                return response()->json(['message' => 'Signature created successfully', 'red' => ''], 201);
             }
         }
-        return response()->json(['message' => 'Signature could not be created'], 400);
+        return response()->json(['message' => 'Signature could not be created', 'red' => ''], 400);
     }
 
 
@@ -192,8 +192,6 @@ class UserManagementController extends Controller
         $user = Auth::user();
         $user_company_id = (isset($user->companies[0]->id) && $user->companies[0]->id > 0 ? $user->companies[0]->id : 0);
 
-        $queryField = isset($request->queryField) ? $request->queryField : 'name';
-        $queryType = isset($request->queryType) ? $request->queryType : 'like';
         $queryValue = isset($request->queryValue) ? $request->queryValue : '';
         $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
 
@@ -212,12 +210,12 @@ class UserManagementController extends Controller
 
         
 
-        if (!empty($queryField)):
-            if ($queryType === 'like') {
-                $query->where($queryField, 'LIKE', '%' . $queryValue . '%');
-            } else {
-                $query->where($queryField, $queryType, $queryValue);
-            }
+        if (!empty($queryValue)):
+            $query->where(function($q) use($queryValue){
+                $q->where('name', 'LIKE', '%' . $queryValue . '%')->orWhere('email', 'LIKE', '%' . $queryValue . '%')
+                    ->where('gas_safe_id_card', 'LIKE', '%' . $queryValue . '%')->where('oil_registration_number', 'LIKE', '%' . $queryValue . '%')
+                    ->where('installer_ref_no', 'LIKE', '%' . $queryValue . '%');
+            });
         endif;
 
         if($status == 2):

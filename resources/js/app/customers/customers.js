@@ -37,7 +37,17 @@ var customerListTable = (function () {
                     minWidth: 300,
                     formatter(cell, formatterParams) {
                         const companyName = cell.getData().company_name;
-                        return `<div class="font-medium whitespace-nowrap">${companyName || ''}</div>`;
+                        let html = '';
+
+                        if(companyName){
+                            html = '<div class="block whitespace-normal">';
+                                html += '<div class="flex items-start">';
+                                html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="building" class="lucide lucide-building stroke-1.5 h-4 w-4"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg></span>';
+                                html += '<div class="text-slate-500 text-xs">'+companyName+'</div>';
+                                html += '</div>';
+                            html += '</div>';
+                        }
+                        return html
                     }
                 },
                 {
@@ -49,11 +59,11 @@ var customerListTable = (function () {
                     formatter(cell, formatterParams) {
                         const borderClass = 'border-b lg:border-b-0 border-slate-200 pb-2';
                         var html = `<div class="${borderClass}">`;
-                        html += '<div class="flex items-center gap-1">';
-                        html += '<span class="sm:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>';
-                        html += '<div class="font-medium whitespace-nowrap">' + cell.getData().customer_full_name + '</div>';
-                        html += '</div>';
-                        html += '</div>';
+                            html += '<div class="flex items-center">';
+                            html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>';
+                            html += '<div class="font-medium whitespace-nowrap">' + cell.getData().customer_full_name + '</div>';
+                            html += '</div>';
+                            html += '</div>';
                         return html;
                     }
                 },
@@ -72,11 +82,11 @@ var customerListTable = (function () {
                         address += (cell.getData().postal_code != null ? cell.getData().postal_code : '');
                 
                         var html = '<div class="block whitespace-normal">';
-                        html += '<div class="flex items-start">';
-                        html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin w-4 h-4"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
-                        html += (address != '' ? '<div class="text-slate-500 text-xs">'+address+'</div>' : '');
-                        html += '</div>';
-                        html += '</div>';
+                                html += '<div class="flex items-start">';
+                                html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin w-4 h-4"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
+                                html += (address != '' ? '<div class="text-slate-500 text-xs">'+address+'</div>' : '');
+                                html += '</div>';
+                            html += '</div>';
                         return html;
                     }
                 },
@@ -86,6 +96,24 @@ var customerListTable = (function () {
                     headerHozAlign: "left",
                     vertAlign: 'middle',
                     responsive: 0
+                },
+                {
+                    title: 'Mobile',
+                    field: 'mobile',
+                    headerHozAlign: "left",
+                    vertAlign: 'middle',
+                    formatter(cell, formatterParams) { 
+                        let html = '';
+                        if(cell.getData().mobile != ''){
+                            html = '<div class="block whitespace-normal">';
+                                html += '<div class="flex items-start">';
+                                html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone stroke-1.5 h-4 w-4"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg></span>';
+                                html += '<div class="text-slate-500 text-xs">'+cell.getData().mobile+'</div>';
+                                html += '</div>';
+                            html += '</div>';
+                        }
+                        return html;
+                    }
                 },
                 /*{
                     title: "Actions",
