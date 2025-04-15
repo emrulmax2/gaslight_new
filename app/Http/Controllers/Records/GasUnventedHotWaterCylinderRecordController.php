@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 
 class GasUnventedHotWaterCylinderRecordController extends Controller
 {
-    public function checkAndUpdateRecordHistory($record_id){
+    public function checkAndUpdateRecordHistory($record_id){ 
         $record = GasUnventedHotWaterCylinderRecord::find($record_id);
         $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasUnventedHotWaterCylinderRecord::class, 'model_id' => $record_id ], [
             'customer_id' => $record->customer_id,

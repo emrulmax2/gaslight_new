@@ -83,26 +83,6 @@
     <div class="intro-y box mt-5 p-5">
         <div class="flex flex-col sm:flex-row sm:items-center xl:items-start gap-4">
             <form class="flex flex-wrap items-center gap-4 w-full" id="tabulator-html-filter-form">
-                <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-                    <label class="w-full sm:w-auto font-medium">Field</label>
-                    <x-base.form-select class="w-full sm:w-auto 2xl:w-full" id="tabulator-html-filter-field">
-                        <option value="name">Name</option>
-                        <option value="email">Email</option>
-                    </x-base.form-select>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-                    <label class="w-full sm:w-auto font-medium">Type</label>
-                    <x-base.form-select class="w-full sm:w-auto" id="tabulator-html-filter-type">
-                        <option value="like">like</option>
-                        <option value="=">=</option>
-                        <option value="<">&lt;</option>
-                        <option value="<=">&lt;=</option>
-                        <option value=">">&gt;</option>
-                        <option value=">=">&gt;=</option>
-                        <option value="!=">!=</option>
-                    </x-base.form-select>
-                </div>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                     <label class="w-full sm:w-auto font-medium">Value</label>

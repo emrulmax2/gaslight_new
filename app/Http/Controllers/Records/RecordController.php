@@ -249,7 +249,7 @@ class RecordController extends Controller
                 'created_by' => $user_id
             ];
             $invoice = Invoice::create($data);
-            if($invoice->id):
+            if($invoice->id): 
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'type' => 'Default',

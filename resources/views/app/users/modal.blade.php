@@ -26,10 +26,10 @@
                             <x-base.form-label for="password">Password <span class="text-danger">*</span></x-base.form-label>
                             <x-base.form-input name="password" id="password" class="w-full" type="password" placeholder="*********" />
                             <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-4 password-strength">
-                                <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
                             </div>
                             <span class="mt-2 text-danger error-password"></span>
                         </div>
@@ -170,25 +170,86 @@ const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("
 const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
 const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatesignature-modal"));
 
-function evaluatePasswordStrength() {
+    document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
+        $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+    });
+
+    $('#successModal .agreeWith').on('click', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        if($theBtn.attr('data-action') == 'RELOAD'){
+            if($theBtn.attr('data-redirect') != ''){
+                window.location.href = $theBtn.attr('data-redirect');
+            }else{
+                window.location.reload();
+            }
+        }else{
+            successModal.hide();
+        }
+    });
+
+        function evaluatePasswordStrength() {
             const password = document.getElementById('password').value;
-            const strengthBars = document.querySelectorAll('#password-strength > div');
-            let strength = 0;
+            let strenghts = checkPasswordStrength(password);
 
-            if (password.length >= 8) strength++;
-            if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
-            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            const box1 = document.getElementById('strength-1');
+            const box2 = document.getElementById('strength-2');
+            const box3 = document.getElementById('strength-3');
+            const box4 = document.getElementById('strength-4');
 
-            strengthBars.forEach((bar, index) => {
-                if (index < strength) {
-                    bar.classList.add('bg-theme-1/30');
-                    bar.classList.remove('bg-slate-400/30');
-                } else {
-                    bar.classList.add('bg-slate-400/30');
-                    bar.classList.remove('bg-theme-1/30');
-                }
-            });
+            switch (strenghts) {
+                    case 1:
+                            box1.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box1.classList.add('bg-danger', 'border-danger');
+                            break;
+                    case 2: 
+                            box2.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box2.classList.add('bg-warning', 'border-warning');
+                            break;
+                    case 3: 
+                            box3.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box3.classList.add('bg-pending', 'border-pending');
+                            break;
+                    case 4: 
+                    case 5: 
+                    case 6: 
+                    case 7: 
+                    case 8: 
+                    case 9: 
+                            box4.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box4.classList.add('bg-success', 'border-success');
+                            break;
+                    default:
+                            box1.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            box2.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            box3.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            box4.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            
+                            box1.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            box2.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            box3.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            box4.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            break;
+            }
+
+            // const password = document.getElementById('password').value;
+            // const strengthBars = document.querySelectorAll('#password-strength > div');
+            // let strength = 0;
+
+            // if (password.length >= 8) strength++;
+            // if (/[A-Z]/.test(password)) strength++;
+            // if (/[0-9]/.test(password)) strength++;
+            // if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            // strengthBars.forEach((bar, index) => {
+            //     if (index < strength) {
+            //         bar.classList.add('bg-theme-1/30');
+            //         bar.classList.remove('bg-slate-400/30');
+            //     } else {
+            //         bar.classList.add('bg-slate-400/30');
+            //         bar.classList.remove('bg-theme-1/30');
+            //     }
+            // });
         }
         function evaluateUpdatedPasswordStrength() {
             const password = document.getElementById('password').value;
@@ -210,13 +271,48 @@ function evaluatePasswordStrength() {
                 }
             });
         }
+        function checkPasswordStrength(password) {
+            // Initialize variables
+            let strength = 0;
+            let tips = "";
+
+            if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) {
+                strength += 1;
+            } else {}
+
+            //If it has numbers and characters
+            if (password.match(/([0-9])/)) {
+                strength += 1;
+            } else {}
+
+            //If it has one special character
+            if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) {
+                strength += 1;
+            } else {}
+
+            //If password is greater than 7
+            if (password.length > 7) {
+                strength += 1;
+            } else {}
+           
+            // Return results
+            if (strength < 2) {
+                return strength;
+            } else if (strength === 2) {
+                return strength;
+            } else if (strength === 3) {
+                return strength;
+            } else {
+                return strength;
+            }
+        }
         $('#password').on('input', function() {
                 evaluatePasswordStrength()
         })
 
-        $('#password').on('input', function() {
-            evaluateUpdatedPasswordStrength()
-        })
+        // $('#password').on('input', function() {
+        //     evaluateUpdatedPasswordStrength()
+        // })
 
 
         $("#addSignUserForm").submit(function(e) {
@@ -255,16 +351,15 @@ function evaluatePasswordStrength() {
                     
                     document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                         $("#successModal .successModalTitle").html("Congratulations!");
-                        $("#successModal .successModalDesc").html(response.data.msg);
-                        //$("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                        $("#successModal .successModalDesc").html(response.data.message);
+                        $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
                     });
 
-                    // setTimeout(() => {
+                    setTimeout(() => {
+                        successModal.hide();
+                        window.location.reload();
 
-                    //     successModal.hide();
-                    //     location.reload();
-
-                    // }, 1500);
+                    }, 1500);
 
                 }
             }).catch(error => {
@@ -279,12 +374,12 @@ function evaluatePasswordStrength() {
                         warningModal.show();
                         document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
                             $("#warningModal .warningModalTitle").html("Error Found!");
-                            $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                            $("#warningModal .warningModalDesc").html(error.response.data.message);
                         });
 
-                        // setTimeout(() => {
-                        //     warningModal.hide();
-                        // }, 1500);
+                        setTimeout(() => {
+                            warningModal.hide();
+                        }, 1500);
                     } else {
                         console.log('error');
                     }
@@ -325,13 +420,13 @@ function evaluatePasswordStrength() {
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
-                    $("#successModal .successModalDesc").html(response.data.msg);
-                    //$("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    $("#successModal .successModalDesc").html(response.data.message);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
                 });
 
                 setTimeout(() => {
                     successModal.hide();
-                    location.reload();
+                    window.location.reload();
                 }, 1500);
             }
         }).catch(error => {
@@ -347,7 +442,7 @@ function evaluatePasswordStrength() {
                     warningModal.show();
                     document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
                         $("#warningModal .warningModalTitle").html("Error Found!");
-                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                        $("#warningModal .warningModalDesc").html(error.response.data.message);
                     });
 
                     setTimeout(() => {
@@ -383,13 +478,13 @@ function evaluatePasswordStrength() {
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
-                    $("#successModal .successModalDesc").html(response.data.msg);
-                    //$("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    $("#successModal .successModalDesc").html(response.data.message);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
                 });
 
                 setTimeout(() => {
                     successModal.hide();
-                    location.reload();
+                    window.location.reload();
                 }, 1500);
             }
         }).catch(error => {
@@ -405,7 +500,7 @@ function evaluatePasswordStrength() {
                     warningModal.show();
                     document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
                         $("#warningModal .warningModalTitle").html("Error Found!");
-                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                        $("#warningModal .warningModalDesc").html(error.response.data.message);
                     });
 
                     setTimeout(() => {
@@ -419,73 +514,6 @@ function evaluatePasswordStrength() {
         
     });
 
-    // $('#customerUpdateForm').on('submit', function(e) {
-    //     e.preventDefault();
-    //     const form = document.getElementById('customerUpdateForm');
-    //     //const form2 = document.getElementById('addStaffForm');
-
-
-    //     let $theForm = $(this);
-        
-    //     $('#userUpdateBtn', $theForm).attr('disabled');
-    //     $("#userUpdateBtn .theLoader").fadeIn();
-
-    //     let formData = new FormData(form);
-        
-    //     // const form2Data = new FormData(form2);
-
-    //     // for (const [key, value] of form2Data.entries()) {
-    //     //     formData.append(key, value);
-    //     // }
-    //     let $id = $('#id').val();
-    //     axios({
-    //         method: "post",
-    //         url: route('staff.update',$id),
-    //         data: formData,
-    //         headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-    //     }).then(response => {
-    //         $('#userUpdateBtn', $theForm).removeAttr('disabled');
-    //         $("#userUpdateBtn .theLoader").fadeOut();
-
-    //         if (response.status == 200) {
-    //             successModal.show();
-    //             document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
-    //                 $("#successModal .successModalTitle").html("Congratulations!");
-    //                 $("#successModal .successModalDesc").html(response.data.msg);
-    //                 //$("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
-    //             });
-
-    //             setTimeout(() => {
-    //                 successModal.hide();
-    //                 location.reload();
-    //             }, 1500);
-    //         }
-    //     }).catch(error => {
-    //         $('#userUpdateBtn', $theForm).removeAttr('disabled');
-    //         $("#userUpdateBtn .theLoader").fadeOut();
-    //         if (error.response) {
-    //             if (error.response.status == 422) {
-    //                 for (const [key, val] of Object.entries(error.response.data.errors)) {
-    //                     $(`#customerCreateForm .${key}`).addClass('border-danger');
-    //                     $(`#customerCreateForm  .error-${key}`).html(val);
-    //                 }
-    //             } else if (error.response.status == 304) {
-    //                 warningModal.show();
-    //                 document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
-    //                     $("#warningModal .warningModalTitle").html("Error Found!");
-    //                     $("#warningModal .warningModalDesc").html(error.response.data.msg);
-    //                 });
-
-    //                 setTimeout(() => {
-    //                     warningModal.hide();
-    //                 }, 1500);
-    //             } else {
-    //                 console.log('error');
-    //             }
-    //         }
-    //     });
-        
-    // });
 
     // Initialize Dropzone when the second tab is shown
     document.querySelector('#example-2-tab').addEventListener('shown.tw.tab', function() {

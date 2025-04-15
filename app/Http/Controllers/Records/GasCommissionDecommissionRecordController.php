@@ -22,7 +22,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class GasCommissionDecommissionRecordController extends Controller
 {
-    public function checkAndUpdateRecordHistory($record_id){
+    public function checkAndUpdateRecordHistory($record_id){ 
         $record = GasCommissionDecommissionRecord::find($record_id);
         $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasCommissionDecommissionRecord::class, 'model_id' => $record_id ], [
             'customer_id' => $record->customer_id,

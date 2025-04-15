@@ -31,7 +31,7 @@ class GasWarningNoticeController extends Controller
 
             'created_by' => $record->created_by,
             'updated_by' => auth()->user()->id,
-        ]);
+        ]); 
     }
 
 

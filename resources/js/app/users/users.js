@@ -6,16 +6,12 @@ let confModalDelTitle = 'Are you sure?';
 
 var usersListTable = (function () {
     var _tableGen = function () {
-    let queryField = $('#tabulator-html-filter-field').val() != '' ? $('#tabulator-html-filter-field').val() : '';
-    let queryType = $('#tabulator-html-filter-type').val() != '' ? $('#tabulator-html-filter-type').val() : '';
     let queryValue = $('#tabulator-html-filter-value').val() != '' ? $('#tabulator-html-filter-value').val() : '';
     // let status = $('#status').val() != '' ? $('#status').val() : '1';
 
     const tableData = new Tabulator("#usersListTable", {
         ajaxURL: route('users.list'),
         ajaxParams: {
-            queryField: queryField,
-            queryType: queryType,
             queryValue: queryValue,
         },
         ajaxFiltering: true,
