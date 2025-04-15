@@ -30,14 +30,14 @@ class HomeOwnerGasSafetyController extends Controller
             'customer_id' => $record->customer_id,
             'customer_job_id' => $record->customer_job_id,
             'job_form_id' => $record->job_form_id,
-            'model' => GasSafetyRecord::class,
+            'model_type' => GasSafetyRecord::class,
             'model_id' => $record->id,
 
             'created_by' => $record->created_by,
             'updated_by' => auth()->user()->id,
         ]);
     }
-    
+
     public function show(GasSafetyRecord $gsr){
         $user_id = auth()->user()->id;
         $gsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);

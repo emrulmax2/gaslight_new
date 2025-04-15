@@ -27,7 +27,7 @@ class GasBreakdownRecordController extends Controller
             'customer_id' => $record->customer_id,
             'customer_job_id' => $record->customer_job_id,
             'job_form_id' => $record->job_form_id,
-            'model' => GasBreakdownRecord::class,
+            'model_type' => GasBreakdownRecord::class,
             'model_id' => $record->id,
 
             'created_by' => $record->created_by,

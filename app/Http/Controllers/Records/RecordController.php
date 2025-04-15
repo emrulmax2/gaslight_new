@@ -212,7 +212,7 @@ class RecordController extends Controller
                     'customer_id' => $invoice->customer_id,
                     'customer_job_id' => $invoice->customer_job_id,
                     'job_form_id' => $invoice->job_form_id,
-                    'model' => Invoice::class,
+                    'model_type' => Invoice::class,
                     'model_id' => $invoice->id,
 
                     'created_by' => $invoice->created_by,
@@ -265,7 +265,7 @@ class RecordController extends Controller
                     'customer_id' => $job->customer_id,
                     'customer_job_id' => $job_id,
                     'job_form_id' => $form_id,
-                    'model' => Invoice::class,
+                    'model_type' => Invoice::class,
                     'model_id' => $invoice->id,
 
                     'created_by' => $user_id,
@@ -291,7 +291,7 @@ class RecordController extends Controller
                     'customer_id' => $quote->customer_id,
                     'customer_job_id' => $quote->customer_job_id,
                     'job_form_id' => $quote->job_form_id,
-                    'model' => Quote::class,
+                    'model_type' => Quote::class,
                     'model_id' => $quote->id,
 
                     'created_by' => $quote->created_by,
@@ -345,7 +345,7 @@ class RecordController extends Controller
                     'customer_id' => $job->customer_id,
                     'customer_job_id' => $job_id,
                     'job_form_id' => $form_id,
-                    'model' => Quote::class,
+                    'model_type' => Quote::class,
                     'model_id' => $quote->id,
 
                     'created_by' => $user_id,
