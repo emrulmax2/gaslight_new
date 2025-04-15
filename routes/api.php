@@ -5,11 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\BoilerBrandAndManualPageController;
+use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\loggedin;
 
-Route::prefix('/v1')->group(function() {
+Route::prefix('/v1')->name('api.')->group(function() {
 
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -29,7 +30,7 @@ Route::prefix('/v1')->group(function() {
     Route::middleware('auth:api')->group(function() {
 
         // Example: Fetch user dashboard
-        Route::get('/dashboard', [DashboardController::class,'index'])->name('api.user.dashboard');
+        Route::get('/dashboard', [DashboardController::class,'index'])->name('user.dashboard');
         // 
         // Example: Fetch user profile
         Route::get('/profile', [UserController::class, 'profile']);

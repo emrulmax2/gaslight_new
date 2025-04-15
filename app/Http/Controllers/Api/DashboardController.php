@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\Cache;
 use App\Fakers\Countries;
 use App\Models\Customer;
 use App\Models\CustomerJob;
+use App\Models\UserReferralCode;
 
 class DashboardController extends Controller
 {
     public function index(Request $request) 
     {
         $user = $request->user();
+        $this->hasReferralCode($user->id);
 
         if($user->role != 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -41,8 +43,10 @@ class DashboardController extends Controller
                     ->get(),
                 'user_jobs_count' => CustomerJob::where('created_by', $theUser->id)->count(),
                 'user_customers_count' => Customer::where('created_by', $theUser->id)->count(),
+                'boiler_manual_url' => route('api.boiler-manuals'),
             ];
         });
+
 
         // Return the data as a JSON response
         return response()->json([
@@ -50,5 +54,21 @@ class DashboardController extends Controller
             'message' => 'Dashboard data retrieved successfully.',
             'data' => $data,
         ], 200);
+    }
+
+
+    public function hasReferralCode($userId){
+        $getUser = User::with('referral')->find($userId);
+        if(!isset($getUser->referral->id)):
+            $name = $getUser->name;
+            $prefix = strtoupper(substr(str_replace(' ', '', $name), 0, 3));
+            UserReferralCode::create([
+                'user_id' => $getUser->id,
+                'code' => $prefix.random_int(100000, 999999),
+                'active' => 1,
+
+                'created_by' => $getUser->id,
+            ]);
+        endif;
     }
 }
