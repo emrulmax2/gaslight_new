@@ -27,7 +27,7 @@
                         <div class="grid grid-cols-12 gap-4">
                             <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="company_name">Company Name</x-base.form-label>
-                                <x-base.form-input type="text" id="company_name" name="company_name" value="{{ isset($company->company_name) ? $company->company_name : '' }}" />
+                                <x-base.form-input class="cap-fullname" type="text" id="company_name" name="company_name" value="{{ isset($company->company_name) ? $company->company_name : '' }}" />
                             </div>
                             <div class="col-span-12 sm:col-span-6 md:col-span-4">
                                 <x-base.form-label for="business_type">Company Business Type</x-base.form-label>

@@ -63,7 +63,7 @@
                         </div>
                         <div class="mb-3">
                             <x-base.form-label for="description">Job Description</x-base.form-label>
-                            <x-base.form-input name="description" id="description" class="w-full" type="text" placeholder="Short Description" />
+                            <x-base.form-input name="description" id="description" class="w-full cap-fullname" type="text" placeholder="Short Description" />
                         </div>
                         <div class="mb-3">
                             <x-base.form-label for="details">Note</x-base.form-label>
