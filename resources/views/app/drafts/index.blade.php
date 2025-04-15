@@ -5,14 +5,14 @@
 @endsection
 
 @section('subcontent')
-<div class="intro-y mt-8 flex items-center">
-    <h2 class="mr-auto text-lg font-medium">Certificates</h2>
-    <div class="flex gap-2">
-        <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
-            <x-base.lucide class="h-4 w-4" icon="home" />
-        </x-base.button>
+    <div class="intro-y mt-8 flex items-center">
+        <h2 class="mr-auto text-lg font-medium">Certificates</h2>
+        <div class="flex gap-2">
+            <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
+                <x-base.lucide class="h-4 w-4" icon="home" />
+            </x-base.button>
+        </div>
     </div>
-</div>
     
     <!-- BEGIN: HTML Table Data -->
     <div class="intro-y box mt-5 p-5">
@@ -34,6 +34,7 @@
                 <div class="items-center lg:mr-4 mt-2 lg:mt-0 2xl:w-64">
                     <label class="flex-none">Certificate Type </label>
                     <x-base.form-select class="mt-1 w-auto sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px]" id="certificate_type" >
+                        <option value="all">All</option>
                         @foreach($certificate_types as $type)
                             <option value="{{ $type->id }}">{{ $type->name }}</option>
                         @endforeach

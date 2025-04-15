@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasBreakdownRecord;
 use App\Models\GasBreakdownRecordAppliance;
 use App\Models\GasServiceRecord;
@@ -20,6 +21,20 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class GasBreakdownRecordController extends Controller
 {
+    public function checkAndUpdateRecordHistory($record_id){
+        $record = GasBreakdownRecord::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model' => GasBreakdownRecord::class, 'model_id' => $record_id ], [
+            'customer_id' => $record->customer_id,
+            'customer_job_id' => $record->customer_job_id,
+            'job_form_id' => $record->job_form_id,
+            'model' => GasBreakdownRecord::class,
+            'model_id' => $record->id,
+
+            'created_by' => $record->created_by,
+            'updated_by' => auth()->user()->id,
+        ]);
+    }
+
     public function show(GasBreakdownRecord $gbr){
         $user_id = auth()->user()->id;
         $gbr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
@@ -74,6 +89,8 @@ class GasBreakdownRecordController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasBreakdownRecord->id);
+
         $saved = 0;
         if($gasBreakdownRecord->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
             $theAppliance = $appliance[$serial];
@@ -145,6 +162,7 @@ class GasBreakdownRecordController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasBreakdownRecord->id);
         
         if($request->input('sign') !== null):
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));

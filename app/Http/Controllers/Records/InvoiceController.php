@@ -98,7 +98,6 @@ class InvoiceController extends Controller
         return response()->json(['msg' => $message, 'red' => '', 'pdf' => $pdf], 200);
     }
 
-
     public function generatePdf($invoice_id) {
         $invoice = Invoice::with('items', 'job', 'job.property', 'customer', 'user', 'user.company')->find($invoice_id);
         $isNonVatCheck = ($invoice->vat_registerd == 1 ? true : false);

@@ -16,6 +16,7 @@ use App\Models\Customer;
 use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasBreakdownRecord;
 use App\Models\GasBreakdownRecordAppliance;
 use App\Models\GasSafetyRecord;
@@ -205,6 +206,18 @@ class RecordController extends Controller
         $invoice = Invoice::with('items')->where('customer_job_id', $job_id)->where('job_form_id', $form_id)
                     ->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         if(isset($invoice->id) && $invoice->id > 0):
+            $existingRD = ExistingRecordDraft::where('model', Invoice::class)->where('model_id', $invoice->id)->get();
+            if($existingRD->isEmpty()):
+                ExistingRecordDraft::create([
+                    'customer_id' => $invoice->customer_id,
+                    'customer_job_id' => $invoice->customer_job_id,
+                    'job_form_id' => $invoice->job_form_id,
+                    'model' => Invoice::class,
+                    'model_id' => $invoice->id,
+
+                    'created_by' => $invoice->created_by,
+                ]);
+            endif;
             return $invoice;
         else:
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
@@ -248,6 +261,16 @@ class RecordController extends Controller
                     'created_by' => $user_id,
                 ]);
 
+                ExistingRecordDraft::create([
+                    'customer_id' => $job->customer_id,
+                    'customer_job_id' => $job_id,
+                    'job_form_id' => $form_id,
+                    'model' => Invoice::class,
+                    'model_id' => $invoice->id,
+
+                    'created_by' => $user_id,
+                ]);
+
                 return $invoice;
             else:
                 return [];
@@ -262,6 +285,19 @@ class RecordController extends Controller
         $quote = Quote::with('items')->where('customer_job_id', $job_id)->where('job_form_id', $form_id)
                     ->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         if(isset($quote->id) && $quote->id > 0):
+            $existingRD = ExistingRecordDraft::where('model', Quote::class)->where('model_id', $quote->id)->get();
+            if($existingRD->isEmpty()):
+                ExistingRecordDraft::create([
+                    'customer_id' => $quote->customer_id,
+                    'customer_job_id' => $quote->customer_job_id,
+                    'job_form_id' => $quote->job_form_id,
+                    'model' => Quote::class,
+                    'model_id' => $quote->id,
+
+                    'created_by' => $quote->created_by,
+                ]);
+            endif;
+
             return $quote;
         else:
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
@@ -302,6 +338,16 @@ class RecordController extends Controller
                     'vat_rate' => 20,
                     'vat_amount' => (!empty($job->estimated_amount) && $job->estimated_amount > 0 ? ($job->estimated_amount * 20) / 100 : 0),
                     
+                    'created_by' => $user_id,
+                ]);
+
+                ExistingRecordDraft::create([
+                    'customer_id' => $job->customer_id,
+                    'customer_job_id' => $job_id,
+                    'job_form_id' => $form_id,
+                    'model' => Quote::class,
+                    'model_id' => $quote->id,
+
                     'created_by' => $user_id,
                 ]);
 
