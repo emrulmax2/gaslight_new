@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasPowerFlushRecord;
 use App\Models\GasPowerFlushRecordChecklist;
 use App\Models\GasPowerFlushRecordRediator;
@@ -20,6 +21,21 @@ use Creagia\LaravelSignPad\Signature;
 
 class GasPowerFlushRecordController extends Controller
 {
+    public function checkAndUpdateRecordHistory($record_id){
+        $record = GasPowerFlushRecord::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model' => GasPowerFlushRecord::class, 'model_id' => $record_id ], [
+            'customer_id' => $record->customer_id,
+            'customer_job_id' => $record->customer_job_id,
+            'job_form_id' => $record->job_form_id,
+            'model' => GasPowerFlushRecord::class,
+            'model_id' => $record->id,
+
+            'created_by' => $record->created_by,
+            'updated_by' => auth()->user()->id,
+        ]);
+    }
+
+
     public function show(GasPowerFlushRecord $gpfr){
         $user_id = auth()->user()->id;
         $gpfr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
@@ -73,6 +89,7 @@ class GasPowerFlushRecordController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasPowerFlush->id);
 
         if($gasPowerFlush->id):
             $gasPowerFlushChecklist = GasPowerFlushRecordChecklist::updateOrCreate(['gas_power_flush_record_id' => $gasPowerFlush->id], [
@@ -146,6 +163,7 @@ class GasPowerFlushRecordController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasPowerFlush->id);
 
         GasPowerFlushRecordRediator::where('gas_power_flush_record_id',  $gasPowerFlush->id)->forceDelete();
         if($gasPowerFlush->id && !empty($rediators)):
@@ -192,6 +210,7 @@ class GasPowerFlushRecordController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasPowerFlush->id);
         
         if($request->input('sign') !== null):
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));

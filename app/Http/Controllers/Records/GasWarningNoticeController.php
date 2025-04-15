@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasWarningNotice;
 use App\Models\GasWarningNoticeAppliance;
 use App\Models\JobForm;
@@ -19,6 +20,21 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class GasWarningNoticeController extends Controller
 {
+    public function checkAndUpdateRecordHistory($record_id){
+        $record = GasWarningNotice::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model' => GasWarningNotice::class, 'model_id' => $record_id ], [
+            'customer_id' => $record->customer_id,
+            'customer_job_id' => $record->customer_job_id,
+            'job_form_id' => $record->job_form_id,
+            'model' => GasWarningNotice::class,
+            'model_id' => $record->id,
+
+            'created_by' => $record->created_by,
+            'updated_by' => auth()->user()->id,
+        ]);
+    }
+
+
     public function show(GasWarningNotice $gsr){
         $user_id = auth()->user()->id;
         $gsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
@@ -73,6 +89,8 @@ class GasWarningNoticeController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasWarningNotice->id);
+
         $saved = 0;
         if($gasWarningNotice->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
             $theAppliance = $appliance[$serial];
@@ -133,6 +151,7 @@ class GasWarningNoticeController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasWarningNotice->id);
         
         if($request->input('sign') !== null):
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));

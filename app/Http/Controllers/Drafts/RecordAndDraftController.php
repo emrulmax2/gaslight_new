@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Drafts;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasBoilerSystemCommissioningChecklist;
 use App\Models\GasBreakdownRecord;
 use App\Models\GasCommissionDecommissionRecord;
@@ -19,6 +20,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class RecordAndDraftController extends Controller
 {
@@ -52,76 +54,38 @@ class RecordAndDraftController extends Controller
         foreach($sorters as $sort):
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
-
-
-        $model = null;
-        $withRelations = ['customer', 'job.property'];
-        
-        if ($certificateType) {
-            switch ($certificateType) {
-                case '3':
-                    $model = new Quote();
-                    break;
-                case '4':
-                    $model = new Invoice();
-                    break;
-                case '6':
-                    $model = new GasSafetyRecord();
-                    break;
-                case '8':
-                    $model = new GasWarningNotice();
-                    break;
-                case '9':
-                    $model = new GasServiceRecord();
-                    break;
-                case '10':
-                    $model = new GasBreakdownRecord();
-                    break;
-                case '13':
-                    $model = new GasBoilerSystemCommissioningChecklist();
-                    break;
-                case '15':
-                    $model = new GasPowerFlushRecord();
-                    break;
-                case '17':
-                    $model = new GasUnventedHotWaterCylinderRecord();
-                    break;
-                case '16':
-                    $model = new GasCommissionDecommissionRecord();
-                    break;
-                default:
-                    $model = new Quote();
-                    break;
-            }
-        } else {
-            $model = new Quote();
-        }
     
-        $query = $model->with($withRelations)
-            ->orderByRaw(implode(',', $sorts));
-
-
+        $query = ExistingRecordDraft::with('customer', 'job', 'job.property', 'form', 'user', 'model')->orderByRaw(implode(',', $sorts));
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
-                $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
+                $q->where(function($sq) use($queryStr){
+                    $sq->where('full_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
+                });
+            })->orWhereHas('job.property', function ($q) use ($queryStr) {
+                $q->where(function($sq) use($queryStr){
+                    $sq->where('occupant_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
+                });
             });
         endif;
-
-        
+        if(!empty($certificateType) && $certificateType != 'all'):
+            $query->where('job_form_id', $certificateType);
+        endif;
         if(!empty($engineerId) && $engineerId != 'all'):
             $query->where('created_by', $engineerId);
         endif;
-            
         if(!empty($status) && $status != 'all'):
-            $query->where('status', $status);
+            $query->whereHas('model', function($q) use($status){
+                $q->where('status', $status);
+            });
         endif;
 
-        if(!empty($dateRange)):
+        if(!empty($dateRange) && strlen($dateRange) == 23 && Str::contains(' - ', $dateRange)):
             $dates = explode(' - ', $dateRange);
-            $query->whereBetween('created_at', [
-                date('Y-m-d', strtotime($dates[0])), 
-                date('Y-m-d', strtotime($dates[1]))
-            ]);
+            $query->whereBetween('created_at', [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
         endif;
 
         $total_rows = $query->count();
@@ -141,19 +105,17 @@ class RecordAndDraftController extends Controller
         if(!empty($Query)):
             $i = 1;
             foreach($Query as $list):
-                $certType = JobForm::where('id', $certificateType)->first();
-                    $data[] = [
-                        'id' => $i,
-                        'landlord_name' => $list->customer->full_name ?? '',
-                        'landlord_address' => $list->customer->full_address ?? '',
-                        'inspection_address' => $list->job->property->full_address ?? '',
-                        'certificate_type' => $certType->name ?? '',
-                        'assign_to' => Auth::user()->name ?? '',
-                        'created_at' => $list->created_at ? $list->created_at->format('jS M, Y \<b\r\/> \a\t h:i a') : '',
-                        'status' => $list->status ?? '',
-                        'actions' => $list->id
-                    ];
-                    $i++;
+                $data[] = [
+                    'id' => $i,
+                    'landlord_name' => $list->customer->full_name ?? '',
+                    'landlord_address' => $list->customer->full_address ?? '',
+                    'inspection_address' => $list->job->property->full_address ?? '',
+                    'certificate_type' => $list->form->name ?? '',
+                    'created_at' => $list->model->created_at ? $list->model->created_at->format('jS M, Y \<b\r\/> \a\t h:i a') : '',
+                    'status' => $list->model->status ?? '',
+                    'actions' => $list->id,
+                ];
+                $i++;
             endforeach;
         endif;
         return response()->json(['last_page' => $last_page, 'data' => $data]); 
