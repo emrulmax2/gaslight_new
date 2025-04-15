@@ -114,6 +114,7 @@ class JobController extends Controller
     }
 
     public function store(JobStoreRequest $request){
+        dd($request->all());
         $data = [
             'customer_id' => $request->customer_id,
             'customer_property_id' => $request->customer_property_id,
