@@ -23,7 +23,7 @@ class GasBreakdownRecordController extends Controller
 {
     public function checkAndUpdateRecordHistory($record_id){
         $record = GasBreakdownRecord::find($record_id);
-        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model' => GasBreakdownRecord::class, 'model_id' => $record_id ], [
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasBreakdownRecord::class, 'model_id' => $record_id ], [
             'customer_id' => $record->customer_id,
             'customer_job_id' => $record->customer_job_id,
             'job_form_id' => $record->job_form_id,

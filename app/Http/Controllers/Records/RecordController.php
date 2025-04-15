@@ -206,7 +206,7 @@ class RecordController extends Controller
         $invoice = Invoice::with('items')->where('customer_job_id', $job_id)->where('job_form_id', $form_id)
                     ->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         if(isset($invoice->id) && $invoice->id > 0):
-            $existingRD = ExistingRecordDraft::where('model', Invoice::class)->where('model_id', $invoice->id)->get();
+            $existingRD = ExistingRecordDraft::where('model_type', Invoice::class)->where('model_id', $invoice->id)->get();
             if($existingRD->isEmpty()):
                 ExistingRecordDraft::create([
                     'customer_id' => $invoice->customer_id,
@@ -285,7 +285,7 @@ class RecordController extends Controller
         $quote = Quote::with('items')->where('customer_job_id', $job_id)->where('job_form_id', $form_id)
                     ->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         if(isset($quote->id) && $quote->id > 0):
-            $existingRD = ExistingRecordDraft::where('model', Quote::class)->where('model_id', $quote->id)->get();
+            $existingRD = ExistingRecordDraft::where('model_type', Quote::class)->where('model_id', $quote->id)->get();
             if($existingRD->isEmpty()):
                 ExistingRecordDraft::create([
                     'customer_id' => $quote->customer_id,
