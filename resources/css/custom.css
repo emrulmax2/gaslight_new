@@ -7,7 +7,9 @@
 .l-auto{
     left: auto;
 }
-
+.cap-fullname{
+    text-transform: capitalize;
+}
 @media (max-width: 668px){
     .gca_responsive.tabulator .tabulator-tableholder .tabulator-table{
         width: 100%;

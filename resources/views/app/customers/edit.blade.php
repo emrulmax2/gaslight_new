@@ -42,7 +42,14 @@
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="full_name">Full Name <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->full_name) ? $customer->full_name : '' }}" name="full_name" id="full_name" class="w-full" type="text" placeholder="Last Name" />
+                                    <x-base.form-input 
+                                        value="{{ isset($customer->full_name) ? $customer->full_name : '' }}" 
+                                        name="full_name" 
+                                        id="full_name" 
+                                        class="w-full cap-fullname" 
+                                        type="text" 
+                                        placeholder="Last Name" 
+                                        />
                                     <div class="acc__input-error error-full_name text-danger text-xs mt-1"></div>
                                 </div>
                             </div>

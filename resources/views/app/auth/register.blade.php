@@ -43,11 +43,10 @@
                         method="POST">
                         <x-base.form-label>Full Name*</x-base.form-label>
                         <x-base.form-input
-                            class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
+                            class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5 cap-fullname"
                             type="text"
                             placeholder="David Peterson"
                             name="name" 
-                            oninput="this.value = this.value.toUpperCase()"
                         />
                         
                         <div id="error-name" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
