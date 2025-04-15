@@ -46,7 +46,8 @@
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
                             type="text"
                             placeholder="David Peterson"
-                            name="name"
+                            name="name" 
+                            oninput="this.value = this.value.toUpperCase()"
                         />
                         
                         <div id="error-name" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
@@ -87,10 +88,10 @@
                         
                         <div id="error-password" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>
                         <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-4">
-                            <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                            <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                            <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                            <div class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
                         </div>
                         <a
                             class="mt-3 block text-xs text-slate-500/80 sm:text-sm"
@@ -294,7 +295,50 @@
 
         function evaluatePasswordStrength() {
             const password = document.getElementById('password').value;
-            const strengthBars = document.querySelectorAll('#password-strength > div');
+            let strenghts = checkPasswordStrength(password);
+
+            const box1 = document.getElementById('strength-1');
+            const box2 = document.getElementById('strength-2');
+            const box3 = document.getElementById('strength-3');
+            const box4 = document.getElementById('strength-4');
+
+            //border-slate-400/20 bg-slate-400/30
+            switch (strenghts) {
+                    case 1:
+                            box1.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box1.classList.add('bg-danger', 'border-danger');
+                            break;
+                    case 2: 
+                            box2.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box2.classList.add('bg-warning', 'border-warning');
+                            break;
+                    case 3: 
+                            box3.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box3.classList.add('bg-pending', 'border-pending');
+                            break;
+                    case 4: 
+                    case 5: 
+                    case 6: 
+                    case 7: 
+                    case 8: 
+                    case 9: 
+                            box4.classList.remove('border-slate-400/20', 'bg-slate-400/30')
+                            box4.classList.add('bg-success', 'border-success');
+                            break;
+                    default:
+                            box1.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            box2.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            box3.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            box4.classList.remove('bg-danger', 'bg-warning','bg-success','bg-pending','border-danger','border-warning','border-pending','border-success');
+                            
+                            box1.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            box2.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            box3.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            box4.classList.add('border-slate-400/20', 'bg-slate-400/30');
+                            break;
+            }
+
+            /*const strengthBars = document.querySelectorAll('#password-strength > div');
             let strength = 0;
 
             if (password.length >= 8) strength++;
@@ -310,7 +354,43 @@
                     bar.classList.add('bg-slate-400/30');
                     bar.classList.remove('bg-theme-1/30');
                 }
-            });
+            });*/
+        }
+
+        function checkPasswordStrength(password) {
+            // Initialize variables
+            let strength = 0;
+            let tips = "";
+
+            if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) {
+                strength += 1;
+            } else {}
+
+            //If it has numbers and characters
+            if (password.match(/([0-9])/)) {
+                strength += 1;
+            } else {}
+
+            //If it has one special character
+            if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) {
+                strength += 1;
+            } else {}
+
+            //If password is greater than 7
+            if (password.length > 7) {
+                strength += 1;
+            } else {}
+           
+            // Return results
+            if (strength < 2) {
+                return strength;
+            } else if (strength === 2) {
+                return strength;
+            } else if (strength === 3) {
+                return strength;
+            } else {
+                return strength;
+            }
         }
             async function register() {
                 // Reset state

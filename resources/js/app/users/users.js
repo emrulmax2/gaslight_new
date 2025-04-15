@@ -49,12 +49,12 @@ var usersListTable = (function () {
                 headerHozAlign: 'left',
                 minWidth: 200
             },
-            {
-                title: 'Status',
-                field: 'status',
-                headerHozAlign: 'left',
-                minWidth: 80
-            },
+            // {
+            //     title: 'Status',
+            //     field: 'status',
+            //     headerHozAlign: 'left',
+            //     minWidth: 80
+            // },
             {
                 title: 'Pricing Package',
                 field: 'package_id',
@@ -119,9 +119,6 @@ var usersListTable = (function () {
                             <a class="flex items-center mr-3 edit" href="javascript:;">
                                 <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                             </a>
-                            <a class="flex items-center delete text-danger" href="javascript:;">
-                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
-                            </a>
                         </div>`);
                     } 
                     else {
@@ -132,11 +129,12 @@ var usersListTable = (function () {
                             <a class="flex items-center mr-3 edit" href="javascript:;">
                                 <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                             </a>
-                            <a class="flex items-center delete text-danger" href="javascript:;">
-                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
-                            </a>
                         </div>`);
                     }
+                    
+                    // <a class="flex items-center delete text-danger" href="javascript:;">
+                    //     <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
+                    // </a>
                 
                     $(a).find(".edit").on("click", function () {
                         location.href = route('users.edit', id);

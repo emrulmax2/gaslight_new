@@ -69,10 +69,12 @@ class CompanyController extends Controller
         $validatedData['gas_safe_registration_no'] = (isset($request->gas_safe_registration_no) && !empty($request->gas_safe_registration_no)) ? $request->gas_safe_registration_no : null;
         $validatedData['gas_safe_id_card'] = (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card)) ? $request->gas_safe_id_card : null;
         
-        Company::create($validatedData);
+        $company = Company::create($validatedData);
         $user = User::find(Auth::user()->id);
         $user->first_login = 0;
         $user->save();
+
+        $company->users()->attach($user->id);
 
         if ($request->has('signature_file')) {
             $file = $request->file('signature_file');
