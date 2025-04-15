@@ -21,9 +21,10 @@ var certificateListTable = (function () {
         ajaxSorting: true,
         printAsHtml: true,
         printStyled: true,
-        pagination: 'remote',
+        pagination: true,
+        paginationMode:"remote",
         paginationSize: 30,
-        paginationSizeSelector: [true, 30,50,100],
+        paginationSizeSelector: [true, 30, 50, 100],
         layout: 'fitColumns',
         responsiveLayout: 'collapse',
         placeholder: 'No matching records found',
@@ -69,7 +70,7 @@ var certificateListTable = (function () {
                 field: 'certificate_type',
                 headerHozAlign: 'left',
                 formatter(cell, formatterParams) { 
-                    var html = '<div class="font-medium text-slate-500">';
+                    var html = '<div class=" text-slate-500 text-xs whitespace-normal">';
                             html += cell.getData().certificate_type;
                         html += '</div>';
                     return html;
@@ -100,9 +101,6 @@ var certificateListTable = (function () {
                 }
             }
         ],
-        ajaxResponse:function(url, params, response){
-            return response.data;
-        },
         renderComplete() {
             createIcons({
                 icons,
@@ -163,16 +161,13 @@ return {
     });
 
     $("#tabulator-html-filter-reset").on("click", function (event) {
-        $("#tabulator-html-filter-field").val("name");
-        $("#tabulator-html-filter-type").val("like");
-        $("#tabulator-html-filter-value").val("");
+        $('#query').val('');
+        $('#engineer').val('all');
+        $('#certificate_type').val('all');
+        $('#date_range').val('');
+        $('#status').val('all');
         filtercertificateListTable();
     });
 
-    $("#add-new").on("click", function () {
-        const el = document.querySelector("#addnew-modal");
-        const modal = tailwind.Modal.getOrCreateInstance(el);
-        modal.toggle();
-    });
 
 })();

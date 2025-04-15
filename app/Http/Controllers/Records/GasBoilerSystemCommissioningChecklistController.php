@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasBoilerSystemCommissioningChecklist;
 use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
 use App\Models\JobForm;
@@ -19,6 +20,20 @@ use Creagia\LaravelSignPad\Signature;
 
 class GasBoilerSystemCommissioningChecklistController extends Controller
 {
+    public function checkAndUpdateRecordHistory($record_id){
+        $record = GasBoilerSystemCommissioningChecklist::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model' => GasBoilerSystemCommissioningChecklist::class, 'model_id' => $record_id ], [
+            'customer_id' => $record->customer_id,
+            'customer_job_id' => $record->customer_job_id,
+            'job_form_id' => $record->job_form_id,
+            'model' => GasBoilerSystemCommissioningChecklist::class,
+            'model_id' => $record->id,
+
+            'created_by' => $record->created_by,
+            'updated_by' => auth()->user()->id,
+        ]);
+    }
+
     public function show(GasBoilerSystemCommissioningChecklist $gbscc){
         $user_id = auth()->user()->id;
         $gbscc->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
@@ -73,6 +88,8 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasBoilerSCC->id);
+
         $saved = 0;
         if($gasBoilerSCC->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
             $theAppliance = $appliance[$serial];
@@ -158,6 +175,7 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
             
             'updated_by' => $user_id,
         ]);
+        $this->checkAndUpdateRecordHistory($gasBoilerSCC->id);
         
         if($request->input('sign') !== null):
             $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
