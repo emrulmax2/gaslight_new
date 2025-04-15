@@ -30,7 +30,7 @@
                             <x-base.form-input value="{{ (!empty($job->description) ? $job->description : '') }}" name="description" id="description" class="w-full cap-fullname" type="text" placeholder="Short Description" />
                         </div>
                         <div class="mb-3">
-                            <x-base.form-label for="details">Job Details</x-base.form-label>
+                            <x-base.form-label for="details">Note</x-base.form-label>
                             <x-base.form-textarea name="details" id="details" class="w-full h-[80px]" placeholder="Details...">{{ (!empty($job->details) ? $job->details : '') }}</x-base.form-textarea>
                         </div>
                         <div class="grid grid-cols-12 gap-x-6 gap-y-3">
