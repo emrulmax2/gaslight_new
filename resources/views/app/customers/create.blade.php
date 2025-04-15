@@ -41,10 +41,9 @@
                                     <x-base.form-label for="full_name">Full Name</x-base.form-label>
                                     <x-base.form-input name="full_name" 
                                     id="full_name" 
-                                    class="w-full" 
+                                    class="w-full cap-fullname" 
                                     type="text" 
                                     placeholder="Full Name" 
-                                    oninput="this.value = this.value.toUpperCase()"
                                     />
                                 </div>
                             </div>
