@@ -26,7 +26,7 @@ class HomeOwnerGasSafetyController extends Controller
 {
     public function checkAndUpdateRecordHistory($record_id){
         $record = GasSafetyRecord::find($record_id);
-        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasSafetyRecord::class, 'model_id' => $record_id ], [
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model' => GasSafetyRecord::class, 'model_id' => $record_id ], [
             'customer_id' => $record->customer_id,
             'customer_job_id' => $record->customer_job_id,
             'job_form_id' => $record->job_form_id,
