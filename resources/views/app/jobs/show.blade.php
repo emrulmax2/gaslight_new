@@ -74,7 +74,17 @@
                                     <option value="">Please Select</option>
                                     @if($slots->count() > 0)
                                         @foreach($slots as $slot)
-                                            <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
+                                            @php
+                                                $time = $slot->start; // Example time in 24-hour format
+                                                $dateTime = new DateTime($time);
+                                                $formattedStartTime = $dateTime->format("h:i A");
+                                                
+                                                $time2 = $slot->end; // Example time in 24-hour format
+                                                $dateTime2 = new DateTime($time2);
+                                                $formattedEndTime = $dateTime2->format("h:i A");
+
+                                            @endphp
+                                            <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $formattedStartTime }} {{ $formattedEndTime }}</option>
                                         @endforeach
                                     @endif
                                 </x-base.tom-select>
