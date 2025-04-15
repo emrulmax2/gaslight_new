@@ -31,7 +31,7 @@
                         </div>
                         <div class="mb-3">
                             <x-base.form-label for="details">Note</x-base.form-label>
-                            <x-base.form-textarea name="details" id="details" class="w-full h-[80px]" placeholder="Details...">{{ (!empty($job->details) ? $job->details : '') }}</x-base.form-textarea>
+                            <x-base.form-textarea name="details" id="details" class="w-full h-[80px] cap-fullname" placeholder="Details...">{{ (!empty($job->details) ? $job->details : '') }}</x-base.form-textarea>
                         </div>
                         <div class="grid grid-cols-12 gap-x-6 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
