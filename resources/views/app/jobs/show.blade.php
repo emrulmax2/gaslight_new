@@ -84,7 +84,7 @@
                                                 $formattedEndTime = $dateTime2->format("h:i A");
 
                                             @endphp
-                                            <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $formattedStartTime }} {{ $formattedEndTime }}</option>
+                                            <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $formattedStartTime }} - {{ $formattedEndTime }}</option>
                                         @endforeach
                                     @endif
                                 </x-base.tom-select>
