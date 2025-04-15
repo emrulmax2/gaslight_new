@@ -39,7 +39,13 @@
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="full_name">Full Name</x-base.form-label>
-                                    <x-base.form-input name="full_name" id="full_name" class="w-full" type="text" placeholder="Full Name" />
+                                    <x-base.form-input name="full_name" 
+                                    id="full_name" 
+                                    class="w-full" 
+                                    type="text" 
+                                    placeholder="Full Name" 
+                                    oninput="this.value = this.value.toUpperCase()"
+                                    />
                                 </div>
                             </div>
                             <div class="col-span-12 lg:col-span-6">
