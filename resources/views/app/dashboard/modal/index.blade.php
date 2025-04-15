@@ -116,7 +116,7 @@
                     </div>
                     <div class="mt-0 lg:mt-3 w-full flex-1 xl:mt-0">
                         <div class="flex flex-col items-center md:flex-row">
-                            <x-base.form-input type="text" class="step1__input" placeholder="Organization/Company" name="company_name" />
+                            <x-base.form-input type="text" class="step1__input cap-fullname" placeholder="Organization/Company" name="company_name" />
                         </div>
                         <div id="error-company_name" class="step1__input-error text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                     </div>

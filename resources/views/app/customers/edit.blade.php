@@ -58,7 +58,7 @@
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_name">Company Name</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->company_name) ? $customer->company_name : '' }}" name="company_name" id="company_name" class="w-full" type="text" placeholder="Company Name" />
+                                    <x-base.form-input value="{{ isset($customer->company_name) ? $customer->company_name : '' }}" name="company_name" id="company_name" class="w-full cap-fullname" type="text" placeholder="Company Name" />
                                 </div>
                             </div>
     
