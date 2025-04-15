@@ -133,11 +133,13 @@
                         <div class="grid grid-cols-12 gap-x-5 gap-y-3 px-5 pt-5 theAddressWrap" id="customerAddressWrap">
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Name</x-base.form-label>
-                                <x-base.form-input value="{{ (isset($job->customer->full_name) ? $job->customer->full_name : '') }}" name="customer_name" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Customer Full Name" />
+                                <x-base.form-input value="{{ (isset($job->customer->full_name) ? $job->customer->full_name : '') }}" name="customer_name" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Customer Full Name" 
+                                    oninput="this.value = this.value.toUpperCase()" />
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Company</x-base.form-label>
-                                <x-base.form-input value="{{ (isset($job->customer->company_name) ? $job->customer->company_name : '') }}" name="customer_company" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Customer Company" />
+                                <x-base.form-input value="{{ (isset($job->customer->company_name) ? $job->customer->company_name : '') }}" name="customer_company" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Customer Company" 
+                                    oninput="this.value = this.value.toUpperCase()" />
                             </div>
                             <div class="col-span-12 sm:col-span-4">
                                 <x-base.form-label>Phone Number</x-base.form-label>
