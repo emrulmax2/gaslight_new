@@ -23,7 +23,7 @@
                         <div class="col-span-12 lg:col-span-6">
                             <div class="m-1">
                                 <x-base.form-label for="company_name">Organization/Company <span class="text-danger">*</span></x-base.form-label>
-                                <x-base.form-input type="text" class="step1__input" placeholder="Organization/Company" name="company_name" oninput="this.value = this.value.toUpperCase()" />
+                                <x-base.form-input type="text" class="step1__input cap-fullname" placeholder="Organization/Company" name="company_name" />
                                 <div id="error-company_name" class="error-company_name text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                             </div>
                         </div>
