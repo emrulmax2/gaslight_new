@@ -21,7 +21,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class GasBreakdownRecordController extends Controller
 {
-    public function checkAndUpdateRecordHistory($record_id){
+    public function checkAndUpdateRecordHistory($record_id){ 
         $record = GasBreakdownRecord::find($record_id);
         $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasBreakdownRecord::class, 'model_id' => $record_id ], [
             'customer_id' => $record->customer_id,

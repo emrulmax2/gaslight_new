@@ -306,7 +306,7 @@ class JobController extends Controller
                 $html .= '<div class="results px-5 py-4" style="max-height: 250px; overflow-y: auto;">';
                     $i = 1;
                     foreach($query as $property):
-                        $html .= '<div data-id="'.$property->id.'" data-of="address" data-title="'.$property->address_line_1.' '.$property->address_line_2.', '.$property->postal_code.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
+                        $html .= '<div data-id="'.$property->id.'" data-of="address" data-title="'.$property->address_line_1.' '.$property->address_line_2.', '.$property->city.', '.$property->postal_code.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
                             $html .= '<div>';
                                 $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
                                     $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin h-4 w-4 stroke-[1.3] text-primary"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
