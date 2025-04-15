@@ -94,6 +94,7 @@ class RecordController extends Controller
             $GasSafetyRecord = GasSafetyRecord::where('customer_job_id', $job->id)->where('job_form_id', $form->id)->get()->first();
             //$GasSafetyRecord->signature;
             
+            
             $gsr_id = (isset($GasSafetyRecord->id) && $GasSafetyRecord->id > 0 ? $GasSafetyRecord->id : 0);
             $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
