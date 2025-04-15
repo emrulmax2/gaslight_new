@@ -23,7 +23,7 @@
                         <div class="col-span-12 lg:col-span-6">
                             <div class="m-1">
                                 <x-base.form-label for="company_name">Organization/Company <span class="text-danger">*</span></x-base.form-label>
-                                <x-base.form-input type="text" class="step1__input" placeholder="Organization/Company" name="company_name" />
+                                <x-base.form-input type="text" class="step1__input" placeholder="Organization/Company" name="company_name" oninput="this.value = this.value.toUpperCase()" />
                                 <div id="error-company_name" class="error-company_name text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                             </div>
                         </div>
@@ -98,7 +98,7 @@
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_address_line_1">Address Line 1 <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input type="text" placeholder="123 Main Street" name="company_address_line_1"  class="address_line_1"/>
+                                    <x-base.form-input type="text" placeholder="123 Main Street" name="company_address_line_1"  class="address_line_1" oninput="this.value = this.value.toUpperCase()"/>
                             
                                     <div id="error-company_address_line_1" class="error-company_address_line_1 text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                                 </div>
@@ -107,34 +107,34 @@
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_address_line_2">Address Line 2</x-base.form-label>
-                                    <x-base.form-input  type="text" placeholder="Apartment 123"  name="company_address_line_2" class="address_line_2"/>
+                                    <x-base.form-input  type="text" placeholder="Apartment 123"  name="company_address_line_2" class="address_line_2" oninput="this.value = this.value.toUpperCase()"/>
                                 </div>
                             </div>
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_city">Town <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input type="text" placeholder="London" name="company_city" class="city"/>
+                                    <x-base.form-input type="text" placeholder="London" name="company_city" class="city" oninput="this.value = this.value.toUpperCase()"/>
                                     <div id="error-company_city" class="error-company_city text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                                 </div>
                             </div>
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_state">County <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input type="text" placeholder="London" name="company_state" class="state"/>
+                                    <x-base.form-input type="text" placeholder="London" name="company_state" class="state" oninput="this.value = this.value.toUpperCase()"/>
                                     <div id="error-company_state" class="error-company_state text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                                 </div>
                             </div>
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_state">Country <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input  type="text" placeholder="London" name="company_country" class="country"/>
+                                    <x-base.form-input  type="text" placeholder="London" name="company_country" class="country" oninput="this.value = this.value.toUpperCase()"/>
                                     <div id="error-company_country" class="error-company_country text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                                 </div>
                             </div>
                             <div class="col-span-12 lg:col-span-6">
                                 <div class="m-1">
                                     <x-base.form-label for="company_postal_code">Post Code <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input type="text" placeholder="SW1W 0NY" name="company_postal_code" class="postal_code"/>
+                                    <x-base.form-input type="text" placeholder="SW1W 0NY" name="company_postal_code" class="postal_code" oninput="this.value = this.value.toUpperCase()"/>
                                      <div id="error-company_postal_code" class="error-company_postal_code text-danger mt-0 lg:mt-2 dark:text-orange-400"></div>
                                 </div>
                             </div>
