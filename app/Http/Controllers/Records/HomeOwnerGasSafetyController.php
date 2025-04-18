@@ -1083,4 +1083,216 @@ class HomeOwnerGasSafetyController extends Controller
             return false;
         endif;
     }
+
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $certificate_id = (isset($request->certificate_id) && $request->certificate_id > 0 ? $request->certificate_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $appliances = json_decode($request->appliances);
+        $safetyChecks = json_decode($request->safetyChecks);
+        $gsrComments = json_decode($request->gsrComments);
+
+        if($customer_job_id == 0):
+            
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $gasSafetyRecord = GasSafetyRecord::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'satisfactory_visual_inspaction' => (isset($safetyChecks->satisfactory_visual_inspaction) && !empty($safetyChecks->satisfactory_visual_inspaction) ? $safetyChecks->satisfactory_visual_inspaction : null),
+                'emergency_control_accessible' => (isset($safetyChecks->emergency_control_accessible) && !empty($safetyChecks->emergency_control_accessible) ? $safetyChecks->emergency_control_accessible : null),
+                'satisfactory_gas_tightness_test' => (isset($safetyChecks->satisfactory_gas_tightness_test) && !empty($safetyChecks->satisfactory_gas_tightness_test) ? $safetyChecks->satisfactory_gas_tightness_test : null),
+                'equipotential_bonding_satisfactory' => (isset($safetyChecks->equipotential_bonding_satisfactory) && !empty($safetyChecks->equipotential_bonding_satisfactory) ? $safetyChecks->satisfactory_gas_tightness_test : null),
+                'co_alarm_fitted' => (isset($safetyChecks->co_alarm_fitted) && !empty($safetyChecks->co_alarm_fitted) ? $safetyChecks->co_alarm_fitted : null),
+                'co_alarm_in_date' => (isset($safetyChecks->co_alarm_in_date) && !empty($safetyChecks->co_alarm_in_date) ? $safetyChecks->co_alarm_in_date : null),
+                'co_alarm_test_satisfactory' => (isset($safetyChecks->co_alarm_test_satisfactory) && !empty($safetyChecks->co_alarm_test_satisfactory) ? $safetyChecks->co_alarm_test_satisfactory : null),
+                'smoke_alarm_fitted' => (isset($safetyChecks->smoke_alarm_fitted) && !empty($safetyChecks->smoke_alarm_fitted) ? $safetyChecks->smoke_alarm_fitted : null),
+
+                'fault_details' => (isset($gsrComments->fault_details) && !empty($gsrComments->fault_details) ? $gsrComments->fault_details : null),
+                'rectification_work_carried_out' => (isset($gsrComments->rectification_work_carried_out) && !empty($gsrComments->rectification_work_carried_out) ? $gsrComments->rectification_work_carried_out : null),
+                'details_work_carried_out' => (isset($gsrComments->details_work_carried_out) && !empty($gsrComments->details_work_carried_out) ? $gsrComments->details_work_carried_out : null),
+                'flue_cap_put_back' => (isset($gsrComments->flue_cap_put_back) && !empty($gsrComments->flue_cap_put_back) ? $gsrComments->flue_cap_put_back : null),
+
+                'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
+                'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
+                'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
+                'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($gasSafetyRecord->id);
+
+            if(!empty($appliances)):
+                foreach($appliances as $serial => $appliance):
+                    $gasAppliance = GasSafetyRecordAppliance::updateOrCreate(['gas_safety_record_id' => $gasSafetyRecord->id, 'appliance_serial' => $serial], [
+                        'gas_safety_record_id' => $gasSafetyRecord->id,
+                        'appliance_serial' => $serial,
+                        'appliance_location_id' => (isset($appliance->appliance_location_id) && !empty($appliance->appliance_location_id) ? $appliance->appliance_location_id : null),
+                        'boiler_brand_id' => (isset($appliance->boiler_brand_id) && !empty($appliance->boiler_brand_id) ? $appliance->boiler_brand_id : null),
+                        'model' => (isset($appliance->model) && !empty($appliance->model) ? $appliance->model : null),
+                        'appliance_type_id' => (isset($appliance->appliance_type_id) && !empty($appliance->appliance_type_id) ? $appliance->appliance_type_id : null),
+                        'serial_no' => (isset($appliance->serial_no) && !empty($appliance->serial_no) ? $appliance->serial_no : null),
+                        'gc_no' => (isset($appliance->gc_no) && !empty($appliance->gc_no) ? $appliance->gc_no : null),
+                        'appliance_flue_type_id' => (isset($appliance->appliance_flue_type_id) && !empty($appliance->appliance_flue_type_id) ? $appliance->appliance_flue_type_id : null),
+                        'opt_pressure' => (isset($appliance->opt_pressure) && !empty($appliance->opt_pressure) ? $appliance->opt_pressure : null),
+                        'safety_devices' => (isset($appliance->safety_devices) && !empty($appliance->safety_devices) ? $appliance->safety_devices : null),
+                        'spillage_test' => (isset($appliance->spillage_test) && !empty($appliance->spillage_test) ? $appliance->spillage_test : null),
+                        'smoke_pellet_test' => (isset($appliance->smoke_pellet_test) && !empty($appliance->smoke_pellet_test) ? $appliance->smoke_pellet_test : null),
+                        'low_analyser_ratio' => (isset($appliance->low_analyser_ratio) && !empty($appliance->low_analyser_ratio) ? $appliance->low_analyser_ratio : null),
+                        'low_co' => (isset($appliance->low_co) && !empty($appliance->low_co) ? $appliance->low_co : null),
+                        'low_co2' => (isset($appliance->low_co2) && !empty($appliance->low_co2) ? $appliance->low_co2 : null),
+                        'high_analyser_ratio' => (isset($appliance->high_analyser_ratio) && !empty($appliance->high_analyser_ratio) ? $appliance->high_analyser_ratio : null),
+                        'high_co' => (isset($appliance->high_co) && !empty($appliance->high_co) ? $appliance->high_co : null),
+                        'high_co2' => (isset($appliance->high_co2) && !empty($appliance->high_co2) ? $appliance->high_co2 : null),
+                        'satisfactory_termination' => (isset($appliance->satisfactory_termination) && !empty($appliance->satisfactory_termination) ? $appliance->satisfactory_termination : null),
+                        'flue_visual_condition' => (isset($appliance->flue_visual_condition) && !empty($appliance->flue_visual_condition) ? $appliance->flue_visual_condition : null),
+                        'adequate_ventilation' => (isset($appliance->adequate_ventilation) && !empty($appliance->adequate_ventilation) ? $appliance->adequate_ventilation : null),
+                        'landlord_appliance' => (isset($appliance->landlord_appliance) && !empty($appliance->landlord_appliance) ? $appliance->landlord_appliance : null),
+                        'inspected' => (isset($appliance->inspected) && !empty($appliance->inspected) ? $appliance->inspected : null),
+                        'appliance_visual_check' => (isset($appliance->appliance_visual_check) && !empty($appliance->appliance_visual_check) ? $appliance->appliance_visual_check : null),
+                        'appliance_serviced' => (isset($appliance->appliance_serviced) && !empty($appliance->appliance_serviced) ? $appliance->appliance_serviced : null),
+                        'appliance_safe_to_use' => (isset($appliance->appliance_safe_to_use) && !empty($appliance->appliance_safe_to_use) ? $appliance->appliance_safe_to_use : null),
+                        
+                        'updated_by' => $user_id,
+                    ]);
+                endforeach;
+            endif;
+
+            if($request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $gasSafetyRecord->deleteSignature();
+                    
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+                    $signature = new Signature();
+                    $signature->model_type = GasSafetyRecord::class;
+                    $signature->model_id = $gasSafetyRecord->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gsr.view', $gasSafetyRecord->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = GasSafetyRecord::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $appliances = GasSafetyRecordAppliance::where('gas_safety_record_id', $record_id)->orderBy('appliance_serial', 'ASC')->get();
+        $data = [
+            'certificate_id' => $record->id,
+            'certificate' => [
+                'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
+                'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
+                'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
+                'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
+                'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
+                'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+            ],
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ]
+        ];
+
+        $data['safetyChecks'] = [
+            'satisfactory_visual_inspaction' => (isset($record->satisfactory_visual_inspaction) && !empty($record->satisfactory_visual_inspaction) ? $record->satisfactory_visual_inspaction : ''),
+            'emergency_control_accessible' => (isset($record->emergency_control_accessible) && !empty($record->emergency_control_accessible) ? $record->emergency_control_accessible : ''),
+            'satisfactory_gas_tightness_test' => (isset($record->satisfactory_gas_tightness_test) && !empty($record->satisfactory_gas_tightness_test) ? $record->satisfactory_gas_tightness_test : ''),
+            'equipotential_bonding_satisfactory' => (isset($record->equipotential_bonding_satisfactory) && !empty($record->equipotential_bonding_satisfactory) ? $record->satisfactory_gas_tightness_test : ''),
+            'co_alarm_fitted' => (isset($record->co_alarm_fitted) && !empty($record->co_alarm_fitted) ? $record->co_alarm_fitted : ''),
+            'co_alarm_in_date' => (isset($record->co_alarm_in_date) && !empty($record->co_alarm_in_date) ? $record->co_alarm_in_date : ''),
+            'co_alarm_test_satisfactory' => (isset($record->co_alarm_test_satisfactory) && !empty($record->co_alarm_test_satisfactory) ? $record->co_alarm_test_satisfactory : ''),
+            'smoke_alarm_fitted' => (isset($record->smoke_alarm_fitted) && !empty($record->smoke_alarm_fitted) ? $record->smoke_alarm_fitted : ''),
+        ];
+        $data['safetyChecksAnswered'] = 0;
+        $data['safetyChecksAnswered'] = count(array_filter($data['safetyChecks'], function($v) { return !empty($v); }));
+
+        $data['gsrComments'] = [
+            'fault_details' => (isset($record->fault_details) && !empty($record->fault_details) ? $record->fault_details : ''),
+            'rectification_work_carried_out' => (isset($record->rectification_work_carried_out) && !empty($record->rectification_work_carried_out) ? $record->rectification_work_carried_out : ''),
+            'details_work_carried_out' => (isset($record->details_work_carried_out) && !empty($record->details_work_carried_out) ? $record->details_work_carried_out : ''),
+            'flue_cap_put_back' => (isset($record->flue_cap_put_back) && !empty($record->flue_cap_put_back) ? $record->flue_cap_put_back : ''),
+        ];
+        $data['commentssAnswered'] = 0;
+        $data['commentssAnswered'] = count(array_filter($data['gsrComments'], function($v) { return !empty($v); }));
+
+        $data['applianceCount'] = 0;
+        if($appliances->count() > 0):
+            foreach($appliances as $appliance):
+                $applianceName = (isset($appliance->make->name) && !empty($appliance->make->name) ? $appliance->make->name.' ' : '');
+                $applianceName .= (isset($appliance->type->name) && !empty($appliance->type->name) ? $appliance->type->name.' ' : '');
+                $data['appliances'][$appliance->appliance_serial] = [
+                    'edit' => 0,
+                    'appliance_label' => 'Appliance '.$appliance->appliance_serial,
+                    'appliance_title' => ($applianceName != '' ? $applianceName : ''),
+                    'gas_safety_record_id' => $appliance->gas_safety_record_id,
+                    'appliance_serial' => $appliance->appliance_serial,
+                    'appliance_location_id' => (isset($appliance->appliance_location_id) && !empty($appliance->appliance_location_id) ? $appliance->appliance_location_id : null),
+                    'boiler_brand_id' => (isset($appliance->boiler_brand_id) && !empty($appliance->boiler_brand_id) ? $appliance->boiler_brand_id : null),
+                    'model' => (isset($appliance->model) && !empty($appliance->model) ? $appliance->model : null),
+                    'appliance_type_id' => (isset($appliance->appliance_type_id) && !empty($appliance->appliance_type_id) ? $appliance->appliance_type_id : null),
+                    'serial_no' => (isset($appliance->serial_no) && !empty($appliance->serial_no) ? $appliance->serial_no : null),
+                    'gc_no' => (isset($appliance->gc_no) && !empty($appliance->gc_no) ? $appliance->gc_no : null),
+                    'appliance_flue_type_id' => (isset($appliance->appliance_flue_type_id) && !empty($appliance->appliance_flue_type_id) ? $appliance->appliance_flue_type_id : null),
+                    'opt_pressure' => (isset($appliance->opt_pressure) && !empty($appliance->opt_pressure) ? $appliance->opt_pressure : null),
+                    'safety_devices' => (isset($appliance->safety_devices) && !empty($appliance->safety_devices) ? $appliance->safety_devices : null),
+                    'spillage_test' => (isset($appliance->spillage_test) && !empty($appliance->spillage_test) ? $appliance->spillage_test : null),
+                    'smoke_pellet_test' => (isset($appliance->smoke_pellet_test) && !empty($appliance->smoke_pellet_test) ? $appliance->smoke_pellet_test : null),
+                    'low_analyser_ratio' => (isset($appliance->low_analyser_ratio) && !empty($appliance->low_analyser_ratio) ? $appliance->low_analyser_ratio : null),
+                    'low_co' => (isset($appliance->low_co) && !empty($appliance->low_co) ? $appliance->low_co : null),
+                    'low_co2' => (isset($appliance->low_co2) && !empty($appliance->low_co2) ? $appliance->low_co2 : null),
+                    'high_analyser_ratio' => (isset($appliance->high_analyser_ratio) && !empty($appliance->high_analyser_ratio) ? $appliance->high_analyser_ratio : null),
+                    'high_co' => (isset($appliance->high_co) && !empty($appliance->high_co) ? $appliance->high_co : null),
+                    'high_co2' => (isset($appliance->high_co2) && !empty($appliance->high_co2) ? $appliance->high_co2 : null),
+                    'satisfactory_termination' => (isset($appliance->satisfactory_termination) && !empty($appliance->satisfactory_termination) ? $appliance->satisfactory_termination : null),
+                    'flue_visual_condition' => (isset($appliance->flue_visual_condition) && !empty($appliance->flue_visual_condition) ? $appliance->flue_visual_condition : null),
+                    'adequate_ventilation' => (isset($appliance->adequate_ventilation) && !empty($appliance->adequate_ventilation) ? $appliance->adequate_ventilation : null),
+                    'landlord_appliance' => (isset($appliance->landlord_appliance) && !empty($appliance->landlord_appliance) ? $appliance->landlord_appliance : null),
+                    'inspected' => (isset($appliance->inspected) && !empty($appliance->inspected) ? $appliance->inspected : null),
+                    'appliance_visual_check' => (isset($appliance->appliance_visual_check) && !empty($appliance->appliance_visual_check) ? $appliance->appliance_visual_check : null),
+                    'appliance_serviced' => (isset($appliance->appliance_serviced) && !empty($appliance->appliance_serviced) ? $appliance->appliance_serviced : null),
+                    'appliance_safe_to_use' => (isset($appliance->appliance_safe_to_use) && !empty($appliance->appliance_safe_to_use) ? $appliance->appliance_safe_to_use : null),
+                    
+                ];
+                $data['applianceCount'] += 1;
+            endforeach;
+        endif;
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
+    }
 }

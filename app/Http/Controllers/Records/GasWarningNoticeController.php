@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
 use App\Models\GasWarningNotice;
 use App\Models\GasWarningNoticeAppliance;
@@ -778,5 +779,160 @@ class GasWarningNoticeController extends Controller
         Storage::disk('public')->put('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName, $content );
 
         return Storage::disk('public')->url('gwn/'.$gwn->customer_job_id.'/'.$gwn->job_form_id.'/'.$fileName);
+    }
+
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $certificate_id = (isset($request->certificate_id) && $request->certificate_id > 0 ? $request->certificate_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $appliances = json_decode($request->appliances);
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $gasWarningRecord = GasWarningNotice::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
+                'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
+                'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
+                'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($gasWarningRecord->id);
+
+            if(!empty($appliances) && $gasWarningRecord->id):
+                $appliance_serial = (isset($appliances->appliance_serial) && $appliances->appliance_serial > 0 ? $appliances->appliance_serial : 1);
+                $gasAppliance = GasWarningNoticeAppliance::updateOrCreate(['gas_warning_notice_id' => $gasWarningRecord->id, 'appliance_serial' => $appliance_serial], [
+                    'gas_warning_notice_id' => $gasWarningRecord->id,
+                    'appliance_serial' => $appliance_serial,
+                    
+                    'appliance_location_id' => (isset($appliances->appliance_location_id) && !empty($appliances->appliance_location_id) ? $appliances->appliance_location_id : null),
+                    'boiler_brand_id' => (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? $appliances->boiler_brand_id : null),
+                    'model' => (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : null),
+                    'appliance_type_id' => (isset($appliances->appliance_type_id) && !empty($appliances->appliance_type_id) ? $appliances->appliance_type_id : null),
+                    'serial_no' => (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : null),
+                    'gc_no' => (isset($appliances->gc_no) && !empty($appliances->gc_no) ? $appliances->gc_no : null),
+                    'gas_warning_classification_id' => (isset($appliances->gas_warning_classification_id) && !empty($appliances->gas_warning_classification_id) ? $appliances->gas_warning_classification_id : null),
+                    
+                    'gas_escape_issue' => (isset($appliances->gas_escape_issue) && !empty($appliances->gas_escape_issue) ? $appliances->gas_escape_issue : null),
+                    'pipework_issue' => (isset($appliances->pipework_issue) && !empty($appliances->pipework_issue) ? $appliances->pipework_issue : null),
+                    'ventilation_issue' => (isset($appliances->ventilation_issue) && !empty($appliances->ventilation_issue) ? $appliances->ventilation_issue : null),
+                    'meter_issue' => (isset($appliances->meter_issue) && !empty($appliances->meter_issue) ? $appliances->meter_issue : null),
+                    'chimeny_issue' => (isset($appliances->chimeny_issue) && !empty($appliances->chimeny_issue) ? $appliances->chimeny_issue : null),
+                    'fault_details' => (isset($appliances->fault_details) && !empty($appliances->fault_details) ? $appliances->fault_details : null),
+                    'action_taken' => (isset($appliances->action_taken) && !empty($appliances->action_taken) ? $appliances->action_taken : null),
+                    'actions_required' => (isset($appliances->actions_required) && !empty($appliances->actions_required) ? $appliances->actions_required : null),
+                    'reported_to_hse' => (isset($appliances->reported_to_hse) && !empty($appliances->reported_to_hse) ? $appliances->reported_to_hse : null),
+                    'reported_to_hde' => (isset($appliances->reported_to_hde) && !empty($appliances->reported_to_hde) ? $appliances->reported_to_hde : null),
+                    'left_on_premisies' => (isset($appliances->left_on_premisies) && !empty($appliances->left_on_premisies) ? $appliances->left_on_premisies : null),
+                    
+                    'updated_by' => $user_id,
+                ]);
+            endif;
+
+            if($request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $gasWarningRecord->deleteSignature();
+                    
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+                    $signature = new Signature();
+                    $signature->model_type = GasWarningNotice::class;
+                    $signature->model_id = $gasWarningRecord->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gas.warning.notice.show', $gasWarningRecord->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = GasWarningNotice::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $appliances = GasWarningNoticeAppliance::where('gas_warning_notice_id', $record_id)->orderBy('id', 'desc')->get()->first();
+
+        $applianceName = (isset($appliances->make->name) && !empty($appliances->make->name) ? $appliances->make->name.' ' : '');
+        $applianceName .= (isset($appliances->type->name) && !empty($appliances->type->name) ? $appliances->type->name.' ' : '');
+        $data = [
+            'certificate_id' => $record->id,
+            'certificate' => [
+                'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
+                'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
+                'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
+                'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
+                'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
+                'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+            ],
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'appliances' => [
+                'appliance_label' => 'Appliance '.$appliances->appliance_serial,
+                'appliance_title' => ($applianceName != '' ? $applianceName : 'N/A'),
+                'gas_warning_notice_id' => $appliances->gas_warning_notice_id,
+                'appliance_serial' => $appliances->appliance_serial,
+                
+                'appliance_location_id' => (isset($appliances->appliance_location_id) && !empty($appliances->appliance_location_id) ? $appliances->appliance_location_id : ''),
+                'boiler_brand_id' => (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? $appliances->boiler_brand_id : ''),
+                'model' => (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : ''),
+                'appliance_type_id' => (isset($appliances->appliance_type_id) && !empty($appliances->appliance_type_id) ? $appliances->appliance_type_id : ''),
+                'serial_no' => (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : ''),
+                'gc_no' => (isset($appliances->gc_no) && !empty($appliances->gc_no) ? $appliances->gc_no : ''),
+                'gas_warning_classification_id' => (isset($appliances->gas_warning_classification_id) && !empty($appliances->gas_warning_classification_id) ? $appliances->gas_warning_classification_id : ''),
+                
+                'gas_escape_issue' => (isset($appliances->gas_escape_issue) && !empty($appliances->gas_escape_issue) ? $appliances->gas_escape_issue : ''),
+                'pipework_issue' => (isset($appliances->pipework_issue) && !empty($appliances->pipework_issue) ? $appliances->pipework_issue : ''),
+                'ventilation_issue' => (isset($appliances->ventilation_issue) && !empty($appliances->ventilation_issue) ? $appliances->ventilation_issue : ''),
+                'meter_issue' => (isset($appliances->meter_issue) && !empty($appliances->meter_issue) ? $appliances->meter_issue : ''),
+                'chimeny_issue' => (isset($appliances->chimeny_issue) && !empty($appliances->chimeny_issue) ? $appliances->chimeny_issue : ''),
+                'fault_details' => (isset($appliances->fault_details) && !empty($appliances->fault_details) ? $appliances->fault_details : ''),
+                'action_taken' => (isset($appliances->action_taken) && !empty($appliances->action_taken) ? $appliances->action_taken : ''),
+                'actions_required' => (isset($appliances->actions_required) && !empty($appliances->actions_required) ? $appliances->actions_required : ''),
+                'reported_to_hse' => (isset($appliances->reported_to_hse) && !empty($appliances->reported_to_hse) ? $appliances->reported_to_hse : ''),
+                'reported_to_hde' => (isset($appliances->reported_to_hde) && !empty($appliances->reported_to_hde) ? $appliances->reported_to_hde : ''),
+                'left_on_premisies' => (isset($appliances->left_on_premisies) && !empty($appliances->left_on_premisies) ? $appliances->left_on_premisies : ''),
+            ]
+        ];
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }

@@ -162,11 +162,14 @@
                         Update Job
                         <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                     </x-base.button>
+                    <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs.record.and.drafts', ['record' => request()->record, 'job' => $job->id]) :  route('jobs.record.and.drafts', ['job' => $job->id])) }}" class="text-white w-full mb-3" variant="linkedin">
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="layers" />
+                        Existing Records & Drafts
+                    </x-base.button>
                     <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs', ['record' => request()->record]) :  route('jobs')) }}" class="w-full" variant="danger">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
                         Cancel
                     </x-base.button>
-                    
                     <x-base.form-input type="hidden" value="{{ $job->id }}" name="customer_job_id" />
                 </div>
             </div>

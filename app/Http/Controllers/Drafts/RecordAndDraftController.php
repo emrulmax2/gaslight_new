@@ -83,9 +83,14 @@ class RecordAndDraftController extends Controller
             });
         endif;
 
-        if(!empty($dateRange) && strlen($dateRange) == 23 && Str::contains(' - ', $dateRange)):
+        if(!empty($dateRange) && strpos($dateRange, ' - ') !== false):
             $dates = explode(' - ', $dateRange);
-            $query->whereBetween('created_at', [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
+            $query->whereHas('model', function($q) use($dates){
+                $q->whereBetween('created_at', [
+                    date('Y-m-d 00:00:00', strtotime($dates[0])), 
+                    date('Y-m-d 23:59:59', strtotime($dates[1]))
+                ]);
+            });
         endif;
 
         $total_rows = $query->count();

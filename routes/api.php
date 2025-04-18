@@ -20,11 +20,11 @@ Route::prefix('/v1')->name('api.')->group(function() {
     Route::post('/login', [LoginController::class, 'login']);
   
     // Public route for registration
-    Route::controller(RegisteredUserController::class)->group(function() {
-        Route::post('register', 'store')->name('register');
-    });
 
-    
+    Route::controller(RegisteredUserController::class)->group(function() {
+        Route::post('register', 'store')->name('register.store');
+        Route::post('register/validate-referral', 'validateReferral')->name('register.validate.referral');
+    });
 
     // Protected routes (require Bearer Token)
     Route::middleware('auth:api')->group(function() {
