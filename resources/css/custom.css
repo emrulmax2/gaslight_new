@@ -442,3 +442,8 @@
 /* GAS ACCORDION */
 
 
+#certificateListTable .tabulator-responsive-collapse > table > tr:nth-child(1) > td:nth-child(2),
+#certificateListTable .tabulator-responsive-collapse > table > tr:nth-child(6) > td:nth-child(2)
+{
+    display: none;
+}

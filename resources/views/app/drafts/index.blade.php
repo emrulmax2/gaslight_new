@@ -33,7 +33,7 @@
                 </div>
                 <div class="items-center lg:mr-4 mt-2 lg:mt-0 2xl:w-64">
                     <label class="flex-none">Certificate Type </label>
-                    <x-base.form-select class="mt-1 w-auto sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px]" id="certificate_type" >
+                    <x-base.form-select class="mt-1 w-auto sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px] max-w-full" id="certificate_type" >
                         <option value="all">All</option>
                         @foreach($certificate_types as $type)
                             <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -61,7 +61,7 @@
             </form>
         </div>
         <div class="scrollbar-hidden overflow-x-auto">
-            <div class="mt-5" id="certificateListTable" ></div>
+            <div class="mt-5 gca_responsive" id="certificateListTable" ></div>
         </div>
     </div>
     <!-- END: HTML Table Data -->

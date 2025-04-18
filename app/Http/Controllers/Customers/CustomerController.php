@@ -141,12 +141,25 @@ class CustomerController extends Controller
                 'other_email' => (!empty($request->other_email) ? $request->other_email : null),
                 'created_by' => auth()->user()->id
             ]);
+
+            $customerData = [
+                'id' => $customer->id,
+                'full_name' => $customer->full_name,
+                'address_line_1' => $customer->address_line_1,
+                'address_line_2' => $customer->address_line_2,
+                'postal_code' => $customer->postal_code,
+                'state' => $customer->state,
+                'city' => $customer->city,
+                'country' => $customer->country,
+                'mobile' => (!empty($request->mobile) ? $request->mobile : ''),
+            ];
             return response()->json([
                 'msg' => 'Customer successfully created.',
                 'record' => $request->record,
                 'red' => isset(request()->record) && !empty(request()->record) 
                     ? route('jobs.create', ['record' => request()->record])
-                    : route('customers')
+                    : route('customers'),
+                'customer' => $customerData
             ], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);

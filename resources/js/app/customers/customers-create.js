@@ -54,16 +54,23 @@ import INTAddressLookUps from '../../address_lookup.js';
             $("#customerSaveBtn .theLoader").fadeOut();
 
             if (response.status == 200) {
+                let red = (response.data.red ? response.data.red : '');
+                if(localStorage.record_url){
+                    red = localStorage.getItem('record_url');
+                    localStorage.setItem('customer', JSON.stringify(response.data.customer));
+                    localStorage.removeItem('record_url');
+                }
+
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                     $("#successModal .successModalTitle").html("Congratulations!");
                     $("#successModal .successModalDesc").html(response.data.msg);
-                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', red);
                 });
 
                 setTimeout(() => {
                     successModal.hide();
-                    window.location.href = response.data.red;
+                    window.location.href = red;
                 }, 1500);
             }
         }).catch(error => {

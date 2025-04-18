@@ -49,6 +49,7 @@ use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\Records\InvoiceController;
+use App\Http\Controllers\Records\NewRecordController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\UserManagementController;
@@ -223,6 +224,8 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('jobs/create', 'create')->name('jobs.create'); 
         Route::post('jobs/store','store')->name('jobs.store');
         Route::get('jobs/show/{job}','show')->name('jobs.show');
+        Route::get('jobs/show/{job}/record-and-drafts','recordAndDrafts')->name('jobs.record.and.drafts');
+        Route::get('jobs/show/{job}/record-and-drafts/list','recordAndDraftsList')->name('jobs.record.and.drafts.list');
         Route::post('jobs/update','update')->name('jobs.update');
         Route::post('jobs/get-calendar-details','getCalendarData')->name('jobs.get.calendar.details');
         Route::post('jobs/add-to-calendar','addToCalendar')->name('jobs.add.to.calendar');
@@ -279,6 +282,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/homeowner_gas_safety_record/show/{gsr}', 'show')->name('records.gsr.view');
         Route::post('records/homeowner_gas_safety_record/store/{gsr}', 'store')->name('records.gsr.store');
+
+        Route::post('new-records/homeowner_gas_safety_record/store-new', 'storeNew')->name('records.gsr.store.new');
+        Route::post('new-records/homeowner_gas_safety_record/edit-ready', 'editReady')->name('records.gsr.edit.ready.new');
     });
     
     Route::controller(GasWarningNoticeController::class)->group(function(){
@@ -287,6 +293,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-warning-notice/show/{gsr}', 'show')->name('records.gas.warning.notice.show');
         Route::post('records/gas-warning-notice/store/{gsr}', 'store')->name('records.gas.warning.notice.store');
+
+        Route::post('new-records/gas-warning-notice/store-new', 'storeNew')->name('records.gwnr.store.new');
+        Route::post('new-records/gas-warning-notice/edit-ready', 'editReady')->name('records.gwnr.edit.ready.new');
     });
     
     Route::controller(GasServiceRecordController::class)->group(function(){
@@ -295,6 +304,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-service-record/show/{gsr}', 'show')->name('records.gas.service.show');
         Route::post('records/gas-service-record/store/{gsr}', 'store')->name('records.gas.service.store');
+
+        Route::post('new-records/gas-service-record/store-new', 'storeNew')->name('records.gas.service.store.new');
+        Route::post('new-records/gas-service-record/edit-ready', 'editReady')->name('records.gas.service.edit.ready.new');
     });
     
     Route::controller(GasBreakdownRecordController::class)->group(function(){
@@ -303,6 +315,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-breakdown-record/show/{gbr}', 'show')->name('records.gas.breakdown.record.show');
         Route::post('records/gas-breakdown-record/store/{gbr}', 'store')->name('records.gas.breakdown.record.store');
+
+        Route::post('new-records/gas-breakdown-record/store-new', 'storeNew')->name('records.gbr.store.new');
+        Route::post('new-records/gas-breakdown-record/edit-ready', 'editReady')->name('records.gbr.edit.ready.new');
     });
     
     Route::controller(UserManagementController::class)->group(function() {
@@ -369,6 +384,23 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(RecordAndDraftController::class)->group(function() {
         Route::get('records-and-drafts', 'index')->name('records-and-drafts');
         Route::get('records-and-drafts/list', 'list')->name('records-and-drafts.list');
+    });
+
+    
+
+    Route::controller(NewRecordController::class)->group(function() {
+        Route::get('new-records', 'index')->name('new.records');
+        Route::get('new-records/create/{form}', 'create')->name('new.records.create');
+
+        // Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.address');
+        // Route::post('records/store-customer', 'storeCustomer')->name('records.store.customer');
+
+        Route::post('new-records/get-jobs/', 'getJobs')->name('new.records.get.jobs');
+        Route::post('new-records/linked-job/', 'linkedJob')->name('new.records.linked.job');
+        Route::post('new-records/get-job-addresses/', 'getJobAddressrs')->name('new.records.get.job.addresses');
+        Route::post('new-records/store-job-address/', 'storeJobAddress')->name('new.records.store.job.addresses');
+        Route::post('new-records/get-job-address-occupant/', 'getJobAddressOccupent')->name('new.records.get.job.address.occupant');
+        Route::post('new-records/store-job-address-occupant/', 'storeJobAddressOccupent')->name('new.records.store.job.address.occupant');
     });
 });
 

@@ -13,9 +13,14 @@ use App\Models\CustomerJobCalendar;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
 use App\Models\CustomerProperty;
+use App\Models\ExistingRecordDraft;
+use App\Models\JobForm;
 use App\Models\Title;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 
 class JobController extends Controller
 {
@@ -373,5 +378,115 @@ class JobController extends Controller
         else:
             return response()->json(['suc' => 2, 'html' => ''], 200);
         endif;
+    }
+
+    public function recordAndDrafts(CustomerJob $job, Request $request){
+        $job->load(['customer', 'property', 'property.customer', 'customer.contact']);
+        $engineers = User::whereHas('companies', function($query) {
+                        $query->where('companies.user_id', Auth::id());
+                    })->select('id', 'name')->get();
+        $certificate_types = JobForm::where('parent_id', '!=',  0)->where('active', 1)->orderBy('id', 'ASC')->get();
+        return view('app.jobs.record-drafts', [
+            'title' => 'Record & Drafts - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Record & Drafts', 'href' => 'javascript:void(0);'],
+            ],
+            'engineers' => $engineers,
+            'certificate_types' => $certificate_types,
+            'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
+            'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
+            'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
+            'job' => $job
+        ]);
+    }
+
+    public function recordAndDraftsList(Request $request){
+        $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
+        $status = (isset($request->status) && !empty($request->status) ? $request->status : '');
+        $engineerId = (isset($request->engineerId) && !empty($request->engineerId) ? $request->engineerId : '');
+        $certificateType = (isset($request->certificateType) && !empty($request->certificateType) ? $request->certificateType : '');
+        $dateRange = (isset($request->dateRange) && !empty($request->dateRange) ? $request->dateRange : '');
+
+        
+        $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
+        $sorts = [];
+        foreach($sorters as $sort):
+            $sorts[] = $sort['field'].' '.$sort['dir'];
+        endforeach;
+    
+        $query = ExistingRecordDraft::with('customer', 'job', 'job.property', 'form', 'user', 'model')
+                ->whereHas('job', function($q) use ($request) {
+                    $q->where('id', $request->job);
+                })
+                ->orderByRaw(implode(',', $sorts));
+        if (!empty($queryStr)):
+            $query->whereHas('customer', function ($q) use ($queryStr) {
+                $q->where(function($sq) use($queryStr){
+                    $sq->where('full_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
+                });
+            })->orWhereHas('job.property', function ($q) use ($queryStr) {
+                $q->where(function($sq) use($queryStr){
+                    $sq->where('occupant_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
+                });
+            });
+        endif;
+        if(!empty($certificateType) && $certificateType != 'all'):
+            $query->where('job_form_id', $certificateType);
+        endif;
+        if(!empty($engineerId) && $engineerId != 'all'):
+            $query->where('created_by', $engineerId);
+        endif;
+        if(!empty($status) && $status != 'all'):
+            $query->whereHas('model', function($q) use($status){
+                $q->where('status', $status);
+            });
+        endif;
+
+        if(!empty($dateRange) && strpos($dateRange, ' - ') !== false):
+            $dates = explode(' - ', $dateRange);
+            $query->whereHas('model', function($q) use($dates){
+                $q->whereBetween('created_at', [
+                    date('Y-m-d 00:00:00', strtotime($dates[0])), 
+                    date('Y-m-d 23:59:59', strtotime($dates[1]))
+                ]);
+            });
+        endif;
+
+        $total_rows = $query->count();
+        $page = (isset($request->page) && $request->page > 0 ? $request->page : 0);
+        $perpage = (isset($request->size) && $request->size == 'true' ? $total_rows : ($request->size > 0 ? $request->size : 10));
+        $last_page = $total_rows > 0 ? ceil($total_rows / $perpage) : '';
+        
+        $limit = $perpage;
+        $offset = ($page > 0 ? ($page - 1) * $perpage : 0);
+
+        $Query= $query->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $data = array();
+
+        if(!empty($Query)):
+            $i = 1;
+            foreach($Query as $list):
+                $data[] = [
+                    'id' => $i,
+                    'landlord_name' => $list->customer->full_name ?? '',
+                    'landlord_address' => $list->customer->full_address ?? '',
+                    'inspection_address' => $list->job->property->full_address ?? '',
+                    'certificate_type' => $list->form->name ?? '',
+                    'created_at' => $list->model->created_at ? $list->model->created_at->format('jS M, Y \<b\r\/> \a\t h:i a') : '',
+                    'status' => $list->model->status ?? '',
+                    'actions' => $list->id,
+                ];
+                $i++;
+            endforeach;
+        endif;
+        return response()->json(['last_page' => $last_page, 'data' => $data]); 
     }
 }

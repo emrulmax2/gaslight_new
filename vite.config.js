@@ -223,6 +223,12 @@ export default defineConfig({
                 "resources/js/app/records/job_sheet_record.js",
                 "resources/js/app/records/job_sheet_record_show.js",
                 "resources/js/app/drafts/certificates.js",
+                "resources/js/app/jobs/record-and-drafts.js",
+
+                "resources/js/app/new-records/index.js",
+                "resources/js/app/new-records/gas-safety-record.js",
+                "resources/js/app/new-records/gas-warning-notice-record.js",
+                "resources/js/app/new-records/gas-service-record.js",
             ],
             refresh: true,
         }),

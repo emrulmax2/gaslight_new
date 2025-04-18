@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
 use App\Models\GasBreakdownRecord;
 use App\Models\GasBreakdownRecordAppliance;
@@ -869,5 +870,180 @@ class GasBreakdownRecordController extends Controller
         Storage::disk('public')->put('gbr/'.$gbr->customer_job_id.'/'.$gbr->job_form_id.'/'.$fileName, $content );
 
         return Storage::disk('public')->url('gbr/'.$gbr->customer_job_id.'/'.$gbr->job_form_id.'/'.$fileName);
+    }
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $certificate_id = (isset($request->certificate_id) && $request->certificate_id > 0 ? $request->certificate_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $appliances = json_decode($request->appliances);
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $gasBreakdownRecord = GasBreakdownRecord::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
+                'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
+                'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
+                'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($gasBreakdownRecord->id);
+
+            if(!empty($appliances) && $gasBreakdownRecord->id):
+                $appliance_serial = (isset($appliances->appliance_serial) && $appliances->appliance_serial > 0 ? $appliances->appliance_serial : 1);
+                $gasAppliance = GasBreakdownRecordAppliance::updateOrCreate(['gas_breakdown_record_id' => $gasBreakdownRecord->id, 'appliance_serial' => $appliance_serial], [
+                    'gas_breakdown_record_id' => $gasBreakdownRecord->id,
+                    'appliance_serial' => $appliance_serial,
+                    
+                    'appliance_location_id' => (isset($appliances->appliance_location_id) && !empty($appliances->appliance_location_id) ? $appliances->appliance_location_id : null),
+                    'boiler_brand_id' => (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? $appliances->boiler_brand_id : null),
+                    'model' => (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : null),
+                    'appliance_type_id' => (isset($appliances->appliance_type_id) && !empty($appliances->appliance_type_id) ? $appliances->appliance_type_id : null),
+                    'serial_no' => (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : null),
+                    'gc_no' => (isset($appliances->gc_no) && !empty($appliances->gc_no) ? $appliances->gc_no : null),
+                    
+                    'performance_analyser_ratio' => (isset($appliances->performance_analyser_ratio) && !empty($appliances->performance_analyser_ratio) ? $appliances->performance_analyser_ratio : null),
+                    'performance_co' => (isset($appliances->performance_co) && !empty($appliances->performance_co) ? $appliances->performance_co : null),
+                    'performance_co2' => (isset($appliances->performance_co2) && !empty($appliances->performance_co2) ? $appliances->performance_co2 : null),
+                    'opt_correctly' => (isset($appliances->opt_correctly) && !empty($appliances->opt_correctly) ? $appliances->opt_correctly : null),
+                    'conf_safety_standards' => (isset($appliances->conf_safety_standards) && !empty($appliances->conf_safety_standards) ? $appliances->conf_safety_standards : null),
+                    'notice_exlained' => (isset($appliances->notice_exlained) && !empty($appliances->notice_exlained) ? $appliances->notice_exlained : null),
+                    'flueing_is_safe' => (isset($appliances->flueing_is_safe) && !empty($appliances->flueing_is_safe) ? $appliances->flueing_is_safe : null),
+                    'ventilation_is_safe' => (isset($appliances->ventilation_is_safe) && !empty($appliances->ventilation_is_safe) ? $appliances->ventilation_is_safe : null),
+                    'emition_combustion_test' => (isset($appliances->emition_combustion_test) && !empty($appliances->emition_combustion_test) ? $appliances->emition_combustion_test : null),
+                    'burner_pressure' => (isset($appliances->burner_pressure) && !empty($appliances->burner_pressure) ? $appliances->burner_pressure : null),
+                    'location_of_fault' => (isset($appliances->location_of_fault) && !empty($appliances->location_of_fault) ? $appliances->location_of_fault : null),
+                    'fault_resolved' => (isset($appliances->fault_resolved) && !empty($appliances->fault_resolved) ? $appliances->fault_resolved : null),
+                    'parts_fitted' => (isset($appliances->parts_fitted) && !empty($appliances->parts_fitted) ? $appliances->parts_fitted : null),
+                    'fitted_parts_name' => (isset($appliances->fitted_parts_name) && !empty($appliances->fitted_parts_name) ? $appliances->fitted_parts_name : null),
+                    'parts_required' => (isset($appliances->parts_required) && !empty($appliances->parts_required) ? $appliances->parts_required : null),
+                    'required_parts_name' => (isset($appliances->required_parts_name) && !empty($appliances->required_parts_name) ? $appliances->required_parts_name : null),
+                    'monoxide_alarm_fitted' => (isset($appliances->monoxide_alarm_fitted) && !empty($appliances->monoxide_alarm_fitted) ? $appliances->monoxide_alarm_fitted : null),
+                    'is_safe' => (isset($appliances->is_safe) && !empty($appliances->is_safe) ? $appliances->is_safe : null),
+                    'parts_available' => (isset($appliances->parts_available) && !empty($appliances->parts_available) ? $appliances->parts_available : null),
+                    'recommend_replacement' => (isset($appliances->recommend_replacement) && !empty($appliances->recommend_replacement) ? $appliances->recommend_replacement : null),
+                    'magnetic_filter_fitted' => (isset($appliances->magnetic_filter_fitted) && !empty($appliances->magnetic_filter_fitted) ? $appliances->magnetic_filter_fitted : null),
+                    'improvement_recommended' => (isset($appliances->improvement_recommended) && !empty($appliances->improvement_recommended) ? $appliances->improvement_recommended : null),
+                    'enginner_comments' => (isset($appliances->enginner_comments) && !empty($appliances->enginner_comments) ? $appliances->enginner_comments : null),
+                    
+                    'updated_by' => $user_id,
+                ]);
+            endif;
+
+            if($request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $gasBreakdownRecord->deleteSignature();
+                    
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+                    $signature = new Signature();
+                    $signature->model_type = GasBreakdownRecord::class;
+                    $signature->model_id = $gasBreakdownRecord->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gas.breakdown.record.show', $gasBreakdownRecord->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = GasBreakdownRecord::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $appliances = GasBreakdownRecordAppliance::where('gas_breakdown_record_id', $record_id)->orderBy('id', 'desc')->get()->first();
+
+        $applianceName = (isset($appliances->make->name) && !empty($appliances->make->name) ? $appliances->make->name.' ' : '');
+        $applianceName .= (isset($appliances->type->name) && !empty($appliances->type->name) ? $appliances->type->name.' ' : '');
+        $data = [
+            'certificate_id' => $record->id,
+            'certificate' => [
+                'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
+                'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
+                'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
+                'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
+                'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
+                'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+            ],
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'appliances' => [
+                'appliance_label' => 'Appliance '.$appliances->appliance_serial,
+                'appliance_title' => ($applianceName != '' ? $applianceName : 'N/A'),
+                'gas_breakdown_record_id' => $appliances->gas_breakdown_record_id,
+                'appliance_serial' => $appliances->appliance_serial,
+                
+                'appliance_location_id' => (isset($appliances->appliance_location_id) && !empty($appliances->appliance_location_id) ? $appliances->appliance_location_id : ''),
+                'boiler_brand_id' => (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? $appliances->boiler_brand_id : ''),
+                'model' => (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : ''),
+                'appliance_type_id' => (isset($appliances->appliance_type_id) && !empty($appliances->appliance_type_id) ? $appliances->appliance_type_id : ''),
+                'serial_no' => (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : ''),
+                'gc_no' => (isset($appliances->gc_no) && !empty($appliances->gc_no) ? $appliances->gc_no : ''),
+                'performance_analyser_ratio' => (isset($appliances->performance_analyser_ratio) && !empty($appliances->performance_analyser_ratio) ? $appliances->performance_analyser_ratio : ''),
+                'performance_co' => (isset($appliances->performance_co) && !empty($appliances->performance_co) ? $appliances->performance_co : ''),
+                'performance_co2' => (isset($appliances->performance_co2) && !empty($appliances->performance_co2) ? $appliances->performance_co2 : ''),
+                'opt_correctly' => (isset($appliances->opt_correctly) && !empty($appliances->opt_correctly) ? $appliances->opt_correctly : ''),
+                'conf_safety_standards' => (isset($appliances->conf_safety_standards) && !empty($appliances->conf_safety_standards) ? $appliances->conf_safety_standards : ''),
+                'notice_exlained' => (isset($appliances->notice_exlained) && !empty($appliances->notice_exlained) ? $appliances->notice_exlained : ''),
+                'flueing_is_safe' => (isset($appliances->flueing_is_safe) && !empty($appliances->flueing_is_safe) ? $appliances->flueing_is_safe : ''),
+                'ventilation_is_safe' => (isset($appliances->ventilation_is_safe) && !empty($appliances->ventilation_is_safe) ? $appliances->ventilation_is_safe : ''),
+                'emition_combustion_test' => (isset($appliances->emition_combustion_test) && !empty($appliances->emition_combustion_test) ? $appliances->emition_combustion_test : ''),
+                'burner_pressure' => (isset($appliances->burner_pressure) && !empty($appliances->burner_pressure) ? $appliances->burner_pressure : ''),
+                'location_of_fault' => (isset($appliances->location_of_fault) && !empty($appliances->location_of_fault) ? $appliances->location_of_fault : ''),
+                'fault_resolved' => (isset($appliances->fault_resolved) && !empty($appliances->fault_resolved) ? $appliances->fault_resolved : ''),
+                'parts_fitted' => (isset($appliances->parts_fitted) && !empty($appliances->parts_fitted) ? $appliances->parts_fitted : ''),
+                'fitted_parts_name' => (isset($appliances->fitted_parts_name) && !empty($appliances->fitted_parts_name) ? $appliances->fitted_parts_name : ''),
+                'parts_required' => (isset($appliances->parts_required) && !empty($appliances->parts_required) ? $appliances->parts_required : ''),
+                'required_parts_name' => (isset($appliances->required_parts_name) && !empty($appliances->required_parts_name) ? $appliances->required_parts_name : ''),
+                'monoxide_alarm_fitted' => (isset($appliances->monoxide_alarm_fitted) && !empty($appliances->monoxide_alarm_fitted) ? $appliances->monoxide_alarm_fitted : ''),
+                'is_safe' => (isset($appliances->is_safe) && !empty($appliances->is_safe) ? $appliances->is_safe : ''),
+                'parts_available' => (isset($appliances->parts_available) && !empty($appliances->parts_available) ? $appliances->parts_available : ''),
+                'recommend_replacement' => (isset($appliances->recommend_replacement) && !empty($appliances->recommend_replacement) ? $appliances->recommend_replacement : ''),
+                'magnetic_filter_fitted' => (isset($appliances->magnetic_filter_fitted) && !empty($appliances->magnetic_filter_fitted) ? $appliances->magnetic_filter_fitted : ''),
+                'improvement_recommended' => (isset($appliances->improvement_recommended) && !empty($appliances->improvement_recommended) ? $appliances->improvement_recommended : ''),
+                'enginner_comments' => (isset($appliances->enginner_comments) && !empty($appliances->enginner_comments) ? $appliances->enginner_comments : ''),
+            ]
+        ];
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }

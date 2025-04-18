@@ -7,9 +7,12 @@ var certificateListTable = (function () {
     let engineerId = $('#engineer').val() != '' ? $('#engineer').val() : '';
     let certificateType = $('#certificate_type').val() != '' ? $('#certificate_type').val() : '';
     let dateRange = $('#date_range').val() != '' ? $('#date_range').val() : '';
+    let $job_id = $('#job_id').val();
+    
+
 
     const tableData = new Tabulator("#certificateListTable", {
-        ajaxURL: route('records-and-drafts.list'),
+        ajaxURL: route('jobs.record.and.drafts.list', { job: $job_id }),
         ajaxParams: {
             queryStr: querystr,
             status: status,
@@ -52,6 +55,9 @@ var certificateListTable = (function () {
                 field: 'landlord_address',
                 headerHozAlign: 'left',
                 formatter(cell, formatterParams) {
+                    // let theIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
+                    // return (cell.getData().landlord_address != '' ? '<div class="text-slate-500 text-xs whitespace-normal flex justify-start items-start">'+cell.getData().landlord_address+'</div>' : '');
+
                     var html = '<div class="block whitespace-normal  border-b lg:border-b-0 border-slate-200 pb-2">';
                         html += '<div class="flex items-start">';
                             html += '<span class="sm:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
@@ -81,6 +87,10 @@ var certificateListTable = (function () {
                 field: 'certificate_type',
                 headerHozAlign: 'left',
                 formatter(cell, formatterParams) { 
+                    // var html = '<div class=" text-slate-500 text-xs whitespace-normal">';
+                    //         html += cell.getData().certificate_type;
+                    //     html += '</div>';
+                    // return html;
                     var html = '<div class="block whitespace-normal">';
                     html += '<div class="flex items-start">';
                         html += '<span class="sm:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="list" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M3 12h.01"></path><path d="M3 18h.01"></path><path d="M3 6h.01"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M8 6h13"></path></svg></span>';
