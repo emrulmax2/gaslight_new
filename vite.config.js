@@ -226,6 +226,7 @@ export default defineConfig({
                 "resources/js/app/jobs/record-and-drafts.js",
 
                 "resources/js/app/new-records/index.js",
+                "resources/js/app/new-records/create.js",
                 "resources/js/app/new-records/gas-safety-record.js",
                 "resources/js/app/new-records/gas-warning-notice-record.js",
                 "resources/js/app/new-records/gas-service-record.js",
