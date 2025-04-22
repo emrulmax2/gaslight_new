@@ -7,13 +7,21 @@ use App\Http\Requests\JobAddressStoreRequest;
 use App\Http\Requests\OccupantDetailsStoreRequest;
 use App\Models\ApplianceFlueType;
 use App\Models\ApplianceLocation;
+use App\Models\ApplianceTimeTemperatureHeating;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
+use App\Models\Color;
+use App\Models\CommissionDecommissionWorkType;
 use App\Models\Customer;
 use App\Models\CustomerProperty;
 use App\Models\JobForm;
 use App\Models\CustomerJob;
 use App\Models\GasWarningClassification;
+use App\Models\PowerflushCirculatorPumpLocation;
+use App\Models\PowerflushCylinderType;
+use App\Models\PowerflushPipeworkType;
+use App\Models\PowerflushSystemType;
+use App\Models\RadiatorType;
 use App\Models\Relation;
 use Illuminate\Http\Request;
 
@@ -55,6 +63,25 @@ class NewRecordController extends Controller
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
             $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
         elseif($form->slug == 'gas_breakdown_record'):
+            $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+        elseif($form->slug == 'gas_boiler_system_commissioning_checklist'):
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['timerTemp'] = ApplianceTimeTemperatureHeating::where('active', 1)->orderBy('name', 'ASC')->get();
+        elseif($form->slug == 'installation_commissioning_decommissioning_record'):
+            $data['worktype'] = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
+        elseif($form->slug == 'unvented_hot_water_cylinders'):
+            //Nothing 
+        elseif($form->slug == 'job_sheet'):
+            //Nothing 
+        elseif($form->slug == 'power_flush_record'):
+            $data['flush_types'] = PowerflushSystemType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flush_cylinder'] = PowerflushCylinderType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flush_pipework'] = PowerflushPipeworkType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flush_pump_location'] = PowerflushCirculatorPumpLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['radiator_type'] = RadiatorType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['color'] = Color::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
             $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();

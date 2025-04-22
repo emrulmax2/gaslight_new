@@ -343,6 +343,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/gas-boiler-system-commissioning-checklist/show/{gbscc}', 'show')->name('records.gas.bscc.record.show');
         Route::post('records/gas-boiler-system-commissioning-checklist/store/{gbscc}', 'store')->name('records.gas.bscc.record.store');
+
+        Route::post('new-records/gas-boiler-system-commissioning-checklist/store-new', 'storeNew')->name('records.gas.bscc.store.new');
+        Route::post('new-records/gas-boiler-system-commissioning-checklist/edit-ready', 'editReady')->name('records.gas.bscc.edit.ready.new');
     });
     
     Route::controller(GasPowerFlushRecordController::class)->group(function(){
@@ -353,6 +356,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/power_flush_record/show/{gpfr}', 'show')->name('records.gas.power.flush.record.show');
         Route::post('records/power_flush_record/store/{gpfr}', 'store')->name('records.gas.power.flush.record.store');
+
+        Route::post('new-records/power_flush_record/store-new', 'storeNew')->name('records.gas.power.flush.store.new');
+        Route::post('new-records/power_flush_record/edit-ready', 'editReady')->name('records.gas.power.flush.edit.ready.new');
     });
     
     Route::controller(GasCommissionDecommissionRecordController::class)->group(function(){
@@ -361,6 +367,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/installation-commissioning-decommissioning-record/show/{gcdr}', 'show')->name('records.gcdr.show');
         Route::post('records/installation-commissioning-decommissioning-record/store/{gcdr}', 'store')->name('records.gcdr.store');
+
+        Route::post('new-records/installation-commissioning-decommissioning-record/store-new', 'storeNew')->name('records.gcdr.store.new');
+        Route::post('new-records/installation-commissioning-decommissioning-record/edit-ready', 'editReady')->name('records.gcdr.edit.ready.new');
     });
     
     Route::controller(GasUnventedHotWaterCylinderRecordController::class)->group(function(){
@@ -370,6 +379,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::get('records/unvented-hot-water-cylinders/show/{guhwcr}', 'show')->name('records.guhwcr.show');
         Route::post('records/unvented-hot-water-cylinders/store/{guhwcr}', 'store')->name('records.guhwcr.store');
+
+        Route::post('new-records/unvented-hot-water-cylinders/store-new', 'storeNew')->name('records.guhwcr.store.new');
+        Route::post('new-records/unvented-hot-water-cylinders/edit-ready', 'editReady')->name('records.guhwcr.edit.ready.new');
     });
     
     Route::controller(GasJobSheetController::class)->group(function(){
@@ -379,6 +391,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('records/job-sheet/show/{gjsr}', 'show')->name('records.gjsr.show');
         Route::post('records/job-sheet/store/{gjsr}', 'store')->name('records.gjsr.store');
         Route::delete('records/job-sheet/destroy-document/{gjsrd}', 'destroyDocument')->name('records.gjsr.destroy.document'); 
+
+        Route::post('new-records/job-sheet/store-new', 'storeNew')->name('records.gjsr.store.new');
+        Route::post('new-records/job-sheet/edit-ready', 'editReady')->name('records.gjsr.edit.ready.new');
     });
 
     Route::controller(RecordAndDraftController::class)->group(function() {
