@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
 use App\Models\GasJobSheetRecord;
 use App\Models\GasJobSheetRecordDetail;
@@ -1122,5 +1123,162 @@ class GasJobSheetController extends Controller
 
         $gjsrd->forceDelete();
         return response()->json(['msg' => 'Gas Job Sheet document Successfully deleted.', 'red' => ''], 200);
+    }
+
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $certificate_id = (isset($request->certificate_id) && $request->certificate_id > 0 ? $request->certificate_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $jobSheets = json_decode($request->jobSheets);
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $gasJobSheetRecord = GasJobSheetRecord::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
+                'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
+                'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($gasJobSheetRecord->id);
+
+            if($gasJobSheetRecord->id):
+                $gasDetails = GasJobSheetRecordDetail::updateOrCreate(['gas_job_sheet_record_id' => $gasJobSheetRecord->id], [
+                    'gas_job_sheet_record_id' => $gasJobSheetRecord->id,
+                    
+                    'date' => (isset($jobSheets->date) && !empty($jobSheets->date) ? date('Y-m-d', strtotime($jobSheets->date)) : null),
+                    'job_note' => (isset($jobSheets->job_note) && !empty($jobSheets->job_note) ? $jobSheets->job_note : null),
+                    'spares_required' => (isset($jobSheets->spares_required) && !empty($jobSheets->spares_required) ? $jobSheets->spares_required : null),
+                    'job_ref' => (isset($jobSheets->job_ref) && !empty($jobSheets->job_ref) ? $jobSheets->job_ref : null),
+                    'arrival_time' => (isset($jobSheets->arrival_time) && !empty($jobSheets->arrival_time) ? $jobSheets->arrival_time : null),
+                    'departure_time' => (isset($jobSheets->departure_time) && !empty($jobSheets->departure_time) ? $jobSheets->departure_time : null),
+                    'hours_used' => (isset($jobSheets->hours_used) && !empty($jobSheets->hours_used) ? $jobSheets->hours_used : null),
+                    'awaiting_parts' => (isset($jobSheets->awaiting_parts) && !empty($jobSheets->awaiting_parts) ? $jobSheets->awaiting_parts : null),
+                    'job_completed' => (isset($jobSheets->job_completed) && !empty($jobSheets->job_completed) ? $jobSheets->job_completed : null),
+                    
+                    'updated_by' => $user_id,
+                ]);
+
+                if($request->hasFile('job_sheet_files')):
+                    $documents = $request->file('job_sheet_files');
+                    foreach($documents as $document):
+                        $documentName = $gasJobSheetRecord->id.'_'.$document->getClientOriginalName();
+                        $path = $document->storeAs('gjsr/'.$customer_job_id.'/'.$job_form_id, $documentName, 'public');
+    
+                        $data = [];
+                        $data['gas_job_sheet_record_id'] = $gasJobSheetRecord->id;
+                        $data['name'] = $documentName;
+                        $data['path'] = Storage::disk('public')->url($path);
+                        $data['mime_type'] = $document->getClientMimeType();
+                        $data['size'] = $document->getSize();
+                        GasJobSheetRecordDocument::create($data);
+                    endforeach;
+                endif;
+            endif;
+
+
+            if($request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $gasJobSheetRecord->deleteSignature();
+                    
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+                    $signature = new Signature();
+                    $signature->model_type = GasJobSheetRecord::class;
+                    $signature->model_id = $gasJobSheetRecord->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gjsr.show', $gasJobSheetRecord->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = GasJobSheetRecord::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $jobSheets = GasJobSheetRecordDetail::where('gas_job_sheet_record_id', $record_id)->orderBy('id', 'desc')->get()->first();
+        $documents = GasJobSheetRecordDocument::where('gas_job_sheet_record_id', $record_id)->orderBy('id', 'asc')->get();
+
+        $data = [
+            'certificate_id' => $record->id,
+            'certificate' => [
+                'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
+                'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
+                'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
+                'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
+                'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+            ],
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'jobSheets' => [
+                'gas_job_sheet_record_id' => $jobSheets->gas_job_sheet_record_id,
+                
+                'date' => (isset($jobSheets->date) && !empty($jobSheets->date) ? date('d-m-Y', strtotime($jobSheets->date)) : ''),
+                'job_note' => (isset($jobSheets->job_note) && !empty($jobSheets->job_note) ? $jobSheets->job_note : ''),
+                'spares_required' => (isset($jobSheets->spares_required) && !empty($jobSheets->spares_required) ? $jobSheets->spares_required : ''),
+                'job_ref' => (isset($jobSheets->job_ref) && !empty($jobSheets->job_ref) ? $jobSheets->job_ref : ''),
+                'arrival_time' => (isset($jobSheets->arrival_time) && !empty($jobSheets->arrival_time) ? $jobSheets->arrival_time : ''),
+                'departure_time' => (isset($jobSheets->departure_time) && !empty($jobSheets->departure_time) ? $jobSheets->departure_time : ''),
+                'hours_used' => (isset($jobSheets->hours_used) && !empty($jobSheets->hours_used) ? $jobSheets->hours_used : ''),
+                'awaiting_parts' => (isset($jobSheets->awaiting_parts) && !empty($jobSheets->awaiting_parts) ? $jobSheets->awaiting_parts : ''),
+                'job_completed' => (isset($jobSheets->job_completed) && !empty($jobSheets->job_completed) ? $jobSheets->job_completed : ''),
+            ]
+        ];
+        $data['jobSheetAnswered'] = count(array_filter($data['jobSheets'], function($v) { return !empty($v); }));
+        $data['jobSheetDocuments'] = '';
+        if($documents->count()):
+            foreach($documents as $doc):
+                if($doc->doc_url):
+                    if(in_array($doc->mime_type, ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'])):
+                        $data['jobSheetDocuments'] .= '<a id="gjsr_doc_'.$doc->id.'" href="'.$doc->doc_url.'" target="_blank" class="relative inline-flex items-center justify-center image-fit h-[60px] w-[60px] bg-success bg-opacity-10 rounded-[3px] overflow-hidden mr-1 mb-1"><button data-id="'.$doc->id.'" class="delete-doc absolute z-10 right-0 top-0 w-[15px] h-[15px] bg-danger text-white rounded-none rounded-bl-[3px] inline-flex items-center justify-center" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" class="lucide lucide-x stroke-1.5 h-3 w-3"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button><img class="rounded-[3px]" src="'.$doc->doc_url.'"></a>';
+                    else:
+                        $data['jobSheetDocuments'] .= '<a id="gjsr_doc_'.$doc->id.'" href="'.$doc->doc_url.'" target="_blank" class="relative inline-flex items-center justify-center h-[60px] w-[60px] bg-success bg-opacity-10 rounded-[3px] overflow-hidden mr-1 mb-1"><button data-id="'.$doc->id.'" class="delete-doc absolute z-10 right-0 top-0 w-[15px] h-[15px] bg-danger text-white rounded-none rounded-bl-[3px] inline-flex items-center justify-center" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" class="lucide lucide-x stroke-1.5 h-3 w-3"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="file-text" class="lucide lucide-file-text stroke-1.5 h-8 w-8 text-success"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></a>';
+                    endif;
+                endif;
+            endforeach;
+        endif;
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }

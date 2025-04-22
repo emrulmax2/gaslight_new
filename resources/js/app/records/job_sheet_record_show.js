@@ -83,4 +83,41 @@
             }
         });
     });
+    
+    $('.editRecordBtn').on('click', function(e){
+        e.preventDefault();
+        var $theBtn = $(this);
+        var record_id = $theBtn.attr('data-id');
+
+        $theBtn.addClass('active').attr('disabled', 'disabled');
+        $theBtn.find('.theLoader').fadeIn();
+        $theBtn.siblings('.action_btns').removeClass('active').attr('disabled', 'disabled');
+
+        axios({
+            method: "post",
+            url: route('records.gjsr.edit.ready.new'),
+            data: {record_id : record_id},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            if (response.status == 200) {
+                let row = response.data.row;
+                
+                localStorage.setItem('certificate_id', row.certificate_id);
+                localStorage.setItem('certificate', JSON.stringify(row.certificate));
+                localStorage.setItem('job', JSON.stringify(row.job));
+                localStorage.setItem('customer', JSON.stringify(row.customer));
+                localStorage.setItem('job_address', JSON.stringify(row.job_address));
+                localStorage.setItem('occupant', JSON.stringify(row.occupant));
+                localStorage.setItem('jobSheets', JSON.stringify(row.jobSheets));
+                localStorage.setItem('jobSheetAnswered', JSON.stringify(row.jobSheetAnswered));
+                localStorage.setItem('jobSheetDocuments', JSON.stringify(row.jobSheetDocuments));
+
+                window.location.href = response.data.red
+            }
+        }).catch(error => {
+            if (error.response) {
+                console.log('error');
+            }
+        });
+    })
 })()

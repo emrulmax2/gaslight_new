@@ -7,6 +7,7 @@ use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CommissionDecommissionWorkType;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
 use App\Models\GasCommissionDecommissionRecord;
 use App\Models\GasCommissionDecommissionRecordAppliance;
@@ -711,5 +712,152 @@ class GasCommissionDecommissionRecordController extends Controller
         Storage::disk('public')->put('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName, $content );
 
         return Storage::disk('public')->url('gcdr/'.$gcdr->customer_job_id.'/'.$gcdr->job_form_id.'/'.$fileName);
+    }
+
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $certificate_id = (isset($request->certificate_id) && $request->certificate_id > 0 ? $request->certificate_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $appliances = json_decode($request->appliances);
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $gasComDecRecord = GasCommissionDecommissionRecord::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
+                'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
+                'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
+                'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($gasComDecRecord->id);
+
+            if(!empty($appliances) && $gasComDecRecord->id):
+                $existAppliances = GasCommissionDecommissionRecordAppliance::where('gas_commission_decommission_record_id', $gasComDecRecord->id)->pluck('id')->unique()->toArray();
+                if(!empty($existAppliances)):
+                    GasCommissionDecommissionRecordApplianceWorkType::whereIn('gas_commission_decommission_record_appliance_id', $existAppliances)->forceDelete();
+                endif;
+                $workTypes = (isset($appliances->work_type) && !empty($appliances->work_type) ? $appliances->work_type : []);
+
+                $appliance_serial = (isset($appliances->appliance_serial) && $appliances->appliance_serial > 0 ? $appliances->appliance_serial : 1);
+                $gasComDecRecAppliance = GasCommissionDecommissionRecordAppliance::updateOrCreate(['gas_commission_decommission_record_id' => $gasComDecRecord->id, 'appliance_serial' => $appliance_serial], [
+                    'gas_commission_decommission_record_id' => $gasComDecRecord->id,
+                    'appliance_serial' => $appliance_serial,
+                    
+                    'details_work_carried_out' => (isset($appliances->details_work_carried_out) && !empty($appliances->details_work_carried_out) ? $appliances->details_work_carried_out : null),
+                    'details_work_required' => (isset($appliances->details_work_required) && !empty($appliances->details_work_required) ? $appliances->details_work_required : null),
+                    'is_safe_to_use' => (isset($appliances->is_safe_to_use) && !empty($appliances->is_safe_to_use) ? $appliances->is_safe_to_use : null),
+                    'have_labels_affixed' => (isset($appliances->have_labels_affixed) && !empty($appliances->have_labels_affixed) ? $appliances->have_labels_affixed : null),
+                    
+                    'updated_by' => $user_id,
+                ]);
+                if($gasComDecRecAppliance->id):
+                    foreach($workTypes as $wt):
+                        $theType = GasCommissionDecommissionRecordApplianceWorkType::create([
+                            'gas_commission_decommission_record_appliance_id' => $gasComDecRecAppliance->id,
+                            'commission_decommission_work_type_id' => $wt
+                        ]);
+                    endforeach;
+                endif;
+            endif;
+
+            if($request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $gasComDecRecord->deleteSignature();
+                    
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+                    $signature = new Signature();
+                    $signature->model_type = GasCommissionDecommissionRecord::class;
+                    $signature->model_id = $gasComDecRecord->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gcdr.show', $gasComDecRecord->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = GasCommissionDecommissionRecord::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $appliances = GasCommissionDecommissionRecordAppliance::where('gas_commission_decommission_record_id', $record_id)->orderBy('id', 'desc')->get()->first();
+        $work_types = GasCommissionDecommissionRecordApplianceWorkType::where('gas_commission_decommission_record_appliance_id', $appliances->id)->pluck('commission_decommission_work_type_id')->unique()->toArray();
+
+        $applianceName = (isset($appliances->make->name) && !empty($appliances->make->name) ? $appliances->make->name.' ' : '');
+        $applianceName .= (isset($appliances->type->name) && !empty($appliances->type->name) ? $appliances->type->name.' ' : '');
+        $data = [
+            'certificate_id' => $record->id,
+            'certificate' => [
+                'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
+                'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
+                'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
+                'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
+                'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
+                'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+            ],
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'appliances' => [
+                'gas_commission_decommission_record_id' => $appliances->gas_commission_decommission_record_id,
+                'appliance_serial' => $appliances->appliance_serial,
+                
+                'details_work_carried_out' => (isset($appliances->details_work_carried_out) && !empty($appliances->details_work_carried_out) ? $appliances->details_work_carried_out : ''),
+                'details_work_required' => (isset($appliances->details_work_required) && !empty($appliances->details_work_required) ? $appliances->details_work_required : ''),
+                'is_safe_to_use' => (isset($appliances->is_safe_to_use) && !empty($appliances->is_safe_to_use) ? $appliances->is_safe_to_use : ''),
+                'have_labels_affixed' => (isset($appliances->have_labels_affixed) && !empty($appliances->have_labels_affixed) ? $appliances->have_labels_affixed : ''),
+                'work_type' => (!empty($work_types) ? $work_types : [])
+            ]
+        ];
+
+        $applianceAnswered = 0;
+        $applianceAnswered += (!empty($data['appliances']['details_work_carried_out']) ? 1 : 0);
+        $applianceAnswered += (!empty($data['appliances']['details_work_required']) ? 1 : 0);
+        $applianceAnswered += (!empty($data['appliances']['is_safe_to_use']) ? 1 : 0);
+        $applianceAnswered += (!empty($data['appliances']['have_labels_affixed']) ? 1 : 0);
+        $applianceAnswered += (!empty($data['appliances']['work_type']) ? 1 : 0);
+        $data['applianceAnswered'] = $applianceAnswered;
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }

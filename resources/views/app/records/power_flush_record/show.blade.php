@@ -16,22 +16,23 @@
             <div class="intro-y col-span-12 max-sm:mt-5 sm:col-span-2 order-2 sm:order-1">
                 <div class="sticky top-0">
                     <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
-                        <x-base.button as="a" href="{{ route('records', [$form->slug, $gpfr->customer_job_id]) }}" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
+                        <x-base.button data-id="{{ $gpfr->id }}" type="button" class="editRecordBtn w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="Pencil" />
                             Edit
+                            <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
-                        <x-base.button value="1" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits submit_1 w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                        <x-base.button value="1" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits submit_1 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
                             Approve
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
-                        <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits submit_2 w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                        <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
                             Approve & Email
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
                         @if(!empty($thePdf))
-                        <x-base.button as="a" href="{{ $thePdf }}" class="w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
+                        <x-base.button as="a" href="{{ $thePdf }}" class="action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="download" />
                             Download
                         </x-base.button>

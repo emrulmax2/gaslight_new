@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
 use App\Models\GasBoilerSystemCommissioningChecklist;
 use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
@@ -916,5 +917,216 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
         Storage::disk('public')->put('gbscc/'.$gbscc->customer_job_id.'/'.$gbscc->job_form_id.'/'.$fileName, $content );
 
         return Storage::disk('public')->url('gbscc/'.$gbscc->customer_job_id.'/'.$gbscc->job_form_id.'/'.$fileName);
+    }
+
+    
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $certificate_id = (isset($request->certificate_id) && $request->certificate_id > 0 ? $request->certificate_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $appliances = json_decode($request->appliances);
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $gasBoilerSCC = GasBoilerSystemCommissioningChecklist::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
+                'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
+                'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
+                'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($gasBoilerSCC->id);
+
+            if(!empty($appliances) && $gasBoilerSCC->id):
+                $appliance_serial = (isset($appliances->appliance_serial) && $appliances->appliance_serial > 0 ? $appliances->appliance_serial : 1);
+                $gasAppliance = GasBoilerSystemCommissioningChecklistAppliance::updateOrCreate(['gas_boiler_system_commissioning_checklist_id' => $gasBoilerSCC->id, 'appliance_serial' => $appliance_serial], [
+                    'gas_boiler_system_commissioning_checklist_id' => $gasBoilerSCC->id,
+                    'appliance_serial' => $appliance_serial,
+                    
+                    'boiler_brand_id' => (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? $appliances->boiler_brand_id : null),
+                    'model' => (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : null),
+                    'serial_no' => (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : null),
+                    'appliance_time_temperature_heating_id' => (isset($appliances->appliance_time_temperature_heating_id) && !empty($appliances->appliance_time_temperature_heating_id) ? $appliances->appliance_time_temperature_heating_id : null),
+                    
+                    'tmp_control_hot_water' => (isset($appliances->tmp_control_hot_water) && !empty($appliances->tmp_control_hot_water) ? $appliances->tmp_control_hot_water : null),
+                    'heating_zone_vlv' => (isset($appliances->heating_zone_vlv) && !empty($appliances->heating_zone_vlv) ? $appliances->heating_zone_vlv : null),
+                    'hot_water_zone_vlv' => (isset($appliances->hot_water_zone_vlv) && !empty($appliances->hot_water_zone_vlv) ? $appliances->hot_water_zone_vlv : null),
+                    'therm_radiator_vlv' => (isset($appliances->therm_radiator_vlv) && !empty($appliances->therm_radiator_vlv) ? $appliances->therm_radiator_vlv : null),
+                    'bypass_to_system' => (isset($appliances->bypass_to_system) && !empty($appliances->bypass_to_system) ? $appliances->bypass_to_system : null),
+                    'boiler_interlock' => (isset($appliances->boiler_interlock) && !empty($appliances->boiler_interlock) ? $appliances->boiler_interlock : null),
+                    'flushed_and_cleaned' => (isset($appliances->flushed_and_cleaned) && !empty($appliances->flushed_and_cleaned) ? $appliances->flushed_and_cleaned : null),
+                    'clearner_name' => (isset($appliances->clearner_name) && !empty($appliances->clearner_name) ? $appliances->clearner_name : null),
+                    'inhibitor_quantity' => (isset($appliances->inhibitor_quantity) && !empty($appliances->inhibitor_quantity) ? $appliances->inhibitor_quantity : null),
+                    'inhibitor_amount' => (isset($appliances->inhibitor_amount) && !empty($appliances->inhibitor_amount) ? $appliances->inhibitor_amount : null),
+                    'primary_ws_filter_installed' => (isset($appliances->primary_ws_filter_installed) && !empty($appliances->primary_ws_filter_installed) ? $appliances->primary_ws_filter_installed : null),
+                    'gas_rate' => (isset($appliances->gas_rate) && !empty($appliances->gas_rate) ? $appliances->gas_rate : null),
+                    'gas_rate_unit' => (isset($appliances->gas_rate_unit) && !empty($appliances->gas_rate_unit) ? $appliances->gas_rate_unit : null),
+                    'cho_factory_setting' => (isset($appliances->cho_factory_setting) && !empty($appliances->cho_factory_setting) ? $appliances->cho_factory_setting : null),
+                    'burner_opt_pressure' => (isset($appliances->burner_opt_pressure) && !empty($appliances->burner_opt_pressure) ? $appliances->burner_opt_pressure : null),
+                    'burner_opt_pressure_unit' => (isset($appliances->burner_opt_pressure_unit) && !empty($appliances->burner_opt_pressure_unit) ? $appliances->burner_opt_pressure_unit : null),
+                    'centeral_heat_flow_temp' => (isset($appliances->centeral_heat_flow_temp) && !empty($appliances->centeral_heat_flow_temp) ? $appliances->centeral_heat_flow_temp : null),
+                    'centeral_heat_return_temp' => (isset($appliances->centeral_heat_return_temp) && !empty($appliances->centeral_heat_return_temp) ? $appliances->centeral_heat_return_temp : null),
+                    'is_in_hard_water_area' => (isset($appliances->is_in_hard_water_area) && !empty($appliances->is_in_hard_water_area) ? $appliances->is_in_hard_water_area : null),
+                    'is_scale_reducer_fitted' => (isset($appliances->is_scale_reducer_fitted) && !empty($appliances->is_scale_reducer_fitted) ? $appliances->is_scale_reducer_fitted : null),
+                    'what_reducer_fitted' => (isset($appliances->what_reducer_fitted) && !empty($appliances->what_reducer_fitted) ? $appliances->what_reducer_fitted : null),
+                    'dom_gas_rate' => (isset($appliances->dom_gas_rate) && !empty($appliances->dom_gas_rate) ? $appliances->dom_gas_rate : null),
+                    'dom_gas_rate_unit' => (isset($appliances->dom_gas_rate_unit) && !empty($appliances->dom_gas_rate_unit) ? $appliances->dom_gas_rate_unit : null),
+                    'dom_burner_opt_pressure' => (isset($appliances->dom_burner_opt_pressure) && !empty($appliances->dom_burner_opt_pressure) ? $appliances->dom_burner_opt_pressure : null),
+                    'dom_burner_opt_pressure_unit' => (isset($appliances->dom_burner_opt_pressure_unit) && !empty($appliances->dom_burner_opt_pressure_unit) ? $appliances->dom_burner_opt_pressure_unit : null),
+                    'dom_cold_water_temp' => (isset($appliances->dom_cold_water_temp) && !empty($appliances->dom_cold_water_temp) ? $appliances->dom_cold_water_temp : null),
+                    'dom_checked_outlet' => (isset($appliances->dom_checked_outlet) && !empty($appliances->dom_checked_outlet) ? $appliances->dom_checked_outlet : null),
+                    'dom_water_flow_rate' => (isset($appliances->dom_water_flow_rate) && !empty($appliances->dom_water_flow_rate) ? $appliances->dom_water_flow_rate : null),
+                    'con_drain_installed' => (isset($appliances->con_drain_installed) && !empty($appliances->con_drain_installed) ? $appliances->con_drain_installed : null),
+                    'point_of_termination' => (isset($appliances->point_of_termination) && !empty($appliances->point_of_termination) ? $appliances->point_of_termination : null),
+                    'dispsal_method' => (isset($appliances->dispsal_method) && !empty($appliances->dispsal_method) ? $appliances->dispsal_method : null),
+                    'min_ratio' => (isset($appliances->min_ratio) && !empty($appliances->min_ratio) ? $appliances->min_ratio : null),
+                    'min_co' => (isset($appliances->min_co) && !empty($appliances->min_co) ? $appliances->min_co : null),
+                    'min_co2' => (isset($appliances->min_co2) && !empty($appliances->min_co2) ? $appliances->min_co2 : null),
+                    'max_ratio' => (isset($appliances->max_ratio) && !empty($appliances->max_ratio) ? $appliances->max_ratio : null),
+                    'max_co' => (isset($appliances->max_co) && !empty($appliances->max_co) ? $appliances->max_co : null),
+                    'max_co2' => (isset($appliances->max_co2) && !empty($appliances->max_co2) ? $appliances->max_co2 : null),
+                    'app_building_regulation' => (isset($appliances->app_building_regulation) && !empty($appliances->app_building_regulation) ? $appliances->app_building_regulation : null),
+                    'commissioned_man_ins' => (isset($appliances->commissioned_man_ins) && !empty($appliances->commissioned_man_ins) ? $appliances->commissioned_man_ins : null),
+                    'demonstrated_understood' => (isset($appliances->demonstrated_understood) && !empty($appliances->demonstrated_understood) ? $appliances->demonstrated_understood : null),
+                    'literature_including' => (isset($appliances->literature_including) && !empty($appliances->literature_including) ? $appliances->literature_including : null),
+                    'is_next_inspection' => (isset($appliances->is_next_inspection) && !empty($appliances->is_next_inspection) ? $appliances->is_next_inspection : null),
+                    
+                    'updated_by' => $user_id,
+                ]);
+            endif;
+
+            if($request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $gasBoilerSCC->deleteSignature();
+                    
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+                    $signature = new Signature();
+                    $signature->model_type = GasBoilerSystemCommissioningChecklist::class;
+                    $signature->model_id = $gasBoilerSCC->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gas.bscc.record.show', $gasBoilerSCC->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = GasBoilerSystemCommissioningChecklist::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $appliances = GasBoilerSystemCommissioningChecklistAppliance::where('gas_boiler_system_commissioning_checklist_id', $record_id)->orderBy('id', 'desc')->get()->first();
+
+        $applianceName = (isset($appliances->make->name) && !empty($appliances->make->name) ? $appliances->make->name.' ' : '');
+        $data = [
+            'certificate_id' => $record->id,
+            'certificate' => [
+                'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
+                'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
+                'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
+                'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
+                'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
+                'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+            ],
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'appliances' => [
+                'appliance_label' => 'Appliance '.$appliances->appliance_serial,
+                'appliance_title' => ($applianceName != '' ? $applianceName : 'N/A'),
+                'gas_boiler_system_commissioning_checklist_id' => $appliances->gas_warning_notice_id,
+                'appliance_serial' => $appliances->appliance_serial,
+                
+                'boiler_brand_id' => (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? $appliances->boiler_brand_id : ''),
+                'model' => (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : ''),
+                'serial_no' => (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : ''),
+                'appliance_time_temperature_heating_id' => (isset($appliances->appliance_time_temperature_heating_id) && !empty($appliances->appliance_time_temperature_heating_id) ? $appliances->appliance_time_temperature_heating_id : ''),
+                
+                'tmp_control_hot_water' => (isset($appliances->tmp_control_hot_water) && !empty($appliances->tmp_control_hot_water) ? $appliances->tmp_control_hot_water : ''),
+                'heating_zone_vlv' => (isset($appliances->heating_zone_vlv) && !empty($appliances->heating_zone_vlv) ? $appliances->heating_zone_vlv : ''),
+                'hot_water_zone_vlv' => (isset($appliances->hot_water_zone_vlv) && !empty($appliances->hot_water_zone_vlv) ? $appliances->hot_water_zone_vlv : ''),
+                'therm_radiator_vlv' => (isset($appliances->therm_radiator_vlv) && !empty($appliances->therm_radiator_vlv) ? $appliances->therm_radiator_vlv : ''),
+                'bypass_to_system' => (isset($appliances->bypass_to_system) && !empty($appliances->bypass_to_system) ? $appliances->bypass_to_system : ''),
+                'boiler_interlock' => (isset($appliances->boiler_interlock) && !empty($appliances->boiler_interlock) ? $appliances->boiler_interlock : ''),
+                'flushed_and_cleaned' => (isset($appliances->flushed_and_cleaned) && !empty($appliances->flushed_and_cleaned) ? $appliances->flushed_and_cleaned : ''),
+                'clearner_name' => (isset($appliances->clearner_name) && !empty($appliances->clearner_name) ? $appliances->clearner_name : ''),
+                'inhibitor_quantity' => (isset($appliances->inhibitor_quantity) && !empty($appliances->inhibitor_quantity) ? $appliances->inhibitor_quantity : ''),
+                'inhibitor_amount' => (isset($appliances->inhibitor_amount) && !empty($appliances->inhibitor_amount) ? $appliances->inhibitor_amount : ''),
+                'primary_ws_filter_installed' => (isset($appliances->primary_ws_filter_installed) && !empty($appliances->primary_ws_filter_installed) ? $appliances->primary_ws_filter_installed : ''),
+                'gas_rate' => (isset($appliances->gas_rate) && !empty($appliances->gas_rate) ? $appliances->gas_rate : ''),
+                'gas_rate_unit' => (isset($appliances->gas_rate_unit) && !empty($appliances->gas_rate_unit) ? $appliances->gas_rate_unit : ''),
+                'cho_factory_setting' => (isset($appliances->cho_factory_setting) && !empty($appliances->cho_factory_setting) ? $appliances->cho_factory_setting : ''),
+                'burner_opt_pressure' => (isset($appliances->burner_opt_pressure) && !empty($appliances->burner_opt_pressure) ? $appliances->burner_opt_pressure : ''),
+                'burner_opt_pressure_unit' => (isset($appliances->burner_opt_pressure_unit) && !empty($appliances->burner_opt_pressure_unit) ? $appliances->burner_opt_pressure_unit : ''),
+                'centeral_heat_flow_temp' => (isset($appliances->centeral_heat_flow_temp) && !empty($appliances->centeral_heat_flow_temp) ? $appliances->centeral_heat_flow_temp : ''),
+                'centeral_heat_return_temp' => (isset($appliances->centeral_heat_return_temp) && !empty($appliances->centeral_heat_return_temp) ? $appliances->centeral_heat_return_temp : ''),
+                'is_in_hard_water_area' => (isset($appliances->is_in_hard_water_area) && !empty($appliances->is_in_hard_water_area) ? $appliances->is_in_hard_water_area : ''),
+                'is_scale_reducer_fitted' => (isset($appliances->is_scale_reducer_fitted) && !empty($appliances->is_scale_reducer_fitted) ? $appliances->is_scale_reducer_fitted : ''),
+                'what_reducer_fitted' => (isset($appliances->what_reducer_fitted) && !empty($appliances->what_reducer_fitted) ? $appliances->what_reducer_fitted : ''),
+                'dom_gas_rate' => (isset($appliances->dom_gas_rate) && !empty($appliances->dom_gas_rate) ? $appliances->dom_gas_rate : ''),
+                'dom_gas_rate_unit' => (isset($appliances->dom_gas_rate_unit) && !empty($appliances->dom_gas_rate_unit) ? $appliances->dom_gas_rate_unit : ''),
+                'dom_burner_opt_pressure' => (isset($appliances->dom_burner_opt_pressure) && !empty($appliances->dom_burner_opt_pressure) ? $appliances->dom_burner_opt_pressure : ''),
+                'dom_burner_opt_pressure_unit' => (isset($appliances->dom_burner_opt_pressure_unit) && !empty($appliances->dom_burner_opt_pressure_unit) ? $appliances->dom_burner_opt_pressure_unit : ''),
+                'dom_cold_water_temp' => (isset($appliances->dom_cold_water_temp) && !empty($appliances->dom_cold_water_temp) ? $appliances->dom_cold_water_temp : ''),
+                'dom_checked_outlet' => (isset($appliances->dom_checked_outlet) && !empty($appliances->dom_checked_outlet) ? $appliances->dom_checked_outlet : ''),
+                'dom_water_flow_rate' => (isset($appliances->dom_water_flow_rate) && !empty($appliances->dom_water_flow_rate) ? $appliances->dom_water_flow_rate : ''),
+                'con_drain_installed' => (isset($appliances->con_drain_installed) && !empty($appliances->con_drain_installed) ? $appliances->con_drain_installed : ''),
+                'point_of_termination' => (isset($appliances->point_of_termination) && !empty($appliances->point_of_termination) ? $appliances->point_of_termination : ''),
+                'dispsal_method' => (isset($appliances->dispsal_method) && !empty($appliances->dispsal_method) ? $appliances->dispsal_method : ''),
+                'min_ratio' => (isset($appliances->min_ratio) && !empty($appliances->min_ratio) ? $appliances->min_ratio : ''),
+                'min_co' => (isset($appliances->min_co) && !empty($appliances->min_co) ? $appliances->min_co : ''),
+                'min_co2' => (isset($appliances->min_co2) && !empty($appliances->min_co2) ? $appliances->min_co2 : ''),
+                'max_ratio' => (isset($appliances->max_ratio) && !empty($appliances->max_ratio) ? $appliances->max_ratio : ''),
+                'max_co' => (isset($appliances->max_co) && !empty($appliances->max_co) ? $appliances->max_co : ''),
+                'max_co2' => (isset($appliances->max_co2) && !empty($appliances->max_co2) ? $appliances->max_co2 : ''),
+                'app_building_regulation' => (isset($appliances->app_building_regulation) && !empty($appliances->app_building_regulation) ? $appliances->app_building_regulation : ''),
+                'commissioned_man_ins' => (isset($appliances->commissioned_man_ins) && !empty($appliances->commissioned_man_ins) ? $appliances->commissioned_man_ins : ''),
+                'demonstrated_understood' => (isset($appliances->demonstrated_understood) && !empty($appliances->demonstrated_understood) ? $appliances->demonstrated_understood : ''),
+                'literature_including' => (isset($appliances->literature_including) && !empty($appliances->literature_including) ? $appliances->literature_including : ''),
+                'is_next_inspection' => (isset($appliances->is_next_inspection) && !empty($appliances->is_next_inspection) ? $appliances->is_next_inspection : ''),
+            ]
+        ];
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }
