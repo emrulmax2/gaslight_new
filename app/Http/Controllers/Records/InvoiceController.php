@@ -7,9 +7,14 @@ use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\Company;
 use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
+use App\Models\ExistingRecordDraft;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
+use App\Models\JobFormPrefixMumbering;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +23,86 @@ use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
 {
+    public function checkAndUpdateRecordHistory($record_id){
+        $record = Invoice::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => Invoice::class, 'model_id' => $record_id ], [
+            'customer_id' => $record->customer_id,
+            'customer_job_id' => $record->customer_job_id,
+            'job_form_id' => $record->job_form_id,
+            'model_type' => Invoice::class,
+            'model_id' => $record->id,
+
+            'created_by' => $record->created_by,
+            'updated_by' => auth()->user()->id,
+        ]); 
+    }
+
+    public function show(Invoice $inv){
+        $user_id = auth()->user()->id;
+        $inv->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
+        $form = JobForm::find($inv->job_form_id);
+        $record = $form->slug;
+
+        if(empty($inv->invoice_number)):
+            $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
+            $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+            $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+            $userLastInvoice = Invoice::where('customer_job_id', $inv->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
+
+            $invSerial = $starting_form;
+            if(!empty($lastInvoiceNo)):
+                preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+                $invSerial = (int) $invoiceNumbers[1] + 1;
+            endif;
+            $invoiceNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+            Invoice::where('id', $inv->id)->update(['invoice_number' => $invoiceNumber]);
+        endif;
+
+        $thePdf = $this->generatePdf($inv->id);
+        return view('app.new-records.'.$record.'.show', [
+            'title' => 'Records - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Record', 'href' => 'javascript:void(0);'],
+                ['label' => $form->name, 'href' => 'javascript:void(0);'],
+            ],
+            'form' => $form,
+            'inv' => $inv,
+            'thePdf' => $thePdf
+        ]);
+    }
+
     public function store(Request $request){
+        $inv_id = $request->inv_id;
+        $customer_job_id = $request->customer_job_id;
+        $job_form_id = $request->job_form_id;
+        $submit_type = $request->submit_type;
+        $inv = Invoice::find($inv_id);
+
+        $red = '';
+        $pdf = Storage::disk('public')->url('invoices/'.$inv->customer_job_id.'/'.$inv->job_form_id.'/'.$inv->invoice_number.'.pdf');
+        $message = '';
+        $pdf = $this->generatePdf($inv_id);
+        if($submit_type == 2):
+            $data = [];
+            $data['status'] = 'Approved & Sent';
+
+            Invoice::where('id', $inv_id)->update($data);
+            
+            $email = $this->sendEmail($inv_id, $job_form_id);
+            $message = (!$email ? 'Gas Warning Noteice Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Gas Warning Noteice Certificate has been approved and a copy of the certificate mailed to the customer');
+        else:
+            $data = [];
+            $data['status'] = 'Approved';
+
+            Invoice::where('id', $inv_id)->update($data);
+            $message = 'Homewoner Gas Warning Noteice Certificate successfully approved.';
+        endif;
+
+        return response()->json(['msg' => $message, 'red' => route('company.dashboard'), 'pdf' => $pdf]);
+    }
+
+    /*public function store(Request $request){
         $submit_type = (isset($request->submit_type) && !empty($request->submit_type) ? $request->submit_type : 1);
         $customer_job_id = $request->customer_job_id;
         $customer_id = $request->customer_id;
@@ -43,7 +127,7 @@ class InvoiceController extends Controller
         endif;
         $invoice = Invoice::where('id', $invoice_id)->update($data);
 
-        /* Update Invoice Items */
+        //Update Invoice Items 
         InvoiceItem::where('invoice_id', $invoice_id)->forceDelete();
         $inv = (isset($request->inv) && !empty($request->inv) ? $request->inv : []);
         if(!empty($inv)):
@@ -96,7 +180,7 @@ class InvoiceController extends Controller
         endif;
         $message = ($submit_type == 3 ? $emailNote : ($submit_type == 2 ? 'Invoice has been approved.' : 'Invoice successfully generated'));
         return response()->json(['msg' => $message, 'red' => '', 'pdf' => $pdf], 200);
-    }
+    }*/
 
     public function generatePdf($invoice_id) {
         $invoice = Invoice::with('items', 'job', 'job.property', 'customer', 'user', 'user.company')->find($invoice_id);
@@ -418,5 +502,183 @@ class InvoiceController extends Controller
         else:
             return false;
         endif;
+    }
+
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $invoice_id = (isset($request->invoice_id) && $request->invoice_id > 0 ? $request->invoice_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $nonVatInvoice = (isset($request->non_vat_invoice) && $request->non_vat_invoice == 1 ? true : false);
+        $invoiceItems = json_decode($request->invoiceItems);
+        $invoiceDiscounts = json_decode($request->invoiceDiscounts);
+        $invoiceAdvance = json_decode($request->invoiceAdvance);
+        $invoiceNotes = $request->invoiceNotes;
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $job = CustomerJob::find($customer_job_id);
+            $invoice = Invoice::updateOrCreate(['id' => $invoice_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'invoice_number' => $request->invoice_number,
+                'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d')),
+                'reference_no' => (isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : null),
+                'non_vat_invoice' => ($nonVatInvoice ? 1 : 0),
+                'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                'advance_amount' => (isset($invoiceAdvance->advance_amount) && !empty($invoiceAdvance->advance_amount) ? $invoiceAdvance->advance_amount : null),
+                'payment_method_id' => (isset($invoiceAdvance->payment_method_id) && !empty($invoiceAdvance->payment_method_id) ? $invoiceAdvance->payment_method_id : null),
+                'advance_date' => (isset($invoiceAdvance->advance_pay_date) && !empty($invoiceAdvance->advance_pay_date) ? date('Y-m-d', strtotime($invoiceAdvance->advance_pay_date)) : null),
+                'notes' => (!empty($invoiceNotes) ? $invoiceNotes : null),
+                'payment_term' => (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($invoice->id);
+
+            InvoiceItem::where('invoice_id', $invoice->id)->forceDelete();
+            if(!empty($invoiceItems)):
+                foreach($invoiceItems as $key => $item):
+                    $units = (isset($item->units) && $item->units > 0 ? $item->units : 0);
+                    $unit_price = (isset($item->price) && $item->price > 0 ? $item->price : 0);
+                    $vat_rate = (isset($item->vat) && $item->vat > 0 ? $item->vat : 0);
+                    
+                    $item_total = $unit_price * $units;
+                    $vat_amount = ($item_total * $vat_rate) / 100;
+
+                    InvoiceItem::create([
+                        'invoice_id' => $invoice->id,
+                        'type' => 'Default',
+                        'description' => (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item'),
+                        'units' => $units,
+                        'unit_price' => $unit_price,
+                        'vat_rate' => $vat_rate,
+                        'vat_amount' => $vat_amount,
+                        
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                    ]);
+                endforeach;
+            endif;
+
+            if(!empty($invoiceDiscounts)):
+                $units = 1;
+                $unit_price = (isset($invoiceDiscounts->amount) && $invoiceDiscounts->amount > 0 ? $invoiceDiscounts->amount : 0);
+                $vat_rate = (isset($item->vat) && $item->vat > 0 ? $item->vat : 0);
+                
+                $vat_amount = ($unit_price * $vat_rate) / 100;
+
+                InvoiceItem::create([
+                    'invoice_id' => $invoice->id,
+                    'type' => 'Discount',
+                    'description' => 'Discount',
+                    'units' => $units,
+                    'unit_price' => $unit_price,
+                    'vat_rate' => $vat_rate,
+                    'vat_amount' => $vat_amount,
+                    
+                    'created_by' => $user_id,
+                    'updated_by' => $user_id,
+                ]);
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('invoice.show', $invoice->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = Invoice::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $invoiceItems = InvoiceItem::where('invoice_id', $record_id)->where('type', 'Default')->orderBy('id', 'ASC')->get();
+        $discountItems = InvoiceItem::where('invoice_id', $record_id)->where('type', 'Discount')->orderBy('id', 'ASC')->get()->first();
+        $nonVatInvoice = (isset($record->non_vat_invoice) && $record->non_vat_invoice == 1 ? true : false);
+
+        $data = [
+            'invoice_id' => $record->id,
+            'invoiceDetails' => [
+                'invoice_number' => (isset($record->invoice_number) && !empty($record->invoice_number) ? $record->invoice_number : ''),
+                'issued_date' => (isset($record->issued_date) && !empty($record->issued_date) ? date('d-m-Y', strtotime($record->issued_date)) : ''),
+                'non_vat_invoice' => (isset($record->non_vat_invoice) && !empty($record->non_vat_invoice) ? $record->non_vat_invoice : ''),
+                'vat_number' => (isset($record->vat_number) && !empty($record->vat_number) ? $record->vat_number : ''),
+            ],
+            'invoiceNotes' => (isset($record->notes) && !empty($record->notes) ? $record->notes : ''),
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'invoiceNumber' => (isset($record->invoice_number) && !empty($record->invoice_number) ? $record->invoice_number : '')
+        ];
+
+        if($invoiceItems->count() > 0):
+            $i = 1;
+            foreach($invoiceItems as $item):
+                $units = (isset($item->units) && !empty($item->units) ? $item->units : 1);
+                $price = (isset($item->unit_price) && !empty($item->unit_price) ? $item->unit_price : 0);
+                $vat_rat = (isset($item->vat_rate) && !empty($item->vat_rate) ? $item->vat_rate : 0);
+
+                $itemTotal = $units * $price;
+                $vatTotal = ($itemTotal * $vat_rat) / 100;
+                $lineTotal = ($nonVatInvoice ? $itemTotal : $itemTotal + $vatTotal);
+
+                $data['invoiceItems'][$i] = [
+                    'inv_item_title' => (isset($item->description) && !empty($item->description) ? $item->description : $i.' Line Item'),
+                    'description' => (isset($item->description) && !empty($item->description) ? $item->description : $i.' Line Item'),
+                    'units' => (isset($item->units) && !empty($item->units) ? $item->units : 1),
+                    'price' => (isset($item->unit_price) && !empty($item->unit_price) ? $item->unit_price : 0),
+                    'vat' => (isset($item->vat_rate) && !empty($item->vat_rate) ? $item->vat_rate : 0),
+                    'line_total' => $lineTotal,
+                ];
+                $i++;
+            endforeach;
+            $data['invoiceItemsCount'] = $invoiceItems->count();
+        endif;
+
+        if(isset($discountItems->id) && $discountItems->id > 0):
+            $data['invoiceDiscounts'] = [
+                'inv_item_title' => 'Discount',
+                'amount' => (isset($discountItems->unit_price) && $discountItems->unit_price > 0 ? $discountItems->unit_price : 0),
+                'vat' => (isset($discountItems->vat_rate) && $discountItems->vat_rate > 0 ? $discountItems->vat_rate : ''),
+            ];
+        endif;
+
+        if(isset($record->advance_amount) && $record->advance_amount > 0):
+            $data['invoiceAdvance'] = [
+                'advance_amount' => (isset($record->advance_amount) && $record->advance_amount > 0 ? $record->advance_amount : ''),
+                'payment_method_id' => (isset($record->payment_method_id) && $record->payment_method_id > 0 ? $record->payment_method_id : ''),
+                'advance_pay_date' => (isset($record->advance_date) && !empty($record->advance_date) ? date('d-m-Y', strtotime($record->advance_date)) : ''),
+            ];
+        endif;
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }

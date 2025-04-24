@@ -58,7 +58,7 @@ class GasServiceRecordController extends Controller
         endif;
 
         $thePdf = $this->generatePdf($gsr->id);
-        return view('app.records.'.$record.'.show', [
+        return view('app.new-records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Record', 'href' => 'javascript:void(0);'],
@@ -70,163 +70,6 @@ class GasServiceRecordController extends Controller
             'signature' => $gsr->signature ? Storage::disk('public')->url($gsr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
-    }
-
-    public function storeAppliance(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-        $serial = $request->appliance_serial;
-        $appliance = (isset($request->app) && !empty($request->app) ? $request->app : []);
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasServiceRecord = GasServiceRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasServiceRecord->id);
-
-        $saved = 0;
-        if($gasServiceRecord->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
-            $theAppliance = $appliance[$serial];
-            $appliance_location_id = (isset($theAppliance['appliance_location_id']) && !empty($theAppliance['appliance_location_id']) ? $theAppliance['appliance_location_id'] : null);
-            if(!empty($appliance_location_id)):
-                $gasAppliance = GasServiceRecordAppliance::updateOrCreate(['gas_service_record_id' => $gasServiceRecord->id, 'appliance_serial' => $serial], [
-                    'gas_service_record_id' => $gasServiceRecord->id,
-                    'appliance_serial' => $serial,
-                    'appliance_location_id' => (isset($theAppliance['appliance_location_id']) && !empty($theAppliance['appliance_location_id']) ? $theAppliance['appliance_location_id'] : null),
-                    'boiler_brand_id' => (isset($theAppliance['boiler_brand_id']) && !empty($theAppliance['boiler_brand_id']) ? $theAppliance['boiler_brand_id'] : null),
-                    'model' => (isset($theAppliance['model']) && !empty($theAppliance['model']) ? $theAppliance['model'] : null),
-                    'appliance_type_id' => (isset($theAppliance['appliance_type_id']) && !empty($theAppliance['appliance_type_id']) ? $theAppliance['appliance_type_id'] : null),
-                    'serial_no' => (isset($theAppliance['serial_no']) && !empty($theAppliance['serial_no']) ? $theAppliance['serial_no'] : null),
-                    'gc_no' => (isset($theAppliance['gc_no']) && !empty($theAppliance['gc_no']) ? $theAppliance['gc_no'] : null),
-                    
-                    'opt_pressure' => (isset($theAppliance['opt_pressure']) && !empty($theAppliance['opt_pressure']) ? $theAppliance['opt_pressure'] : null),
-                    'rented_accommodation' => (isset($theAppliance['rented_accommodation']) && !empty($theAppliance['rented_accommodation']) ? $theAppliance['rented_accommodation'] : null),
-                    'type_of_work_carried_out' => (isset($theAppliance['type_of_work_carried_out']) && !empty($theAppliance['type_of_work_carried_out']) ? $theAppliance['type_of_work_carried_out'] : null),
-                    'test_carried_out' => (isset($theAppliance['test_carried_out']) && !empty($theAppliance['test_carried_out']) ? $theAppliance['test_carried_out'] : null),
-                    'is_electricial_bonding' => (isset($theAppliance['is_electricial_bonding']) && !empty($theAppliance['is_electricial_bonding']) ? $theAppliance['is_electricial_bonding'] : null),
-                    'low_analyser_ratio' => (isset($theAppliance['low_analyser_ratio']) && !empty($theAppliance['low_analyser_ratio']) ? $theAppliance['low_analyser_ratio'] : null),
-                    'low_co' => (isset($theAppliance['low_co']) && !empty($theAppliance['low_co']) ? $theAppliance['low_co'] : null),
-                    'low_co2' => (isset($theAppliance['low_co2']) && !empty($theAppliance['low_co2']) ? $theAppliance['low_co2'] : null),
-                    'high_analyser_ratio' => (isset($theAppliance['high_analyser_ratio']) && !empty($theAppliance['high_analyser_ratio']) ? $theAppliance['high_analyser_ratio'] : null),
-                    'high_co' => (isset($theAppliance['high_co']) && !empty($theAppliance['high_co']) ? $theAppliance['high_co'] : null),
-                    'high_co2' => (isset($theAppliance['high_co2']) && !empty($theAppliance['high_co2']) ? $theAppliance['high_co2'] : null),
-
-                    'heat_exchanger' => (isset($theAppliance['heat_exchanger']) && !empty($theAppliance['heat_exchanger']) ? $theAppliance['heat_exchanger'] : null),
-                    'heat_exchanger_detail' => (isset($theAppliance['heat_exchanger_detail']) && !empty($theAppliance['heat_exchanger_detail']) ? $theAppliance['heat_exchanger_detail'] : null),
-                    'burner_injectors' => (isset($theAppliance['burner_injectors']) && !empty($theAppliance['burner_injectors']) ? $theAppliance['burner_injectors'] : null),
-                    'burner_injectors_detail' => (isset($theAppliance['burner_injectors_detail']) && !empty($theAppliance['burner_injectors_detail']) ? $theAppliance['burner_injectors_detail'] : null),
-                    'flame_picture' => (isset($theAppliance['flame_picture']) && !empty($theAppliance['flame_picture']) ? $theAppliance['flame_picture'] : null),
-                    'flame_picture_detail' => (isset($theAppliance['flame_picture_detail']) && !empty($theAppliance['flame_picture_detail']) ? $theAppliance['flame_picture_detail'] : null),
-                    'ignition' => (isset($theAppliance['ignition']) && !empty($theAppliance['ignition']) ? $theAppliance['ignition'] : null),
-                    'ignition_detail' => (isset($theAppliance['ignition_detail']) && !empty($theAppliance['ignition_detail']) ? $theAppliance['ignition_detail'] : null),
-                    'electrics' => (isset($theAppliance['electrics']) && !empty($theAppliance['electrics']) ? $theAppliance['electrics'] : null),
-                    'electrics_detail' => (isset($theAppliance['electrics_detail']) && !empty($theAppliance['electrics_detail']) ? $theAppliance['electrics_detail'] : null),
-                    'controls' => (isset($theAppliance['controls']) && !empty($theAppliance['controls']) ? $theAppliance['controls'] : null),
-                    'controls_detail' => (isset($theAppliance['controls_detail']) && !empty($theAppliance['controls_detail']) ? $theAppliance['controls_detail'] : null),
-                    'leak_gas_water' => (isset($theAppliance['leak_gas_water']) && !empty($theAppliance['leak_gas_water']) ? $theAppliance['leak_gas_water'] : null),
-                    'leak_gas_water_detail' => (isset($theAppliance['leak_gas_water_detail']) && !empty($theAppliance['leak_gas_water_detail']) ? $theAppliance['leak_gas_water_detail'] : null),
-                    'seals' => (isset($theAppliance['seals']) && !empty($theAppliance['seals']) ? $theAppliance['seals'] : null),
-                    'seals_detail' => (isset($theAppliance['seals_detail']) && !empty($theAppliance['seals_detail']) ? $theAppliance['seals_detail'] : null),
-                    'pipework' => (isset($theAppliance['pipework']) && !empty($theAppliance['pipework']) ? $theAppliance['pipework'] : null),
-                    'pipework_detail' => (isset($theAppliance['pipework_detail']) && !empty($theAppliance['pipework_detail']) ? $theAppliance['pipework_detail'] : null),
-                    'fans' => (isset($theAppliance['fans']) && !empty($theAppliance['fans']) ? $theAppliance['fans'] : null),
-                    'fans_detail' => (isset($theAppliance['fans_detail']) && !empty($theAppliance['fans_detail']) ? $theAppliance['fans_detail'] : null),
-                    'fireplace' => (isset($theAppliance['fireplace']) && !empty($theAppliance['fireplace']) ? $theAppliance['fireplace'] : null),
-                    'fireplace_detail' => (isset($theAppliance['fireplace_detail']) && !empty($theAppliance['fireplace_detail']) ? $theAppliance['fireplace_detail'] : null),
-                    'closure_plate' => (isset($theAppliance['closure_plate']) && !empty($theAppliance['closure_plate']) ? $theAppliance['closure_plate'] : null),
-                    'closure_plate_detail' => (isset($theAppliance['closure_plate_detail']) && !empty($theAppliance['closure_plate_detail']) ? $theAppliance['closure_plate_detail'] : null),
-                    'allowable_location' => (isset($theAppliance['allowable_location']) && !empty($theAppliance['allowable_location']) ? $theAppliance['allowable_location'] : null),
-                    'allowable_location_detail' => (isset($theAppliance['allowable_location_detail']) && !empty($theAppliance['allowable_location_detail']) ? $theAppliance['allowable_location_detail'] : null),
-                    'boiler_ratio' => (isset($theAppliance['boiler_ratio']) && !empty($theAppliance['boiler_ratio']) ? $theAppliance['boiler_ratio'] : null),
-                    'boiler_ratio_detail' => (isset($theAppliance['boiler_ratio_detail']) && !empty($theAppliance['boiler_ratio_detail']) ? $theAppliance['boiler_ratio_detail'] : null),
-                    'stability' => (isset($theAppliance['stability']) && !empty($theAppliance['stability']) ? $theAppliance['stability'] : null),
-                    'stability_detail' => (isset($theAppliance['stability_detail']) && !empty($theAppliance['stability_detail']) ? $theAppliance['stability_detail'] : null),
-                    'return_air_ple' => (isset($theAppliance['return_air_ple']) && !empty($theAppliance['return_air_ple']) ? $theAppliance['return_air_ple'] : null),
-                    'return_air_ple_detail' => (isset($theAppliance['return_air_ple_detail']) && !empty($theAppliance['return_air_ple_detail']) ? $theAppliance['return_air_ple_detail'] : null),
-                    'ventillation' => (isset($theAppliance['ventillation']) && !empty($theAppliance['ventillation']) ? $theAppliance['ventillation'] : null),
-                    'ventillation_detail' => (isset($theAppliance['ventillation_detail']) && !empty($theAppliance['ventillation_detail']) ? $theAppliance['ventillation_detail'] : null),
-                    'flue_termination' => (isset($theAppliance['flue_termination']) && !empty($theAppliance['flue_termination']) ? $theAppliance['flue_termination'] : null),
-                    'flue_termination_detail' => (isset($theAppliance['flue_termination_detail']) && !empty($theAppliance['flue_termination_detail']) ? $theAppliance['flue_termination_detail'] : null),
-                    'smoke_pellet_flue_flow' => (isset($theAppliance['smoke_pellet_flue_flow']) && !empty($theAppliance['smoke_pellet_flue_flow']) ? $theAppliance['smoke_pellet_flue_flow'] : null),
-                    'smoke_pellet_flue_flow_detail' => (isset($theAppliance['smoke_pellet_flue_flow_detail']) && !empty($theAppliance['smoke_pellet_flue_flow_detail']) ? $theAppliance['smoke_pellet_flue_flow_detail'] : null),
-                    'smoke_pellet_spillage' => (isset($theAppliance['smoke_pellet_spillage']) && !empty($theAppliance['smoke_pellet_spillage']) ? $theAppliance['smoke_pellet_spillage'] : null),
-                    'smoke_pellet_spillage_detail' => (isset($theAppliance['smoke_pellet_spillage_detail']) && !empty($theAppliance['smoke_pellet_spillage_detail']) ? $theAppliance['smoke_pellet_spillage_detail'] : null),
-                    'working_pressure' => (isset($theAppliance['working_pressure']) && !empty($theAppliance['working_pressure']) ? $theAppliance['working_pressure'] : null),
-                    'working_pressure_detail' => (isset($theAppliance['working_pressure_detail']) && !empty($theAppliance['working_pressure_detail']) ? $theAppliance['working_pressure_detail'] : null),
-                    'savety_devices' => (isset($theAppliance['savety_devices']) && !empty($theAppliance['savety_devices']) ? $theAppliance['savety_devices'] : null),
-                    'savety_devices_detail' => (isset($theAppliance['savety_devices_detail']) && !empty($theAppliance['savety_devices_detail']) ? $theAppliance['savety_devices_detail'] : null),
-                    'gas_tightness' => (isset($theAppliance['gas_tightness']) && !empty($theAppliance['gas_tightness']) ? $theAppliance['gas_tightness'] : null),
-                    'gas_tightness_detail' => (isset($theAppliance['gas_tightness_detail']) && !empty($theAppliance['gas_tightness_detail']) ? $theAppliance['gas_tightness_detail'] : null),
-                    'expansion_vassel_checked' => (isset($theAppliance['expansion_vassel_checked']) && !empty($theAppliance['expansion_vassel_checked']) ? $theAppliance['expansion_vassel_checked'] : null),
-                    'expansion_vassel_checked_detail' => (isset($theAppliance['expansion_vassel_checked_detail']) && !empty($theAppliance['expansion_vassel_checked_detail']) ? $theAppliance['expansion_vassel_checked_detail'] : null),
-                    'other_regulations' => (isset($theAppliance['other_regulations']) && !empty($theAppliance['other_regulations']) ? $theAppliance['other_regulations'] : null),
-                    'other_regulations_detail' => (isset($theAppliance['other_regulations_detail']) && !empty($theAppliance['other_regulations_detail']) ? $theAppliance['other_regulations_detail'] : null),
-                    'is_safe_to_use' => (isset($theAppliance['is_safe_to_use']) && !empty($theAppliance['is_safe_to_use']) ? $theAppliance['is_safe_to_use'] : null),
-                    'instruction_followed' => (isset($theAppliance['instruction_followed']) && !empty($theAppliance['instruction_followed']) ? $theAppliance['instruction_followed'] : null),
-                    'work_required_note' => (isset($theAppliance['work_required_note']) && !empty($theAppliance['work_required_note']) ? $theAppliance['work_required_note'] : null),
-                    
-                    'updated_by' => $user_id,
-                ]);
-                $saved = 1;
-            endif;
-
-            return response()->json(['msg' => 'Appliance Details successfully updated.', 'saved' => $saved], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeSignatures(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        
-        $gasServiceRecord = GasServiceRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-
-            'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
-            'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
-            'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
-            'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasServiceRecord->id);
-        
-        if($request->input('sign') !== null):
-            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
-            $signatureData = base64_decode($signatureData);
-            if(strlen($signatureData) > 2621):
-                $gasServiceRecord->deleteSignature();
-                
-                $imageName = 'signatures/' . Str::uuid() . '.png';
-                Storage::disk('public')->put($imageName, $signatureData);
-                $signature = new Signature();
-                $signature->model_type = GasServiceRecord::class;
-                $signature->model_id = $gasServiceRecord->id;
-                $signature->uuid = Str::uuid();
-                $signature->filename = $imageName;
-                $signature->document_filename = null;
-                $signature->certified = false;
-                $signature->from_ips = json_encode([request()->ip()]);
-                $signature->save();
-            endif;
-        endif;
-
-        return response()->json(['msg' => 'Gas Service Record Successfully Saved.', 'saved' => 1, 'red' => route('records.gas.service.show', $gasServiceRecord->id)], 200);
     }
 
     public function store(Request $request){
@@ -242,7 +85,7 @@ class GasServiceRecordController extends Controller
         $pdf = $this->generatePdf($gsr_id);
         if($submit_type == 2):
             $data = [];
-            $data['status'] = 'Approved';
+            $data['status'] = 'Approved & Sent';
 
             GasServiceRecord::where('id', $gsr_id)->update($data);
             
@@ -1175,7 +1018,7 @@ class GasServiceRecordController extends Controller
                 endif;
             endif;
 
-            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gas.service.show', $gasServiceRecord->id)], 200);
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.gas.service.show', $gasServiceRecord->id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
         endif;

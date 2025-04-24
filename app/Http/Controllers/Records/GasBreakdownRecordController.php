@@ -59,7 +59,7 @@ class GasBreakdownRecordController extends Controller
         endif;
 
         $thePdf = $this->generatePdf($gbr->id);
-        return view('app.records.'.$record.'.show', [
+        return view('app.new-records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Record', 'href' => 'javascript:void(0);'],
@@ -71,121 +71,6 @@ class GasBreakdownRecordController extends Controller
             'signature' => $gbr->signature ? Storage::disk('public')->url($gbr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
-    }
-
-    public function storeAppliance(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-        $serial = $request->appliance_serial;
-        $appliance = (isset($request->app) && !empty($request->app) ? $request->app : []);
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasBreakdownRecord = GasBreakdownRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasBreakdownRecord->id);
-
-        $saved = 0;
-        if($gasBreakdownRecord->id && isset($appliance[$serial]) && !empty($appliance[$serial])):
-            $theAppliance = $appliance[$serial];
-            $appliance_location_id = (isset($theAppliance['appliance_location_id']) && !empty($theAppliance['appliance_location_id']) ? $theAppliance['appliance_location_id'] : null);
-            if(!empty($appliance_location_id)):
-                $gasAppliance = GasBreakdownRecordAppliance::updateOrCreate(['gas_breakdown_record_id' => $gasBreakdownRecord->id, 'appliance_serial' => $serial], [
-                    'gas_breakdown_record_id' => $gasBreakdownRecord->id,
-                    'appliance_serial' => $serial,
-                    'appliance_location_id' => (isset($theAppliance['appliance_location_id']) && !empty($theAppliance['appliance_location_id']) ? $theAppliance['appliance_location_id'] : null),
-                    'boiler_brand_id' => (isset($theAppliance['boiler_brand_id']) && !empty($theAppliance['boiler_brand_id']) ? $theAppliance['boiler_brand_id'] : null),
-                    'model' => (isset($theAppliance['model']) && !empty($theAppliance['model']) ? $theAppliance['model'] : null),
-                    'appliance_type_id' => (isset($theAppliance['appliance_type_id']) && !empty($theAppliance['appliance_type_id']) ? $theAppliance['appliance_type_id'] : null),
-                    'serial_no' => (isset($theAppliance['serial_no']) && !empty($theAppliance['serial_no']) ? $theAppliance['serial_no'] : null),
-                    'gc_no' => (isset($theAppliance['gc_no']) && !empty($theAppliance['gc_no']) ? $theAppliance['gc_no'] : null),
-                    
-                    'performance_analyser_ratio' => (isset($theAppliance['performance_analyser_ratio']) && !empty($theAppliance['performance_analyser_ratio']) ? $theAppliance['performance_analyser_ratio'] : null),
-                    'performance_co' => (isset($theAppliance['performance_co']) && !empty($theAppliance['performance_co']) ? $theAppliance['performance_co'] : null),
-                    'performance_co2' => (isset($theAppliance['performance_co2']) && !empty($theAppliance['performance_co2']) ? $theAppliance['performance_co2'] : null),
-                    'opt_correctly' => (isset($theAppliance['opt_correctly']) && !empty($theAppliance['opt_correctly']) ? $theAppliance['opt_correctly'] : null),
-                    'conf_safety_standards' => (isset($theAppliance['conf_safety_standards']) && !empty($theAppliance['conf_safety_standards']) ? $theAppliance['conf_safety_standards'] : null),
-                    'notice_exlained' => (isset($theAppliance['notice_exlained']) && !empty($theAppliance['notice_exlained']) ? $theAppliance['notice_exlained'] : null),
-                    'flueing_is_safe' => (isset($theAppliance['flueing_is_safe']) && !empty($theAppliance['flueing_is_safe']) ? $theAppliance['flueing_is_safe'] : null),
-                    'ventilation_is_safe' => (isset($theAppliance['ventilation_is_safe']) && !empty($theAppliance['ventilation_is_safe']) ? $theAppliance['ventilation_is_safe'] : null),
-                    'emition_combustion_test' => (isset($theAppliance['emition_combustion_test']) && !empty($theAppliance['emition_combustion_test']) ? $theAppliance['emition_combustion_test'] : null),
-                    'burner_pressure' => (isset($theAppliance['burner_pressure']) && !empty($theAppliance['burner_pressure']) ? $theAppliance['burner_pressure'] : null),
-                    'location_of_fault' => (isset($theAppliance['location_of_fault']) && !empty($theAppliance['location_of_fault']) ? $theAppliance['location_of_fault'] : null),
-                    'fault_resolved' => (isset($theAppliance['fault_resolved']) && !empty($theAppliance['fault_resolved']) ? $theAppliance['fault_resolved'] : null),
-                    'parts_fitted' => (isset($theAppliance['parts_fitted']) && !empty($theAppliance['parts_fitted']) ? $theAppliance['parts_fitted'] : null),
-                    'fitted_parts_name' => (isset($theAppliance['fitted_parts_name']) && !empty($theAppliance['fitted_parts_name']) ? $theAppliance['fitted_parts_name'] : null),
-                    'parts_required' => (isset($theAppliance['parts_required']) && !empty($theAppliance['parts_required']) ? $theAppliance['parts_required'] : null),
-                    'required_parts_name' => (isset($theAppliance['required_parts_name']) && !empty($theAppliance['required_parts_name']) ? $theAppliance['required_parts_name'] : null),
-                    'monoxide_alarm_fitted' => (isset($theAppliance['monoxide_alarm_fitted']) && !empty($theAppliance['monoxide_alarm_fitted']) ? $theAppliance['monoxide_alarm_fitted'] : null),
-                    'is_safe' => (isset($theAppliance['is_safe']) && !empty($theAppliance['is_safe']) ? $theAppliance['is_safe'] : null),
-                    'parts_available' => (isset($theAppliance['parts_available']) && !empty($theAppliance['parts_available']) ? $theAppliance['parts_available'] : null),
-                    'recommend_replacement' => (isset($theAppliance['recommend_replacement']) && !empty($theAppliance['recommend_replacement']) ? $theAppliance['recommend_replacement'] : null),
-                    'magnetic_filter_fitted' => (isset($theAppliance['magnetic_filter_fitted']) && !empty($theAppliance['magnetic_filter_fitted']) ? $theAppliance['magnetic_filter_fitted'] : null),
-                    'improvement_recommended' => (isset($theAppliance['improvement_recommended']) && !empty($theAppliance['improvement_recommended']) ? $theAppliance['improvement_recommended'] : null),
-                    'enginner_comments' => (isset($theAppliance['enginner_comments']) && !empty($theAppliance['enginner_comments']) ? $theAppliance['enginner_comments'] : null),
-                    
-                    'updated_by' => $user_id,
-                ]);
-                $saved = 1;
-            endif;
-
-            return response()->json(['msg' => 'Appliance Details successfully updated.', 'saved' => $saved], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeSignatures(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        
-        $gasBreakdownRecord = GasBreakdownRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-
-            'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
-            'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
-            'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
-            'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasBreakdownRecord->id);
-        
-        if($request->input('sign') !== null):
-            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
-            $signatureData = base64_decode($signatureData);
-            if(strlen($signatureData) > 2621):
-                $gasBreakdownRecord->deleteSignature();
-                
-                $imageName = 'signatures/' . Str::uuid() . '.png';
-                Storage::disk('public')->put($imageName, $signatureData);
-                $signature = new Signature();
-                $signature->model_type = GasBreakdownRecord::class;
-                $signature->model_id = $gasBreakdownRecord->id;
-                $signature->uuid = Str::uuid();
-                $signature->filename = $imageName;
-                $signature->document_filename = null;
-                $signature->certified = false;
-                $signature->from_ips = json_encode([request()->ip()]);
-                $signature->save();
-            endif;
-        endif;
-
-        return response()->json(['msg' => 'Gas Breakdown Record Successfully Saved.', 'saved' => 1, 'red' => route('records.gas.breakdown.record.show', $gasBreakdownRecord->id)], 200);
     }
 
     public function store(Request $request){
@@ -201,7 +86,7 @@ class GasBreakdownRecordController extends Controller
         $pdf = $this->generatePdf($gbr_id);
         if($submit_type == 2):
             $data = [];
-            $data['status'] = 'Approved';
+            $data['status'] = 'Approved & Sent';
 
             GasBreakdownRecord::where('id', $gbr_id)->update($data);
             
@@ -973,7 +858,7 @@ class GasBreakdownRecordController extends Controller
                 endif;
             endif;
 
-            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gas.breakdown.record.show', $gasBreakdownRecord->id)], 200);
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.gas.breakdown.record.show', $gasBreakdownRecord->id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
         endif;

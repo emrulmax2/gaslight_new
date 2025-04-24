@@ -20,7 +20,7 @@
                         </a>
                     </div>--}}
                     <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
-                        <a href="{{ route('records.create') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
+                        <a href="{{ route('new.records') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",

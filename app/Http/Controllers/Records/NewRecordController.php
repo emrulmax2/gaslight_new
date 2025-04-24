@@ -16,14 +16,21 @@ use App\Models\Customer;
 use App\Models\CustomerProperty;
 use App\Models\JobForm;
 use App\Models\CustomerJob;
+use App\Models\ExistingRecordDraft;
 use App\Models\GasWarningClassification;
+use App\Models\Invoice;
+use App\Models\JobFormPrefixMumbering;
+use App\Models\PaymentMethod;
 use App\Models\PowerflushCirculatorPumpLocation;
 use App\Models\PowerflushCylinderType;
 use App\Models\PowerflushPipeworkType;
 use App\Models\PowerflushSystemType;
+use App\Models\Quote;
 use App\Models\RadiatorType;
 use App\Models\Relation;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Number;
 
 class NewRecordController extends Controller
 {
@@ -45,7 +52,7 @@ class NewRecordController extends Controller
                 ['label' => $form->name, 'href' => 'javascript:void(0);'],
             ],
             'form' => $form,
-            'relations' => Relation::where('active', 1)->orderBy('name', 'ASC')->get()
+            'relations' => Relation::where('active', 1)->orderBy('name', 'ASC')->get(),
         ];
 
         if($form->slug == 'homeowner_gas_safety_record'):
@@ -85,12 +92,22 @@ class NewRecordController extends Controller
             $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
             $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+        elseif($form->slug == 'invoice'):
+            $user = User::find(auth()->user()->id);
+            $data['non_vat_invoice'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
+            $data['vat_number'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
+            $data['methods'] = PaymentMethod::where('active', 1)->orderBy('name', 'asc')->get();
+        elseif($form->slug == 'quote'):
+            $user = User::find(auth()->user()->id);
+            $data['non_vat_quote'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
+            $data['vat_number'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
         endif;
         return view('app.new-records.'.$form->slug.'.index', $data);
     }
 
     public function getJobs(Request $request){
         $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
 
         $html = '';
         $query = CustomerJob::with('customer', 'property', 'priority', 'status')->where('created_by', $user_id)->orderBy('id', 'DESC')->get();
@@ -98,26 +115,30 @@ class NewRecordController extends Controller
             $html .= '<div class="results existingAddress">';
                 $i = 1;
                 foreach($query as $job):
-                    $html .= '<div data-id="'.$job->id.'" data-description="'.(!empty($job->description) ? $job->description : (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '')).'" class="customerJobItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
-                        $html .= '<div>';
-                            $html .= '<div class="group relative flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
-                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="briefcase" class="theIcon lucide lucide-briefcase stroke-1.5 h-4 w-4 text-primary"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>';
-                                $html .= '<span style="display: none;" class="h-4 w-4 theLoader absolute left-0 top-0 bottom-0 right-0 m-auto"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#0d9488"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span>';
-                            $html .= '</div>';
-                        $html .= '</div>';
-                        $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                    $recordExist = ExistingRecordDraft::where('customer_job_id', $job->id)->where('job_form_id', $job_form_id)->get();
+                    if($recordExist->count() == 0):
+                        $html .= '<div data-id="'.$job->id.'" data-description="'.(!empty($job->description) ? $job->description : (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '')).'" class="customerJobItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
                             $html .= '<div>';
-                                $html .= '<div class="whitespace-normal font-medium">';
-                                    $html .= $job->description;
+                                $html .= '<div class="group relative flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                    $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="briefcase" class="theIcon lucide lucide-briefcase stroke-1.5 h-4 w-4 text-primary"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>';
+                                    $html .= '<span style="display: none;" class="h-4 w-4 theLoader absolute left-0 top-0 bottom-0 right-0 m-auto"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#0d9488"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span>';
                                 $html .= '</div>';
-                                $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
-                                    $html .= (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '');
+                            $html .= '</div>';
+                            $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                                $html .= '<div>';
+                                    $html .= '<div class="whitespace-normal font-medium">';
+                                        $html .= $job->description;
+                                    $html .= '</div>';
+                                    $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                                        $html .= (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '');
+                                        $html .= (isset($job->customer->postal_code) && !empty($job->customer->postal_code) ? ' ('.$job->customer->postal_code.')' : '');
+                                    $html .= '</div>';
                                 $html .= '</div>';
                             $html .= '</div>';
                         $html .= '</div>';
-                    $html .= '</div>';
 
-                    $i++;
+                        $i++;
+                    endif;
                 endforeach;
             $html .= '</div>';
 
@@ -245,5 +266,45 @@ class NewRecordController extends Controller
         $address = CustomerProperty::where('id', $property_id)->update($data);
         return response()->json(['msg' => 'Customer Job Addresses occupant details successfully created.', 'red' => '', 'occupant' => $occupant, 'id' => $property_id], 200);
        
+    }
+
+    public function getInvoiceNumber(Request $request){
+        $user_id = auth()->user()->id;
+        $form_id = $request->job_form_id;
+
+        $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
+        $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+        $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+        $userLastInvoice = Invoice::where('job_form_id', $form_id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
+
+        $invSerial = $starting_form;
+        if(!empty($lastInvoiceNo)):
+            preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+            $invSerial = (int) $invoiceNumbers[1] + 1;
+        endif;
+        $invoiceNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+
+        return response()->json(['invoiceNumber' => $invoiceNumber], 200);
+    }
+
+    public function getQuoteNumber(Request $request){
+        $user_id = auth()->user()->id;
+        $form_id = $request->job_form_id;
+
+        $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
+        $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+        $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+        $userLastQuote = Quote::where('job_form_id', $form_id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $lastQuoteNo = (isset($userLastQuote->quote_number) && !empty($userLastQuote->quote_number) ? $userLastQuote->quote_number : '');
+
+        $invSerial = $starting_form;
+        if(!empty($lastQuoteNo)):
+            preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+            $invSerial = (int) $quoteNumbers[1] + 1;
+        endif;
+        $quoteNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+
+        return response()->json(['quoteNumber' => $quoteNumber], 200);
     }
 }

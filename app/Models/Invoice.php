@@ -10,6 +10,12 @@ class Invoice extends Model
 {
     use SoftDeletes, HasFactory;
 
+    protected static function booted(){
+        static::creating(function ($thisModel) {
+            $thisModel->created_by = auth()->user()->id;
+        });
+    }
+
     protected $fillable = [
         'customer_id',
         'customer_job_id',
