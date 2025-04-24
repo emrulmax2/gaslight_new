@@ -60,7 +60,7 @@ class GasPowerFlushRecordController extends Controller
         endif;
 
         $thePdf = $this->generatePdf($gpfr->id);
-        return view('app.records.'.$record.'.show', [
+        return view('app.new-records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Record', 'href' => 'javascript:void(0);'],
@@ -73,167 +73,6 @@ class GasPowerFlushRecordController extends Controller
             'signature' => $gpfr->signature ? Storage::disk('public')->url($gpfr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
-    }
-
-    public function storeChecklist(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasPowerFlush = GasPowerFlushRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasPowerFlush->id);
-
-        if($gasPowerFlush->id):
-            $gasPowerFlushChecklist = GasPowerFlushRecordChecklist::updateOrCreate(['gas_power_flush_record_id' => $gasPowerFlush->id], [
-                'gas_power_flush_record_id' => $gasPowerFlush->id,
-
-                'powerflush_system_type_id' => (isset($request->powerflush_system_type_id) && !empty($request->powerflush_system_type_id) ? $request->powerflush_system_type_id : null),
-                'boiler_brand_id' => (isset($request->boiler_brand_id) && !empty($request->boiler_brand_id) ? $request->boiler_brand_id : null),
-                'radiators' => (isset($request->radiators) && !empty($request->radiators) ? $request->radiators : null),
-                'pipework' => (isset($request->pipework) && !empty($request->pipework) ? $request->pipework : null),
-                'appliance_type_id' => (isset($request->appliance_type_id) && !empty($request->appliance_type_id) ? $request->appliance_type_id : null),
-                'appliance_location_id' => (isset($request->appliance_location_id) && !empty($request->appliance_location_id) ? $request->appliance_location_id : null),
-                'serial_no' => (isset($request->serial_no) && !empty($request->serial_no) ? $request->serial_no : null),
-                'powerflush_cylinder_type_id' => (isset($request->powerflush_cylinder_type_id) && !empty($request->powerflush_cylinder_type_id) ? $request->powerflush_cylinder_type_id : null),
-                'powerflush_pipework_type_id' => (isset($request->powerflush_pipework_type_id) && !empty($request->powerflush_pipework_type_id) ? $request->powerflush_pipework_type_id : null),
-                'twin_radiator_vlv_fitted' => (isset($request->twin_radiator_vlv_fitted) && !empty($request->twin_radiator_vlv_fitted) ? $request->twin_radiator_vlv_fitted : null),
-                'completely_warm_on_fired' => (isset($request->completely_warm_on_fired) && !empty($request->completely_warm_on_fired) ? $request->completely_warm_on_fired : null),
-                'circulation_for_all_readiators' => (isset($request->circulation_for_all_readiators) && !empty($request->circulation_for_all_readiators) ? $request->circulation_for_all_readiators : null),
-                'suffifiently_sound' => (isset($request->suffifiently_sound) && !empty($request->suffifiently_sound) ? $request->suffifiently_sound : null),
-                'powerflush_circulator_pump_location_id' => (isset($request->powerflush_circulator_pump_location_id) && !empty($request->powerflush_circulator_pump_location_id) ? $request->powerflush_circulator_pump_location_id : null),
-                'number_of_radiators' => (isset($request->number_of_radiators) && !empty($request->number_of_radiators) ? $request->number_of_radiators : null),
-                'radiator_type_id' => (isset($request->radiator_type_id) && !empty($request->radiator_type_id) ? $request->radiator_type_id : null),
-                'getting_warm' => (isset($request->getting_warm) && !empty($request->getting_warm) ? $request->getting_warm : null),
-                'are_trvs_fitted' => (isset($request->are_trvs_fitted) && !empty($request->are_trvs_fitted) ? $request->are_trvs_fitted : null),
-                'sign_of_neglect' => (isset($request->sign_of_neglect) && !empty($request->sign_of_neglect) ? $request->sign_of_neglect : null),
-                'radiator_open_fully' => (isset($request->radiator_open_fully) && !empty($request->radiator_open_fully) ? $request->radiator_open_fully : null),
-                'number_of_valves' => (isset($request->number_of_valves) && !empty($request->number_of_valves) ? $request->number_of_valves : null),
-                'valves_located' => (isset($request->valves_located) && !empty($request->valves_located) ? $request->valves_located : null),
-                'fe_tank_location' => (isset($request->fe_tank_location) && !empty($request->fe_tank_location) ? $request->fe_tank_location : null),
-                'fe_tank_checked' => (isset($request->fe_tank_checked) && !empty($request->fe_tank_checked) ? $request->fe_tank_checked : null),
-                'fe_tank_condition' => (isset($request->fe_tank_condition) && !empty($request->fe_tank_condition) ? $request->fe_tank_condition : null),
-                'color_id' => (isset($request->color_id) && !empty($request->color_id) ? $request->color_id : null),
-                'before_color_id' => (isset($request->before_color_id) && !empty($request->before_color_id) ? $request->before_color_id : null),
-                'mw_ph' => (isset($request->mw_ph) && !empty($request->mw_ph) ? $request->mw_ph : null),
-                'mw_chloride' => (isset($request->mw_chloride) && !empty($request->mw_chloride) ? $request->mw_chloride : null),
-                'mw_hardness' => (isset($request->mw_hardness) && !empty($request->mw_hardness) ? $request->mw_hardness : null),
-                'mw_inhibitor' => (isset($request->mw_inhibitor) && !empty($request->mw_inhibitor) ? $request->mw_inhibitor : null),
-                'bpf_ph' => (isset($request->bpf_ph) && !empty($request->bpf_ph) ? $request->bpf_ph : null),
-                'bpf_chloride' => (isset($request->bpf_chloride) && !empty($request->bpf_chloride) ? $request->bpf_chloride : null),
-                'bpf_hardness' => (isset($request->bpf_hardness) && !empty($request->bpf_hardness) ? $request->bpf_hardness : null),
-                'bpf_inhibitor' => (isset($request->bpf_inhibitor) && !empty($request->bpf_inhibitor) ? $request->bpf_inhibitor : null),
-                'apf_ph' => (isset($request->apf_ph) && !empty($request->apf_ph) ? $request->apf_ph : null),
-                'apf_chloride' => (isset($request->apf_chloride) && !empty($request->apf_chloride) ? $request->apf_chloride : null),
-                'apf_hardness' => (isset($request->apf_hardness) && !empty($request->apf_hardness) ? $request->apf_hardness : null),
-                'apf_inhibitor' => (isset($request->apf_inhibitor) && !empty($request->apf_inhibitor) ? $request->apf_inhibitor : null),
-                'mw_tds_reading' => (isset($request->mw_tds_reading) && !empty($request->mw_tds_reading) ? $request->mw_tds_reading : null),
-                'bf_tds_reading' => (isset($request->bf_tds_reading) && !empty($request->bf_tds_reading) ? $request->bf_tds_reading : null),
-                'af_tds_reading' => (isset($request->af_tds_reading) && !empty($request->af_tds_reading) ? $request->af_tds_reading : null),
-
-                'updated_by' => $user_id,
-            ]);
-
-            return response()->json(['msg' => 'Power Flush Checklist Details successfully updated.', 'saved' => 1], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeRadiators(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-        $rediators = (isset($request->red) && !empty($request->red) ? $request->red : []);
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasPowerFlush = GasPowerFlushRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasPowerFlush->id);
-
-        GasPowerFlushRecordRediator::where('gas_power_flush_record_id',  $gasPowerFlush->id)->forceDelete();
-        if($gasPowerFlush->id && !empty($rediators)):
-            foreach($rediators as $rediator):
-                $gasPowerFlushChecklist = GasPowerFlushRecordRediator::create([
-                    'gas_power_flush_record_id' => $gasPowerFlush->id,
-
-                    'rediator_location' => (isset($rediator['rediator_location']) && !empty($rediator['rediator_location']) ? $rediator['rediator_location'] : null),
-                    'tmp_b_top' => (isset($rediator['tmp_b_top']) && !empty($rediator['tmp_b_top']) ? $rediator['tmp_b_top'] : null),
-                    'tmp_b_bottom' => (isset($rediator['tmp_b_bottom']) && !empty($rediator['tmp_b_bottom']) ? $rediator['tmp_b_bottom'] : null),
-                    'tmp_b_left' => (isset($rediator['tmp_b_left']) && !empty($rediator['tmp_b_left']) ? $rediator['tmp_b_left'] : null),
-                    'tmp_b_right' => (isset($rediator['tmp_b_right']) && !empty($rediator['tmp_b_right']) ? $rediator['tmp_b_right'] : null),
-                    'tmp_a_top' => (isset($rediator['tmp_a_top']) && !empty($rediator['tmp_a_top']) ? $rediator['tmp_a_top'] : null),
-                    'tmp_a_bottom' => (isset($rediator['tmp_a_bottom']) && !empty($rediator['tmp_a_bottom']) ? $rediator['tmp_a_bottom'] : null),
-                    'tmp_a_left' => (isset($rediator['tmp_a_left']) && !empty($rediator['tmp_a_left']) ? $rediator['tmp_a_left'] : null),
-                    'tmp_a_right' => (isset($rediator['tmp_a_right']) && !empty($rediator['tmp_a_right']) ? $rediator['tmp_a_right'] : null)
-                ]);
-            endforeach;
-
-            return response()->json(['msg' => 'Power Flush Radiators Details successfully updated.', 'saved' => 1], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeSignatures(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        
-        $gasPowerFlush = GasPowerFlushRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-
-            'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
-            'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
-            'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
-            'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasPowerFlush->id);
-        
-        if($request->input('sign') !== null):
-            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
-            $signatureData = base64_decode($signatureData);
-            if(strlen($signatureData) > 2621):
-                $gasPowerFlush->deleteSignature();
-                
-                $imageName = 'signatures/' . Str::uuid() . '.png';
-                Storage::disk('public')->put($imageName, $signatureData);
-                $signature = new Signature();
-                $signature->model_type = GasPowerFlushRecord::class;
-                $signature->model_id = $gasPowerFlush->id;
-                $signature->uuid = Str::uuid();
-                $signature->filename = $imageName;
-                $signature->document_filename = null;
-                $signature->certified = false;
-                $signature->from_ips = json_encode([request()->ip()]);
-                $signature->save();
-            endif;
-        endif;
-
-        return response()->json(['msg' => 'Gas Power Flush Record Successfully Saved.', 'saved' => 1, 'red' => route('records.gas.power.flush.record.show', $gasPowerFlush->id)], 200);
     }
 
     public function store(Request $request){
@@ -249,7 +88,7 @@ class GasPowerFlushRecordController extends Controller
         $pdf = $this->generatePdf($gpfr_id);
         if($submit_type == 2):
             $data = [];
-            $data['status'] = 'Approved';
+            $data['status'] = 'Approved & Sent';
 
             GasPowerFlushRecord::where('id', $gpfr_id)->update($data);
             
@@ -1009,7 +848,7 @@ class GasPowerFlushRecordController extends Controller
                 endif;
             endif;
 
-            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gas.power.flush.record.show', $gasPowerFlush->id)], 200);
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.gas.power.flush.record.show', $gasPowerFlush->id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
         endif;

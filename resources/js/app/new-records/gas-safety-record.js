@@ -440,7 +440,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         if($.isEmptyObject(errors)){
             axios({
                 method: "post",
-                url: route('records.gsr.store.new'),
+                url: route('new.records.gsr.store.new'),
                 data: formData,
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {

@@ -186,7 +186,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         if($.isEmptyObject(errors)){
             axios({
                 method: "post",
-                url: route('records.gjsr.store.new'),
+                url: route('new.records.gjsr.store.new'),
                 data: formData,
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
@@ -301,7 +301,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         if(action == 'DELETEDOC'){
             axios({
                 method: 'delete',
-                url: route('records.gjsr.destroy.document', row_id),
+                url: route('new.records.gjsr.destroy.document', row_id),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
                 if (response.status == 200) {

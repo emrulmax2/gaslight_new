@@ -77,10 +77,11 @@ import INTAddressLookUps from '../../address_lookup.js';
     $(document).on('click', '.jobBlock', function(e){
         e.preventDefault();
         let $thejobBlock = $(this);
+        let job_form_id = $('#certificateForm [name="job_form_id"]').val();
         
         $.ajax({
             type: 'POST',
-            data: {},
+            data: {job_form_id : job_form_id},
             url: route('new.records.get.jobs'),
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             async: false,
@@ -524,6 +525,23 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('#certificate_id').val(0);
     }
     /* Auto Load Certificate Edit Data End */
+
+    /* Auto Load Invoice Edit Data Start */
+    if(localStorage.invoice_id && localStorage.getItem('invoice_id') > 0){
+        $('#invoice_id').val(localStorage.getItem('invoice_id'));
+        if(localStorage.invoiceDetails){
+            let invoiceDetails = localStorage.getItem('invoiceDetails');
+            let invoiceObj = JSON.parse(invoiceDetails);
+
+            $('#non_vat_invoice').val((invoiceObj.non_vat_invoice ? invoiceObj.non_vat_invoice : '0'))
+            $('#vat_number').val((invoiceObj.vat_number ? invoiceObj.vat_number : ''))
+            $('#issued_date').val((invoiceObj.issued_date ? invoiceObj.issued_date : getTodayDate()))
+            
+        }
+    }else{
+        $('#invoice_id').val(0);
+    }
+    /* Auto Load Invoice Edit Data End */
 
 
     

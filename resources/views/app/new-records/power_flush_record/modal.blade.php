@@ -95,40 +95,32 @@
                         <h2 class="mb-4 mt-4 font-medium text-base leading-none tracking-normal">If microbore system</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Are twin entry radiator valves fitted</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atervf_yes" name="twin_radiator_vlv_fitted" {{ (isset($gpfrc->twin_radiator_vlv_fitted) && $gpfrc->twin_radiator_vlv_fitted == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atervf_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atervf_no" name="twin_radiator_vlv_fitted" {{ (isset($gpfrc->twin_radiator_vlv_fitted) && $gpfrc->twin_radiator_vlv_fitted == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atervf_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Are twin entry radiator valves fitted</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atervf_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atervf_yes" name="twin_radiator_vlv_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atervf_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atervf_no" name="twin_radiator_vlv_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>If so, are all radiators completely warm when boiler fired</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_isaarcwwbf_yes" name="completely_warm_on_fired" {{ (isset($gpfrc->completely_warm_on_fired) && $gpfrc->completely_warm_on_fired == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_isaarcwwbf_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_isaarcwwbf_no" name="completely_warm_on_fired" {{ (isset($gpfrc->completely_warm_on_fired) && $gpfrc->completely_warm_on_fired == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_isaarcwwbf_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">If so, are all radiators completely warm when boiler fired</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_isaarcwwbf_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_isaarcwwbf_yes" name="completely_warm_on_fired" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_isaarcwwbf_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_isaarcwwbf_no" name="completely_warm_on_fired" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -137,21 +129,17 @@
                         <h2 class="mb-4 mt-4 font-medium text-base leading-none tracking-normal">If single pipe system</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Is there circulation (heat) to all radiators</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_itchtar_yes" name="circulation_for_all_readiators" {{ (isset($gpfrc->circulation_for_all_readiators) && $gpfrc->circulation_for_all_readiators == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_itchtar_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_itchtar_no" name="circulation_for_all_readiators" {{ (isset($gpfrc->circulation_for_all_readiators) && $gpfrc->circulation_for_all_readiators == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_itchtar_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Is there circulation (heat) to all radiators</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_itchtar_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_itchtar_yes" name="circulation_for_all_readiators" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_itchtar_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_itchtar_no" name="circulation_for_all_readiators" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -160,21 +148,17 @@
                         <h2 class="mb-4 mt-4 font-medium text-base leading-none tracking-normal">If elderly steel pipework</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Is system sufficiently sound to power flush</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_issstpf_yes" name="suffifiently_sound" {{ (isset($gpfrc->suffifiently_sound) && $gpfrc->suffifiently_sound == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_issstpf_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_issstpf_no" name="suffifiently_sound" {{ (isset($gpfrc->suffifiently_sound) && $gpfrc->suffifiently_sound == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_issstpf_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Is system sufficiently sound to power flush</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_issstpf_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_issstpf_yes" name="suffifiently_sound" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_issstpf_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_issstpf_no" name="suffifiently_sound" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -205,78 +189,62 @@
                         </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Are they getting warm</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atgw_yes" name="getting_warm" {{ (isset($gpfrc->getting_warm) && $gpfrc->getting_warm == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atgw_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atgw_no" name="getting_warm" {{ (isset($gpfrc->getting_warm) && $gpfrc->getting_warm == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atgw_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Are they getting warm</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atgw_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atgw_yes" name="getting_warm" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atgw_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atgw_no" name="getting_warm" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Are TRV's fitted</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atrvf_yes" name="are_trvs_fitted" {{ (isset($gpfrc->are_trvs_fitted) && $gpfrc->are_trvs_fitted == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atrvf_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atrvf_no" name="are_trvs_fitted" {{ (isset($gpfrc->are_trvs_fitted) && $gpfrc->are_trvs_fitted == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atrvf_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Are TRV's fitted</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atrvf_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atrvf_yes" name="are_trvs_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atrvf_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atrvf_no" name="are_trvs_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Any obvious signs of neglect/leak</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_aosonl_yes" name="sign_of_neglect" {{ (isset($gpfrc->sign_of_neglect) && $gpfrc->sign_of_neglect == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_aosonl_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_aosonl_no" name="sign_of_neglect" {{ (isset($gpfrc->sign_of_neglect) && $gpfrc->sign_of_neglect == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_aosonl_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Any obvious signs of neglect/leak</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_aosonl_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_aosonl_yes" name="sign_of_neglect" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_aosonl_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_aosonl_no" name="sign_of_neglect" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Do all thermostic radiator valves (TRV's) open fully</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_datrvof_yes" name="radiator_open_fully" {{ (isset($gpfrc->radiator_open_fully) && $gpfrc->radiator_open_fully == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_datrvof_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_datrvof_no" name="radiator_open_fully" {{ (isset($gpfrc->radiator_open_fully) && $gpfrc->radiator_open_fully == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_datrvof_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Do all thermostic radiator valves (TRV's) open fully</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_datrvof_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_datrvof_yes" name="radiator_open_fully" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_datrvof_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_datrvof_no" name="radiator_open_fully" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -289,21 +257,17 @@
                         <x-base.form-input value="{{ (isset($gpfrc->number_of_valves) ? $gpfrc->number_of_valves : '') }}" name="number_of_valves" class="w-full h-[35px] rounded-[3px]" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Location</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atzvl_yes" name="valves_located" {{ (isset($gpfrc->valves_located) && $gpfrc->valves_located == 'Airing Cupboard' ? 'Checked' : '') }} value="Airing Cupboard" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atzvl_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    Airing Cupboard
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_atzvl_no" name="valves_located" {{ (isset($gpfrc->valves_located) && $gpfrc->valves_located == 'Elsewhere' ? 'Checked' : '') }} value="Elsewhere" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_atzvl_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    Elsewhere
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Location</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_atzvl_yes">Airing Cupboard</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atzvl_yes" name="valves_located" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Airing Cupboard"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_datrvof_no">Elsewhere</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_atzvl_no" name="valves_located" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Elsewhere"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -316,21 +280,17 @@
                         <x-base.form-input value="{{ (isset($gpfrc->fe_tank_location) ? $gpfrc->fe_tank_location : '') }}" name="fe_tank_location" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label>Checked</x-base.form-label>
-                        <div class="flex justify-start items-center">
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_fetnkck_yes" name="fe_tank_checked" {{ (isset($gpfrc->fe_tank_checked) && $gpfrc->fe_tank_checked == 'Yes' ? 'Checked' : '') }} value="Yes" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_fetnkck_yes" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="success">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    YES
-                                </x-base.button>
-                            </div>
-                            <div class="radioItem mr-[3px]">
-                                <input id="gwn_fetnkck_no" name="fe_tank_checked" {{ (isset($gpfrc->fe_tank_checked) && $gpfrc->fe_tank_checked == 'No' ? 'Checked' : '') }} value="No" type="radio" class="absolute w-0 h-0 opacity-0" />
-                                <x-base.button as="label" for="gwn_fetnkck_no" size="sm" class="text-white text-sm px-3 py-1 text-[12px] rounded-[3px]" variant="danger">
-                                    <x-base.lucide class="h-3 w-3 mr-1.5 checked" icon="check-circle"/><x-base.lucide class="h-3 w-3 mr-1.5 unchecked" icon="x-circle"/>
-                                    NO
-                                </x-base.button>
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Checked</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_fetnkck_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_fetnkck_yes" name="fe_tank_checked" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_fetnkck_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_fetnkck_no" name="fe_tank_checked" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -361,40 +321,42 @@
                         </x-base.form-select>
                     </div>
                     <div class="col-span-12">
-                        <x-base.table bordered sm id="invoiceItemsTable">
-                            <x-base.table.thead class="max-sm:hidden">
-                                <x-base.table.tr>
-                                    <x-base.table.th class="whitespace-normal text-left">Test Parameter</x-base.table.th>
-                                    <x-base.table.th class="whitespace-normal text-left">pH</x-base.table.th>
-                                    <x-base.table.th class="whitespace-normal text-left">chloride (ppm)</x-base.table.th>
-                                    <x-base.table.th class="whitespace-normal text-left">Hardness</x-base.table.th>
-                                    <x-base.table.th class="whitespace-normal text-left">Inhibitor (ppm molybdate)</x-base.table.th>
-                                </x-base.table.tr>
-                            </x-base.table.thead>
-                            <x-base.table.tbody>
-                                <x-base.table.tr>
-                                    <x-base.table.th class="whitespace-normal text-left">Mains water</x-base.table.th>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->mw_ph) ? $gpfrc->mw_ph : '') }}" name="mw_ph" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->mw_chloride) ? $gpfrc->mw_chloride : '') }}" name="mw_chloride" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->mw_hardness) ? $gpfrc->mw_hardness : '') }}" name="mw_hardness" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->mw_inhibitor) ? $gpfrc->mw_inhibitor : '') }}" name="mw_inhibitor" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                </x-base.table.tr>
-                                <x-base.table.tr>
-                                    <x-base.table.th class="whitespace-normal text-left">System water before PowerFlush</x-base.table.th>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->bpf_ph) ? $gpfrc->bpf_ph : '') }}" name="bpf_ph" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->bpf_chloride) ? $gpfrc->bpf_chloride : '') }}" name="bpf_chloride" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->bpf_hardness) ? $gpfrc->bpf_hardness : '') }}" name="bpf_hardness" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->bpf_inhibitor) ? $gpfrc->bpf_inhibitor : '') }}" name="bpf_inhibitor" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                </x-base.table.tr>
-                                <x-base.table.tr>
-                                    <x-base.table.th class="whitespace-normal text-left">System water after PowerFlush</x-base.table.th>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->apf_ph) ? $gpfrc->apf_ph : '') }}" name="apf_ph" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->apf_chloride) ? $gpfrc->apf_chloride : '') }}" name="apf_chloride" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->apf_hardness) ? $gpfrc->apf_hardness : '') }}" name="apf_hardness" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                    <x-base.table.td class="whitespace-normal text-left"><x-base.form-input value="{{ (isset($gpfrc->apf_inhibitor) ? $gpfrc->apf_inhibitor : '') }}" name="apf_inhibitor" class="w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
-                                </x-base.table.tr>
-                            </x-base.table.tbody>
-                        </x-base.table>
+                        <div class="overflow-x-auto">
+                            <x-base.table bordered sm>
+                                <x-base.table.thead>
+                                    <x-base.table.tr>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">Test Parameter</x-base.table.th>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">pH</x-base.table.th>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">chloride (ppm)</x-base.table.th>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">Hardness</x-base.table.th>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">Inhibitor (ppm molybdate)</x-base.table.th>
+                                    </x-base.table.tr>
+                                </x-base.table.thead>
+                                <x-base.table.tbody>
+                                    <x-base.table.tr>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">Mains water</x-base.table.th>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="mw_ph" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="mw_chloride" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="mw_hardness" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="mw_inhibitor" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                    </x-base.table.tr>
+                                    <x-base.table.tr>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">System water before PowerFlush</x-base.table.th>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="bpf_ph" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="bpf_chloride" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="bpf_hardness" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="bpf_inhibitor" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                    </x-base.table.tr>
+                                    <x-base.table.tr>
+                                        <x-base.table.th class="whitespace-normal text-left max-sm:text-xs max-sm:p-1">System water after PowerFlush</x-base.table.th>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="apf_ph" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="apf_chloride" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="apf_hardness" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                        <x-base.table.td class="whitespace-normal text-left max-sm:p-1"><x-base.form-input value="" name="apf_inhibitor" class="w-[80px] sm:w-full h-[30px] rounded-[3px]" type="text" placeholder="" /></x-base.table.td>
+                                    </x-base.table.tr>
+                                </x-base.table.tbody>
+                            </x-base.table>
+                        </div>
                     </div>
 
                     <div class="col-span-12">

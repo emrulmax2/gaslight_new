@@ -60,7 +60,7 @@ class GasJobSheetController extends Controller
         endif;
 
         $thePdf = $this->generatePdf($gjsr->id);
-        return view('app.records.'.$record.'.show', [
+        return view('app.new-records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Record', 'href' => 'javascript:void(0);'],
@@ -73,107 +73,6 @@ class GasJobSheetController extends Controller
             'signature' => $gjsr->signature ? Storage::disk('public')->url($gjsr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
-    }
-
-    public function storeDetails(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasJobSheetRecord = GasJobSheetRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasJobSheetRecord->id);
-        
-        if($gasJobSheetRecord->id):
-            $gasJobShetDetails = GasJobSheetRecordDetail::updateOrCreate(['gas_job_sheet_record_id' => $gasJobSheetRecord->id], [
-                'gas_job_sheet_record_id' => $gasJobSheetRecord->id,
-                
-                'date' => (isset($request->date) && !empty($request->date) ? date('Y-m-d', strtotime($request->date)) : null),
-                'job_note' => (isset($request->job_note) && !empty($request->job_note) ? $request->job_note : null),
-                'spares_required' => (isset($request->spares_required) && !empty($request->spares_required) ? $request->spares_required : null),
-                'job_ref' => (isset($request->job_ref) && !empty($request->job_ref) ? $request->job_ref : null),
-                'arrival_time' => (isset($request->arrival_time) && !empty($request->arrival_time) ? $request->arrival_time : null),
-                'departure_time' => (isset($request->departure_time) && !empty($request->departure_time) ? $request->departure_time : null),
-                'hours_used' => (isset($request->hours_used) && !empty($request->hours_used) ? $request->hours_used : null),
-                'awaiting_parts' => (isset($request->awaiting_parts) && !empty($request->awaiting_parts) ? $request->awaiting_parts : null),
-                'job_completed' => (isset($request->job_completed) && !empty($request->job_completed) ? $request->job_completed : null),
-
-                'updated_by' => $user_id,
-            ]);
-
-            if($request->hasFile('job_sheet_files')):
-                $documents = $request->file('job_sheet_files');
-                foreach($documents as $document):
-                    $documentName = $gasJobSheetRecord->id.'_'.$document->getClientOriginalName();
-                    $path = $document->storeAs('gjsr/'.$customer_job_id.'/'.$job_form_id, $documentName, 'public');
-
-                    $data = [];
-                    $data['gas_job_sheet_record_id'] = $gasJobSheetRecord->id;
-                    $data['name'] = $documentName;
-                    $data['path'] = Storage::disk('public')->url($path);
-                    $data['mime_type'] = $document->getClientMimeType();
-                    $data['size'] = $document->getSize();
-                    GasJobSheetRecordDocument::create($data);
-                endforeach;
-            endif;
-
-            return response()->json(['msg' => 'Job Sheet Details successfully updated.', 'saved' => 1], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeSignatures(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        
-        $gasJobSheetRecord = GasJobSheetRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-
-            'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
-            'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
-            'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasJobSheetRecord->id);
-        
-        if($request->input('sign') !== null):
-            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
-            $signatureData = base64_decode($signatureData);
-            if(strlen($signatureData) > 2621):
-                $gasJobSheetRecord->deleteSignature();
-                
-                $imageName = 'signatures/' . Str::uuid() . '.png';
-                Storage::disk('public')->put($imageName, $signatureData);
-                $signature = new Signature();
-                $signature->model_type = GasJobSheetRecord::class;
-                $signature->model_id = $gasJobSheetRecord->id;
-                $signature->uuid = Str::uuid();
-                $signature->filename = $imageName;
-                $signature->document_filename = null;
-                $signature->certified = false;
-                $signature->from_ips = json_encode([request()->ip()]);
-                $signature->save();
-            endif;
-        endif;
-
-        return response()->json(['msg' => 'Gas Job Sheet Record Successfully Saved.', 'saved' => 1, 'red' => route('records.gjsr.show', $gasJobSheetRecord->id)], 200);
     }
 
     public function store(Request $request){
@@ -189,7 +88,7 @@ class GasJobSheetController extends Controller
         $pdf = $this->generatePdf($gjsr_id);
         if($submit_type == 2):
             $data = [];
-            $data['status'] = 'Approved';
+            $data['status'] = 'Approved & Sent';
 
             GasJobSheetRecord::where('id', $gjsr_id)->update($data);
             
@@ -1220,7 +1119,7 @@ class GasJobSheetController extends Controller
                 endif;
             endif;
 
-            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.gjsr.show', $gasJobSheetRecord->id)], 200);
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.gjsr.show', $gasJobSheetRecord->id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
         endif;

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Records;
 use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
+use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
+use App\Models\ExistingRecordDraft;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JobForm;
@@ -12,6 +15,7 @@ use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\Quote;
 use App\Models\QuoteItem;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,81 +23,85 @@ use Illuminate\Support\Number;
 
 class QuoteController extends Controller
 {
-    public function store(Request $request){
-        $submit_type = (isset($request->submit_type) && !empty($request->submit_type) ? $request->submit_type : 1);
-        $customer_job_id = $request->customer_job_id;
-        $customer_id = $request->customer_id;
-        $job_form_id = $request->job_form_id;
-        $quote_id = $request->quote_id;
+    public function checkAndUpdateRecordHistory($record_id){
+        $record = Quote::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => Quote::class, 'model_id' => $record_id ], [
+            'customer_id' => $record->customer_id,
+            'customer_job_id' => $record->customer_job_id,
+            'job_form_id' => $record->job_form_id,
+            'model_type' => Quote::class,
+            'model_id' => $record->id,
+
+            'created_by' => $record->created_by,
+            'updated_by' => auth()->user()->id,
+        ]); 
+    }
+
+    public function show(Quote $qut){
         $user_id = auth()->user()->id;
+        $qut->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
+        $form = JobForm::find($qut->job_form_id);
+        $record = $form->slug;
 
-        $data = [
-            'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : null),
-            'reference_no' => (isset($request->reference_no) && !empty($request->reference_no) ? $request->reference_no : null),
-            'non_vat_quote' => (isset($request->non_vat_quote) && $request->non_vat_quote > 0 ? $request->non_vat_quote : 0),
-            'notes' => (!empty($request->notes) ? $request->notes : null),
-            'payment_term' => (!empty($request->payment_term) ? $request->payment_term : null),
-            
-            'updated_by' => $user_id
-        ];
-        if($submit_type != 1):
-            $data['status'] = 'Approved';
-        endif;
-        $quote = Quote::where('id', $quote_id)->update($data);
+        if(empty($qut->quote_number)):
+            $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
+            $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+            $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+            $userLastQuote = Quote::where('customer_job_id', $qut->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $lastQuoteNo = (isset($userLastQuote->quote_number) && !empty($userLastQuote->quote_number) ? $userLastQuote->quote_number : '');
 
-        /* Update Quote Items */
-        QuoteItem::where('quote_id', $quote_id)->forceDelete();
-        $qot = (isset($request->qot) && !empty($request->qot) ? $request->qot : []);
-        if(!empty($qot)):
-            $discount = (isset($qot['discount']) && !empty($qot['discount']) ? $qot['discount'] : []);
-            foreach($qot as $type => $item):
-                if($type != 'discount'):
-                    $units = (isset($item['units']) && $item['units'] > 0 ? $item['units'] : 0);
-                    $unit_price = (isset($item['unit_price']) && $item['unit_price'] > 0 ? $item['unit_price'] : 0);
-                    $vat_rate = (isset($item['vat_rate']) && $item['vat_rate'] > 0 ? $item['vat_rate'] : 0);
-                    $vat_amount = (isset($item['vat_amount']) && $item['vat_amount'] > 0 ? $item['vat_amount'] : 0);
-                    QuoteItem::create([
-                        'quote_id' => $quote_id,
-                        'type' => 'Default',
-                        'description' => (isset($item['descritpion']) && !empty($item['descritpion']) ? $item['descritpion'] : 'Quote Item'),
-                        'units' => $units,
-                        'unit_price' => $unit_price,
-                        'vat_rate' => $vat_rate,
-                        'vat_amount' => $vat_amount,
-                        
-                        'created_by' => $user_id,
-                        'updated_by' => $user_id,
-                    ]);
-                endif;
-            endforeach;
-            if(!empty($discount)):
-                $units = (isset($discount['units']) && $discount['units'] > 0 ? $discount['units'] : 0);
-                $unit_price = (isset($discount['unit_price']) && $discount['unit_price'] > 0 ? $discount['unit_price'] : 0);
-                $vat_rate = (isset($discount['vat_rate']) && $discount['vat_rate'] > 0 ? $discount['vat_rate'] : 0);
-                $vat_amount = (isset($discount['vat_amount']) && $discount['vat_amount'] > 0 ? $discount['vat_amount'] : 0);
-                QuoteItem::create([
-                    'quote_id' => $quote_id,
-                    'type' => 'Discount',
-                    'description' => (isset($discount['description']) && !empty($discount['description']) ? $discount['description'] : 'Discount'),
-                    'units' => $units,
-                    'unit_price' => $unit_price,
-                    'vat_rate' => $vat_rate,
-                    'vat_amount' => $vat_amount,
-                    
-                    'created_by' => $user_id,
-                    'updated_by' => $user_id,
-                ]);
+            $qutSerial = $starting_form;
+            if(!empty($lastQuoteNo)):
+                preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+                $qutSerial = (int) $quoteNumbers[1] + 1;
             endif;
+            $quoteNumber = $prifix.str_pad($qutSerial, 6, '0', STR_PAD_LEFT);
+            Quote::where('id', $qut->id)->update(['quote_number' => $quoteNumber]);
         endif;
-        
-        $pdf = $this->generatePDF($quote_id);
-        $emailNote = 'Quote has been approved and email successfully sent to the customer.';
-        if($submit_type == 3):
-            $email = $this->sendEmail($quote_id, $job_form_id);
-            $emailNote = (!$email ? 'Quote has been approved. Email cannot be sent due to an invalid or empty email address.' : $emailNote);
+
+        $thePdf = $this->generatePdf($qut->id);
+        return view('app.new-records.'.$record.'.show', [
+            'title' => 'Records - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Record', 'href' => 'javascript:void(0);'],
+                ['label' => $form->name, 'href' => 'javascript:void(0);'],
+            ],
+            'form' => $form,
+            'qut' => $qut,
+            'thePdf' => $thePdf,
+            'hasInvoice' => Invoice::where('customer_job_id', $qut->customer_job_id)->get()->count()
+        ]);
+    }
+
+
+    public function store(Request $request){
+        $qut_id = $request->qut_id;
+        $customer_job_id = $request->customer_job_id;
+        $job_form_id = $request->job_form_id;
+        $submit_type = $request->submit_type;
+        $qut = Quote::find($qut_id);
+
+        $red = '';
+        $pdf = Storage::disk('public')->url('quotes/'.$qut->customer_job_id.'/'.$qut->job_form_id.'/'.$qut->quote_number.'.pdf');
+        $message = '';
+        $pdf = $this->generatePdf($qut_id);
+        if($submit_type == 2):
+            $data = [];
+            $data['status'] = 'Approved & Sent';
+
+            Quote::where('id', $qut_id)->update($data);
+            
+            $email = $this->sendEmail($qut_id, $job_form_id);
+            $message = (!$email ? 'Quote has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Quote has been approved and a copy of the certificate mailed to the customer');
+        else:
+            $data = [];
+            $data['status'] = 'Approved';
+
+            Quote::where('id', $qut_id)->update($data);
+            $message = 'Quote successfully approved.';
         endif;
-        $message = ($submit_type == 3 ? $emailNote : ($submit_type == 2 ? 'Quote has been approved.' : 'Quote successfully generated'));
-        return response()->json(['msg' => $message, 'red' => '', 'pdf' => $pdf], 200);
+
+        return response()->json(['msg' => $message, 'red' => route('company.dashboard'), 'pdf' => $pdf]);
     }
 
 
@@ -486,9 +494,242 @@ class QuoteController extends Controller
                     ]);
                 endforeach;
             endif;
-            return response()->json(['msg' => 'Quote successfully converted to invoice.', 'red' => route('records', ['invoice', $customer_job_id])], 200);
+
+            $record = Invoice::with('customer', 'customer.contact', 'job', 'job.property')->find($invoice->id);
+            $invoiceItems = InvoiceItem::where('invoice_id', $invoice->id)->where('type', 'Default')->orderBy('id', 'ASC')->get();
+            $discountItems = InvoiceItem::where('invoice_id', $invoice->id)->where('type', 'Discount')->orderBy('id', 'ASC')->get()->first();
+            $nonVatInvoice = (isset($record->non_vat_invoice) && $record->non_vat_invoice == 1 ? true : false);
+
+            $data = [
+                'invoice_id' => $record->id,
+                'invoiceDetails' => [
+                    'invoice_number' => (isset($record->invoice_number) && !empty($record->invoice_number) ? $record->invoice_number : ''),
+                    'issued_date' => (isset($record->issued_date) && !empty($record->issued_date) ? date('d-m-Y', strtotime($record->issued_date)) : ''),
+                    'non_vat_invoice' => (isset($record->non_vat_invoice) && !empty($record->non_vat_invoice) ? $record->non_vat_invoice : ''),
+                    'vat_number' => (isset($record->vat_number) && !empty($record->vat_number) ? $record->vat_number : ''),
+                ],
+                'invoiceNotes' => (isset($record->notes) && !empty($record->notes) ? $record->notes : ''),
+                'job' => $record->job,
+                'customer' => $record->customer,
+                'job_address' => $record->job->property,
+                'occupant' => [
+                    'customer_property_occupant_id' => $record->job->property->id,
+                    'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                    'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                    'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+                ],
+                'invoiceNumber' => (isset($record->invoice_number) && !empty($record->invoice_number) ? $record->invoice_number : '')
+            ];
+    
+            if($invoiceItems->count() > 0):
+                $i = 1;
+                foreach($invoiceItems as $item):
+                    $units = (isset($item->units) && !empty($item->units) ? $item->units : 1);
+                    $price = (isset($item->unit_price) && !empty($item->unit_price) ? $item->unit_price : 0);
+                    $vat_rat = (isset($item->vat_rate) && !empty($item->vat_rate) ? $item->vat_rate : 0);
+    
+                    $itemTotal = $units * $price;
+                    $vatTotal = ($itemTotal * $vat_rat) / 100;
+                    $lineTotal = ($nonVatInvoice ? $itemTotal : $itemTotal + $vatTotal);
+    
+                    $data['invoiceItems'][$i] = [
+                        'inv_item_title' => (isset($item->description) && !empty($item->description) ? $item->description : $i.' Line Item'),
+                        'description' => (isset($item->description) && !empty($item->description) ? $item->description : $i.' Line Item'),
+                        'units' => (isset($item->units) && !empty($item->units) ? $item->units : 1),
+                        'price' => (isset($item->unit_price) && !empty($item->unit_price) ? $item->unit_price : 0),
+                        'vat' => (isset($item->vat_rate) && !empty($item->vat_rate) ? $item->vat_rate : 0),
+                        'line_total' => $lineTotal,
+                    ];
+                    $i++;
+                endforeach;
+                $data['invoiceItemsCount'] = $invoiceItems->count();
+            endif;
+    
+            if(isset($discountItems->id) && $discountItems->id > 0):
+                $data['invoiceDiscounts'] = [
+                    'inv_item_title' => 'Discount',
+                    'amount' => (isset($discountItems->unit_price) && $discountItems->unit_price > 0 ? $discountItems->unit_price : 0),
+                    'vat' => (isset($discountItems->vat_rate) && $discountItems->vat_rate > 0 ? $discountItems->vat_rate : ''),
+                ];
+            endif;
+    
+            if(isset($record->advance_amount) && $record->advance_amount > 0):
+                $data['invoiceAdvance'] = [
+                    'advance_amount' => (isset($record->advance_amount) && $record->advance_amount > 0 ? $record->advance_amount : ''),
+                    'payment_method_id' => (isset($record->payment_method_id) && $record->payment_method_id > 0 ? $record->payment_method_id : ''),
+                    'advance_pay_date' => (isset($record->advance_date) && !empty($record->advance_date) ? date('d-m-Y', strtotime($record->advance_date)) : ''),
+                ];
+            endif;
+    
+            return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.', 'red' => ''], 422);
         endif;
+    }
+
+    
+    public function storeNew(Request $request){
+        $user_id = auth()->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $quote_id = (isset($request->quote_id) && $request->quote_id > 0 ? $request->quote_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+        
+        $nonVatInvoice = (isset($request->non_vat_quote) && $request->non_vat_quote == 1 ? true : false);
+        $quoteItems = json_decode($request->quoteItems);
+        $quoteDiscounts = json_decode($request->quoteDiscounts);
+        $quoteNotes = $request->quoteNotes;
+
+        if($customer_job_id == 0):
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+
+        if($customer_job_id > 0):
+            $job = CustomerJob::find($customer_job_id);
+            $quote = Quote::updateOrCreate(['id' => $quote_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+
+                'quote_number' => $request->quote_number,
+                'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d')),
+                'reference_no' => (isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : null),
+                'non_vat_quote' => ($nonVatInvoice ? 1 : 0),
+                'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                'notes' => (!empty($quoteNotes) ? $quoteNotes : null),
+                'payment_term' => (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null),
+                
+                'updated_by' => $user_id,
+            ]);
+            $this->checkAndUpdateRecordHistory($quote->id);
+
+            QuoteItem::where('quote_id', $quote->id)->forceDelete();
+            if(!empty($quoteItems)):
+                foreach($quoteItems as $key => $item):
+                    $units = (isset($item->units) && $item->units > 0 ? $item->units : 0);
+                    $unit_price = (isset($item->price) && $item->price > 0 ? $item->price : 0);
+                    $vat_rate = (isset($item->vat) && $item->vat > 0 ? $item->vat : 0);
+                    
+                    $item_total = $unit_price * $units;
+                    $vat_amount = ($item_total * $vat_rate) / 100;
+
+                    QuoteItem::create([
+                        'quote_id' => $quote->id,
+                        'type' => 'Default',
+                        'description' => (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item'),
+                        'units' => $units,
+                        'unit_price' => $unit_price,
+                        'vat_rate' => $vat_rate,
+                        'vat_amount' => $vat_amount,
+                        
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                    ]);
+                endforeach;
+            endif;
+
+            if(!empty($quoteDiscounts)):
+                $units = 1;
+                $unit_price = (isset($quoteDiscounts->amount) && $quoteDiscounts->amount > 0 ? $quoteDiscounts->amount : 0);
+                $vat_rate = (isset($item->vat) && $item->vat > 0 ? $item->vat : 0);
+                
+                $vat_amount = ($unit_price * $vat_rate) / 100;
+
+                QuoteItem::create([
+                    'quote_id' => $quote->id,
+                    'type' => 'Discount',
+                    'description' => 'Discount',
+                    'units' => $units,
+                    'unit_price' => $unit_price,
+                    'vat_rate' => $vat_rate,
+                    'vat_amount' => $vat_amount,
+                    
+                    'created_by' => $user_id,
+                    'updated_by' => $user_id,
+                ]);
+            endif;
+
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('quote.show', $quote->id)], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function editReady(Request $request){
+        $record_id = $request->record_id;
+
+        $record = Quote::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $quoteItems = QuoteItem::where('quote_id', $record_id)->where('type', 'Default')->orderBy('id', 'ASC')->get();
+        $discountItems = QuoteItem::where('quote_id', $record_id)->where('type', 'Discount')->orderBy('id', 'ASC')->get()->first();
+        $nonVatInvoice = (isset($record->non_vat_quote) && $record->non_vat_quote == 1 ? true : false);
+
+        $data = [
+            'quote_id' => $record->id,
+            'quoteDetails' => [
+                'quote_number' => (isset($record->quote_number) && !empty($record->quote_number) ? $record->quote_number : ''),
+                'issued_date' => (isset($record->issued_date) && !empty($record->issued_date) ? date('d-m-Y', strtotime($record->issued_date)) : ''),
+                'non_vat_quote' => (isset($record->non_vat_quote) && !empty($record->non_vat_quote) ? $record->non_vat_quote : ''),
+                'vat_number' => (isset($record->vat_number) && !empty($record->vat_number) ? $record->vat_number : ''),
+            ],
+            'quoteNotes' => (isset($record->notes) && !empty($record->notes) ? $record->notes : ''),
+            'job' => $record->job,
+            'customer' => $record->customer,
+            'job_address' => $record->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $record->job->property->id,
+                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
+                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
+                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+            ],
+            'quoteNumber' => (isset($record->quote_number) && !empty($record->quote_number) ? $record->quote_number : '')
+        ];
+
+        if($quoteItems->count() > 0):
+            $i = 1;
+            foreach($quoteItems as $item):
+                $units = (isset($item->units) && !empty($item->units) ? $item->units : 1);
+                $price = (isset($item->unit_price) && !empty($item->unit_price) ? $item->unit_price : 0);
+                $vat_rat = (isset($item->vat_rate) && !empty($item->vat_rate) ? $item->vat_rate : 0);
+
+                $itemTotal = $units * $price;
+                $vatTotal = ($itemTotal * $vat_rat) / 100;
+                $lineTotal = ($nonVatInvoice ? $itemTotal : $itemTotal + $vatTotal);
+
+                $data['quoteItems'][$i] = [
+                    'inv_item_title' => (isset($item->description) && !empty($item->description) ? $item->description : $i.' Line Item'),
+                    'description' => (isset($item->description) && !empty($item->description) ? $item->description : $i.' Line Item'),
+                    'units' => (isset($item->units) && !empty($item->units) ? $item->units : 1),
+                    'price' => (isset($item->unit_price) && !empty($item->unit_price) ? $item->unit_price : 0),
+                    'vat' => (isset($item->vat_rate) && !empty($item->vat_rate) ? $item->vat_rate : 0),
+                    'line_total' => $lineTotal,
+                ];
+                $i++;
+            endforeach;
+            $data['quoteItemsCount'] = $quoteItems->count();
+        endif;
+
+        if(isset($discountItems->id) && $discountItems->id > 0):
+            $data['quoteDiscounts'] = [
+                'inv_item_title' => 'Discount',
+                'amount' => (isset($discountItems->unit_price) && $discountItems->unit_price > 0 ? $discountItems->unit_price : 0),
+                'vat' => (isset($discountItems->vat_rate) && $discountItems->vat_rate > 0 ? $discountItems->vat_rate : ''),
+            ];
+        endif;
+
+        return response()->json(['row' => $data, 'red' => route('new.records.create', $record->job_form_id)], 200);
     }
 }

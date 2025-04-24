@@ -60,7 +60,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
         endif;
 
         $thePdf = $this->generatePdf($guhwcr->id);
-        return view('app.records.'.$record.'.show', [
+        return view('app.new-records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Record', 'href' => 'javascript:void(0);'],
@@ -73,151 +73,6 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
             'signature' => $guhwcr->signature ? Storage::disk('public')->url($guhwcr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
-    }
-
-    public function storeSystem(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasUnvenHotWtrCylindrRecord = GasUnventedHotWaterCylinderRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasUnvenHotWtrCylindrRecord->id);
-
-        $saved = 0;
-        if($gasUnvenHotWtrCylindrRecord->id):
-            $guhwcrSystem = GasUnventedHotWaterCylinderRecordSystem::updateOrCreate(['gas_unvented_hot_water_cylinder_record_id' => $gasUnvenHotWtrCylindrRecord->id], [
-                'gas_unvented_hot_water_cylinder_record_id' => $gasUnvenHotWtrCylindrRecord->id,
-                
-                'type' => (isset($request->type) && !empty($request->type) ? $request->type : null),
-                'make' => (isset($request->make) && !empty($request->make) ? $request->make : null),
-                'model' => (isset($request->model) && !empty($request->model) ? $request->model : null),
-                'location' => (isset($request->location) && !empty($request->location) ? $request->location : null),
-                'serial_no' => (isset($request->serial_no) && !empty($request->serial_no) ? $request->serial_no : null),
-                'gc_number' => (isset($request->gc_number) && !empty($request->gc_number) ? $request->gc_number : null),
-                'direct_or_indirect' => (isset($request->direct_or_indirect) && !empty($request->direct_or_indirect) ? $request->direct_or_indirect : null),
-                'boiler_solar_immersion' => (isset($request->boiler_solar_immersion) && !empty($request->boiler_solar_immersion) ? $request->boiler_solar_immersion : null),
-                'capacity' => (isset($request->capacity) && !empty($request->capacity) ? $request->capacity : null),
-                'warning_label_attached' => (isset($request->warning_label_attached) && !empty($request->warning_label_attached) ? $request->warning_label_attached : null),
-                'water_pressure' => (isset($request->water_pressure) && !empty($request->water_pressure) ? $request->water_pressure : null),
-                'flow_rate' => (isset($request->flow_rate) && !empty($request->flow_rate) ? $request->flow_rate : null),
-                'fully_commissioned' => (isset($request->fully_commissioned) && !empty($request->fully_commissioned) ? $request->fully_commissioned : null),
-                
-                'updated_by' => $user_id,
-            ]);
-
-            return response()->json(['msg' => 'Unvented Hot Water System Details successfully updated.', 'saved' => 1], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeInspection(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        $gasUnvenHotWtrCylindrRecord = GasUnventedHotWaterCylinderRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasUnvenHotWtrCylindrRecord->id);
-
-        $saved = 0;
-        if($gasUnvenHotWtrCylindrRecord->id):
-            $guhwcrInspection = GasUnventedHotWaterCylinderRecordInspection::updateOrCreate(['gas_unvented_hot_water_cylinder_record_id' => $gasUnvenHotWtrCylindrRecord->id], [
-                'gas_unvented_hot_water_cylinder_record_id' => $gasUnvenHotWtrCylindrRecord->id,
-                
-                'system_opt_pressure' => (isset($request->system_opt_pressure) && !empty($request->system_opt_pressure) ? $request->system_opt_pressure : null),
-                'opt_presure_exp_vsl' => (isset($request->opt_presure_exp_vsl) && !empty($request->opt_presure_exp_vsl) ? $request->opt_presure_exp_vsl : null),
-                'opt_presure_exp_vlv' => (isset($request->opt_presure_exp_vlv) && !empty($request->opt_presure_exp_vlv) ? $request->opt_presure_exp_vlv : null),
-                'tem_relief_vlv' => (isset($request->tem_relief_vlv) && !empty($request->tem_relief_vlv) ? $request->tem_relief_vlv : null),
-                'opt_temperature' => (isset($request->opt_temperature) && !empty($request->opt_temperature) ? $request->opt_temperature : null),
-                'combined_temp_presr' => (isset($request->combined_temp_presr) && !empty($request->combined_temp_presr) ? $request->combined_temp_presr : null),
-                'max_circuit_presr' => (isset($request->max_circuit_presr) && !empty($request->max_circuit_presr) ? $request->max_circuit_presr : null),
-                'flow_temp' => (isset($request->flow_temp) && !empty($request->flow_temp) ? $request->flow_temp : null),
-                'd1_mormal_size' => (isset($request->d1_mormal_size) && !empty($request->d1_mormal_size) ? $request->d1_mormal_size : null),
-                'd1_length' => (isset($request->d1_length) && !empty($request->d1_length) ? $request->d1_length : null),
-                'd1_discharges_no' => (isset($request->d1_discharges_no) && !empty($request->d1_discharges_no) ? $request->d1_discharges_no : null),
-                'd1_manifold_size' => (isset($request->d1_manifold_size) && !empty($request->d1_manifold_size) ? $request->d1_manifold_size : null),
-                'd1_is_tundish_install_same_location' => (isset($request->d1_is_tundish_install_same_location) && !empty($request->d1_is_tundish_install_same_location) ? $request->d1_is_tundish_install_same_location : null),
-                'd1_is_tundish_visible' => (isset($request->d1_is_tundish_visible) && !empty($request->d1_is_tundish_visible) ? $request->d1_is_tundish_visible : null),
-                'd1_is_auto_dis_intall' => (isset($request->d1_is_auto_dis_intall) && !empty($request->d1_is_auto_dis_intall) ? $request->d1_is_auto_dis_intall : null),
-                'd2_mormal_size' => (isset($request->d2_mormal_size) && !empty($request->d2_mormal_size) ? $request->d2_mormal_size : null),
-                'd2_pipework_material' => (isset($request->d2_pipework_material) && !empty($request->d2_pipework_material) ? $request->d2_pipework_material : null),
-                'd2_minimum_v_length' => (isset($request->d2_minimum_v_length) && !empty($request->d2_minimum_v_length) ? $request->d2_minimum_v_length : null),
-                'd2_fall_continuously' => (isset($request->d2_fall_continuously) && !empty($request->d2_fall_continuously) ? $request->d2_fall_continuously : null),
-                'd2_termination_method' => (isset($request->d2_termination_method) && !empty($request->d2_termination_method) ? $request->d2_termination_method : null),
-                'd2_termination_satisfactory' => (isset($request->d2_termination_satisfactory) && !empty($request->d2_termination_satisfactory) ? $request->d2_termination_satisfactory : null),
-                'comments' => (isset($request->comments) && !empty($request->comments) ? $request->comments : null),
-                
-                'updated_by' => $user_id,
-            ]);
-
-            return response()->json(['msg' => 'Inspection Details successfully updated.', 'saved' => 1], 200);
-        else:
-            return response()->json(['msg' => 'Something went wrong. Please try later or contact with the Administrator.'], 422);
-        endif;
-    }
-
-    public function storeSignatures(Request $request){
-        $customer_job_id = $request->customer_job_id;
-        $job_form_id = $request->job_form_id;
-
-        $job = CustomerJob::with('customer', 'customer.contact', 'property')->find($customer_job_id);
-        $form = JobForm::find($job_form_id);
-        $user_id = auth()->user()->id;
-
-        
-        $gasServiceRecord = GasUnventedHotWaterCylinderRecord::updateOrCreate([ 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
-            'customer_id' => $job->customer_id,
-            'customer_job_id' => $customer_job_id,
-            'job_form_id' => $job_form_id,
-
-            'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
-            'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
-            'received_by' => (isset($request->received_by) && !empty($request->received_by) ? $request->received_by : null),
-            'relation_id' => (isset($request->relation_id) && !empty($request->relation_id) ? $request->relation_id : null),
-            
-            'updated_by' => $user_id,
-        ]);
-        $this->checkAndUpdateRecordHistory($gasServiceRecord->id);
-        
-        if($request->input('sign') !== null):
-            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
-            $signatureData = base64_decode($signatureData);
-            if(strlen($signatureData) > 2621):
-                $gasServiceRecord->deleteSignature();
-                
-                $imageName = 'signatures/' . Str::uuid() . '.png';
-                Storage::disk('public')->put($imageName, $signatureData);
-                $signature = new Signature();
-                $signature->model_type = GasUnventedHotWaterCylinderRecord::class;
-                $signature->model_id = $gasServiceRecord->id;
-                $signature->uuid = Str::uuid();
-                $signature->filename = $imageName;
-                $signature->document_filename = null;
-                $signature->certified = false;
-                $signature->from_ips = json_encode([request()->ip()]);
-                $signature->save();
-            endif;
-        endif;
-
-        return response()->json(['msg' => 'Unvented Hot Water Cylinder Record Successfully Saved.', 'saved' => 1, 'red' => route('records.guhwcr.show', $gasServiceRecord->id)], 200);
     }
 
     public function store(Request $request){
@@ -233,7 +88,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
         $pdf = $this->generatePdf($guhwcr_id);
         if($submit_type == 2):
             $data = [];
-            $data['status'] = 'Approved';
+            $data['status'] = 'Approved & Sent';
 
             GasUnventedHotWaterCylinderRecord::where('id', $guhwcr_id)->update($data);
             
@@ -1029,7 +884,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
                 endif;
             endif;
 
-            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('records.guhwcr.show', $gasUnvenHWCRecord->id)], 200);
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.guhwcr.show', $gasUnvenHWCRecord->id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
         endif;
