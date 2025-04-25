@@ -424,18 +424,18 @@ import INTAddressLookUps from '../../address_lookup.js';
         }else{
             errors['appliance_error'] = 'Please add at least one appliance.';
         }
-        if(localStorage.safetyChecks){
-            let safetyChecks = localStorage.getItem('safetyChecks');
-            formData.append('safetyChecks', safetyChecks);
-        }else{
-            errors['satisfy_checks'] = 'Please insert satisfactory checks.';
-        }
-        if(localStorage.gsrComments){
-            let gsrComments = localStorage.getItem('gsrComments');
-            formData.append('gsrComments', gsrComments);
-        }else{
-            errors['gsr_comments'] = 'Please update comments form.';
-        }
+        // if(localStorage.safetyChecks){
+        //     let safetyChecks = localStorage.getItem('safetyChecks');
+        //     formData.append('safetyChecks', safetyChecks);
+        // }else{
+        //     errors['satisfy_checks'] = 'Please insert satisfactory checks.';
+        // }
+        // if(localStorage.gsrComments){
+        //     let gsrComments = localStorage.getItem('gsrComments');
+        //     formData.append('gsrComments', gsrComments);
+        // }else{
+        //     errors['gsr_comments'] = 'Please update comments form.';
+        // }
 
         if($.isEmptyObject(errors)){
             axios({
@@ -489,9 +489,9 @@ import INTAddressLookUps from '../../address_lookup.js';
                 $("#warningModal .warningModalDesc").html((messages != '' ? messages : 'Appliance, Safety checks, or Comments can not be empty.'));
             });
 
-            setTimeout(() => {
-                warningModal.hide();
-            }, 1500);
+            // setTimeout(() => {
+            //     warningModal.hide();
+            // }, 1500);
         }
     })
 

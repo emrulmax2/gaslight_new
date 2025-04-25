@@ -104,6 +104,7 @@ class JobController extends Controller
     }
 
     public function create(){
+        $user = User::find(auth()->user()->id);
         return view('app.jobs.create', [
             'title' => 'Jobs - Gas Certificate APP',
             'breadcrumbs' => [
@@ -114,7 +115,8 @@ class JobController extends Controller
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
             'customers' => Customer::with('title')->where('created_by', auth()->user()->id)->orderBy('full_name', 'asc')->get(),
-            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get()
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
+            'hasVat' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? true : false)
         ]);
     }
 
@@ -158,6 +160,7 @@ class JobController extends Controller
     }
 
     public function show(CustomerJob $job){
+        $user = User::find(auth()->user()->id);
         $job->load(['customer', 'property', 'property.customer', 'customer.contact']);
         return view('app.jobs.show', [
             'title' => 'Jobs - Gas Certificate APP',
@@ -169,7 +172,8 @@ class JobController extends Controller
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
             'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
-            'job' => $job
+            'job' => $job,
+            'hasVat' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? true : false)
         ]);
     }
 

@@ -71,7 +71,7 @@
                         </div>
                         <div class="grid grid-cols-12 gap-x-6 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="estimated_amount">Estimated Job Value (Excluding VAT)</x-base.form-label>
+                                <x-base.form-label for="estimated_amount">Estimated Job Value {{ !$hasVat ? '(Excluding VAT)' : '' }}</x-base.form-label>
                                 <x-base.form-input step="any" name="estimated_amount" id="estimated_amount" class="w-full" type="number" placeholder="0.00" />
                             </div>
                             <div class="col-span-12 sm:col-span-4">

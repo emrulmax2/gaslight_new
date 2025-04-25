@@ -271,6 +271,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('new-records/get-invoice-no/', 'getInvoiceNumber')->name('new.records.get.invoice.number');
         Route::post('new-records/get-quote-no/', 'getQuoteNumber')->name('new.records.get.quote.number');
+
+        Route::post('new-records/get-customers/', 'getCustomers')->name('new.records.get.customers');
+        Route::post('new-records/get-linked-customer/', 'getLInkedCustomer')->name('new.records.linked.customer');
     });
     
     Route::controller(InvoiceController::class)->group(function(){

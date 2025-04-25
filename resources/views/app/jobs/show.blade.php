@@ -35,7 +35,7 @@
                         </div>
                         <div class="grid grid-cols-12 gap-x-6 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="estimated_amount">Estimated Job Value (Excluding VAT)</x-base.form-label>
+                                <x-base.form-label for="estimated_amount">Estimated Job Value {{ !$hasVat ? '(Excluding VAT)' : '' }}</x-base.form-label>
                                 <x-base.form-input value="{{ (!empty($job->estimated_amount) ? $job->estimated_amount : '') }}" step="any" name="estimated_amount" id="estimated_amount" class="w-full" type="number" placeholder="0.00" />
                             </div>
                             <div class="col-span-12 sm:col-span-4">
@@ -154,9 +154,9 @@
                     </div>
                 </div>
                 <div class="intro-y box p-5">
-                    <x-base.button type="button" class="mb-3 w-full text-white" variant="twitter" data-tw-toggle="modal" data-tw-target="#jobActionsListModal">
+                    <!-- <x-base.button type="button" class="mb-3 w-full text-white" variant="twitter" data-tw-toggle="modal" data-tw-target="#jobActionsListModal">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />Create
-                    </x-base.button>
+                    </x-base.button> -->
                     <x-base.button type="submit" id="jobUpdateBtn" class="text-white w-full mb-3" variant="success">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
                         Update Job
@@ -166,10 +166,10 @@
                         <x-base.lucide class="mr-2 h-4 w-4" icon="layers" />
                         Existing Records & Drafts
                     </x-base.button>
-                    <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs', ['record' => request()->record]) :  route('jobs')) }}" class="w-full" variant="danger">
+                    <!-- <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs', ['record' => request()->record]) :  route('jobs')) }}" class="w-full" variant="danger">
                         <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
                         Cancel
-                    </x-base.button>
+                    </x-base.button> -->
                     <x-base.form-input type="hidden" value="{{ $job->id }}" name="customer_job_id" />
                 </div>
             </div>

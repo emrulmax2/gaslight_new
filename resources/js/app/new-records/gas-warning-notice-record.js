@@ -243,9 +243,9 @@ import INTAddressLookUps from '../../address_lookup.js';
                 $("#warningModal .warningModalDesc").html((messages != '' ? messages : 'Appliance, Safety checks, or Comments can not be empty.'));
             });
 
-            setTimeout(() => {
-                warningModal.hide();
-            }, 3000);
+            // setTimeout(() => {
+            //     warningModal.hide();
+            // }, 3000);
         }
     })
 

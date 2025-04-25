@@ -11,6 +11,7 @@ import INTAddressLookUps from '../../address_lookup.js';
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const customerJobAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerJobAddressModal"));
     const addJobAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobAddressModal"));
+    const customerListModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerListModal"));
 
     const jobAddressOccupantModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#jobAddressOccupantModal"));
     const addJobAddressOccupantModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobAddressOccupantModal"));
@@ -39,6 +40,10 @@ import INTAddressLookUps from '../../address_lookup.js';
 
     document.getElementById("linkedJobModal").addEventListener("hide.tw.modal", function (event) {
         $('#linkedJobModal .linkedJobListWrap').html('');
+    });
+
+    document.getElementById("customerListModal").addEventListener("hide.tw.modal", function (event) {
+        $('#customerListModal .customersListWrap').html('');
     });
 
     document.getElementById("customerJobAddressModal").addEventListener("hide.tw.modal", function (event) {
@@ -234,6 +239,95 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(0);
         })
     }
+    $('.customerBlock').on('click', function(e){
+        e.preventDefault();
+        let $theCustomerBlock = $(this);
+        let job_form_id = $('#certificateForm [name="job_form_id"]').val();
+        
+        $.ajax({
+            type: 'POST',
+            data: {job_form_id : job_form_id},
+            url: route('new.records.get.customers'),
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            async: false,
+            success: function(data) {
+                customerListModal.show();
+                document.getElementById("customerListModal").addEventListener("shown.tw.modal", function (event) {
+                    $('#customerListModal .customersListWrap').html(data.html);
+                });
+            },
+            error:function(e){
+                console.log('Error');
+            }
+        });
+    });
+    $('#customerListModal').on('click', '.customerItem', function(e){
+        e.preventDefault();
+        let $theCustomer = $(this);
+
+        if(!$theCustomer.hasClass('disabled')){
+            $('#customerListModal .customerItem').addClass('disabled')
+
+            $theCustomer.find('.theIcon').fadeOut();
+            $theCustomer.find('.theLoader').fadeIn();
+
+            let theCustomerId = $theCustomer.attr('data-id');
+            let theCustomerDescription = $theCustomer.attr('data-description');
+
+            
+            $.ajax({
+                type: 'POST',
+                data: {customer_id : theCustomerId},
+                url: route('new.records.linked.customer'),
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                async: false,
+                success: function(data) {
+                    $theCustomer.find('.theLoader').fadeOut();
+                    $theCustomer.find('.theIcon').fadeIn();
+
+                    let customerObj = data.customer;
+                        customer_id = customerObj.id;
+                        job_id = 0;
+                    localStorage.setItem('customer', JSON.stringify(customerObj));
+                    localStorage.removeItem('job');
+                    localStorage.removeItem('job_address');
+                    localStorage.removeItem('occupant');
+
+                    let customerAddress = '';
+                    customerAddress += (customerObj.address_line_1 != null ? customerObj.address_line_1+' ' : '');
+                    customerAddress += (customerObj.address_line_2 != null ? customerObj.address_line_2+', ' : '');
+                    customerAddress += (customerObj.city != null ? customerObj.city+', ' : '');
+                    customerAddress += (customerObj.state != null ? customerObj.state+', ' : '');
+                    customerAddress += (customerObj.postal_code != null ? customerObj.postal_code : '');
+
+                    $('.jobWrap').find('.theDesc').html('Click here to select a job').removeClass('font-medium');
+                    $('.jobWrap').find('.theId').val(0);
+
+                    $('.customerWrap').find('.theDesc').html(customerObj.full_name).addClass('font-medium');
+                    $('.customerWrap').find('.theId').val(customer_id);
+
+                    $('.customerAddressWrap').fadeIn('fast', function(){
+                        $('.theDesc', this).html(customerAddress).addClass('font-medium');
+                        $('.theId', this).val(0);
+                    })
+                    $('.customerPropertyWrap').fadeIn('fast', function(){
+                        $('.theDesc', this).html('Click here to add job address').removeClass('font-medium');
+                        $('.theId', this).val(0);
+                    })
+
+                    $('.customerPropertyOccupantWrap').fadeOut('fast', function(){
+                        $('.theDesc', this).html('Click here to add job address occupant').removeClass('font-medium');
+                        $('.theId', this).val(0);
+                    })
+
+                    customerListModal.hide();
+                },
+                error:function(e){
+                    console.log('Error');
+                }
+            });
+        }
+    });
     /* On Load Check & Set Customer End */
 
     /* On Click Add Customer Address Start */
@@ -479,8 +573,16 @@ import INTAddressLookUps from '../../address_lookup.js';
     $('.relationBlock').on('click', function(e){
         e.preventDefault();
         let $theBtn = $(this);
+        let relation_id = $('#relation_id').val();
 
         relationModal.show();
+        document.getElementById('relationModal').addEventListener('shown.tw.modal', function(event){
+            if(relation_id > 0){
+                $('#relationModal #relation_'+relation_id).prop('checked', true);
+            }else{
+                $('#relationModal .relation_item').prop('checked', false);
+            }
+        });
     });
     $('#relationModal').on('change', '.relation_item', function(){
         let $theRelation = $('#relationModal .relation_item:checked');

@@ -809,6 +809,7 @@ class GasPowerFlushRecordController extends Controller
                 ]);
 
                 $appliance_serial = (isset($radiators->appliance_serial) && $radiators->appliance_serial > 0 ? $radiators->appliance_serial : 1);
+                GasPowerFlushRecordRediator::where('gas_power_flush_record_id', $gasPowerFlush->id)->forceDelete();
                 if(!empty($radiators)):
                     foreach($radiators as $serial => $radiator):
                         $gasPowerFlushRadiator = GasPowerFlushRecordRediator::create([
