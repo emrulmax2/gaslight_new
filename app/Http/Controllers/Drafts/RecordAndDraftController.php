@@ -110,12 +110,21 @@ class RecordAndDraftController extends Controller
         if(!empty($Query)):
             $i = 1;
             foreach($Query as $list):
+                $certificate_number = '';
+                if(isset($list->model->certificate_number) && !empty($list->model->certificate_number)):
+                    $certificate_number = $list->model->certificate_number;
+                elseif(isset($list->model->invoice_number) && !empty($list->model->invoice_number)):
+                    $certificate_number = $list->model->quote_number;
+                elseif(isset($list->model->quote_number) && !empty($list->model->quote_number)):
+                    $certificate_number = $list->model->quote_number;
+                endif;
                 $data[] = [
                     'id' => $i,
                     'landlord_name' => $list->customer->full_name ?? '',
                     'landlord_address' => $list->customer->full_address ?? '',
                     'inspection_address' => $list->job->property->full_address ?? '',
                     'certificate_type' => $list->form->name ?? '',
+                    'certificate_number' => $certificate_number,
                     'created_at' => $list->model->created_at ? $list->model->created_at->format('jS M, Y \<b\r\/> \a\t h:i a') : '',
                     'status' => $list->model->status ?? '',
                     'actions' => $list->id,

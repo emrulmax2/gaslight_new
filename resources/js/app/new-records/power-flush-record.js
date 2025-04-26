@@ -370,6 +370,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         const $theForm = $(this);
         let formData = new FormData(form);
         
+        
         $('#saveCertificateBtn', $theForm).attr('disabled', 'disabled');
         $("#saveCertificateBtn .theLoader").fadeIn();
 
@@ -435,7 +436,7 @@ import INTAddressLookUps from '../../address_lookup.js';
                     messages += value+' ';
                 }
             }
-
+            
             $('#saveCertificateBtn', $theForm).removeAttr('disabled');
             $("#saveCertificateBtn .theLoader").fadeOut();
 

@@ -20,6 +20,27 @@
 </x-base.dialog>
 <!-- END: Job Linked Modal Content -->
 
+ <!-- BEGIN: Job Linked Modal Content -->
+<x-base.dialog id="customerListModal" staticBackdrop>
+    <x-base.dialog.panel class="rounded-none">
+        <form method="post" action="#" id="customerListForm">
+            <x-base.dialog.title>
+                <h2 class="mr-auto text-base font-medium">Customers</h2>
+                <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+            </x-base.dialog.title>
+            <x-base.dialog.description class="bg-slate-200 py-2">
+                <div class="relative mb-2">
+                    <a href="{{ route('customers.create') }}" data-key="record_url" data-value="{{ url()->current() }}"class="theStorageTrigger text-primary flex justify-between items-center p-3 bg-white mt-2 text-base">Add Customer<x-base.lucide class="ml-auto h-4 w-4" icon="plus-circle" /></a>
+                </div>
+                <div class="customersListWrap overflow-x-hidden overflow-y-auto" style="max-height: 75vh;">
+                    
+                </div>
+            </x-base.dialog.description>
+        </form>
+    </x-base.dialog.panel>
+</x-base.dialog>
+<!-- END: Job Linked Modal Content -->
+
 <!-- BEGIN: Job Address Modal Content -->
 <x-base.dialog id="customerJobAddressModal" staticBackdrop>
     <x-base.dialog.panel class="rounded-none">
@@ -131,21 +152,13 @@
                     <div class="acc__input-error error-occupant_name text-danger text-xs mt-1"></div>
                 </div>
                 <div class="mb-3">
-                    <x-base.form-label for="occupant_phone">Phone <span class="text-danger">*</span></x-base.form-label>
+                    <x-base.form-label for="occupant_phone">Phone</x-base.form-label>
                     <x-base.form-input name="occupant_phone" id="occupant_phone" class="w-full" type="text" placeholder="Phone" />
                     <div class="acc__input-error error-occupant_phone text-danger text-xs mt-1"></div>
                 </div>
                 <div class="mb-3">
                     <x-base.form-label for="occupant_email">Email</x-base.form-label>
                     <x-base.form-input name="occupant_email" id="occupant_email" class="w-full" type="email" placeholder="Email Address" />
-                </div>
-                <h2 class="text-base font-medium mb-2 pt-5">Gas Service Due Date</h2>
-                <div class="mb-3">
-                    <x-base.litepicker name="due_date" id="due_date" class="block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />
-                </div>
-                <div>
-                    <h2 class="text-base font-medium mb-2">Note</h2>
-                    <x-base.form-textarea name="note" id="note" class="w-full h-[80px]" placeholder="Note..."></x-base.form-textarea>
                 </div>
             </x-base.dialog.description>
             <x-base.dialog.footer>
@@ -172,9 +185,9 @@
             <x-base.dialog.description class="p-0">
                 @if($relations->count() > 0)
                     @foreach($relations as $rel)
-                        <x-base.form-check class="cursor-pointer font-medium ml-0 p-3 border-b">
-                            <x-base.form-check.label class="font-medium ml-0" for="relation_{{ $rel->id}}">{{ $rel->name }}</x-base.form-check.label>
-                            <x-base.form-check.input id="relation_{{ $rel->id}}" name="relation_item" class="relation_item ml-auto" type="radio" data-label="{{ $rel->name }}" value="{{ $rel->id }}"/>
+                        <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 relative border-b">
+                            <x-base.form-check.label class="font-medium ml-0 block w-full py-2" for="relation_{{ $rel->id}}">{{ $rel->name }}</x-base.form-check.label>
+                            <x-base.form-check.input id="relation_{{ $rel->id}}" name="relation_item" class="relation_item absolute right-2 top-0 bottom-0 my-auto" type="radio" data-label="{{ $rel->name }}" value="{{ $rel->id }}"/>
                         </x-base.form-check>
                     @endforeach
                 @endif

@@ -77,6 +77,19 @@ var certificateListTable = (function () {
                 },
             },
             {
+                title: 'Certificate Number',
+                field: 'certificate_number',
+                headerHozAlign: 'left',
+                formatter(cell, formatterParams) { 
+                    var html = '<div class="block whitespace-normal">';
+                    html += '<div class="flex items-start">';
+                        html += (cell.getData().certificate_number != '' ? '<div class="text-slate-500 text-xs">'+cell.getData().certificate_number+'</div>' : '');
+                        html += '</div>';
+                    html += '</div>';
+                return html;
+                },
+            },
+            {
                 title: 'Certificate Type',
                 field: 'certificate_type',
                 headerHozAlign: 'left',

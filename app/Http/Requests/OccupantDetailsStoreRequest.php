@@ -23,7 +23,7 @@ class OccupantDetailsStoreRequest extends FormRequest
     {
         return [
             'occupant_name' => 'required',
-            'occupant_phone' => 'required'
+            //'occupant_phone' => 'required'
         ];
     }
 }
