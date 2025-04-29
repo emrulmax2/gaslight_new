@@ -61,6 +61,11 @@ class NewRecordController extends Controller
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
             $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['flue_types'] = ApplianceFlueType::where('active', 1)->orderBy('name', 'ASC')->get();
+        elseif($form->slug == 'landlord_gas_safety_record'):
+            $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();
+            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+            $data['flue_types'] = ApplianceFlueType::where('active', 1)->orderBy('name', 'ASC')->get();
         elseif($form->slug == 'gas_warning_notice'):
             $data['locations'] = ApplianceLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['boilers'] = BoilerBrand::orderBy('name', 'ASC')->get();

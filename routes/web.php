@@ -49,6 +49,7 @@ use App\Http\Controllers\Records\GasWarningNoticeController;
 use App\Http\Controllers\Records\HomeOwnerGasSafetyController;
 
 use App\Http\Controllers\Records\InvoiceController;
+use App\Http\Controllers\Records\LandlordGasSafetyController;
 use App\Http\Controllers\Records\NewRecordController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
@@ -299,6 +300,14 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('new-records/homeowner_gas_safety_record/store-new', 'storeNew')->name('new.records.gsr.store.new');
         Route::post('new-records/homeowner_gas_safety_record/edit-ready', 'editReady')->name('new.records.gsr.edit.ready.new');
+    });
+    
+    Route::controller(LandlordGasSafetyController::class)->group(function(){
+        Route::get('new-records/landlord-gas-safety-record/show/{glsr}', 'show')->name('new.records.glsr.view');
+        Route::post('new-records/landlord-gas-safety-record/store/{glsr}', 'store')->name('new.records.glsr.store');
+
+        Route::post('new-records/landlord-gas-safety-record/store-new', 'storeNew')->name('new.records.glsr.store.new');
+        Route::post('new-records/landlord-gas-safety-record/edit-ready', 'editReady')->name('new.records.glsr.edit.ready.new');
     });
     
     Route::controller(GasWarningNoticeController::class)->group(function(){

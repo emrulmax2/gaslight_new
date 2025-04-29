@@ -72,7 +72,7 @@
                     <input type="hidden" name="customer_property_id" value="0" class="theId"/>
                 </a>
             </div>
-            {{--<div class="px-2 py-3 mt-2 customerPropertyOccupantWrap bg-white" style="display: none;">
+            <div class="px-2 py-3 mt-2 customerPropertyOccupantWrap bg-white" style="display: none;">
                 <a href="javascript:void(0);" class="flex justify-between items-center cursor-pointer customerPropertyOccupantBlock">
                     <div>
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Occupant's Details</div>
@@ -81,7 +81,7 @@
                     <span style="flex: 0 0 16px; margin-left: 20px;"><x-base.lucide class="h-4 w-4 text-success" icon="chevron-right" /></span>
                     <input type="hidden" name="customer_property_occupant_id" value="0" class="theId"/>
                 </a>
-            </div>--}}
+            </div>
         </div>
 
         <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2">
@@ -236,7 +236,7 @@
 
     <!-- END: HTML Table Data -->
 
-    @include('app.new-records.homeowner_gas_safety_record.appliance-modal')
+    @include('app.new-records.landlord_gas_safety_record.modal')
     @include('app.new-records.modal')
     @include('app.action-modals')
 @endsection
@@ -259,5 +259,5 @@
 
 @pushOnce('scripts')
     @vite('resources/js/app/new-records/create.js')
-    @vite('resources/js/app/new-records/homeowner-gas-safety-record.js')
+    @vite('resources/js/app/new-records/landlord-gas-safety-record.js')
 @endPushOnce

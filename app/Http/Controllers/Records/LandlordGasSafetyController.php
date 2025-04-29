@@ -5,32 +5,29 @@ namespace App\Http\Controllers\Records;
 use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
-use App\Models\Company;
-use App\Models\Customer;
-use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
-use App\Models\GasSafetyRecord;
-use App\Models\GasSafetyRecordAppliance;
+use App\Models\GasLandlordSafetyRecord;
+use App\Models\GasLandlordSafetyRecordAppliance;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
-use Creagia\LaravelSignPad\Signature;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Creagia\LaravelSignPad\Signature;
 use Illuminate\Support\Str;
-use Barryvdh\DomPDF\Facade\Pdf;
 
-class HomeOwnerGasSafetyController extends Controller
+class LandlordGasSafetyController extends Controller
 {
     public function checkAndUpdateRecordHistory($record_id){ 
-        $record = GasSafetyRecord::find($record_id);
-        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasSafetyRecord::class, 'model_id' => $record_id ], [
+        $record = GasLandlordSafetyRecord::find($record_id);
+        $existingRD = ExistingRecordDraft::updateOrCreate([ 'model_type' => GasLandlordSafetyRecord::class, 'model_id' => $record_id ], [
             'customer_id' => $record->customer_id,
             'customer_job_id' => $record->customer_job_id,
             'job_form_id' => $record->job_form_id,
-            'model_type' => GasSafetyRecord::class,
+            'model_type' => GasLandlordSafetyRecord::class,
             'model_id' => $record->id,
 
             'created_by' => $record->created_by,
@@ -38,17 +35,17 @@ class HomeOwnerGasSafetyController extends Controller
         ]);
     }
 
-    public function show(GasSafetyRecord $gsr){
+    public function show(GasLandlordSafetyRecord $glsr){
         $user_id = auth()->user()->id;
-        $gsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
-        $form = JobForm::find($gsr->job_form_id);
+        $glsr->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
+        $form = JobForm::find($glsr->job_form_id);
         $record = $form->slug;
 
-        if(empty($gsr->certificate_number)):
+        if(empty($glsr->certificate_number)):
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
             $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
             $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
-            $userLastCertificate = GasSafetyRecord::where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $userLastCertificate = GasLandlordSafetyRecord::where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
             $lastCertificateNo = (isset($userLastCertificate->certificate_number) && !empty($userLastCertificate->certificate_number) ? $userLastCertificate->certificate_number : '');
 
             $cerSerial = $starting_form;
@@ -57,10 +54,10 @@ class HomeOwnerGasSafetyController extends Controller
                 $cerSerial = (int) $certificateNumbers[1] + 1;
             endif;
             $certificateNumber = $prifix.str_pad($cerSerial, 6, '0', STR_PAD_LEFT);
-            GasSafetyRecord::where('id', $gsr->id)->update(['certificate_number' => $certificateNumber]);
+            GasLandlordSafetyRecord::where('id', $glsr->id)->update(['certificate_number' => $certificateNumber]);
         endif;
 
-        $thePdf = $this->generatePdf($gsr->id);
+        $thePdf = $this->generatePdf($glsr->id);
         return view('app.new-records.'.$record.'.show', [
             'title' => 'Records - Gas Certificate APP',
             'breadcrumbs' => [
@@ -68,61 +65,61 @@ class HomeOwnerGasSafetyController extends Controller
                 ['label' => $form->name, 'href' => 'javascript:void(0);'],
             ],
             'form' => $form,
-            'gsr' => $gsr,
-            'gsra1' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 1)->get()->first(),
-            'gsra2' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 2)->get()->first(),
-            'gsra3' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 3)->get()->first(),
-            'gsra4' => GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 4)->get()->first(),
-            'signature' => $gsr->signature ? Storage::disk('public')->url($gsr->signature->filename) : '',
+            'glsr' => $glsr,
+            'glsra1' => GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 1)->get()->first(),
+            'glsra2' => GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 2)->get()->first(),
+            'glsra3' => GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 3)->get()->first(),
+            'glsra4' => GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 4)->get()->first(),
+            'signature' => $glsr->signature ? Storage::disk('public')->url($glsr->signature->filename) : '',
             'thePdf' => $thePdf
         ]);
     }
 
     public function store(Request $request){
-        $gsr_id = $request->gsr_id;
+        $glsr_id = $request->glsr_id;
         $customer_job_id = $request->customer_job_id;
         $job_form_id = $request->job_form_id;
         $submit_type = $request->submit_type;
-        $gsr = GasSafetyRecord::find($gsr_id);
+        $glsr = GasLandlordSafetyRecord::find($glsr_id);
 
         $red = '';
-        $pdf = Storage::disk('public')->url('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$gsr->certificate_number.'.pdf');
+        $pdf = Storage::disk('public')->url('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$glsr->certificate_number.'.pdf');
         $message = '';
-        $pdf = $this->generatePdf($gsr_id);
+        $pdf = $this->generatePdf($glsr_id);
         if($submit_type == 2):
             $data = [];
             $data['status'] = 'Approved & Sent';
 
-            GasSafetyRecord::where('id', $gsr_id)->update($data);
+            GasLandlordSafetyRecord::where('id', $glsr_id)->update($data);
             
-            $email = $this->sendEmail($gsr_id, $job_form_id);
+            $email = $this->sendEmail($glsr_id, $job_form_id);
             $message = (!$email ? 'Gas Safety Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Gas Safety Certificate has been approved and a copy of the certificate mailed to the customer');
         else:
             $data = [];
             $data['status'] = 'Approved';
 
-            GasSafetyRecord::where('id', $gsr_id)->update($data);
+            GasLandlordSafetyRecord::where('id', $glsr_id)->update($data);
             $message = 'Homewoner Gas Safety Certificate successfully approved.';
         endif;
 
         return response()->json(['msg' => $message, 'red' => route('company.dashboard'), 'pdf' => $pdf]);
     }
 
-    public function generatePdf($gsr_id) {
+    public function generatePdf($glsr_id) {
         $user_id = auth()->user()->id;
-        $gsr = GasSafetyRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gsr_id);
-        $gsra1 = GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 1)->get()->first();
-        $gsra2 = GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 2)->get()->first();
-        $gsra3 = GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 3)->get()->first();
-        $gsra4 = GasSafetyRecordAppliance::where('gas_safety_record_id', $gsr->id)->where('appliance_serial', 4)->get()->first();
+        $glsr = GasLandlordSafetyRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($glsr_id);
+        $glsra1 = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 1)->get()->first();
+        $glsra2 = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 2)->get()->first();
+        $glsra3 = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 3)->get()->first();
+        $glsra4 = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 4)->get()->first();
 
         $logoPath = resource_path('images/gas_safe_register_dark.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
-        $userSignBase64 = (isset($gsr->user->signature) && Storage::disk('public')->exists($gsr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gsr->user->signature->filename)) : '');
-        $signatureBase64 = ($gsr->signature && Storage::disk('public')->exists($gsr->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gsr->signature->filename)) : '');
+        $userSignBase64 = (isset($glsr->user->signature) && Storage::disk('public')->exists($glsr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($glsr->user->signature->filename)) : '');
+        $signatureBase64 = ($glsr->signature && Storage::disk('public')->exists($glsr->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($glsr->signature->filename)) : '');
 
-        $report_title = 'Certificate of '.$gsr->certificate_number;
+        $report_title = 'Certificate of '.$glsr->certificate_number;
         $PDFHTML = '';
         $PDFHTML .= '<html>';
             $PDFHTML .= '<head>';
@@ -275,7 +272,7 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
-                                    $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Homeowner Gas Safety Record</h1>';
+                                    $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Landlord Gas Safety Record</h1>';
                                     $PDFHTML .= '<div class="text-white text-12px leading-1-3">';
                                         $PDFHTML .= 'This inspection is for gas safety purposes only to comply with the Gas Safety (Installation and Use) Regulations. Flues have been inspected visually and checked for satisfactory evacuation of products of combustion
                                                     A detailed internal inspection of the flue integrity, construction and lining has NOT been carried out.
@@ -284,7 +281,7 @@ class HomeOwnerGasSafetyController extends Controller
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col2 align-middle text-center">';
                                     $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gsr->certificate_number.'</div>';
+                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$glsr->certificate_number.'</div>';
                                 $PDFHTML .= '</td>';
                             $PDFHTML .= '</tr>';
                         $PDFHTML .= '</tbody>';
@@ -317,15 +314,15 @@ class HomeOwnerGasSafetyController extends Controller
                                                         $PDFHTML .= '<tbody>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Engineer</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->user->name) && !empty($gsr->user->name) ? $gsr->user->name : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($glsr->user->name) && !empty($glsr->user->name) ? $glsr->user->name : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">GAS SAFE REG.</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->gas_safe_registration_no) && !empty($gsr->user->company->gas_safe_registration_no) ? $gsr->user->company->gas_safe_registration_no : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->user->company->gas_safe_registration_no) && !empty($glsr->user->company->gas_safe_registration_no) ? $glsr->user->company->gas_safe_registration_no : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">ID CARD NO.</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->gas_safe_id_card) && !empty($gsr->user->gas_safe_id_card) ? $gsr->user->gas_safe_id_card : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->user->gas_safe_id_card) && !empty($glsr->user->gas_safe_id_card) ? $glsr->user->gas_safe_id_card : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>';
@@ -339,19 +336,19 @@ class HomeOwnerGasSafetyController extends Controller
                                                         $PDFHTML .= '<tbody>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->company_name) && !empty($gsr->user->company->company_name) ? $gsr->user->company->company_name : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->user->company->company_name) && !empty($glsr->user->company->company_name) ? $glsr->user->company->company_name : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->user->company->pdf_address) && !empty($gsr->user->company->pdf_address) ? $gsr->user->company->pdf_address : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($glsr->user->company->pdf_address) && !empty($glsr->user->company->pdf_address) ? $glsr->user->company->pdf_address : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">TEL NO.</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->company_phone) && !empty($gsr->user->company->company_phone) ? $gsr->user->company->company_phone : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->user->company->company_phone) && !empty($glsr->user->company->company_phone) ? $glsr->user->company->company_phone : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                             $PDFHTML .= '<tr>';
                                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Email</td>';
-                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->company_email) && !empty($gsr->user->company->company_email) ? $gsr->user->company->company_email : '').'</td>';
+                                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->user->company->company_email) && !empty($glsr->user->company->company_email) ? $glsr->user->company->company_email : '').'</td>';
                                                             $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '</tbody>';
                                                     $PDFHTML .= '</table>';
@@ -365,15 +362,15 @@ class HomeOwnerGasSafetyController extends Controller
                                         $PDFHTML .= '<tbody>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->job->property->occupant_name) && !empty($gsr->job->property->occupant_name) ? $gsr->job->property->occupant_name : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->job->property->occupant_name) && !empty($glsr->job->property->occupant_name) ? $glsr->job->property->occupant_name : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->job->property->pdf_address) && !empty($gsr->job->property->pdf_address) ? $gsr->job->property->pdf_address : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($glsr->job->property->pdf_address) && !empty($glsr->job->property->pdf_address) ? $glsr->job->property->pdf_address : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->job->property->postal_code) && !empty($gsr->job->property->postal_code) ? $gsr->job->property->postal_code : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->job->property->postal_code) && !empty($glsr->job->property->postal_code) ? $glsr->job->property->postal_code : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>';
@@ -387,19 +384,19 @@ class HomeOwnerGasSafetyController extends Controller
                                         $PDFHTML .= '<tbody>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->customer->full_name) && !empty($glsr->customer->full_name) ? $glsr->customer->full_name : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company Name</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px leading-none align-middle">'.(isset($gsr->customer->company_name) && !empty($gsr->customer->company_name) ? $gsr->customer->company_name : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px leading-none align-middle">'.(isset($glsr->customer->company_name) && !empty($glsr->customer->company_name) ? $glsr->customer->company_name : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->customer->pdf_address) && !empty($gsr->customer->pdf_address) ? $gsr->customer->pdf_address : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($glsr->customer->pdf_address) && !empty($glsr->customer->pdf_address) ? $glsr->customer->pdf_address : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                             $PDFHTML .= '<tr>';
                                                 $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>';
-                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->customer->postal_code) && !empty($gsr->customer->postal_code) ? $gsr->customer->postal_code : '').'</td>';
+                                                $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($glsr->customer->postal_code) && !empty($glsr->customer->postal_code) ? $glsr->customer->postal_code : '').'</td>';
                                             $PDFHTML .= '</tr>';
                                         $PDFHTML .= '</tbody>';
                                     $PDFHTML .= '</table>';
@@ -450,43 +447,43 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">1</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->location->name) && !empty($gsra1->location->name) ? $gsra1->location->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->make->name) && !empty($gsra1->make->name) ? $gsra1->make->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->model) && !empty($gsra1->model) ? $gsra1->model : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->serial_no) && !empty($gsra1->serial_no) ? $gsra1->serial_no : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->flue->name) && !empty($gsra1->flue->name) ? $gsra1->flue->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($gsra1->opt_pressure) && !empty($gsra1->opt_pressure) ? $gsra1->opt_pressure : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->location->name) && !empty($glsra1->location->name) ? $glsra1->location->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->make->name) && !empty($glsra1->make->name) ? $glsra1->make->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->model) && !empty($glsra1->model) ? $glsra1->model : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->type->name) && !empty($glsra1->type->name) ? $glsra1->type->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->serial_no) && !empty($glsra1->serial_no) ? $glsra1->serial_no : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->flue->name) && !empty($glsra1->flue->name) ? $glsra1->flue->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($glsra1->opt_pressure) && !empty($glsra1->opt_pressure) ? $glsra1->opt_pressure : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">2</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->location->name) && !empty($gsra2->location->name) ? $gsra2->location->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->make->name) && !empty($gsra2->make->name) ? $gsra2->make->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->model) && !empty($gsra2->model) ? $gsra2->model : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->type->name) && !empty($gsra2->type->name) ? $gsra2->type->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->serial_no) && !empty($gsra2->serial_no) ? $gsra2->serial_no : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->flue->name) && !empty($gsra2->flue->name) ? $gsra2->flue->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($gsra2->opt_pressure) && !empty($gsra2->opt_pressure) ? $gsra2->opt_pressure : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->location->name) && !empty($glsra2->location->name) ? $glsra2->location->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->make->name) && !empty($glsra2->make->name) ? $glsra2->make->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->model) && !empty($glsra2->model) ? $glsra2->model : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->type->name) && !empty($glsra2->type->name) ? $glsra2->type->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->serial_no) && !empty($glsra2->serial_no) ? $glsra2->serial_no : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->flue->name) && !empty($glsra2->flue->name) ? $glsra2->flue->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($glsra2->opt_pressure) && !empty($glsra2->opt_pressure) ? $glsra2->opt_pressure : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">3</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->location->name) && !empty($gsra3->location->name) ? $gsra3->location->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->make->name) && !empty($gsra3->make->name) ? $gsra3->make->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->model) && !empty($gsra3->model) ? $gsra3->model : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->type->name) && !empty($gsra3->type->name) ? $gsra3->type->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->serial_no) && !empty($gsra3->serial_no) ? $gsra3->serial_no : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->flue->name) && !empty($gsra3->flue->name) ? $gsra3->flue->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($gsra3->opt_pressure) && !empty($gsra3->opt_pressure) ? $gsra3->opt_pressure : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->location->name) && !empty($glsra3->location->name) ? $glsra3->location->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->make->name) && !empty($glsra3->make->name) ? $glsra3->make->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->model) && !empty($glsra3->model) ? $glsra3->model : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->type->name) && !empty($glsra3->type->name) ? $glsra3->type->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->serial_no) && !empty($glsra3->serial_no) ? $glsra3->serial_no : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->flue->name) && !empty($glsra3->flue->name) ? $glsra3->flue->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($glsra3->opt_pressure) && !empty($glsra3->opt_pressure) ? $glsra3->opt_pressure : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">4</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->location->name) && !empty($gsra4->location->name) ? $gsra4->location->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->make->name) && !empty($gsra4->make->name) ? $gsra4->make->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->model) && !empty($gsra4->model) ? $gsra4->model : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->type->name) && !empty($gsra4->type->name) ? $gsra4->type->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->serial_no) && !empty($gsra4->serial_no) ? $gsra4->serial_no : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->flue->name) && !empty($gsra4->flue->name) ? $gsra4->flue->name : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($gsra4->opt_pressure) && !empty($gsra4->opt_pressure) ? $gsra4->opt_pressure : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->location->name) && !empty($glsra4->location->name) ? $glsra4->location->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->make->name) && !empty($glsra4->make->name) ? $glsra4->make->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->model) && !empty($glsra4->model) ? $glsra4->model : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->type->name) && !empty($glsra4->type->name) ? $glsra4->type->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->serial_no) && !empty($glsra4->serial_no) ? $glsra4->serial_no : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->flue->name) && !empty($glsra4->flue->name) ? $glsra4->flue->name : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">'.(isset($glsra4->opt_pressure) && !empty($glsra4->opt_pressure) ? $glsra4->opt_pressure : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -541,51 +538,51 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">1</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->safety_devices) && !empty($gsra1->safety_devices) ? $gsra1->safety_devices : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->spillage_test) && !empty($gsra1->spillage_test) ? $gsra1->spillage_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->smoke_pellet_test) && !empty($gsra1->smoke_pellet_test) ? $gsra1->smoke_pellet_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra1->low_analyser_ratio) && !empty($gsra1->low_analyser_ratio) ? $gsra1->low_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra1->low_co) && !empty($gsra1->low_co) ? $gsra1->low_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra1->low_co2) && !empty($gsra1->low_co2) ? $gsra1->low_co2 : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra1->high_analyser_ratio) && !empty($gsra1->high_analyser_ratio) ? $gsra1->high_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra1->high_co) && !empty($gsra1->high_co) ? $gsra1->high_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($gsra1->high_co2) && !empty($gsra1->high_co2) ? $gsra1->high_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->safety_devices) && !empty($glsra1->safety_devices) ? $glsra1->safety_devices : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->spillage_test) && !empty($glsra1->spillage_test) ? $glsra1->spillage_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->smoke_pellet_test) && !empty($glsra1->smoke_pellet_test) ? $glsra1->smoke_pellet_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra1->low_analyser_ratio) && !empty($glsra1->low_analyser_ratio) ? $glsra1->low_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra1->low_co) && !empty($glsra1->low_co) ? $glsra1->low_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra1->low_co2) && !empty($glsra1->low_co2) ? $glsra1->low_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra1->high_analyser_ratio) && !empty($glsra1->high_analyser_ratio) ? $glsra1->high_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra1->high_co) && !empty($glsra1->high_co) ? $glsra1->high_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($glsra1->high_co2) && !empty($glsra1->high_co2) ? $glsra1->high_co2 : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">2</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->safety_devices) && !empty($gsra2->safety_devices) ? $gsra2->safety_devices : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->spillage_test) && !empty($gsra2->spillage_test) ? $gsra2->spillage_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->smoke_pellet_test) && !empty($gsra2->smoke_pellet_test) ? $gsra2->smoke_pellet_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra2->low_analyser_ratio) && !empty($gsra2->low_analyser_ratio) ? $gsra2->low_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra2->low_co) && !empty($gsra2->low_co) ? $gsra2->low_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra2->low_co2) && !empty($gsra2->low_co2) ? $gsra2->low_co2 : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra2->high_analyser_ratio) && !empty($gsra2->high_analyser_ratio) ? $gsra2->high_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra2->high_co) && !empty($gsra2->high_co) ? $gsra2->high_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($gsra2->high_co2) && !empty($gsra2->high_co2) ? $gsra2->high_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->safety_devices) && !empty($glsra2->safety_devices) ? $glsra2->safety_devices : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->spillage_test) && !empty($glsra2->spillage_test) ? $glsra2->spillage_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->smoke_pellet_test) && !empty($glsra2->smoke_pellet_test) ? $glsra2->smoke_pellet_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra2->low_analyser_ratio) && !empty($glsra2->low_analyser_ratio) ? $glsra2->low_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra2->low_co) && !empty($glsra2->low_co) ? $glsra2->low_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra2->low_co2) && !empty($glsra2->low_co2) ? $glsra2->low_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra2->high_analyser_ratio) && !empty($glsra2->high_analyser_ratio) ? $glsra2->high_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra2->high_co) && !empty($glsra2->high_co) ? $glsra2->high_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($glsra2->high_co2) && !empty($glsra2->high_co2) ? $glsra2->high_co2 : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">3</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->safety_devices) && !empty($gsra3->safety_devices) ? $gsra3->safety_devices : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->spillage_test) && !empty($gsra3->spillage_test) ? $gsra3->spillage_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->smoke_pellet_test) && !empty($gsra3->smoke_pellet_test) ? $gsra3->smoke_pellet_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra3->low_analyser_ratio) && !empty($gsra3->low_analyser_ratio) ? $gsra3->low_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra3->low_co) && !empty($gsra3->low_co) ? $gsra3->low_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra3->low_co2) && !empty($gsra3->low_co2) ? $gsra3->low_co2 : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra3->high_analyser_ratio) && !empty($gsra3->high_analyser_ratio) ? $gsra3->high_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra3->high_co) && !empty($gsra3->high_co) ? $gsra3->high_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($gsra3->high_co2) && !empty($gsra3->high_co2) ? $gsra3->high_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->safety_devices) && !empty($glsra3->safety_devices) ? $glsra3->safety_devices : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->spillage_test) && !empty($glsra3->spillage_test) ? $glsra3->spillage_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->smoke_pellet_test) && !empty($glsra3->smoke_pellet_test) ? $glsra3->smoke_pellet_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra3->low_analyser_ratio) && !empty($glsra3->low_analyser_ratio) ? $glsra3->low_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra3->low_co) && !empty($glsra3->low_co) ? $glsra3->low_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra3->low_co2) && !empty($glsra3->low_co2) ? $glsra3->low_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra3->high_analyser_ratio) && !empty($glsra3->high_analyser_ratio) ? $glsra3->high_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra3->high_co) && !empty($glsra3->high_co) ? $glsra3->high_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($glsra3->high_co2) && !empty($glsra3->high_co2) ? $glsra3->high_co2 : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">4</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->safety_devices) && !empty($gsra4->safety_devices) ? $gsra4->safety_devices : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->spillage_test) && !empty($gsra4->spillage_test) ? $gsra4->spillage_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->smoke_pellet_test) && !empty($gsra4->smoke_pellet_test) ? $gsra4->smoke_pellet_test : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra4->low_analyser_ratio) && !empty($gsra4->low_analyser_ratio) ? $gsra4->low_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra4->low_co) && !empty($gsra4->low_co) ? $gsra4->low_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra4->low_co2) && !empty($gsra4->low_co2) ? $gsra4->low_co2 : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra4->high_analyser_ratio) && !empty($gsra4->high_analyser_ratio) ? $gsra4->high_analyser_ratio : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($gsra4->high_co) && !empty($gsra4->high_co) ? $gsra4->high_co : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($gsra4->high_co2) && !empty($gsra4->high_co2) ? $gsra4->high_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->safety_devices) && !empty($glsra4->safety_devices) ? $glsra4->safety_devices : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->spillage_test) && !empty($glsra4->spillage_test) ? $glsra4->spillage_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->smoke_pellet_test) && !empty($glsra4->smoke_pellet_test) ? $glsra4->smoke_pellet_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra4->low_analyser_ratio) && !empty($glsra4->low_analyser_ratio) ? $glsra4->low_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra4->low_co) && !empty($glsra4->low_co) ? $glsra4->low_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra4->low_co2) && !empty($glsra4->low_co2) ? $glsra4->low_co2 : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra4->high_analyser_ratio) && !empty($glsra4->high_analyser_ratio) ? $glsra4->high_analyser_ratio : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b border-r">'.(isset($glsra4->high_co) && !empty($glsra4->high_co) ? $glsra4->high_co : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-90px border-b">'.(isset($glsra4->high_co2) && !empty($glsra4->high_co2) ? $glsra4->high_co2 : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -627,43 +624,43 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">1</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->flue_visual_condition) && !empty($gsra1->flue_visual_condition) ? $gsra1->flue_visual_condition : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->adequate_ventilation) && !empty($gsra1->adequate_ventilation) ? $gsra1->adequate_ventilation : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->landlord_appliance) && !empty($gsra1->landlord_appliance) ? $gsra1->landlord_appliance : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->inspected) && !empty($gsra1->inspected) ? $gsra1->inspected : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->appliance_visual_check) && !empty($gsra1->appliance_visual_check) ? $gsra1->appliance_visual_check : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra1->appliance_serviced) && !empty($gsra1->appliance_serviced) ? $gsra1->appliance_serviced : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($gsra1->appliance_safe_to_use) && !empty($gsra1->appliance_safe_to_use) ? $gsra1->appliance_safe_to_use : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->flue_visual_condition) && !empty($glsra1->flue_visual_condition) ? $glsra1->flue_visual_condition : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->adequate_ventilation) && !empty($glsra1->adequate_ventilation) ? $glsra1->adequate_ventilation : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->landlord_appliance) && !empty($glsra1->landlord_appliance) ? $glsra1->landlord_appliance : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->inspected) && !empty($glsra1->inspected) ? $glsra1->inspected : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->appliance_visual_check) && !empty($glsra1->appliance_visual_check) ? $glsra1->appliance_visual_check : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra1->appliance_serviced) && !empty($glsra1->appliance_serviced) ? $glsra1->appliance_serviced : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($glsra1->appliance_safe_to_use) && !empty($glsra1->appliance_safe_to_use) ? $glsra1->appliance_safe_to_use : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">2</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->flue_visual_condition) && !empty($gsra2->flue_visual_condition) ? $gsra2->flue_visual_condition : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->adequate_ventilation) && !empty($gsra2->adequate_ventilation) ? $gsra2->adequate_ventilation : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->landlord_appliance) && !empty($gsra2->landlord_appliance) ? $gsra2->landlord_appliance : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->inspected) && !empty($gsra2->inspected) ? $gsra2->inspected : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->appliance_visual_check) && !empty($gsra2->appliance_visual_check) ? $gsra2->appliance_visual_check : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra2->appliance_serviced) && !empty($gsra2->appliance_serviced) ? $gsra2->appliance_serviced : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($gsra2->appliance_safe_to_use) && !empty($gsra2->appliance_safe_to_use) ? $gsra2->appliance_safe_to_use : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->flue_visual_condition) && !empty($glsra2->flue_visual_condition) ? $glsra2->flue_visual_condition : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->adequate_ventilation) && !empty($glsra2->adequate_ventilation) ? $glsra2->adequate_ventilation : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->landlord_appliance) && !empty($glsra2->landlord_appliance) ? $glsra2->landlord_appliance : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->inspected) && !empty($glsra2->inspected) ? $glsra2->inspected : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->appliance_visual_check) && !empty($glsra2->appliance_visual_check) ? $glsra2->appliance_visual_check : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra2->appliance_serviced) && !empty($glsra2->appliance_serviced) ? $glsra2->appliance_serviced : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($glsra2->appliance_safe_to_use) && !empty($glsra2->appliance_safe_to_use) ? $glsra2->appliance_safe_to_use : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">3</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->flue_visual_condition) && !empty($gsra3->flue_visual_condition) ? $gsra3->flue_visual_condition : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->adequate_ventilation) && !empty($gsra3->adequate_ventilation) ? $gsra3->adequate_ventilation : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->landlord_appliance) && !empty($gsra3->landlord_appliance) ? $gsra3->landlord_appliance : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->inspected) && !empty($gsra3->inspected) ? $gsra3->inspected : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->appliance_visual_check) && !empty($gsra3->appliance_visual_check) ? $gsra3->appliance_visual_check : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra3->appliance_serviced) && !empty($gsra3->appliance_serviced) ? $gsra3->appliance_serviced : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($gsra3->appliance_safe_to_use) && !empty($gsra3->appliance_safe_to_use) ? $gsra3->appliance_safe_to_use : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->flue_visual_condition) && !empty($glsra3->flue_visual_condition) ? $glsra3->flue_visual_condition : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->adequate_ventilation) && !empty($glsra3->adequate_ventilation) ? $glsra3->adequate_ventilation : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->landlord_appliance) && !empty($glsra3->landlord_appliance) ? $glsra3->landlord_appliance : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->inspected) && !empty($glsra3->inspected) ? $glsra3->inspected : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->appliance_visual_check) && !empty($glsra3->appliance_visual_check) ? $glsra3->appliance_visual_check : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra3->appliance_serviced) && !empty($glsra3->appliance_serviced) ? $glsra3->appliance_serviced : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($glsra3->appliance_safe_to_use) && !empty($glsra3->appliance_safe_to_use) ? $glsra3->appliance_safe_to_use : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">4</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->flue_visual_condition) && !empty($gsra4->flue_visual_condition) ? $gsra4->flue_visual_condition : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->adequate_ventilation) && !empty($gsra4->adequate_ventilation) ? $gsra4->adequate_ventilation : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->landlord_appliance) && !empty($gsra4->landlord_appliance) ? $gsra4->landlord_appliance : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->inspected) && !empty($gsra4->inspected) ? $gsra4->inspected : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->appliance_visual_check) && !empty($gsra4->appliance_visual_check) ? $gsra4->appliance_visual_check : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gsra4->appliance_serviced) && !empty($gsra4->appliance_serviced) ? $gsra4->appliance_serviced : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($gsra4->appliance_safe_to_use) && !empty($gsra4->appliance_safe_to_use) ? $gsra4->appliance_safe_to_use : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->flue_visual_condition) && !empty($glsra4->flue_visual_condition) ? $glsra4->flue_visual_condition : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->adequate_ventilation) && !empty($glsra4->adequate_ventilation) ? $glsra4->adequate_ventilation : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->landlord_appliance) && !empty($glsra4->landlord_appliance) ? $glsra4->landlord_appliance : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->inspected) && !empty($glsra4->inspected) ? $glsra4->inspected : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->appliance_visual_check) && !empty($glsra4->appliance_visual_check) ? $glsra4->appliance_visual_check : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($glsra4->appliance_serviced) && !empty($glsra4->appliance_serviced) ? $glsra4->appliance_serviced : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b w-140px">'.(isset($glsra4->appliance_safe_to_use) && !empty($glsra4->appliance_safe_to_use) ? $glsra4->appliance_safe_to_use : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -680,19 +677,19 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-1 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">SATISFACTORY VISUAL INSPECTION</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->satisfactory_visual_inspaction) && !empty($gsr->satisfactory_visual_inspaction) ? $gsr->satisfactory_visual_inspaction : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->satisfactory_visual_inspaction) && !empty($glsr->satisfactory_visual_inspaction) ? $glsr->satisfactory_visual_inspaction : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-1 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">EMERGENCY CONTROL ACCESSIBLE</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->emergency_control_accessible) && !empty($gsr->emergency_control_accessible) ? $gsr->emergency_control_accessible : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->emergency_control_accessible) && !empty($glsr->emergency_control_accessible) ? $glsr->emergency_control_accessible : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-1 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">SATISFACTORY GAS TIGHTNESS TEST</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->satisfactory_gas_tightness_test) && !empty($gsr->satisfactory_gas_tightness_test) ? $gsr->satisfactory_gas_tightness_test : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->satisfactory_gas_tightness_test) && !empty($glsr->satisfactory_gas_tightness_test) ? $glsr->satisfactory_gas_tightness_test : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-1 py-05 text-10px tracking-normal text-left leading-1-5 border-b border-r">EQUIPOTENTIAL BONDING SATISFACTION</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->equipotential_bonding_satisfactory) && !empty($gsr->equipotential_bonding_satisfactory) ? $gsr->equipotential_bonding_satisfactory : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->equipotential_bonding_satisfactory) && !empty($glsr->equipotential_bonding_satisfactory) ? $glsr->equipotential_bonding_satisfactory : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -708,19 +705,19 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">APPROVED CO ALARMS FITTED</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->co_alarm_fitted) && !empty($gsr->co_alarm_fitted) ? $gsr->co_alarm_fitted : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->co_alarm_fitted) && !empty($glsr->co_alarm_fitted) ? $glsr->co_alarm_fitted : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">ARE CO ALARMS IN DATE</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->co_alarm_in_date) && !empty($gsr->co_alarm_in_date) ? $gsr->co_alarm_in_date : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->co_alarm_in_date) && !empty($glsr->co_alarm_in_date) ? $glsr->co_alarm_in_date : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">TESTING CO ALARMS</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->co_alarm_test_satisfactory) && !empty($gsr->co_alarm_test_satisfactory) ? $gsr->co_alarm_test_satisfactory : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->co_alarm_test_satisfactory) && !empty($glsr->co_alarm_test_satisfactory) ? $glsr->co_alarm_test_satisfactory : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class=" bg-light-2 border-primary text-primary font-medium pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-5 border-b border-r">SMOKE ALARMS FITTED</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($gsr->smoke_alarm_fitted) && !empty($gsr->smoke_alarm_fitted) ? $gsr->smoke_alarm_fitted : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-5 w-60px border-b">'.(isset($glsr->smoke_alarm_fitted) && !empty($glsr->smoke_alarm_fitted) ? $glsr->smoke_alarm_fitted : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -735,7 +732,7 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '</thead>';
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top h-83px">'.(isset($gsr->fault_details) && !empty($gsr->fault_details) ? $gsr->fault_details : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top h-83px">'.(isset($glsr->fault_details) && !empty($glsr->fault_details) ? $glsr->fault_details : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -749,7 +746,7 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '</thead>';
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  h-83px">'.(isset($gsr->rectification_work_carried_out) && !empty($gsr->rectification_work_carried_out) ? $gsr->rectification_work_carried_out : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  h-83px">'.(isset($glsr->rectification_work_carried_out) && !empty($glsr->rectification_work_carried_out) ? $glsr->rectification_work_carried_out : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -773,7 +770,7 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '</thead>';
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 h-60px align-top">'.(isset($gsr->details_work_carried_out) && !empty($gsr->details_work_carried_out) ? $gsr->details_work_carried_out : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 h-60px align-top">'.(isset($glsr->details_work_carried_out) && !empty($glsr->details_work_carried_out) ? $glsr->details_work_carried_out : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
@@ -781,14 +778,14 @@ class HomeOwnerGasSafetyController extends Controller
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
                                             $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px uppercase px-2 py-1 leading-none align-middle">HAS FLUE CAP BEEN PUT BACK?</td>';
-                                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">'.(isset($gsr->flue_cap_put_back) && !empty($gsr->flue_cap_put_back) ? $gsr->flue_cap_put_back : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">'.(isset($glsr->flue_cap_put_back) && !empty($glsr->flue_cap_put_back) ? $glsr->flue_cap_put_back : '').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
                             $PDFHTML .= '</td>';
                             $PDFHTML .= '<td class="w-col9 pl-1 pr-0 pb-0 pt-0 align-top">';
-                                $inspectionDeate = (isset($gsr->inspection_date) && !empty($gsr->inspection_date) ? date('d-m-Y', strtotime($gsr->inspection_date)) : date('d-m-Y'));
-                                $nextInspectionDate = (isset($gsr->next_inspection_date) && !empty($gsr->next_inspection_date) ? date('d-m-Y', strtotime($gsr->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
+                                $inspectionDeate = (isset($glsr->inspection_date) && !empty($glsr->inspection_date) ? date('d-m-Y', strtotime($glsr->inspection_date)) : date('d-m-Y'));
+                                $nextInspectionDate = (isset($glsr->next_inspection_date) && !empty($glsr->next_inspection_date) ? date('d-m-Y', strtotime($glsr->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
                                 
                                 $PDFHTML .= '<table class="table table-sm bordered border-primary">';
                                     $PDFHTML .= '<thead>';
@@ -813,7 +810,7 @@ class HomeOwnerGasSafetyController extends Controller
                                                         $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>';
-                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->user->name) && !empty($gsr->user->name) ? $gsr->user->name : '').'</td>';
+                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($glsr->user->name) && !empty($glsr->user->name) ? $glsr->user->name : '').'</td>';
                                                         $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Date of Issue</td>';
@@ -835,11 +832,11 @@ class HomeOwnerGasSafetyController extends Controller
                                                         $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Received By</td>';
-                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->relation->name) && !empty($gsr->relation->name) ? $gsr->relation->name : '').'</td>';
+                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($glsr->relation->name) && !empty($glsr->relation->name) ? $glsr->relation->name : '').'</td>';
                                                         $PDFHTML .= '</tr>';
                                                         $PDFHTML .= '<tr>';
                                                             $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>';
-                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->received_by) && !empty($gsr->received_by) ? $gsr->received_by : (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '')).'</td>';
+                                                            $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($glsr->received_by) && !empty($glsr->received_by) ? $glsr->received_by : (isset($glsr->customer->full_name) && !empty($glsr->customer->full_name) ? $glsr->customer->full_name : '')).'</td>';
                                                         $PDFHTML .= '</tr>';
                                                     $PDFHTML .= '</tbody>';
                                                 $PDFHTML .= '</table>';
@@ -861,24 +858,24 @@ class HomeOwnerGasSafetyController extends Controller
         $PDFHTML .= '</html>';
 
 
-        $fileName = $gsr->certificate_number.'.pdf';
-        if (Storage::disk('public')->exists('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName)) {
-            Storage::disk('public')->delete('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName);
+        $fileName = $glsr->certificate_number.'.pdf';
+        if (Storage::disk('public')->exists('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName)) {
+            Storage::disk('public')->delete('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName);
         }
         $pdf = Pdf::loadHTML($PDFHTML)->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
             ->setPaper('a4', 'landscape') //portrait landscape
             ->setWarnings(false);
         $content = $pdf->output();
-        Storage::disk('public')->put('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName, $content );
+        Storage::disk('public')->put('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName, $content );
 
-        return Storage::disk('public')->url('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName);
+        return Storage::disk('public')->url('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName);
     }
 
-    public function sendEmail($gsr_id, $job_form_id){
+    public function sendEmail($glsr_id, $job_form_id){
         $user_id = auth()->user()->id;
-        $gsr = GasSafetyRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gsr_id);
-        $customerName = (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '');
-        $customerEmail = (isset($gsr->customer->contact->email) && !empty($gsr->customer->contact->email) ? $gsr->customer->contact->email : '');
+        $glsr = GasLandlordSafetyRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($glsr_id);
+        $customerName = (isset($glsr->customer->full_name) && !empty($glsr->customer->full_name) ? $glsr->customer->full_name : '');
+        $customerEmail = (isset($glsr->customer->contact->email) && !empty($glsr->customer->contact->email) ? $glsr->customer->contact->email : '');
         if(!empty($customerEmail)):
             $template = JobFormEmailTemplate::where('user_id', $user_id)->where('job_form_id', $job_form_id)->get()->first();
             $subject = (isset($template->subject) && !empty($template->subject) ? $template->subject : 'Gas Safety Record');
@@ -903,11 +900,11 @@ class HomeOwnerGasSafetyController extends Controller
 
             ];
 
-            $fileName = $gsr->certificate_number.'.pdf';
+            $fileName = $glsr->certificate_number.'.pdf';
             $attachmentFiles = [];
-            if (Storage::disk('public')->exists('gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName)):
+            if (Storage::disk('public')->exists('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName)):
                 $attachmentFiles[] = [
-                    "pathinfo" => 'gsr/'.$gsr->customer_job_id.'/'.$gsr->job_form_id.'/'.$fileName,
+                    "pathinfo" => 'glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName,
                     "nameinfo" => $fileName,
                     "mimeinfo" => 'application/pdf',
                     "disk" => 'public'
@@ -934,7 +931,7 @@ class HomeOwnerGasSafetyController extends Controller
         
         $appliances = json_decode($request->appliances);
         $safetyChecks = json_decode($request->safetyChecks);
-        $gsrComments = json_decode($request->gsrComments);
+        $glsrComments = json_decode($request->glsrComments);
 
         if($customer_job_id == 0):
             
@@ -950,7 +947,7 @@ class HomeOwnerGasSafetyController extends Controller
         endif;
 
         if($customer_job_id > 0):
-            $gasSafetyRecord = GasSafetyRecord::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
+            $gasSafetyRecord = GasLandlordSafetyRecord::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
                 'customer_id' => $customer_id,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
@@ -964,10 +961,10 @@ class HomeOwnerGasSafetyController extends Controller
                 'co_alarm_test_satisfactory' => (isset($safetyChecks->co_alarm_test_satisfactory) && !empty($safetyChecks->co_alarm_test_satisfactory) ? $safetyChecks->co_alarm_test_satisfactory : null),
                 'smoke_alarm_fitted' => (isset($safetyChecks->smoke_alarm_fitted) && !empty($safetyChecks->smoke_alarm_fitted) ? $safetyChecks->smoke_alarm_fitted : null),
 
-                'fault_details' => (isset($gsrComments->fault_details) && !empty($gsrComments->fault_details) ? $gsrComments->fault_details : null),
-                'rectification_work_carried_out' => (isset($gsrComments->rectification_work_carried_out) && !empty($gsrComments->rectification_work_carried_out) ? $gsrComments->rectification_work_carried_out : null),
-                'details_work_carried_out' => (isset($gsrComments->details_work_carried_out) && !empty($gsrComments->details_work_carried_out) ? $gsrComments->details_work_carried_out : null),
-                'flue_cap_put_back' => (isset($gsrComments->flue_cap_put_back) && !empty($gsrComments->flue_cap_put_back) ? $gsrComments->flue_cap_put_back : null),
+                'fault_details' => (isset($glsrComments->fault_details) && !empty($glsrComments->fault_details) ? $glsrComments->fault_details : null),
+                'rectification_work_carried_out' => (isset($glsrComments->rectification_work_carried_out) && !empty($glsrComments->rectification_work_carried_out) ? $glsrComments->rectification_work_carried_out : null),
+                'details_work_carried_out' => (isset($glsrComments->details_work_carried_out) && !empty($glsrComments->details_work_carried_out) ? $glsrComments->details_work_carried_out : null),
+                'flue_cap_put_back' => (isset($glsrComments->flue_cap_put_back) && !empty($glsrComments->flue_cap_put_back) ? $glsrComments->flue_cap_put_back : null),
 
                 'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
                 'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
@@ -980,8 +977,8 @@ class HomeOwnerGasSafetyController extends Controller
 
             if(!empty($appliances)):
                 foreach($appliances as $serial => $appliance):
-                    $gasAppliance = GasSafetyRecordAppliance::updateOrCreate(['gas_safety_record_id' => $gasSafetyRecord->id, 'appliance_serial' => $serial], [
-                        'gas_safety_record_id' => $gasSafetyRecord->id,
+                    $gasAppliance = GasLandlordSafetyRecordAppliance::updateOrCreate(['gas_landlord_safety_record_id' => $gasSafetyRecord->id, 'appliance_serial' => $serial], [
+                        'gas_landlord_safety_record_id' => $gasSafetyRecord->id,
                         'appliance_serial' => $serial,
                         'appliance_location_id' => (isset($appliance->appliance_location_id) && !empty($appliance->appliance_location_id) ? $appliance->appliance_location_id : null),
                         'boiler_brand_id' => (isset($appliance->boiler_brand_id) && !empty($appliance->boiler_brand_id) ? $appliance->boiler_brand_id : null),
@@ -1023,7 +1020,7 @@ class HomeOwnerGasSafetyController extends Controller
                     $imageName = 'signatures/' . Str::uuid() . '.png';
                     Storage::disk('public')->put($imageName, $signatureData);
                     $signature = new Signature();
-                    $signature->model_type = GasSafetyRecord::class;
+                    $signature->model_type = GasLandlordSafetyRecord::class;
                     $signature->model_id = $gasSafetyRecord->id;
                     $signature->uuid = Str::uuid();
                     $signature->filename = $imageName;
@@ -1034,7 +1031,7 @@ class HomeOwnerGasSafetyController extends Controller
                 endif;
             endif;
 
-            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.gsr.view', $gasSafetyRecord->id)], 200);
+            return response()->json(['msg' => 'Certificate successfully created.', 'red' => route('new.records.glsr.view', $gasSafetyRecord->id)], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
         endif;
@@ -1043,8 +1040,8 @@ class HomeOwnerGasSafetyController extends Controller
     public function editReady(Request $request){
         $record_id = $request->record_id;
 
-        $record = GasSafetyRecord::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
-        $appliances = GasSafetyRecordAppliance::where('gas_safety_record_id', $record_id)->orderBy('appliance_serial', 'ASC')->get();
+        $record = GasLandlordSafetyRecord::with('customer', 'customer.contact', 'job', 'job.property')->find($record_id);
+        $appliances = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $record_id)->orderBy('appliance_serial', 'ASC')->get();
         $data = [
             'certificate_id' => $record->id,
             'certificate' => [
@@ -1079,14 +1076,14 @@ class HomeOwnerGasSafetyController extends Controller
         $data['safetyChecksAnswered'] = 0;
         $data['safetyChecksAnswered'] = count(array_filter($data['safetyChecks'], function($v) { return !empty($v); }));
 
-        $data['gsrComments'] = [
+        $data['glsrComments'] = [
             'fault_details' => (isset($record->fault_details) && !empty($record->fault_details) ? $record->fault_details : ''),
             'rectification_work_carried_out' => (isset($record->rectification_work_carried_out) && !empty($record->rectification_work_carried_out) ? $record->rectification_work_carried_out : ''),
             'details_work_carried_out' => (isset($record->details_work_carried_out) && !empty($record->details_work_carried_out) ? $record->details_work_carried_out : ''),
             'flue_cap_put_back' => (isset($record->flue_cap_put_back) && !empty($record->flue_cap_put_back) ? $record->flue_cap_put_back : ''),
         ];
         $data['commentssAnswered'] = 0;
-        $data['commentssAnswered'] = count(array_filter($data['gsrComments'], function($v) { return !empty($v); }));
+        $data['commentssAnswered'] = count(array_filter($data['glsrComments'], function($v) { return !empty($v); }));
 
         $data['applianceCount'] = 0;
         if($appliances->count() > 0):
@@ -1097,7 +1094,7 @@ class HomeOwnerGasSafetyController extends Controller
                     'edit' => 0,
                     'appliance_label' => 'Appliance '.$appliance->appliance_serial,
                     'appliance_title' => ($applianceName != '' ? $applianceName : ''),
-                    'gas_safety_record_id' => $appliance->gas_safety_record_id,
+                    'gas_landlord_safety_record_id' => $appliance->gas_landlord_safety_record_id,
                     'appliance_serial' => $appliance->appliance_serial,
                     'appliance_location_id' => (isset($appliance->appliance_location_id) && !empty($appliance->appliance_location_id) ? $appliance->appliance_location_id : null),
                     'boiler_brand_id' => (isset($appliance->boiler_brand_id) && !empty($appliance->boiler_brand_id) ? $appliance->boiler_brand_id : null),
