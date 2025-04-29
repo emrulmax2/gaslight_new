@@ -402,11 +402,16 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('.gsfSignature .sign-pad-button-submit').trigger('click');
     });
 
+    $('.gsfSignature .sign-pad-button-submit').on('click', function(){
+        console.log('clicked');
+    })
+
     $('#certificateForm').on('submit', function(e){
         e.preventDefault();
         const form = document.getElementById('certificateForm');
         const $theForm = $(this);
         let formData = new FormData(form);
+        console.log('submitted');
         
         $('#saveCertificateBtn', $theForm).attr('disabled', 'disabled');
         $("#saveCertificateBtn .theLoader").fadeIn();
@@ -424,18 +429,14 @@ import INTAddressLookUps from '../../address_lookup.js';
         }else{
             errors['appliance_error'] = 'Please add at least one appliance.';
         }
-        // if(localStorage.safetyChecks){
-        //     let safetyChecks = localStorage.getItem('safetyChecks');
-        //     formData.append('safetyChecks', safetyChecks);
-        // }else{
-        //     errors['satisfy_checks'] = 'Please insert satisfactory checks.';
-        // }
-        // if(localStorage.gsrComments){
-        //     let gsrComments = localStorage.getItem('gsrComments');
-        //     formData.append('gsrComments', gsrComments);
-        // }else{
-        //     errors['gsr_comments'] = 'Please update comments form.';
-        // }
+        if(localStorage.safetyChecks){
+            let safetyChecks = localStorage.getItem('safetyChecks');
+            formData.append('safetyChecks', safetyChecks);
+        }
+        if(localStorage.gsrComments){
+            let gsrComments = localStorage.getItem('gsrComments');
+            formData.append('gsrComments', gsrComments);
+        }
 
         if($.isEmptyObject(errors)){
             axios({

@@ -216,7 +216,7 @@ export default defineConfig({
 
                 "resources/js/app/new-records/index.js",
                 "resources/js/app/new-records/create.js",
-                "resources/js/app/new-records/gas-safety-record.js",
+                "resources/js/app/new-records/homeowner-gas-safety-record.js",
                 "resources/js/app/new-records/gas-warning-notice-record.js",
                 "resources/js/app/new-records/gas-service-record.js",
                 "resources/js/app/new-records/gas-breakdown-record.js",
@@ -230,6 +230,8 @@ export default defineConfig({
                 "resources/js/app/new-records/invoice_show.js",
                 "resources/js/app/new-records/quote.js",
                 "resources/js/app/new-records/quote_show.js",
+                "resources/js/app/new-records/landlord-gas-safety-record.js",
+                "resources/js/app/new-records/landlord-gass-safety-record-show.js",
             ],
             refresh: true,
         }),
