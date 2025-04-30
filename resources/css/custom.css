@@ -465,3 +465,7 @@
 .h-\[15px\]{
     height: 15px;
 }
+
+.customerPropertyOccupantBlock .theDesc{
+    text-transform: capitalize;
+}

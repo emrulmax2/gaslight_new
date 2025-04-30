@@ -69,4 +69,12 @@ class CustomerProperty extends Model
         //$address .= (!empty($this->country) ? $this->country : '');
         return $address;
     }
+
+    public function setOccupantNameAttribute($value) {  
+        $this->attributes['occupant_name'] =  (!empty($value) ? ucwords($value) : null);
+    }
+
+    public function getOccupantNameAttribute($value) {
+        return (!empty($value) ? ucwords($value) : '');
+    }
 }

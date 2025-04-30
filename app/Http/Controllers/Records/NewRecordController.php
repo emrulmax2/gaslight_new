@@ -263,7 +263,7 @@ class NewRecordController extends Controller
 
         $occupant = (!empty($request->occupant_name) ? $request->occupant_name : null);
         $data = [
-            'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
+            'occupant_name' => (!empty($request->occupant_name) ? ucwords($request->occupant_name) : null),
             'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
             'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
         ];

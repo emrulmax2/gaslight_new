@@ -26,6 +26,78 @@ class CustomerController extends Controller
 
     public function list(Request $request){
         $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
+
+
+        $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id);
+        if(!empty($queryStr)):
+            $query->where(function($q) use($queryStr){
+                $q->where('full_name','LIKE','%'.$queryStr.'%')
+                    ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
+                    ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
+                    ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
+            });
+        endif;
+        $query = $query->get();
+        $groupedCustomer = $query->groupBy(function ($item) {
+            $full_names = explode(' ', $item->full_name);
+            return strtoupper(substr(end($full_names), 0, 1));
+        })->sortKeys();
+
+        $html = '';
+        if($groupedCustomer->count() > 0):
+            foreach($groupedCustomer as $letter => $customers):
+                $html .= '<div class="box mb-0 shadow-none rounded-none border-none">';
+                    $html .= '<div class="flex flex-col items-center bg-slate-200 px-3 py-3 dark:border-darkmode-400 sm:flex-row">';
+                        $html .= '<h2 class="mr-auto font-medium uppercase text-dark">';
+                            $html .= $letter;
+                        $html .= '</h2>';
+                    $html .= '</div>';
+                    $html .= '<div class="results existingAddress">';
+                        $i = 1;
+                        foreach($customers as $customer):
+                            $allWords = explode(' ', $customer->full_name);
+                            $label = (isset($allWords[0]) && !empty($allWords[0]) ? mb_substr($allWords[0], 0, 1) : '').(count($allWords) > 1 ? mb_substr(end($allWords), 0, 1) : '');
+                            
+                            $html .= '<div data-id="'.$customer->id.'" data-description="'.$customer->full_name.' '.$customer->postal_code.'" class="customer_row flex items-center cursor-pointer '.($i != $customers->count() ? ' border-b border-slate-100 ' : '').' bg-white px-3 py-3">';
+                                $html .= '<div>';
+                                    $html .= '<div class="group relative flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                        $html .= '<span class="text-primary text-xs uppercase font-medium">'.$label.'</span>';
+                                        //$html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" class="lucide lucide-users stroke-1.5 h-4 w-4 text-primary"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+                                        $html .= '<span style="display: none;" class="h-4 w-4 theLoader absolute left-0 top-0 bottom-0 right-0 m-auto"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#0d9488"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span>';
+                                    $html .= '</div>';
+                                $html .= '</div>';
+                                $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                                    $html .= '<div>';
+                                        $html .= '<div class="whitespace-normal font-medium">';
+                                            $html .= $customer->full_name;
+                                        $html .= '</div>';
+                                        $html .= '<div class="mt-0.5 whitespace-normal text-xs text-slate-500">';
+                                            $html .= (isset($customer->address_line_1) && !empty($customer->address_line_1) ? $customer->address_line_1.' ' : '');
+                                            $html .= (isset($customer->address_line_2) && !empty($customer->address_line_2) ? $customer->address_line_2.', ' : '');
+                                            $html .= (isset($customer->city) && !empty($customer->city) ? $customer->city.', ' : '');
+                                            $html .= (isset($customer->postal_code) && !empty($customer->postal_code) ? $customer->postal_code : '');
+                                        $html .= '</div>';
+                                    $html .= '</div>';
+                                $html .= '</div>';
+                            $html .= '</div>';
+    
+                            $i++;
+                        endforeach;
+                    $html .= '</div>';
+                $html .= '</div>';
+            endforeach;
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-pending border-pending bg-opacity-20 border-opacity-5 text-pending dark:border-pending dark:border-opacity-20 mb-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>
+                        No match found.
+                    </div>';
+        endif;
+        
+        return response()->json(['html' => $html]);
+    }
+
+    public function listOld(Request $request){
+        $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
         $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
 
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
