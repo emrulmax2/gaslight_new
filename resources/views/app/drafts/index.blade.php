@@ -19,10 +19,10 @@
         <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
             <form class="sm:mr-auto lg:flex w-full lg:w-auto" id="tabulator-html-filter-form" >
                 <div class="items-center sm:mr-4 xl:mt-0">
-                    <label class="flex-none xl:w-auto xl:flex-initial">Keywords</label>
+                    <label class="flex-none xl:w-auto xl:flex-initial max-sm:hidden">Keywords</label>
                     <x-base.form-input class="2xl:w-full h-[35px] rounded-[3px]" id="query" type="text" placeholder="Search..." />
                 </div>
-                <div class="items-center lg:mr-4 mt-2 lg:mt-0">
+                <div class="items-center lg:mr-4 mt-2 lg:mt-0 max-sm:hidden">
                     <label class="flex-none xl:w-auto xl:flex-initial">Engineer</label>
                     <x-base.form-select class="mt-1 w-full sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px]" id="engineer" >
                         <option value="all">All</option>
@@ -31,7 +31,7 @@
                         @endforeach
                     </x-base.form-select>
                 </div>
-                <div class="items-center lg:mr-4 mt-2 lg:mt-0 2xl:w-64">
+                <div class="items-center lg:mr-4 mt-2 lg:mt-0 2xl:w-64 max-sm:hidden">
                     <label class="flex-none">Certificate Type </label>
                     <x-base.form-select class="mt-1 w-auto sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px] max-w-full" id="certificate_type" >
                         <option value="all">All</option>
@@ -40,11 +40,11 @@
                         @endforeach
                     </x-base.form-select>
                 </div>
-                <div class="items-center  lg:mr-4 mt-2 lg:mt-0 w-full sm:w-56 ">
+                <div class="items-center  lg:mr-4 mt-2 lg:mt-0 w-full sm:w-56 max-sm:hidden">
                     <label class="flex-none">Date Range </label>
                     <x-base.litepicker class="mx-auto w-full h-[35px] rounded-[3px]" id="date_range"  />
                 </div>
-                <div class="items-center lg:mr-4 mt-2 lg:mt-0">
+                <div class="items-center lg:mr-4 mt-2 lg:mt-0 max-sm:hidden">
                     <label class="flex-none">Status </label>
                     <x-base.form-select class="mt-1 w-full sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px]" id="status" >
                         <option value="all">All</option>
@@ -54,7 +54,7 @@
                         <option value="Cancelled">Cancelled</option>
                     </x-base.form-select>
                 </div>
-                <div class="mt-4 lg:mt-0 text-right ml-0 sm:ml-auto xl:pt-[20px]">
+                <div class="mt-4 lg:mt-0 text-right ml-0 sm:ml-auto xl:pt-[20px] max-sm:hidden">
                     <x-base.button class="w-full sm:w-16 h-[35px]" id="tabulator-html-filter-go" type="button" variant="primary" >Go</x-base.button>
                     <x-base.button class="mt-1 w-full sm:ml-1 sm:mt-0 sm:w-16 h-[35px]" id="tabulator-html-filter-reset" type="button" variant="secondary" >Reset</x-base.button>
                 </div>

@@ -134,7 +134,14 @@ var certificateListTable = (function () {
                 attrs: { "stroke-width": 1.5 },
                 nameAttr: "data-lucide",
             });
-        },
+        },//url
+    });
+
+    tableData.on("rowClick", function(e, row){
+        var theUrl = row.getData().url;
+        if(theUrl != ''){
+            window.location.href = theUrl;
+        }
     });
 
     tableData.on("renderComplete", () => {
