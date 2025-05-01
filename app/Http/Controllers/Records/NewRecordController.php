@@ -320,12 +320,12 @@ class NewRecordController extends Controller
         $query = Customer::with('contact')->where('created_by', $user_id)->get();
         $groupedCustomer = $query->groupBy(function ($item) {
             $full_names = explode(' ', $item->full_name);
-            return strtoupper(substr(end($full_names), 0, 1));
+            return strtoupper(substr($full_names[0], 0, 1));
         })->sortKeys();
         
         if($query->count() > 0):
             foreach($groupedCustomer as $letter => $customers):
-                $html .= '<div class="box mb-0 shadow-none rounded-none border-none">';
+                $html .= '<div class="box mb-0 shadow-none rounded-none border-none customersContainer">';
                     $html .= '<div class="flex flex-col items-center bg-slate-100 px-3 py-3 dark:border-darkmode-400 sm:flex-row">';
                         $html .= '<h2 class="mr-auto font-medium uppercase text-dark">';
                             $html .= $letter;

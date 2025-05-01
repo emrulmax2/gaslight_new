@@ -40,7 +40,7 @@ class CustomerController extends Controller
         $query = $query->get();
         $groupedCustomer = $query->groupBy(function ($item) {
             $full_names = explode(' ', $item->full_name);
-            return strtoupper(substr(end($full_names), 0, 1));
+            return strtoupper(substr($full_names[0], 0, 1));
         })->sortKeys();
 
         $html = '';

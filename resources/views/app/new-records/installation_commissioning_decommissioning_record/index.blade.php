@@ -42,7 +42,8 @@
                 </h2>
             </div>
             <div class="px-2 py-3 customerWrap bg-white">
-                <a href="{{ route('customers') }}" data-key="record_url" data-value="{{ url()->current() }}" class="theStorageTrigger flex justify-between items-center cursor-pointer customerBlock">
+                <!--<a href="{{ route('customers') }}" data-key="record_url" data-value="{{ url()->current() }}" class="theStorageTrigger flex justify-between items-center cursor-pointer customerBlock"> -->
+                <a href="javascript:void(0);" class="flex justify-between items-center cursor-pointer customerBlock">
                     <div>
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Customer</div>
                         <div class="theDesc">Click here to select a customer</div>
