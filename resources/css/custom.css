@@ -465,7 +465,18 @@
 .h-\[15px\]{
     height: 15px;
 }
-
 .customerPropertyOccupantBlock .theDesc{
     text-transform: capitalize;
+}
+
+.flex-zero-full{
+    flex: 0 0 100%;
+}
+@media (max-width: 768px){
+    .certificateListTable tbody tr{
+        display: block;
+    }
+    .certificateListTable tbody tr td{
+        display: block;
+    }
 }

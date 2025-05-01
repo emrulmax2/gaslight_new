@@ -32,6 +32,10 @@
                 <div class="relative mb-2">
                     <a href="{{ route('customers.create') }}" data-key="record_url" data-value="{{ url()->current() }}"class="theStorageTrigger text-primary flex justify-between items-center p-3 bg-white mt-2 text-base">Add Customer<x-base.lucide class="ml-auto h-4 w-4" icon="plus-circle" /></a>
                 </div>
+                <div class="relative customerSearchWrap mb-2">
+                    <x-base.form-input name="search_customer" id="search_customer" class="w-full border-none rounded-none m-0" type="text" placeholder="search Here" />
+                    <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+                </div>
                 <div class="customersListWrap overflow-x-hidden overflow-y-auto" style="max-height: 75vh;">
                     
                 </div>

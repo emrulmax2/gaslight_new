@@ -8,11 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\FileRecord;
+use App\Models\PricingPackage;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Number;
 
 class UserManagementController extends Controller
 {
@@ -23,6 +25,7 @@ class UserManagementController extends Controller
         return view('app.users.index', [
             'title' => 'Users List - Gas Certificate App',
             'users' => User::all(),
+            'packages' => PricingPackage::whereNot('period', 'Free Trail')->where('active', 1)->orderBy('order', 'ASC')->get()
         ]);
     }
 

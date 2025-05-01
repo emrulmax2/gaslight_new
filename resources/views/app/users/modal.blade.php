@@ -67,6 +67,22 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mt-4">
+                            <x-base.form-label>Pricing Package</x-base.form-label>
+                            @if($packages->count() > 0)
+                                <div>
+                                    @foreach($packages as $pack)
+                                        <x-base.form-check class="mb-2">
+                                            <x-base.form-check.input id="pricing_package_{{ $pack->id }}" name="pricing_package_id" type="radio" value="{{ $pack->id }}"/>
+                                            <x-base.form-check.label for="pricing_package_{{ $pack->id }}">
+                                                {{ $pack->title }} - {{ Number::currency($pack->price, 'GBP') }} /{{ $pack->period }}
+                                            </x-base.form-check.label>
+                                        </x-base.form-check>
+                                    @endforeach
+                                </div>
+                            @endif
+                            <span class="mt-2 text-danger error-pricing_package_id"></span>
+                        </div>
                         <div class="mt-3">
                             <x-base.button class="w-auto border-0 rounded-0" id="userSaveBtn" type="submit" variant="primary">
                                 Save
