@@ -22,6 +22,10 @@ class Dashboard extends Controller
         $theUser = auth()->user()->id;
         $this->hasReferralCode();
         return view('app.dashboard.index',[
+            'title' => 'Dashboard - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Record & Drafts', 'href' => 'javascript:void(0);'],
+            ],
             'user' => User::with('referral')->find(auth()->user()->id),
             'countries' => Countries::fakeCountries(),
             'first_login' => auth()->user()->first_login,

@@ -6,214 +6,24 @@ var customerListTable = (function () {
         let querystr = $("#query").val() != "" ? $("#query").val() : "";
         let status = $("#status").val() != "" ? $("#status").val() : "";
 
-        let tableContent = new Tabulator("#customerListTable", {
-            ajaxURL: route("customers.list"),
-            ajaxParams: { querystr: querystr, status: status },
-            pagination: true,
-            paginationMode:"remote",
-            filterMode: "remote",
-            sortMode: "remote",
-            printAsHtml: true,
-            printStyled: true,
-            paginationSize: 10,
-            paginationSizeSelector: [true, 5, 10, 20, 30, 40],
-            layout: "fitColumns",
-            responsiveLayout: "collapse",
-            placeholder: "No matching records found",
-            columns: [
-                {
-                    title: "#ID",
-                    field: "id",
-                    vertAlign: 'middle',
-                    width: "80",
-                    responsive: 0
-                
-                },
-                {
-                    title: "Name",
-                    field: "customer_full_name",
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    minWidth: 220,
-                    formatter(cell, formatterParams) {
-                        const borderClass = 'border-b lg:border-b-0 border-slate-200 pb-2';
-                            var html = `<div class="${borderClass}">`;
-                            html += '<div class="flex items-center">';
-                                html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>';
-                                html += '<div class="font-medium whitespace-nowrap">' + cell.getData().customer_full_name + '</div>';
-                            html += '</div>';
-                            if(cell.getData().company_name != null){
-                                html += '<div class="block whitespace-normal">';
-                                    html += '<div class="flex items-start">';
-                                        html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="building" class="lucide lucide-building stroke-1.5 h-4 w-4"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg></span>';
-                                        html += '<div class="text-slate-500 text-xs">' + cell.getData().company_name + '</div>';
-                                    html += '</div>';
-                                html += '</div>';
-                            }
-                            html += '</div>';
-                        return html;
-                    }
-                },
-                {
-                    title: 'Address',
-                    field: 'address_line_1',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    minWidth: 220,
-                    formatter(cell, formatterParams) { 
-                        let address = '';
-                        address += (cell.getData().address_line_1 != null ? cell.getData().address_line_1+' ' : '');
-                        address += (cell.getData().address_line_2 != null ? cell.getData().address_line_2+', ' : '');
-                        address += (cell.getData().city != null ? cell.getData().city+', ' : '');
-                        address += (cell.getData().state != null ? cell.getData().state+', ' : '');
-                        address += (cell.getData().postal_code != null ? cell.getData().postal_code : '');
-                
-                        var html = '<div class="block whitespace-normal">';
-                                html += '<div class="flex items-start">';
-                                html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin w-4 h-4"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
-                                html += (address != '' ? '<div class="text-slate-500 text-xs">'+address+'</div>' : '');
-                                html += '</div>';
-                            html += '</div>';
-                        return html;
-                    }
-                },
-                {
-                    title: 'Email',
-                    field: 'email',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    responsive: 0
-                },
-                {
-                    title: 'Mobile',
-                    field: 'mobile',
-                    headerHozAlign: "left",
-                    vertAlign: 'middle',
-                    formatter(cell, formatterParams) { 
-                        let html = '';
-                        if(cell.getData().mobile != ''){
-                            html = '<div class="block whitespace-normal">';
-                                html += '<div class="flex items-start">';
-                                html += '<span class="sm:hidden mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone stroke-1.5 h-4 w-4"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg></span>';
-                                html += '<div class="text-slate-500 text-xs">'+cell.getData().mobile+'</div>';
-                                html += '</div>';
-                            html += '</div>';
-                        }
-                        return html;
-                    }
-                },
-                /*{
-                    title: "Actions",
-                    field: "id",
-                    headerSort: false,
-                    hozAlign: "center",
-                    headerHozAlign: "center",
-                    width: "120",
-                    download:false,
-                    vertAlign: 'middle',
-                    formatter(cell, formatterParams) {                        
-                        var btns = "";
-                        if (cell.getData().deleted_at == null) {
-                            btns += '<a href="'+route('customers.jobs', cell.getData().id)+'" class="rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Eye" class="w-4 h-4"></i></a>';
-                            btns += '<button data-id="' +cell.getData().id +'" class="delete_btn rounded-full bg-danger text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="Trash2" class="w-4 h-4"></i></button>';
-                        }  else {
-                            btns += '<button data-id="' +cell.getData().id +'"  class="restore_btn rounded-full bg-success text-white p-0 w-[36px] h-[36px] inline-flex justify-center items-center ml-1"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>';
-                        }
-                        
-                        return btns;
-                    },
-                },*/
-            ],
-            // ajaxResponse: function(url, params, response){
-            //     return response.data;
-            // },
-            renderComplete() {
+        axios({
+            method: 'get',
+            url: route('customers.list', {querystr: querystr}),
+            data: {querystr: querystr},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            if (response.status == 200) {
+                $('#customerListTable').html(response.data.html);
+
                 createIcons({
                     icons,
                     attrs: { "stroke-width": 1.5 },
                     nameAttr: "data-lucide",
                 });
-            },
-        });
-
-        
-
-        tableContent.on("rowClick", (e, row) => {
-            if(localStorage.record_url){
-                localStorage.removeItem('job');
-                localStorage.removeItem('customer');
-                localStorage.removeItem('job_address');
-                localStorage.removeItem('occupant');
-
-                let redirect = localStorage.getItem('record_url');
-                localStorage.setItem('customer', JSON.stringify(row.getData()));
-                localStorage.removeItem('record_url')
-                window.location.href = redirect;
-            }else{
-                window.location.href = route('customers.edit', row.getData().id);
             }
+        }).catch(error =>{
+            console.log(error)
         });
-
-        tableContent.on("renderComplete", () => {
-            createIcons({
-                icons,
-                attrs: { "stroke-width": 1.5 },
-                nameAttr: "data-lucide",
-            });
-        });
-
-        // Redraw table onresize
-        window.addEventListener("resize", () => {
-            tableContent.redraw();
-            createIcons({
-                icons,
-                "stroke-width": 1.5,
-                nameAttr: "data-lucide",
-            });
-        });
-
-        // Export
-        $("#tabulator-export-csv").on("click", function (event) {
-            tableContent.download("csv", "data.csv");
-        });
-
-        $("#tabulator-export-json").on("click", function (event) {
-            tableContent.download("json", "data.json");
-        });
-
-        $("#tabulator-export-xlsx").on("click", function (event) {
-            window.XLSX = xlsx;
-            tableContent.download("xlsx", "data.xlsx", {
-                sheetName: "Title Details",
-            });
-        });
-
-        $("#tabulator-export-html").on("click", function (event) {
-            tableContent.download("html", "data.html", {
-                style: true,
-            });
-        });
-
-        // Print
-        $("#tabulator-print").on("click", function (event) {
-            tableContent.print();
-        });
-
-        function updateColumnVisibility() {
-            if (window.innerWidth < 768) {
-                tableContent.getColumn("id").hide();
-                tableContent.getColumn("email").hide();
-
-            } else {
-                tableContent.getColumn("id").show();
-                tableContent.getColumn("email").show();
-            }
-        }
-        
-        window.addEventListener("resize", updateColumnVisibility);
-        setTimeout(() => {
-            updateColumnVisibility();
-        }, 200)
         
     };
     return {
@@ -228,33 +38,35 @@ var customerListTable = (function () {
     if ($("#customerListTable").length) {
         customerListTable.init();
 
-        function filterCustomerListTable() {
-            customerListTable.init();
-        }
-
-
-
-
         // On submit filter form
-        $("#tabulator-html-filter-form").on("keypress", function (event) {
-                let keycode = event.keyCode ? event.keyCode : event.which;
-                if (keycode == "13") {
-                    event.preventDefault();
-                    filterCustomerListTable();
-                }
+        $("#query").on("keypress", function (e) {
+            var key = e.keyCode || e.which;
+            if(key === 13){
+                e.preventDefault();
+    
+                customerListTable.init();
+                console.log('enter')
             }
-        );
-
-        // On click go button
-        $("#tabulator-html-filter-go").on("click", function (event) {
-            filterCustomerListTable();
         });
 
-        // On reset filter form
-        $("#tabulator-html-filter-reset").on("click", function (event) {
-            $("#query").val("");
-            $("#status").val("1");
-            filterCustomerListTable();
+        $("#customerListTable").on('click', '.customer_row', function(e){
+            let $theRow = $(this);
+            let theRowId = $theRow.attr('data-id');
+            window.location.href = route('customers.edit', theRowId);
+
+            // if(localStorage.record_url){
+            //     localStorage.removeItem('job');
+            //     localStorage.removeItem('customer');
+            //     localStorage.removeItem('job_address');
+            //     localStorage.removeItem('occupant');
+
+            //     let redirect = localStorage.getItem('record_url');
+            //     localStorage.setItem('customer', JSON.stringify(row.getData()));
+            //     localStorage.removeItem('record_url')
+            //     window.location.href = redirect;
+            // }else{
+            //     window.location.href = route('customers.edit', theRowId);
+            // }
         });
     }
 

@@ -118,6 +118,48 @@ class RecordAndDraftController extends Controller
                 elseif(isset($list->model->quote_number) && !empty($list->model->quote_number)):
                     $certificate_number = $list->model->quote_number;
                 endif;
+                $theModel = $list->model->getMorphClass();
+                switch($list->job_form_id){
+                    case(4):
+                        $url = route('invoice.show', $list->model_id);
+                        break;
+                    case(3):
+                        $url = route('quote.show', $list->model_id);
+                        break;
+                    case(6):
+                        $url = route('new.records.gsr.view', $list->model_id);
+                        break;
+                    case(7):
+                        $url = route('new.records.glsr.view', $list->model_id);
+                        break;
+                    case(8):
+                        $url = route('new.records.gas.warning.notice.show', $list->model_id);
+                        break;
+                    case(9):
+                        $url = route('new.records.gas.service.show', $list->model_id);
+                        break;
+                    case(10):
+                        $url = route('new.records.gas.breakdown.record.show', $list->model_id);
+                        break;
+                    case(13):
+                        $url = route('new.records.gas.bscc.record.show', $list->model_id);
+                        break;
+                    case(15):
+                        $url = route('new.records.gas.power.flush.record.show', $list->model_id);
+                        break;
+                    case(16):
+                        $url = route('new.records.gcdr.show', $list->model_id);
+                        break;
+                    case(17):
+                        $url = route('new.records.guhwcr.show', $list->model_id);
+                        break;
+                    case(18):
+                        $url = route('new.records.gjsr.show', $list->model_id);
+                        break;
+                    default:
+                        $url = '';
+                        break;
+                }
                 $data[] = [
                     'id' => $i,
                     'landlord_name' => $list->customer->full_name ?? '',
@@ -128,6 +170,7 @@ class RecordAndDraftController extends Controller
                     'created_at' => $list->model->created_at ? $list->model->created_at->format('jS M, Y \<b\r\/> \a\t h:i a') : '',
                     'status' => $list->model->status ?? '',
                     'actions' => $list->id,
+                    'url' => $url
                 ];
                 $i++;
             endforeach;

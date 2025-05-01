@@ -148,7 +148,7 @@
                 <h2 class="text-base font-medium mb-2">Occupant's Details</h2>
                 <div class="mb-3">
                     <x-base.form-label for="occupant_name">Name <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input name="occupant_name" id="occupant_name" class="w-full" type="text" placeholder="Name" />
+                    <x-base.form-input name="occupant_name" id="occupant_name" class="w-full capitalize" type="text" placeholder="Name" />
                     <div class="acc__input-error error-occupant_name text-danger text-xs mt-1"></div>
                 </div>
                 <div class="mb-3">

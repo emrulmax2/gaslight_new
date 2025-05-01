@@ -1,7 +1,7 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
-    <title>Dashboard - Midone - Tailwind Admin Dashboard Template</title>
+    <title>{{ $title }}</title>
 @endsection
 
 @section('subcontent')
