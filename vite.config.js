@@ -232,6 +232,10 @@ export default defineConfig({
                 "resources/js/app/new-records/quote_show.js",
                 "resources/js/app/new-records/landlord-gas-safety-record.js",
                 "resources/js/app/new-records/landlord-gass-safety-record-show.js",
+
+                "resources/js/app/user-settings/subscription.js",
+                "resources/js/app/users/profile.js",
+                "resources/js/app/users/subscription.js",
             ],
             refresh: true,
         }),

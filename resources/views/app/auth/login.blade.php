@@ -40,7 +40,7 @@
                         <x-base.form-input id="email"
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5 login__input"
                             type="text"
-                            placeholder="x@y.Z"
+                            placeholder="username@example.com"
                         />
                         <div id="error-email" class="login__input-error text-danger mt-2 dark:text-orange-400 "></div>        
                         <x-base.form-label class="mt-4">Password*</x-base.form-label>

@@ -526,6 +526,31 @@
 <!-- END: Modal Content -->
 
 
+
+<!-- BEGIN: Subscription Modal Modal Content -->
+<x-base.dialog id="subscriptionNoticeModal" staticBackdrop>
+    <x-base.dialog.panel class="rounded-none">
+        <x-base.dialog.description class="p-10 px-16">
+            <h2 class="text-center text-2xl text-primary font-bold tracking-normal mb-3 capitalize">Upgrade your subscription plan.</h2>
+            <p class="text-center mb-5">
+                Your free trial has ended. We hope you enjoyed it! To keep using all the features, consider upgrading to a paid plan.
+            </p>
+            <div class="shareButtons flex items-center justify-center mt-5">
+                <x-base.button type="button" data-tw-dismiss="modal" class="w-auto rounded-full text-white mr-1 px-3" size="sm" variant="danger" >
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                    Cancle
+                </x-base.button>
+                <x-base.button  as="a" href="{{ route('company.dashboard.upgrade.subscriptions') }}" class="w-auto rounded-full text-white mr-1 px-3" size="sm" variant="facebook" >
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Upgrade Now
+                </x-base.button>
+            </div>
+        </x-base.dialog.description>
+    </x-base.dialog.panel>
+</x-base.dialog>
+<!-- END: SEND SMS Invitation Modal Content -->
+
+
 <x-base.dialog id="successModal">
     <x-base.dialog.panel>
         <div class="p-5 text-center">

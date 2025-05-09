@@ -54,7 +54,7 @@
                         <x-base.form-input
                             class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
                             type="text"
-                            placeholder="Jon@doe.com"
+                            placeholder="username@example.com"
                             name="email"
                         />
                         <div id="error-email" class="register__input-error text-danger mt-2 dark:text-orange-400"></div>

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompanyAddressRequest;
+use App\Http\Requests\CompanyInfoRequest;
 use App\Models\User;
 use App\Models\Company;
 use Illuminate\Support\Str;
@@ -13,6 +15,7 @@ use App\Models\CompanyBankDetails;
 use App\Models\RegisterBody;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
@@ -203,5 +206,119 @@ class CompanyController extends Controller
     public function restore($id)
     {
         //
+    }
+
+    public function updateCompanyInfo(CompanyInfoRequest $request){
+        $company = Company::find($request->company_id);
+        $hasVat = (isset($request->vat_number_check) && $request->vat_number_check == 1 ? true : false);
+        $companyData = [
+            'company_name' => (!empty($request->company_name) ? $request->company_name : null),
+            'vat_number' => ($hasVat && !empty($request->vat_number) ? $request->vat_number : null),
+            'business_type' => (!empty($request->business_type) ? $request->business_type : null),
+            'company_registration' => ($request->business_type == 'Company' && !empty($request->company_registration) ? $request->company_registration : null),
+            'display_company_name' => (!empty($request->display_company_name) && $request->display_company_name > 0 ? $request->display_company_name : 0),
+        ];
+        $companyUpdate = Company::where('id', $company->id)->update($companyData);
+
+        if($companyUpdate):
+            return response()->json(['msg' => 'Company Information updated successfully', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
+        endif;
+    }
+
+    public function updateRegistrationInfo(Request $request){
+        $company = Company::find($request->company_id);
+        
+        $companyData = [
+            'gas_safe_registration_no' => (!empty($request->gas_safe_registration_no) ? $request->gas_safe_registration_no : null),
+            'registration_no' => (!empty($request->registration_no) ? $request->registration_no : null),
+            'register_body_id' => (!empty($request->register_body_id) ? $request->register_body_id : null),
+            'registration_body_for_legionella' => (!empty($request->registration_body_for_legionella) ? $request->registration_body_for_legionella : null),
+            'registration_body_no_for_legionella' => (!empty($request->registration_body_no_for_legionella) ? $request->registration_body_no_for_legionella : null),
+        ];
+
+        $companyUpdate = Company::where('id', $company->id)->update($companyData);
+
+        if($companyUpdate):
+            return response()->json(['msg' => 'Company Registration details successfully updated.', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
+        endif;
+    }
+
+    public function updateContactInfo(Request $request){
+        $company = Company::find($request->company_id);
+        
+        $companyData = [
+            'company_phone' => (!empty($request->company_phone) ? $request->company_phone : null),
+            'company_web_site' => (!empty($request->company_web_site) ? $request->company_web_site : null),
+            'company_tagline' => (!empty($request->company_tagline) ? $request->company_tagline : null),
+            'company_email' => (!empty($request->company_email) ? $request->company_email : null),
+        ];
+
+        $companyUpdate = Company::where('id', $company->id)->update($companyData);
+
+        if($companyUpdate):
+            return response()->json(['msg' => 'Company Contact details successfully updated.', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
+        endif;
+    }
+
+    public function updateAddressInfo(CompanyAddressRequest $request){
+        $company = Company::find($request->company_id);
+        
+        $companyData = [
+            'company_address_line_1' => (!empty($request->company_address_line_1) ? $request->company_address_line_1 : null),
+            'company_address_line_2' => (!empty($request->company_address_line_2) ? $request->company_address_line_2 : null),
+            'company_city' => (!empty($request->company_city) ? $request->company_city : null),
+            'company_state' => (!empty($request->company_state) ? $request->company_state : null),
+            'company_postal_code' => (!empty($request->company_postal_code) ? $request->company_postal_code : null),
+            'company_country' => (!empty($request->company_country) ? $request->company_country : null),
+        ];
+
+        $companyUpdate = Company::where('id', $company->id)->update($companyData);
+
+        if($companyUpdate):
+            return response()->json(['msg' => 'Company Address successfully updated.', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
+        endif;
+    }
+
+    public function updateBankInfo(Request $request){
+        
+        $bankDetails = CompanyBankDetails::updateOrInsert(['company_id' => $request->company_id], [
+            'bank_name'       => $request->bank_name ?? null,
+            'name_on_account' => $request->name_on_account ?? null,
+            'account_number'  => $request->account_number ?? null,
+            'sort_code'       => $request->sort_code ?? null,
+            'payment_term'    => $request->payment_term ?? null,
+            'updated_at'      => now(),
+        ]);
+
+        if($bankDetails):
+            return response()->json(['msg' => 'Company Bank Details successfully updated.', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
+        endif;
+    }
+
+    public function updateCompanyLogo(Request $request){
+        $company = Company::find($request->company_id);
+        if ($request->hasFile('company_logo')):
+            if (!empty($company->company_logo) && Storage::disk('public')->exists('companies/'.$company->id.'/'.$company->company_logo)):
+                Storage::disk('public')->delete('companies/'.$company->id.'/'.$company->company_logo);
+            endif;
+
+            $document = $request->file('company_logo');
+            $imageName = time().'_'.$company->id.'.'.$document->getClientOriginalExtension();
+            $path = $document->storeAs('companies/'.$company->id, $imageName, 'public');
+            
+            $company->update(['company_logo' => $imageName]);
+        endif;
+
+        return redirect('company');
     }
 }

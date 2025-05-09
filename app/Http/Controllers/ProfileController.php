@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Models\FileRecord;
 use App\Models\Staff;
 use App\Models\User;
+use App\Models\UserPricingPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Creagia\LaravelSignPad\Signature;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Number;
+use Stripe;
 
 class ProfileController extends Controller
 {
@@ -19,7 +25,8 @@ class ProfileController extends Controller
     {
         return view('app.profile.index', [
             'title' => 'Profile - Gas Certificate APP',
-            'user' => User::find(auth()->user()->id)
+            'user' => User::find(auth()->user()->id),
+            'method' => $this->paymentMethods(auth()->user()->id)
         ]);
     }
 
@@ -106,6 +113,72 @@ class ProfileController extends Controller
         return response()->json(['message' => 'Signature could not be uploaded'], 400);
     }
 
+    public function updateData(Request $request){
+        $user_id = $request->id;
+        $value = (isset($request->fieldValue) && !empty($request->fieldValue) ? $request->fieldValue : null);
+        $field = $request->fieldName;
+
+        if($user_id > 0 && $field != ''):
+            $user = User::find($user_id);
+            $user->update([$field => $value]);
+
+            return response()->json(['msg' => 'User data successfully updated.'], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request){
+        $user_id = $request->id;
+        if(!empty($request->input('password'))):
+            $user = User::find($user_id);
+            $user->update(['password' => Hash::make($request->input('password'))]);
+            
+            return response()->json(['msg' => 'You password successfully updated.'], 200);
+        else:
+            return response()->json(['msg' => 'Password can not be empty.'], 304);
+        endif;
+    }
+
+    public function paymentMethods($user_id){
+        $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $paymentData = [];
+        if(isset($userPackage->stripe_customer_id) && !empty($userPackage->stripe_customer_id)):
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $customer = $stripe->customers->retrieve($userPackage->stripe_customer_id);
+            try{
+                $paymentMethod = (isset($customer->invoice_settings->default_payment_method) && !empty($customer->invoice_settings->default_payment_method) ? $customer->invoice_settings->default_payment_method : '');
+                if(!empty($paymentMethod)):
+                    try{
+                        $paymentMethod = $stripe->customers->retrievePaymentMethod(
+                            $userPackage->stripe_customer_id,
+                            $paymentMethod
+                        );
+                        $paymentData['brand'] = $paymentMethod->card->brand;
+                        $paymentData['display_brand'] = $paymentMethod->card->display_brand;
+                        $paymentData['last4'] = $paymentMethod->card->last4;
+                        $paymentData['exp_month'] = $paymentMethod->card->exp_month;
+                        $paymentData['exp_year'] = $paymentMethod->card->exp_year;
+
+                        $session = $stripe->billingPortal->sessions->create([
+                            'customer' => $userPackage->stripe_customer_id,
+                            'return_url' => route('profile'),
+                        ]);
+                        $paymentData['portal_url'] = (isset($session->url) && !empty($session->url) ? $session->url : '');
+                        
+                    }catch(Exception $e){
+                        //return redirect('profile');
+                    }
+                else:
+                    //return redirect('profile');
+                endif;
+            }catch(Exception $e){
+                //return redirect('profile');
+            }
+        endif;
+
+        return $paymentData;
+    }
 
 }
 

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserStoreRequest extends FormRequest
+class UpgradeSubscriptionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,14 @@ class UserStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => 'required|min:8|confirmed',
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'pricing_package_id' => 'required',
+            'pricing_package_id' => 'required'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'pricing_package_id.required' => 'Please select a package.'
         ];
     }
 }
