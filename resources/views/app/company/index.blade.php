@@ -139,7 +139,7 @@
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="map-pin" />
                 <div>
                     <span class="font-medium text-slate-500 text-sm block">Address</span>
-                    <span class="font-normal text-slate-400 text-xs block">{!! (!empty($company->full_address_html) ? $company->full_address_html : 'N/A') !!}</span>
+                    <span class="font-normal text-slate-400 text-xs block">{!! (!empty($company->full_address_with_html) ? $company->full_address_with_html : 'N/A') !!}</span>
                 </div>
             </div>
         </div>

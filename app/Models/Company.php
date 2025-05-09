@@ -12,7 +12,7 @@ class Company extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    protected $appends = ['pdf_address', 'logo_url', 'full_address', 'full_address_html'];
+    protected $appends = ['pdf_address', 'logo_url', 'full_address', 'full_address_html', 'full_address_with_html'];
 
     protected $fillable = [
         'id',
@@ -80,6 +80,16 @@ class Company extends Model
         $address .= (!empty($this->company_postal_code) ? $this->company_postal_code : '');
         //$address .= (!empty($this->company_state) ? $this->company_state.', ' : '');
         //$address .= (!empty($this->company_country) ? $this->company_country : '');
+        return $address;
+    }
+
+    public function getFullAddressWithHtmlAttribute(){
+        $address = '';
+        $address .= $this->company_address_line_1.' '.$this->company_address_line_2.',<br/> ';
+        $address .= (!empty($this->company_city) ? $this->company_city.', ' : '');
+        $address .= (!empty($this->company_postal_code) ? $this->company_postal_code.', <br/>' : '');
+        $address .= (!empty($this->company_state) ? $this->company_state.', ' : '');
+        $address .= (!empty($this->company_country) ? $this->company_country : '');
         return $address;
     }
 
