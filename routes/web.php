@@ -54,6 +54,8 @@ use App\Http\Controllers\Records\NewRecordController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\UserSubscriptionController;
+use App\Http\Middleware\CheckSubscription;
 use App\Models\BoilerBrand;
 use App\Models\GasServiceRecord;
 
@@ -149,8 +151,13 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(Dashboard::class)->group(function () {
         Route::get('/', 'index')->name('company.dashboard')->middleware(CheckFirstLogin::class);
         Route::post('send-invitation-sms', 'sendInvitationSms')->name('company.dashboard.send.invitation.sms');
+        Route::get('upgrade-subscriptions', 'upgradeSubscriptions')->name('company.dashboard.upgrade.subscriptions');
+        Route::post('upgrade-subscription', 'upgradeSubscription')->name('company.dashboard.upgrade.subscription');
     });
 
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+    
     Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
         
         Route::get('boiler-manuals', 'index')->name('boiler-manuals');
@@ -168,6 +175,13 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('initial-setup', 'initialSetup')->name('initial.setup'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
         Route::post('company/update', 'update')->name('company.update'); 
+
+        Route::post('company/update-company-info', 'updateCompanyInfo')->name('company.update.company.info'); 
+        Route::post('company/update-registration-info', 'updateRegistrationInfo')->name('company.update.registration.info'); 
+        Route::post('company/update-contact-info', 'updateContactInfo')->name('company.update.contact.info'); 
+        Route::post('company/update-address-info', 'updateAddressInfo')->name('company.update.address.info'); 
+        Route::post('company/update-bank-info', 'updateBankInfo')->name('company.update.bank.info'); 
+        Route::post('company/update-company-logo', 'updateCompanyLogo')->name('company.update.company.logo'); 
     });
 
     Route::resource('staff', StaffController::class);
@@ -181,8 +195,6 @@ Route::middleware(Authenticate::class)->group(function() {
         
         
     });
-
-    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::controller(CustomerController::class)->group(function() {
         Route::get('customers', 'index')->name('customers'); 
@@ -258,81 +270,126 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('gas-rate-calculator', 'index')->name('gas.rate.calculator');
     });
 
+    Route::middleware(CheckSubscription::class)->group(function() {
+        Route::controller(NewRecordController::class)->group(function() {
+            Route::get('new-records', 'index')->name('new.records');
+            Route::get('new-records/create/{form}', 'create')->name('new.records.create');
+
+            Route::post('new-records/get-jobs/', 'getJobs')->name('new.records.get.jobs');
+            Route::post('new-records/linked-job/', 'linkedJob')->name('new.records.linked.job');
+            Route::post('new-records/get-job-addresses/', 'getJobAddressrs')->name('new.records.get.job.addresses');
+            Route::post('new-records/store-job-address/', 'storeJobAddress')->name('new.records.store.job.addresses');
+            Route::post('new-records/get-job-address-occupant/', 'getJobAddressOccupent')->name('new.records.get.job.address.occupant');
+            Route::post('new-records/store-job-address-occupant/', 'storeJobAddressOccupent')->name('new.records.store.job.address.occupant');
+
+            Route::post('new-records/get-invoice-no/', 'getInvoiceNumber')->name('new.records.get.invoice.number');
+            Route::post('new-records/get-quote-no/', 'getQuoteNumber')->name('new.records.get.quote.number');
+
+            Route::post('new-records/get-customers/', 'getCustomers')->name('new.records.get.customers');
+            Route::post('new-records/get-linked-customer/', 'getLInkedCustomer')->name('new.records.linked.customer');
+        });
+        
+        Route::controller(InvoiceController::class)->group(function(){
+            Route::get('new-records/invoice/show/{inv}', 'show')->name('invoice.show');
+            Route::post('new-records/invoice/store', 'store')->name('invoice.store');
+
+            Route::post('new-records/invoice/store-new', 'storeNew')->name('invoice.store.new');
+            Route::post('new-records/invoice/edit-ready', 'editReady')->name('invoice.edit.ready.new');
+        });
+        
+        Route::controller(QuoteController::class)->group(function(){
+            Route::get('new-records/quote/show/{qut}', 'show')->name('quote.show');
+            Route::post('new-records/quote/store', 'store')->name('quote.store');
+            Route::post('new-records/quote/convert-to-invoice', 'convertToInvoice')->name('quote.convert.to.invoice');
+
+            Route::post('new-records/quote/store-new', 'storeNew')->name('quote.store.new');
+            Route::post('new-records/quote/edit-ready', 'editReady')->name('quote.edit.ready.new');
+        });
+        
+        Route::controller(HomeOwnerGasSafetyController::class)->group(function(){
+            Route::get('new-records/homeowner_gas_safety_record/show/{gsr}', 'show')->name('new.records.gsr.view');
+            Route::post('new-records/homeowner_gas_safety_record/store/{gsr}', 'store')->name('new.records.gsr.store');
+
+            Route::post('new-records/homeowner_gas_safety_record/store-new', 'storeNew')->name('new.records.gsr.store.new');
+            Route::post('new-records/homeowner_gas_safety_record/edit-ready', 'editReady')->name('new.records.gsr.edit.ready.new');
+        });
+        
+        Route::controller(LandlordGasSafetyController::class)->group(function(){
+            Route::get('new-records/landlord-gas-safety-record/show/{glsr}', 'show')->name('new.records.glsr.view');
+            Route::post('new-records/landlord-gas-safety-record/store/{glsr}', 'store')->name('new.records.glsr.store');
+
+            Route::post('new-records/landlord-gas-safety-record/store-new', 'storeNew')->name('new.records.glsr.store.new');
+            Route::post('new-records/landlord-gas-safety-record/edit-ready', 'editReady')->name('new.records.glsr.edit.ready.new');
+        });
+        
+        Route::controller(GasWarningNoticeController::class)->group(function(){
+            Route::get('new-records/gas-warning-notice/show/{gsr}', 'show')->name('new.records.gas.warning.notice.show');
+            Route::post('new-records/gas-warning-notice/store/{gsr}', 'store')->name('new.records.gas.warning.notice.store');
+
+            Route::post('new-records/gas-warning-notice/store-new', 'storeNew')->name('new.records.gwnr.store.new');
+            Route::post('new-records/gas-warning-notice/edit-ready', 'editReady')->name('new.records.gwnr.edit.ready.new');
+        });
+        
+        Route::controller(GasServiceRecordController::class)->group(function(){
+            Route::get('new-records/gas-service-record/show/{gsr}', 'show')->name('new.records.gas.service.show');
+            Route::post('new-records/gas-service-record/store/{gsr}', 'store')->name('new.records.gas.service.store');
+
+            Route::post('new-records/gas-service-record/store-new', 'storeNew')->name('new.records.gas.service.store.new');
+            Route::post('new-records/gas-service-record/edit-ready', 'editReady')->name('new.records.gas.service.edit.ready.new');
+        });
+        
+        Route::controller(GasBreakdownRecordController::class)->group(function(){
+            Route::get('new-records/gas-breakdown-record/show/{gbr}', 'show')->name('new.records.gas.breakdown.record.show');
+            Route::post('new-records/gas-breakdown-record/store/{gbr}', 'store')->name('new.records.gas.breakdown.record.store');
+
+            Route::post('new-records/gas-breakdown-record/store-new', 'storeNew')->name('new.records.gbr.store.new');
+            Route::post('new-records/gas-breakdown-record/edit-ready', 'editReady')->name('new.records.gbr.edit.ready.new');
+        });
     
-    Route::controller(NewRecordController::class)->group(function() {
-        Route::get('new-records', 'index')->name('new.records');
-        Route::get('new-records/create/{form}', 'create')->name('new.records.create');
+        Route::controller(GasBoilerSystemCommissioningChecklistController::class)->group(function(){
+            Route::get('new-records/gas-boiler-system-commissioning-checklist/show/{gbscc}', 'show')->name('new.records.gas.bscc.record.show');
+            Route::post('new-records/gas-boiler-system-commissioning-checklist/store/{gbscc}', 'store')->name('new.records.gas.bscc.record.store');
 
-        Route::post('new-records/get-jobs/', 'getJobs')->name('new.records.get.jobs');
-        Route::post('new-records/linked-job/', 'linkedJob')->name('new.records.linked.job');
-        Route::post('new-records/get-job-addresses/', 'getJobAddressrs')->name('new.records.get.job.addresses');
-        Route::post('new-records/store-job-address/', 'storeJobAddress')->name('new.records.store.job.addresses');
-        Route::post('new-records/get-job-address-occupant/', 'getJobAddressOccupent')->name('new.records.get.job.address.occupant');
-        Route::post('new-records/store-job-address-occupant/', 'storeJobAddressOccupent')->name('new.records.store.job.address.occupant');
+            Route::post('new-records/gas-boiler-system-commissioning-checklist/store-new', 'storeNew')->name('new.records.gas.bscc.store.new');
+            Route::post('new-records/gas-boiler-system-commissioning-checklist/edit-ready', 'editReady')->name('new.records.gas.bscc.edit.ready.new');
+        });
+        
+        Route::controller(GasPowerFlushRecordController::class)->group(function(){
+            Route::delete('new-records/power_flush_record/destroy-rediator/{gpfrr}', 'destroyRediator')->name('new.records.gas.power.flush.record.delete.rediator');
 
-        Route::post('new-records/get-invoice-no/', 'getInvoiceNumber')->name('new.records.get.invoice.number');
-        Route::post('new-records/get-quote-no/', 'getQuoteNumber')->name('new.records.get.quote.number');
+            Route::get('new-records/power_flush_record/show/{gpfr}', 'show')->name('new.records.gas.power.flush.record.show');
+            Route::post('new-records/power_flush_record/store/{gpfr}', 'store')->name('new.records.gas.power.flush.record.store');
 
-        Route::post('new-records/get-customers/', 'getCustomers')->name('new.records.get.customers');
-        Route::post('new-records/get-linked-customer/', 'getLInkedCustomer')->name('new.records.linked.customer');
+            Route::post('new-records/power_flush_record/store-new', 'storeNew')->name('new.records.gas.power.flush.store.new');
+            Route::post('new-records/power_flush_record/edit-ready', 'editReady')->name('new.records.gas.power.flush.edit.ready.new');
+        });
+        
+        Route::controller(GasCommissionDecommissionRecordController::class)->group(function(){
+            Route::get('new-records/installation-commissioning-decommissioning-record/show/{gcdr}', 'show')->name('new.records.gcdr.show');
+            Route::post('new-records/installation-commissioning-decommissioning-record/store/{gcdr}', 'store')->name('new.records.gcdr.store');
+
+            Route::post('new-records/installation-commissioning-decommissioning-record/store-new', 'storeNew')->name('new.records.gcdr.store.new');
+            Route::post('new-records/installation-commissioning-decommissioning-record/edit-ready', 'editReady')->name('new.records.gcdr.edit.ready.new');
+        });
+        
+        Route::controller(GasUnventedHotWaterCylinderRecordController::class)->group(function(){
+            Route::get('new-records/unvented-hot-water-cylinders/show/{guhwcr}', 'show')->name('new.records.guhwcr.show');
+            Route::post('new-records/unvented-hot-water-cylinders/store/{guhwcr}', 'store')->name('new.records.guhwcr.store');
+
+            Route::post('new-records/unvented-hot-water-cylinders/store-new', 'storeNew')->name('new.records.guhwcr.store.new');
+            Route::post('new-records/unvented-hot-water-cylinders/edit-ready', 'editReady')->name('new.records.guhwcr.edit.ready.new');
+        });
+        
+        Route::controller(GasJobSheetController::class)->group(function(){
+            Route::get('new-records/job-sheet/show/{gjsr}', 'show')->name('new.records.gjsr.show');
+            Route::post('new-records/job-sheet/store/{gjsr}', 'store')->name('new.records.gjsr.store');
+            Route::delete('new-records/job-sheet/destroy-document/{gjsrd}', 'destroyDocument')->name('new.records.gjsr.destroy.document'); 
+
+            Route::post('new-records/job-sheet/store-new', 'storeNew')->name('new.records.gjsr.store.new');
+            Route::post('new-records/job-sheet/edit-ready', 'editReady')->name('new.records.gjsr.edit.ready.new');
+        });
     });
     
-    Route::controller(InvoiceController::class)->group(function(){
-        Route::get('new-records/invoice/show/{inv}', 'show')->name('invoice.show');
-        Route::post('new-records/invoice/store', 'store')->name('invoice.store');
-
-        Route::post('new-records/invoice/store-new', 'storeNew')->name('invoice.store.new');
-        Route::post('new-records/invoice/edit-ready', 'editReady')->name('invoice.edit.ready.new');
-    });
-    
-    Route::controller(QuoteController::class)->group(function(){
-        Route::get('new-records/quote/show/{qut}', 'show')->name('quote.show');
-        Route::post('new-records/quote/store', 'store')->name('quote.store');
-        Route::post('new-records/quote/convert-to-invoice', 'convertToInvoice')->name('quote.convert.to.invoice');
-
-        Route::post('new-records/quote/store-new', 'storeNew')->name('quote.store.new');
-        Route::post('new-records/quote/edit-ready', 'editReady')->name('quote.edit.ready.new');
-    });
-    
-    Route::controller(HomeOwnerGasSafetyController::class)->group(function(){
-        Route::get('new-records/homeowner_gas_safety_record/show/{gsr}', 'show')->name('new.records.gsr.view');
-        Route::post('new-records/homeowner_gas_safety_record/store/{gsr}', 'store')->name('new.records.gsr.store');
-
-        Route::post('new-records/homeowner_gas_safety_record/store-new', 'storeNew')->name('new.records.gsr.store.new');
-        Route::post('new-records/homeowner_gas_safety_record/edit-ready', 'editReady')->name('new.records.gsr.edit.ready.new');
-    });
-    
-    Route::controller(LandlordGasSafetyController::class)->group(function(){
-        Route::get('new-records/landlord-gas-safety-record/show/{glsr}', 'show')->name('new.records.glsr.view');
-        Route::post('new-records/landlord-gas-safety-record/store/{glsr}', 'store')->name('new.records.glsr.store');
-
-        Route::post('new-records/landlord-gas-safety-record/store-new', 'storeNew')->name('new.records.glsr.store.new');
-        Route::post('new-records/landlord-gas-safety-record/edit-ready', 'editReady')->name('new.records.glsr.edit.ready.new');
-    });
-    
-    Route::controller(GasWarningNoticeController::class)->group(function(){
-        Route::get('new-records/gas-warning-notice/show/{gsr}', 'show')->name('new.records.gas.warning.notice.show');
-        Route::post('new-records/gas-warning-notice/store/{gsr}', 'store')->name('new.records.gas.warning.notice.store');
-
-        Route::post('new-records/gas-warning-notice/store-new', 'storeNew')->name('new.records.gwnr.store.new');
-        Route::post('new-records/gas-warning-notice/edit-ready', 'editReady')->name('new.records.gwnr.edit.ready.new');
-    });
-    
-    Route::controller(GasServiceRecordController::class)->group(function(){
-        Route::get('new-records/gas-service-record/show/{gsr}', 'show')->name('new.records.gas.service.show');
-        Route::post('new-records/gas-service-record/store/{gsr}', 'store')->name('new.records.gas.service.store');
-
-        Route::post('new-records/gas-service-record/store-new', 'storeNew')->name('new.records.gas.service.store.new');
-        Route::post('new-records/gas-service-record/edit-ready', 'editReady')->name('new.records.gas.service.edit.ready.new');
-    });
-    
-    Route::controller(GasBreakdownRecordController::class)->group(function(){
-        Route::get('new-records/gas-breakdown-record/show/{gbr}', 'show')->name('new.records.gas.breakdown.record.show');
-        Route::post('new-records/gas-breakdown-record/store/{gbr}', 'store')->name('new.records.gas.breakdown.record.store');
-
-        Route::post('new-records/gas-breakdown-record/store-new', 'storeNew')->name('new.records.gbr.store.new');
-        Route::post('new-records/gas-breakdown-record/edit-ready', 'editReady')->name('new.records.gbr.edit.ready.new');
-    });
     
     Route::controller(UserManagementController::class)->group(function() {
         Route::get('users', 'index')->name('users.index'); 
@@ -349,54 +406,22 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('users/get-details', 'getDetails')->name('users.get.details');
         Route::post('users/search', 'search')->name('users.search');
-    });
-    
-    Route::controller(GasBoilerSystemCommissioningChecklistController::class)->group(function(){
-        Route::get('new-records/gas-boiler-system-commissioning-checklist/show/{gbscc}', 'show')->name('new.records.gas.bscc.record.show');
-        Route::post('new-records/gas-boiler-system-commissioning-checklist/store/{gbscc}', 'store')->name('new.records.gas.bscc.record.store');
 
-        Route::post('new-records/gas-boiler-system-commissioning-checklist/store-new', 'storeNew')->name('new.records.gas.bscc.store.new');
-        Route::post('new-records/gas-boiler-system-commissioning-checklist/edit-ready', 'editReady')->name('new.records.gas.bscc.edit.ready.new');
-    });
-    
-    Route::controller(GasPowerFlushRecordController::class)->group(function(){
-        Route::delete('new-records/power_flush_record/destroy-rediator/{gpfrr}', 'destroyRediator')->name('new.records.gas.power.flush.record.delete.rediator');
-
-        Route::get('new-records/power_flush_record/show/{gpfr}', 'show')->name('new.records.gas.power.flush.record.show');
-        Route::post('new-records/power_flush_record/store/{gpfr}', 'store')->name('new.records.gas.power.flush.record.store');
-
-        Route::post('new-records/power_flush_record/store-new', 'storeNew')->name('new.records.gas.power.flush.store.new');
-        Route::post('new-records/power_flush_record/edit-ready', 'editReady')->name('new.records.gas.power.flush.edit.ready.new');
-    });
-    
-    Route::controller(GasCommissionDecommissionRecordController::class)->group(function(){
-        Route::get('new-records/installation-commissioning-decommissioning-record/show/{gcdr}', 'show')->name('new.records.gcdr.show');
-        Route::post('new-records/installation-commissioning-decommissioning-record/store/{gcdr}', 'store')->name('new.records.gcdr.store');
-
-        Route::post('new-records/installation-commissioning-decommissioning-record/store-new', 'storeNew')->name('new.records.gcdr.store.new');
-        Route::post('new-records/installation-commissioning-decommissioning-record/edit-ready', 'editReady')->name('new.records.gcdr.edit.ready.new');
-    });
-    
-    Route::controller(GasUnventedHotWaterCylinderRecordController::class)->group(function(){
-        Route::get('new-records/unvented-hot-water-cylinders/show/{guhwcr}', 'show')->name('new.records.guhwcr.show');
-        Route::post('new-records/unvented-hot-water-cylinders/store/{guhwcr}', 'store')->name('new.records.guhwcr.store');
-
-        Route::post('new-records/unvented-hot-water-cylinders/store-new', 'storeNew')->name('new.records.guhwcr.store.new');
-        Route::post('new-records/unvented-hot-water-cylinders/edit-ready', 'editReady')->name('new.records.guhwcr.edit.ready.new');
-    });
-    
-    Route::controller(GasJobSheetController::class)->group(function(){
-        Route::get('new-records/job-sheet/show/{gjsr}', 'show')->name('new.records.gjsr.show');
-        Route::post('new-records/job-sheet/store/{gjsr}', 'store')->name('new.records.gjsr.store');
-        Route::delete('new-records/job-sheet/destroy-document/{gjsrd}', 'destroyDocument')->name('new.records.gjsr.destroy.document'); 
-
-        Route::post('new-records/job-sheet/store-new', 'storeNew')->name('new.records.gjsr.store.new');
-        Route::post('new-records/job-sheet/edit-ready', 'editReady')->name('new.records.gjsr.edit.ready.new');
+        Route::get('users/navigations/{user}', 'navigations')->name('users.navigations');
+        Route::get('users/plans/{user}', 'userPlans')->name('users.plans');
+        Route::post('users/cancel-subscription', 'cancelSubscription')->name('users.cancel.subscription');
+        Route::get('users/payment-history/{user}', 'paymentHistory')->name('users.payment.history');
     });
 
     Route::controller(RecordAndDraftController::class)->group(function() {
         Route::get('records-and-drafts', 'index')->name('records-and-drafts');
         Route::get('records-and-drafts/list', 'list')->name('records-and-drafts.list');
+    });
+
+    Route::controller(UserSubscriptionController::class)->group(function () {
+        Route::get('settings/user-subscriptions-manager', 'index')->name('user.subscriptions');
+        Route::get('settings/user-subscriptions-manager/list', 'list')->name('user.subscriptions.list');
+        Route::get('settings/user-subscriptions-manager/download-invoice/{inv}', 'downloadInvoice')->name('user.subscriptions.download.invoice');
     });
 });
 
@@ -411,6 +436,9 @@ Route::controller(ProfileController::class)->group(function() {
     Route::post('profile/update', 'update')->name('profile.update');
     Route::post('profile-draw-signature/','drawSignatureStore')->name('profile.draw-signature'); 
     Route::post('profile-signature-upload/','fileUploadStore')->name('profile.upload-signature');
+
+    Route::post('profile/update-data','updateData')->name('profile.update.data');
+    Route::post('profile/update-password','updatePassword')->name('profile.update.password');
 });
 
 

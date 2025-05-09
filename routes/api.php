@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BoilerBrandAndManualPageController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\UserSubscriptionWebhookController;
 use App\Http\Middleware\loggedin;
 
 Route::prefix('/v1')->name('api.')->group(function() {
@@ -69,4 +70,8 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::delete('company/{company}', 'destroy')->name('company.destroy');
         });
     });
+});
+
+Route::controller(UserSubscriptionWebhookController::class)->group(function () {
+    Route::post('subscription-hooks', 'stripeHooks')->name('subscription.hooks');
 });

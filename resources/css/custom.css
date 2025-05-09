@@ -480,3 +480,27 @@
         display: block;
     }
 }
+
+.packageItems input:checked + label .packageTop{
+    background: rgb(13, 148, 136);
+}
+.packageItems input:checked + label .packageBottom{
+    border-color: rgb(13, 148, 136);
+}
+
+.overlayBG::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, .45);
+}
+
+.bg-success-40 {
+    background-color: rgb(var(--color-success) / 0.4);
+}
+.bg-danger-40 {
+    background-color: rgb(var(--color-danger) / 0.4);
+}

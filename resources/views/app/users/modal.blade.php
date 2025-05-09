@@ -1,102 +1,126 @@
-<!-- BEGIN: Create User Modal Content -->
-<x-base.dialog id="addnew-modal" size="xl" staticBackdrop >
-    <x-base.dialog.panel>
-        <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#">
-            <x-base.lucide class="h-8 w-8 text-slate-400" icon="X" />
-        </a>
-        <div class="px-16 pt-16 pb-5 flex items-left">
-            <x-base.lucide class="h-8 w-8 text-primary" icon="UserPlus"/>
-            <div id="titleModal" class="text-2xl ml-2">Create User</div>
-        </div>
-        <div id="base-start" class=" flex flex-col px-16 pt-5 pb-16">
-            <div>
-                <div class="mb-4">
-                    <form id="userCreateForm" enctype="multipart/form-data" class="mb-4">
-                        <div class="mt-3">
-                            <x-base.form-label for="name">Name <span class="text-danger">*</span></x-base.form-label>
-                            <x-base.form-input name="name" id="name" class="w-full" type="text" placeholder="John Doe" />
-                            <span class="mt-2 text-danger error-name"></span>
-                        </div>
-                        <div class="mt-3">
-                            <x-base.form-label for="email">Email <span class="text-danger">*</span></x-base.form-label>
-                            <x-base.form-input name="email" id="email" class="w-full" type="text" placeholder="yourname@example.com" />
-                            <span class="mt-2 text-danger error-email"></span>
-                        </div>
-                        <div class="mt-3">
-                            <x-base.form-label for="password">Password <span class="text-danger">*</span></x-base.form-label>
-                            <x-base.form-input name="password" id="password" class="w-full" type="password" placeholder="*********" />
-                            <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-4 password-strength">
-                                <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                            </div>
-                            <span class="mt-2 text-danger error-password"></span>
-                        </div>
-                        <div class="mt-3">
-                            <x-base.form-label for="password_confirmation">Password Confirmation</x-base.form-label>
-                            <x-base.form-input name="password_confirmation" id="password_confirmation" class="w-full" type="password" placeholder="*********" />
-                            <span class="mt-2 text-danger error-password_confirmation"></span>
-                        </div>
-                        <div class="grid grid-cols-12 gap-6">
-                            <div class="intro-y col-span-12 md:col-span-4">
-                                <div class="intro-y mt-5">
-                                    <div class="mt-3">
-                                        <x-base.form-label for="gas_safe_id_card">Gas Safe Id Card</x-base.form-label>
-                                        <x-base.form-input name="gas_safe_id_card" id="gas_safe_id_card" class="w-full" type="text" placeholder="" />
-                                        <span class="mt-2 text-danger error-gas_safe_id_card"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="intro-y col-span-12 md:col-span-4">
-                                <div class="intro-y mt-5">
-                                    <div class="mt-3">
-                                        <x-base.form-label for="oil_registration_number">Oil Registration Number</x-base.form-label>
-                                        <x-base.form-input name="oil_registration_number" id="oil_registration_number" class="w-full" type="text" placeholder="" />
-                                        <span class="mt-2 text-danger error-oil_registration_number"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="intro-y col-span-12 md:col-span-4">
-                                <div class="intro-y mt-5">
-                                    <div class="mt-3">
-                                        <x-base.form-label for="installer_ref_no">Installer Ref No</x-base.form-label>
-                                        <x-base.form-input name="installer_ref_no" id="installer_ref_no" class="w-full" type="text" placeholder="" />
-                                        <span class="mt-2 text-danger error-installer_ref_no"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <x-base.form-label>Pricing Package</x-base.form-label>
-                            @if($packages->count() > 0)
-                                <div>
-                                    @foreach($packages as $pack)
-                                        <x-base.form-check class="mb-2">
-                                            <x-base.form-check.input id="pricing_package_{{ $pack->id }}" name="pricing_package_id" type="radio" value="{{ $pack->id }}"/>
-                                            <x-base.form-check.label for="pricing_package_{{ $pack->id }}">
-                                                {{ $pack->title }} - {{ Number::currency($pack->price, 'GBP') }} /{{ $pack->period }}
-                                            </x-base.form-check.label>
-                                        </x-base.form-check>
-                                    @endforeach
-                                </div>
-                            @endif
-                            <span class="mt-2 text-danger error-pricing_package_id"></span>
-                        </div>
-                        <div class="mt-3">
-                            <x-base.button class="w-auto border-0 rounded-0" id="userSaveBtn" type="submit" variant="primary">
-                                Save
-                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                            </x-base.button>
-                        </div>
-                    </form>
-                </div>       
-            </div>
-        </div>
 
+<!-- BEGIN: Add New User Modal Content -->
+<x-base.dialog id="addnew-modal" staticBackdrop size="xl">
+    <x-base.dialog.panel class="rounded-none">
+        <form method="post" action="#" id="userCreateForm">
+            <x-base.dialog.title>
+                <h2 class="mr-auto text-base font-medium inline-flex items-center"><x-base.lucide class="h-4 w-4 mr-2 text-primary" icon="UserPlus"/> Create User</h2>
+                <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+            </x-base.dialog.title>
+            <x-base.dialog.description class="">
+                <div class="grid grid-cols-12 gap-x-4 gap-y-2">
+                    <div class="col-span-12 sm:col-span-6">
+                        <x-base.form-label for="name">Name <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input name="name" id="name" class="w-full" type="text" placeholder="John Doe" />
+                        <div class="mt-1 text-danger acc-input-error error-name" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <x-base.form-label for="email">Email <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input name="email" id="email" class="w-full" type="text" placeholder="yourname@example.com" />
+                        <div class="mt-1 text-danger acc-input-error error-email" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <x-base.form-label for="password">Password <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input name="password" id="password" class="w-full" type="password" placeholder="*********" />
+                        <div id="password-strength" class="mt-2 grid h-1.5 w-full grid-cols-12 gap-4 password-strength">
+                            <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                            <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                        </div>
+                        <div class="mt-1 text-danger acc-input-error error-password" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <x-base.form-label for="password_confirmation">Password Confirmation</x-base.form-label>
+                        <x-base.form-input name="password_confirmation" id="password_confirmation" class="w-full" type="password" placeholder="*********" />
+                        <div class="mt-1 text-danger acc-input-error error-password_confirmation" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-12 md:col-span-4">
+                        <x-base.form-label for="gas_safe_id_card">Gas Safe Id Card</x-base.form-label>
+                        <x-base.form-input name="gas_safe_id_card" id="gas_safe_id_card" class="w-full" type="text" placeholder="" />
+                        <div class="mt-1 text-danger acc-input-error error-gas_safe_id_card" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-12 md:col-span-4">
+                        <x-base.form-label for="oil_registration_number">Oil Registration Number</x-base.form-label>
+                        <x-base.form-input name="oil_registration_number" id="oil_registration_number" class="w-full" type="text" placeholder="" />
+                        <div class="mt-1 text-danger acc-input-error error-oil_registration_number" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-12 md:col-span-4">
+                        <x-base.form-label for="installer_ref_no">Installer Ref No</x-base.form-label>
+                        <x-base.form-input name="installer_ref_no" id="installer_ref_no" class="w-full" type="text" placeholder="" />
+                        <div class="mt-2 text-danger acc-input-error error-installer_ref_no" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-12 gap-x-4 gap-y-2">
+                    @if($packages->count() > 0)
+                        @foreach($packages as $pack)
+                            <div class="col-span-12 sm:col-span-6 relative packageItems">
+                                <input class="w-0 h-0 opacity-0 absolute left-0 top-0" id="pricing_package_{{ $pack->id }}" name="pricing_package_id" type="radio" value="{{ $pack->id }}"/>
+                                <label class="packag block m-0 cursor-pointer" for="pricing_package_{{ $pack->id }}">
+                                    <span class="bg-primary packageTop text-center block rounded rounded-br-none rounded-bl-none text-white py-6 px-5">
+                                        <span class="text-xl font-bold leading-none mb-1 block">{{ $pack->title }}</span>
+                                        <span class="text-xl font-bold leading-none block">{{ Number::currency($pack->price, 'GBP') }} /{{ $pack->period }}</span>
+                                        <!-- <span class="text-slate-200 text-xs block">Exc. VAT</span> -->
+                                    </span>
+                                    <span class="px-4 packageBottom py-6 block border border-primary border-t-0 rounded rounded-tl-none rounded-tr-none text-center">
+                                        <span class="block text-slate-500 text-xs mb-3">{{ $pack->description }}</span>
+                                        <a href="#" class="ml-auto font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">More Features</a>
+                                    </span>
+                                </label>
+                            </div>
+                        @endforeach
+                    @endif
+                    <div class="mt-2 text-danger error-pricing_package_id" style="display: none;"></div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-12 gap-x-4 gap-y-2">
+                    <div class="col-span-12">
+                        <x-base.form-label for="card_holder_name">Card Holder Name</x-base.form-label>
+                        <x-base.form-input name="card_holder_name" id="card_holder_name" class="w-full" type="text" placeholder="John Doe" />
+                        <div class="mt-2 text-danger acc-input-error error-card_holder_name" style="display: none;"></div>
+                    </div>
+
+                    <div class="col-span-12">
+                        <x-base.form-label for="card_details_label">Card Details</x-base.form-label>
+                        <div id="card-element"></div>
+                        <div class="mt-2 text-danger acc-input-error error-card_element" style="display: none;"></div>
+                    </div>
+
+                    <div class="col-span-12">
+                        <x-base.form-label for="card_number_element">Card Number</x-base.form-label>
+                        <div id="card_number_element" class="w-full rounded-md border border-slate-200 shadow-sm px-3"></div>
+                        <div class="mt-2 text-danger acc-input-error error-card_number_element" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-4">
+                        <x-base.form-label for="card_expiry_element">Expiry Date</x-base.form-label>
+                        <div id="card_expiry_element" class="w-full rounded-md border border-slate-200 shadow-sm px-3"></div>
+                        <div class="mt-2 text-danger acc-input-error error-card_expiry_element" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-4">
+                        <x-base.form-label for="card_cvc_element">CVC</x-base.form-label>
+                        <div id="card_cvc_element" class="w-full rounded-md border border-slate-200 shadow-sm px-3"></div>
+                        <div class="mt-2 text-danger acc-input-error error-card_cvc_element" style="display: none;"></div>
+                    </div>
+                    <div class="col-span-4">
+                        <x-base.form-label for="postal_code">Postal Code</x-base.form-label>
+                        <x-base.form-input name="postal_code" id="postal_code" class="w-full" type="text" placeholder="G13 1LS" />
+                        <div class="mt-2 text-danger acc-input-error error-postal_code" style="display: none;"></div>
+                    </div>
+                </div>
+            </x-base.dialog.description>
+            <x-base.dialog.footer>
+                <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
+                <x-base.button class="w-auto" id="userSaveBtn" type="submit" variant="primary">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Save
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+            </x-base.dialog.footer>
+        </form>
     </x-base.dialog.panel>
 </x-base.dialog>
-<!-- END: Create User Modal Content -->
+<!-- END: Add New User Modal Content -->
+
 
 <x-base.dialog id="updatesignature-modal" size="xl" staticBackdrop >
     <x-base.dialog.panel>
@@ -179,30 +203,32 @@
 
     </x-base.dialog.panel>
 </x-base.dialog>
+
+<script src="https://js.stripe.com/v3/"></script>
 @pushOnce('scripts')
     <script type="module">
+        const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
+        const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
+        const addnewModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addnew-modal"));
+        const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatesignature-modal"));
 
-const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
-const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
-const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatesignature-modal"));
+        document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
+            $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+        });
 
-    document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
-        $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
-    });
-
-    $('#successModal .agreeWith').on('click', function(e){
-        e.preventDefault();
-        let $theBtn = $(this);
-        if($theBtn.attr('data-action') == 'RELOAD'){
-            if($theBtn.attr('data-redirect') != ''){
-                window.location.href = $theBtn.attr('data-redirect');
+        $('#successModal .agreeWith').on('click', function(e){
+            e.preventDefault();
+            let $theBtn = $(this);
+            if($theBtn.attr('data-action') == 'RELOAD'){
+                if($theBtn.attr('data-redirect') != ''){
+                    window.location.href = $theBtn.attr('data-redirect');
+                }else{
+                    window.location.reload();
+                }
             }else{
-                window.location.reload();
+                successModal.hide();
             }
-        }else{
-            successModal.hide();
-        }
-    });
+        });
 
         function evaluatePasswordStrength() {
             const password = document.getElementById('password').value;
@@ -323,25 +349,21 @@ const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySe
             }
         }
         $('#password').on('input', function() {
-                evaluatePasswordStrength()
+            evaluatePasswordStrength()
         })
-
-        // $('#password').on('input', function() {
-        //     evaluateUpdatedPasswordStrength()
-        // })
 
 
         $("#addSignUserForm").submit(function(e) {
             e.preventDefault();
             
-        const loadingElement = document.createElement('div');
-        loadingElement.classList.add('loading-icon');
-        loadingElement.setAttribute('data-lucide', 'loader');
-        loadingElement.style.display = 'inline-block';
-        loadingElement.style.marginLeft = '10px';
-        let $theForm = $(this);
+            const loadingElement = document.createElement('div');
+            loadingElement.classList.add('loading-icon');
+            loadingElement.setAttribute('data-lucide', 'loader');
+            loadingElement.style.display = 'inline-block';
+            loadingElement.style.marginLeft = '10px';
+            let $theForm = $(this);
 
-        $(".sign-pad-button-submit").append(loadingElement);
+            $(".sign-pad-button-submit").append(loadingElement);
 
             createIcons({
                         icons,
@@ -424,113 +446,233 @@ const updatesignatureModal = tailwind.Modal.getOrCreateInstance(document.querySe
             let formData = new FormData(this);
             let $id = $('#edit_id').val();
             axios({
-            method: "post",
-            url: route('users.upload-signature', { user_id: $id }),
-            data: formData,
-            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-        }).then(response => {
-            $('#userSaveBtn', $theForm).removeAttr('disabled');
-            $("#userSaveBtn .theLoader").fadeOut();
+                method: "post",
+                url: route('users.upload-signature', { user_id: $id }),
+                data: formData,
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                $('#userSaveBtn', $theForm).removeAttr('disabled');
+                $("#userSaveBtn .theLoader").fadeOut();
 
-            if (response.status == 201) {
-                successModal.show();
-                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
-                    $("#successModal .successModalTitle").html("Congratulations!");
-                    $("#successModal .successModalDesc").html(response.data.message);
-                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
-                });
-
-                setTimeout(() => {
-                    successModal.hide();
-                    window.location.reload();
-                }, 1500);
-            }
-        }).catch(error => {
-            $('#userSaveBtn', $theForm).removeAttr('disabled');
-            $("#userSaveBtn .theLoader").fadeOut();
-            if (error.response) {
-                if (error.response.status == 422) {
-                    for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#customerCreateForm .${key}`).addClass('border-danger');
-                        $(`#customerCreateForm  .error-${key}`).html(val);
-                    }
-                } else if (error.response.status == 304) {
-                    warningModal.show();
-                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
-                        $("#warningModal .warningModalTitle").html("Error Found!");
-                        $("#warningModal .warningModalDesc").html(error.response.data.message);
+                if (response.status == 201) {
+                    successModal.show();
+                    document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#successModal .successModalTitle").html("Congratulations!");
+                        $("#successModal .successModalDesc").html(response.data.message);
+                        $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
                     });
 
                     setTimeout(() => {
-                        warningModal.hide();
+                        successModal.hide();
+                        window.location.reload();
                     }, 1500);
-                } else {
-                    console.log('error');
                 }
-            }
-        });
+            }).catch(error => {
+                $('#userSaveBtn', $theForm).removeAttr('disabled');
+                $("#userSaveBtn .theLoader").fadeOut();
+                if (error.response) {
+                    if (error.response.status == 422) {
+                        for (const [key, val] of Object.entries(error.response.data.errors)) {
+                            $(`#customerCreateForm .${key}`).addClass('border-danger');
+                            $(`#customerCreateForm  .error-${key}`).html(val);
+                        }
+                    } else if (error.response.status == 304) {
+                        warningModal.show();
+                        document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#warningModal .warningModalTitle").html("Error Found!");
+                            $("#warningModal .warningModalDesc").html(error.response.data.message);
+                        });
 
-        });
-    
-        $('#userCreateForm').on('submit', function(e) {
-        e.preventDefault();
-
-        let $theForm = this;
-
-        $('#userSaveBtn', $theForm).attr('disabled');
-        $("#userSaveBtn .theLoader").fadeIn();
-        let formData = new FormData(this);
-        
-        axios({
-            method: "post",
-            url: route('users.store'),
-            data: formData,
-            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-        }).then(response => {
-            $('#userSaveBtn', $theForm).removeAttr('disabled');
-            $("#userSaveBtn .theLoader").fadeOut();
-
-            if (response.status == 201) {
-                successModal.show();
-                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
-                    $("#successModal .successModalTitle").html("Congratulations!");
-                    $("#successModal .successModalDesc").html(response.data.message);
-                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
-                });
-
-                setTimeout(() => {
-                    successModal.hide();
-                    window.location.reload();
-                }, 1500);
-            }
-        }).catch(error => {
-            $('#userSaveBtn', $theForm).removeAttr('disabled');
-            $("#userSaveBtn .theLoader").fadeOut();
-            if (error.response) {
-                if (error.response.status == 422) {
-                    for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#userCreateForm .${key}`).addClass('border-danger');
-                        $(`#userCreateForm  .error-${key}`).html(val);
+                        setTimeout(() => {
+                            warningModal.hide();
+                        }, 1500);
+                    } else {
+                        console.log('error');
                     }
-                } else if (error.response.status == 304) {
-                    warningModal.show();
-                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
-                        $("#warningModal .warningModalTitle").html("Error Found!");
-                        $("#warningModal .warningModalDesc").html(error.response.data.message);
-                    });
-
-                    setTimeout(() => {
-                        warningModal.hide();
-                    }, 1500);
-                } else {
-                    console.log('error');
                 }
+            });
+
+        });
+
+
+        /* New USER registration Start */
+        const form = document.getElementById('userCreateForm')
+        let $theForm = $('#userCreateForm');
+        const stripe = Stripe('{{ env("STRIPE_KEY") }}');
+        const elements = stripe.elements();
+
+        let style = {
+            base: {
+                iconColor: '#666EE8',
+                color: '#475569',
+                fontSize: '14px',
+                lineHeight: '36px',
+                fontWeight: 400,
+                fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
+                borderRadius: '0.375rem',
+                '::placeholder': {
+                    color: '#9ca3af',
+                },
+            },
+        };
+
+        var cardNumberElement = elements.create('cardNumber', { style: style, showIcon: true, placeholder: '1234 1234 1234 1234'});
+        cardNumberElement.mount('#card_number_element');
+
+        var cardExpiryElement = elements.create('cardExpiry', { style: style });
+        cardExpiryElement.mount('#card_expiry_element');
+
+        var cardCvcElement = elements.create('cardCvc', { style: style });
+        cardCvcElement.mount('#card_cvc_element');
+
+        const email = document.getElementById('email');
+        const carHolderName = document.getElementById('card_holder_name');
+        const postalCode = document.getElementById('postal_code');
+        let $theButton = $('#userSaveBtn', $theForm);
+
+        cardNumberElement.on('change', function(event) {
+            if (event.error) {
+                $('.error-card_number_element', $theForm).fadeIn().html(event.error.message)
+            } else {
+                $('.error-card_number_element', $theForm).fadeOut().html('')
+            }
+
+            if (event.complete) {
+                $theButton.removeAttr('disabled');
+            } else {
+                $theButton.attr('disabled', 'disabled');
             }
         });
+        cardExpiryElement.on('change', function(event) {
+            if (event.error) {
+                $('.error-card_expiry_element', $theForm).fadeIn().html(event.error.message)
+            } else {
+                $('.error-card_expiry_element', $theForm).fadeOut().html('')
+            }
+
+            if (event.complete) {
+                $theButton.removeAttr('disabled');
+            } else {
+                $theButton.attr('disabled', 'disabled');
+            }
+        });
+        cardCvcElement.on('change', function(event) {
+            if(event.error){
+                $('.error-card_cvc_element', $theForm).fadeIn().html(event.error.message);
+            }else{
+                $('.error-card_cvc_element', $theForm).fadeOut().html('');
+            }
+
+            if(event.complete){
+                $theButton.removeAttr('disabled');
+            }else{
+                $theButton.attr('disabled', 'disabled');
+            }
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            $('.acc-input-error', $theForm).fadeOut().html('');
+            $theButton.attr('disabled');
+            $(".theLoader", $theButton).fadeIn();
+
+            if(postalCode.value == ''){
+                $('.error-postal_code', $theForm).fadeIn().html('This field is required.');
+                
+                $theButton.removeAttr('disabled');
+                $(".theLoader", $theButton).fadeOut();
+
+                return false;
+            }
+
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardNumberElement,
+                billing_details:{
+                    name: carHolderName.value,
+                    email: email.value,
+                    address: {
+                        postal_code : postalCode.value
+                    }
+                }
+            });
+
+            if (error) {
+                $('input[name="token"]', $theForm).remove();
+                $('.error-card_number_element', $theForm).fadeIn().html(error.message);
+                $theButton.removeAttr('disabled');
+                $('.theLoader', $theButton).fadeOut();
+            } else {
+                let token = document.createElement('input')
+                    token.setAttribute('type', 'hidden')
+                    token.setAttribute('name', 'token')
+                    token.setAttribute('value', paymentMethod.id);
+                    form.appendChild(token);
+
+                // Send paymentMethod.id to your server to complete the payment
+                //console.log(paymentMethod);
+
+                $('.acc-input-error', $theForm).fadeOut().html('');
+                $theButton.attr('disabled', 'disabled');
+                $('.theLoader', $theButton).fadeIn();
+
+                let formData = new FormData(form);
+                axios({
+                    method: "post",
+                    url: route('users.store'),
+                    data: formData,
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    $theButton.removeAttr('disabled');
+                    $('.theLoader', $theButton).fadeOut();
+
+                    if (response.status == 200) {
+                        addnewModal.hide();
+
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.message);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                        });
+
+                        setTimeout(() => {
+                            successModal.hide();
+                            window.location.reload();
+                        }, 2500);
+                    }
+                }).catch(error => {
+                    $theButton.removeAttr('disabled');
+                    $('.theLoader', $theButton).fadeOut();
+                    if (error.response) {
+                        console.log(error.response);
+                        if (error.response.status == 422) {
+                            for (const [key, val] of Object.entries(error.response.data.errors)) {
+                                $(`#userCreateForm .${key}`).addClass('border-danger');
+                                $(`#userCreateForm  .error-${key}`).fadeIn().html(val);
+                            }
+                        } else if (error.response.status == 304) {
+                            warningModal.show();
+                            document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                                $("#warningModal .warningModalTitle").html("Error Found!");
+                                $("#warningModal .warningModalDesc").html(error.response.data.message);
+                            });
+
+                            setTimeout(() => {
+                                warningModal.hide();
+                            }, 1500);
+                        } else {
+                            console.log('error');
+                        }
+                    }
+                });
+            }
+
+        });
+        /* New USER registration End */
+
         
-    });
-
-
     // Initialize Dropzone when the second tab is shown
     document.querySelector('#example-2-tab').addEventListener('shown.tw.tab', function() {
         

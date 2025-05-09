@@ -24,7 +24,7 @@ class Company extends Model
         'display_company_name',
         'gas_safe_registration_no',
         'registration_no',
-        'registration_body_for',
+        'register_body_id',
         'registration_body_for_legionella',
         'registration_body_no_for_legionella',
         'company_web_site',
@@ -96,6 +96,10 @@ class Company extends Model
     public function bank()
     {
         return $this->hasOne(CompanyBankDetails::class, 'Company_id', 'id'); 
+    }
+
+    public function regbody(){
+        return $this->belongsTo(RegisterBody::class, 'register_body_id');
     }
 
 }

@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // ...
         'impersonate' => \Lab404\Impersonate\Middleware\Impersonate::class,
+        'subscribed' => \App\Http\Middleware\CheckSubscription::class,
     ];
 }

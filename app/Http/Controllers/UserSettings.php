@@ -16,6 +16,7 @@ class UserSettings extends Controller
 
         return view('app.settings.index',[
             'users' => $users,
+            'title' => 'Settings - Gas Certificate App',
         ]);
     }
 

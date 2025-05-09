@@ -66,6 +66,7 @@ class RecordAndDraftController extends Controller
                 });
             });
         endif;
+        $query->where('created_by', auth()->user()->id);
         $Query = $query->get();
 
         $html = '';
@@ -140,7 +141,7 @@ class RecordAndDraftController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Inspection Name</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto">'.($list->job->property->occupant_name ?? ($list->customer->full_name ?? '')).'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->job->property->occupant_name ?? ($list->customer->full_name ?? '')).'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
@@ -152,7 +153,7 @@ class RecordAndDraftController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Landlord Name</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto">'.($list->customer->full_name ?? '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->customer->full_name ?? '').'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
@@ -164,7 +165,7 @@ class RecordAndDraftController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Assigned To</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto">'.(isset($list->model->user->name) ? $list->model->user->name : '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.(isset($list->model->user->name) ? $list->model->user->name : '').'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';

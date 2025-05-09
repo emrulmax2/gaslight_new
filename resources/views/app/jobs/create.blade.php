@@ -19,7 +19,7 @@
         <div class="grid grid-cols-12 gap-6 mt-5">
             <div class="col-span-12 sm:col-span-9">
                 <div class="intro-y box">
-                <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
+                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">
                             Job Details
                         </h2>

@@ -13,6 +13,8 @@ class UserPricingPackage extends Model
     protected $fillable = [
         'user_id',
         'pricing_package_id',
+        'stripe_customer_id',
+        'stripe_subscription_id',
         'start',
         'end',
         'price',
@@ -24,6 +26,23 @@ class UserPricingPackage extends Model
 
 
     protected $dates = ['deleted_at'];
+    
+
+    public function setStartAttribute($value) {  
+        $this->attributes['start'] =  (!empty($value) ? date('Y-m-d', strtotime($value)) : null);
+    }
+
+    public function getStartAttribute($value) {
+        return (!empty($value) ? date('d-m-Y', strtotime($value)) : '');
+    }
+
+    public function setEndAttribute($value) {  
+        $this->attributes['end'] =  (!empty($value) ? date('Y-m-d', strtotime($value)) : null);
+    }
+
+    public function getEndAttribute($value) {
+        return (!empty($value) ? date('d-m-Y', strtotime($value)) : '');
+    }
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');

@@ -15,6 +15,7 @@ class PricingPackage extends Model
         'subtitle',
         'description',
         'period',
+        'stripe_plan',
         'price',
         'order',
         'active',

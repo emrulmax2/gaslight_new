@@ -9,12 +9,17 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\FileRecord;
 use App\Models\PricingPackage;
+use App\Models\UserPricingPackage;
+use App\Models\UserPricingPackageInvoice;
 use Creagia\LaravelSignPad\Signature;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Number;
+use Psy\Readline\Hoa\Console;
+use Stripe;
 
 class UserManagementController extends Controller
 {
@@ -30,10 +35,12 @@ class UserManagementController extends Controller
     }
 
 
-    public function store(UserStoreRequest $request)
-    {
-
+    public function store(UserStoreRequest $request){
+        $package = PricingPackage::find($request->pricing_package_id);
         $hashPassword = Hash::make($request->input('password'));
+
+        $name = $request->input('name');
+        $email = $request->input('email');
 
         $user = User::create([
             'parent_id' => Auth::user()->id,
@@ -49,7 +56,77 @@ class UserManagementController extends Controller
         ]);
         $user->companies()->attach(Auth::user()->company->id);
         $user->save();
-        return response()->json(['message' => 'User created successfully'], 201);
+
+        if($user->id):
+            $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+            try{
+                $customer = $stripe->customers->create([
+                    'name' => $name,
+                    'email' => $email,
+                    'payment_method' => $request->token,
+                    'invoice_settings' => [
+                        'default_payment_method' => $request->token
+                    ]
+                ]);
+
+                try{
+                    $subscription = $stripe->subscriptions->create([
+                        'customer' => $customer->id,
+                        'items' => [
+                            ['price' => 'price_1RKzh62cOx8B9eTd2jYERHnY']
+                        ],
+                        'currency' => 'GBP',
+                        'default_payment_method' => $request->token,
+                        'metadata' => [
+                            'billed_to' => $request->card_holder_name,
+                            'user_id' => $user->id
+                        ],
+                        'payment_behavior' => 'allow_incomplete'
+                    ]);
+
+                    $userPackage = UserPricingPackage::create([
+                        'user_id' => $user->id,
+                        'pricing_package_id' => $request->pricing_package_id,
+                        'stripe_customer_id' => $customer->id,
+                        'stripe_subscription_id' => $subscription->id,
+                        'start' => date('Y-m-d', $subscription->current_period_start),
+                        'end' => date('Y-m-d', $subscription->current_period_end),
+                        'price' => $package->price,
+                        'active' => ($subscription->status && $subscription->status == 'active' ? 1 : 0),
+                        
+                        'created_by' => auth()->user()->id
+                    ]);
+
+                    if($userPackage->id):
+                        $invoice = UserPricingPackageInvoice::create([
+                            'user_id' => $user->id,
+                            'user_pricing_package_id' => $userPackage->id,
+                            'invoice_id' => $subscription->latest_invoice,
+                            'start' => date('Y-m-d', $subscription->current_period_start),
+                            'end' => date('Y-m-d', $subscription->current_period_end),
+                            'status' => (isset($subscription->status) && !empty($subscription->status) ? $subscription->status : null),
+                            
+                            'created_by' => auth()->user()->id,
+                        ]);
+                    endif;
+                    return response()->json(['message' => 'User successfully created.', 'red' => ''], 200);
+                }catch(Exception $e){
+                    $user->companies()->detach(Auth::user()->company->id);
+                    $user->forceDelete();
+
+                    $message = $e->getMessage();
+                    return response()->json(['message' => 'Can not create the user due to payment failure.', 'red' => ''], 304);
+                }
+            }catch(Exception $e){
+                $user->companies()->detach(Auth::user()->company->id);
+                $user->forceDelete();
+
+                $message = $e->getMessage();
+                return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
+            }
+        else:
+            return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
+        endif;
     }
 
 
@@ -195,8 +272,7 @@ class UserManagementController extends Controller
         $user = Auth::user();
         $user_company_id = (isset($user->companies[0]->id) && $user->companies[0]->id > 0 ? $user->companies[0]->id : 0);
 
-        $queryValue = isset($request->queryValue) ? $request->queryValue : '';
-        $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
+        $querystr = isset($request->querystr) ? $request->querystr : '';
 
         
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
@@ -209,68 +285,96 @@ class UserManagementController extends Controller
                 ->leftJoin('companies', 'company_staff.company_id', '=', 'companies.id')
                 ->select('users.*', 'companies.company_name as company_name','companies.id as company_id')
                 ->where('company_staff.company_id', $user_company_id)
+                ->whereNot('users.id', $user->id)
                 ->orderByRaw(implode(',', $sorts));
 
-        
-
-        if (!empty($queryValue)):
-            $query->where(function($q) use($queryValue){
-                $q->where('name', 'LIKE', '%' . $queryValue . '%')->orWhere('email', 'LIKE', '%' . $queryValue . '%')
-                    ->where('gas_safe_id_card', 'LIKE', '%' . $queryValue . '%')->where('oil_registration_number', 'LIKE', '%' . $queryValue . '%')
-                    ->where('installer_ref_no', 'LIKE', '%' . $queryValue . '%');
+        if (!empty($querystr)):
+            $query->where(function($q) use($querystr){
+                $q->where('name', 'LIKE', '%' . $querystr . '%')->orWhere('email', 'LIKE', '%' . $querystr . '%')
+                    ->where('gas_safe_id_card', 'LIKE', '%' . $querystr . '%')->where('oil_registration_number', 'LIKE', '%' . $querystr . '%')
+                    ->where('installer_ref_no', 'LIKE', '%' . $querystr . '%');
             });
         endif;
 
-        if($status == 2):
-            $query->onlyTrashed();
-        endif;
-
-        $total_rows = $query->count();
-        $page = (isset($request->page) && $request->page > 0 ? $request->page : 0);
-        $perpage = (isset($request->size) && $request->size == 'true' ? $total_rows : ($request->size > 0 ? $request->size : 10));
-        $last_page = $total_rows > 0 ? ceil($total_rows / $perpage) : '';
-        
-        $limit = $perpage;
-        $offset = ($page > 0 ? ($page - 1) * $perpage : 0);
-
-        $Query= $query->skip($offset)
-            ->take($limit)
-            ->get();
-        $Query->load(['signature' => function($query) {
-                $query->orderBy('created_at', 'desc');
-            }]);
-        $data = array();
+        $Query= $query->get();
+        $html = '';
 
         if(!empty($Query)):
             $i = 1;
             foreach($Query as $list):
-                $k =0;
-                $nestedDataContainer = [];
-                
-                    $data[] = [
-                        'id' => $list->id,
-                        'sl' => $i,
-                        "name" => $list->name,
-                        'email' =>$list->email,
-                        'status' => isset($list->status) ? 'Active' : 'Inactive',
-                        'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
-                        'delete_url' => route('users.destroy', $list->id),
-                        'restore_url' => route('users.restore', $list->id),
-                        'edit_url' => route('users.edit', $list->id),
-                        'gas_safe_id_card' => $list->gas_safe_id_card,
-                        'oil_registration_number' => $list->oil_registration_number,
-                        'installer_ref_no' => $list->installer_ref_no,
-                        'visibility_control' => $user->parent_id,
-                        'signature' => $list->signature ? Storage::disk('public')->url($list->signature->filename) : null,
-                        'package_id' => (isset($list->userpackage->pricing_package_id) && !empty($list->userpackage->pricing_package_id) ? $list->userpackage->pricing_package_id : ''),
-                        'package' => (isset($list->userpackage->package->title) && !empty($list->userpackage->package->title) ? $list->userpackage->package->title : ''),
-                        'package_start' => (isset($list->userpackage->start) && !empty($list->userpackage->start) ? date('jS F, Y', strtotime($list->userpackage->start)) : ''),
-                        'package_end' => (isset($list->userpackage->end) && !empty($list->userpackage->end) ? date('jS F, Y', strtotime($list->userpackage->end)) : ''),
-                    ];
-                    $i++;
+                $userPackage = UserPricingPackage::with('package')->where('user_id', $list->id)->orderBy('id', 'DESC')->get()->first();
+                $html .= '<div data-id="'.$list->id.'" class="userWrap px-0 py-4 border-b border-b-slate-100 flex items-center">';
+                    $html .= '<div class="mr-auto">';
+                        $html .= '<div class=" text-slate-500 text-xs leading-none mb-2">'.(isset($userPackage->package->title) ? $userPackage->package->title : 'N/A').'</div>';
+                        $html .= '<div class="font-medium text-dark leading-none mb-2">'.$list->name.'</div>';
+                        $html .= '<div class=" text-slate-500 text-xs leading-none mb-4"> Renews '.(isset($userPackage->end) && !empty($userPackage->end) ? date('d F, Y', strtotime($userPackage->end)) : 'N/A').'</div>';
+                        $html .= (isset($userPackage->active) && $userPackage->active == 1 ? '<span class="text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Active</span>' : '<span class="text-xs bg-danger-40 text-dark leading-none font-medium px-2 py-0.5">Inactive</span>');
+                    $html .= '</div>';
+                    $html .= '<div class="ml-auto">';
+                        $html .= '<a href="'.route('users.navigations', $list->id).'" class="text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-ellipsis-vertical-icon lucide-ellipsis-vertical"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></a>';
+                    $html .= '</div>';
+                $html .= '</div>';
+                $i++;
                 
             endforeach;
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-pending border-pending bg-opacity-20 border-opacity-5 text-pending dark:border-pending dark:border-opacity-20 mb-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>
+                        No match found.
+                    </div>';
         endif;
-        return response()->json(['last_page' => $last_page,'current_page'=> $page*1 , 'data' => $data]); 
+        return response()->json(['html' => $html], 200); 
+    }
+
+    public function navigations(User $user){
+        return view('app.users.navigations', [
+            'title' => 'User Navigation - Gas Certificate App',
+            'user' => $user
+        ]);
+    }
+
+    public function userPlans(User $user){
+        $user->load('userpackage');
+        return view('app.users.plans', [
+            'title' => 'User Plans - Gas Certificate App',
+            'user' => $user,
+            'packages' => PricingPackage::whereNot('period', 'Free Trail')->where('active', 1)->orderBy('order', 'ASC')->get()
+        ]);
+    }
+
+    public function cancelSubscription(Request $request){
+        $currentUser = User::find(Auth::user()->id);
+        $user_id = $request->user_id;
+        $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $userInvoice = UserPricingPackageInvoice::where('user_id', $user_id)->where('user_pricing_package_id', $userPackage->id)->orderBy('id', 'DESC')->get()->first();
+        
+        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+        try{
+            $subscription = $stripe->subscriptions->cancel($userPackage->stripe_subscription_id, [
+                'cancellation_details' => [
+                    'comment' => 'Canceled by '.$currentUser->name.' at '.date('Y-m-d H:i:s').'.'
+                ],
+                // 'invoice_now' => true,
+                // 'prorate' => true
+            ]);
+            // $userPackage->update(['active' => 0, 'updated_by' => Auth::user()->id]);
+            // if(isset($userInvoice->id) && $userInvoice->id > 0):
+            //     $userInvoice->update(['status' => 'canceled', 'updated_by' => Auth::user()->id]);
+            // endif;
+
+            return response()->json(['message' => 'Subscription successfully cancelled.', 'red' => route('users.index')], 200);
+        }catch(Exception $e){
+            $message = $e->getMessage();
+            return response()->json(['message' => 'Can not canceled the subscription due to unexpected errors.', 'red' => ''], 422);
+        }
+    }
+
+    public function paymentHistory(User $user){
+        $user->load('userpackage');
+        return view('app.users.payment-history', [
+            'title' => 'User Plans - Gas Certificate App',
+            'user' => $user,
+            'packages' => PricingPackage::whereNot('period', 'Free Trail')->where('active', 1)->orderBy('order', 'ASC')->get()
+        ]);
     }
 }

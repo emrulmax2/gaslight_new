@@ -77,7 +77,16 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
 
     public function userpackage()
     {
-        return $this->hasOne(UserPricingPackage::class, 'user_id')->where('active', 1)->latestOfMany();
+        return $this->hasOne(UserPricingPackage::class, 'user_id')->latestOfMany();//->where('active', 1)
+    }
+
+    public function getSubscribedAttribute()
+    {
+        if ( (!isset($this->userpackage->active) || $this->userpackage->active == 0) || (empty($this->userpackage->end) || date('Y-m-d', strtotime($this->userpackage->end)) < date('Y-m-d')) ) {
+            return false;
+        }
+
+        return true;
     }
 
     
