@@ -236,6 +236,7 @@ export default defineConfig({
                 "resources/js/app/user-settings/subscription.js",
                 "resources/js/app/users/profile.js",
                 "resources/js/app/users/subscription.js",
+                "resources/js/app/users/initial-staff-setup.js",
             ],
             refresh: true,
         }),

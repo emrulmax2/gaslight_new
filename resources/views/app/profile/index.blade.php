@@ -87,11 +87,15 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Subscriptions</h3>
         <div class="box rounded-md p-0 overflow-hidden">
-            <a href="javascript:void(0);" class="border-b flex w-full items-center px-5 py-3">
+            <a href="{{ route('users.plans', $user->id) }}" class="border-b flex w-full items-center px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
                 <span class="font-medium text-slate-500 text-sm">
-                    {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? $user->userpackage->package->title : '') }}
-                    {{ (isset($user->userpackage->price) && !empty($user->userpackage->price) ? ' ('.Number::currency($user->userpackage->price, 'GBP').')' : '') }}
+                    @if(isset($user->userpackage->id) && $user->userpackage->id > 0 )
+                        {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? $user->userpackage->package->title : '') }}
+                        {{ (isset($user->userpackage->price) && !empty($user->userpackage->price) ? ' ('.Number::currency($user->userpackage->price, 'GBP').')' : '') }}
+                    @else 
+                        N/A
+                    @endif
                 </span>
             </a>
             <a href="{{ route('users.index') }}" class="flex w-full items-start px-5 py-3">

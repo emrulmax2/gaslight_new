@@ -19,7 +19,11 @@ class CheckFirstLogin
         $user = Auth::user();
 
         if ($user && $user->first_login == 1) {
-            return redirect()->route('initial.setup');
+            if($user->role == 'staff'):
+                return redirect()->route('initial.staff.setup');
+            else:
+                return redirect()->route('initial.setup');
+            endif;
         }
         
         return $next($request);

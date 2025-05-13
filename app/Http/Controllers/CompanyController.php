@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use App\Http\Requests\UpdateStaffInitalRequest;
 use App\Models\CompanyBankDetails;
 use App\Models\RegisterBody;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class CompanyController extends Controller
 {
@@ -49,6 +51,14 @@ class CompanyController extends Controller
 
     public function initialSetup(){
         return view('app.dashboard.initial-setup');
+    }
+
+
+    public function initialStaffSetup(){
+        return view('app.dashboard.initial-staff-setup', [
+            'title' => 'Inital Setup - Gas Safety Engineer',
+            'user' => Auth::user(),
+        ]);
     }
 
     /**
@@ -190,6 +200,56 @@ class CompanyController extends Controller
 
 
         return response()->json(['msg' => 'Company Settings updated successfully', 'red' => '', ], 200);
+    }
+
+    public function updateStaff(UpdateStaffInitalRequest $request){
+        $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+        $decodedData = base64_decode($signatureData, true);
+
+        if (!$request->has('signature_file') && strlen($decodedData) <= 2621) {
+            throw ValidationException::withMessages([
+                'signature' => ['Either upload a signature file or drawn signature is required.']
+            ]);
+        }
+
+        $user_id = $request->user_id;
+        $hashPassword = Hash::make($request->input('password'));
+        User::where('id', $user_id)->update(['password' => $hashPassword, 'first_login' => 0]);
+
+        if ($request->has('signature_file')) {
+            $file = $request->file('signature_file');
+            $newFilePath = 'signatures/' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+    
+            Storage::disk('public')->put($newFilePath, file_get_contents($file->getRealPath()));
+    
+            $signature = new Signature();
+            $signature->model_type = User::class;
+            $signature->model_id = $user_id;
+            $signature->uuid = Str::uuid();
+            $signature->filename = $newFilePath;
+            $signature->document_filename = null;
+            $signature->certified = false;
+            $signature->from_ips = json_encode([request()->ip()]);
+            $signature->save();
+            
+        } elseif ($request->has('sign') && $request->input('sign') !== null) {
+            $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+            $signatureData = base64_decode($signatureData);
+            $imageName = 'signatures/' . Str::uuid() . '.png';
+            Storage::disk('public')->put($imageName, $signatureData);
+
+            $signature = new Signature();
+            $signature->model_type = User::class;
+            $signature->model_id = $user_id;
+            $signature->uuid = Str::uuid();
+            $signature->filename = $imageName;
+            $signature->document_filename = null;
+            $signature->certified = false;
+            $signature->from_ips = json_encode([request()->ip()]);
+            $signature->save();
+        }
+
+        return response()->json(['msg' => 'Inital setup successfully completed.', 'red' => route('company.dashboard')], 200);
     }
 
     /**
