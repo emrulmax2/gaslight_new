@@ -6,6 +6,7 @@
     const updateUserDataModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updateUserDataModal"));
     const updatePasswordModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatePasswordModal"));
     const updateSignatureModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updateSignatureModal"));
+    const updateUserNameModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updateUserNameModal"));
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -456,5 +457,85 @@
         });
 
     });
+
+
+    $('#updateUserNameForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('updateUserNameForm');
+        const $theForm = $(this);
+        
+        $('#updateUserNameForm .acc__input-error').html('');
+        $('#updateUNameBtn', $theForm).attr('disabled', 'disabled');
+        $("#updateUNameBtn .theLoader").fadeIn();
+
+        
+        let form_data = new FormData(form);
+        form_data.append('file', $('#updateUserNameForm input[name="photo"]')[0].files[0]); 
+        axios({
+            method: "POST",
+            url: route('profile.update.photo'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#updateUNameBtn', $theForm).removeAttr('disabled');
+            $("#updateUNameBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                updateUserNameModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                });
+
+                setTimeout(() => {
+                    successModal.hide();
+                    window.location.reload();
+                }, 1500);
+            }
+        }).catch(error => {
+            $('#updateUNameBtn', $theForm).removeAttr('disabled');
+            $("#updateUNameBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#updateUserNameForm .${key}`).addClass('border-danger');
+                        $(`#updateUserNameForm  .error-${key}`).html(val);
+                    }
+                } else if (error.response.status == 304) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    })
+
+
+    $('#updateUserNameForm').on('change', '#userPhotoAdd', function(){
+        showPreview('userPhotoAdd', 'userImageAdd')
+    })
+    
+
+    function showPreview(inputId, targetImageId) {
+        var src = document.getElementById(inputId);
+        var target = document.getElementById(targetImageId);
+        var title = document.getElementById('selected_image_title');
+        var fr = new FileReader();
+        fr.onload = function () {
+            target.src = fr.result;
+        }
+        fr.readAsDataURL(src.files[0]);
+    };
 
 })()

@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserUpdateRequest;
+use App\Jobs\GCEMailerJob;
+use App\Mail\GCESendMail;
 use App\Models\FileRecord;
 use App\Models\PricingPackage;
 use App\Models\UserPricingPackage;
@@ -52,7 +54,7 @@ class UserManagementController extends Controller
             'oil_registration_number' => $request->input('oil_registration_number'),
             'installer_ref_no' => $request->input('installer_ref_no'),
             'active' => 1,
-            'fast_login' => 0
+            'first_login' => 1
         ]);
         $user->companies()->attach(Auth::user()->company->id);
         $user->save();
@@ -73,7 +75,7 @@ class UserManagementController extends Controller
                     $subscription = $stripe->subscriptions->create([
                         'customer' => $customer->id,
                         'items' => [
-                            ['price' => 'price_1RKzh62cOx8B9eTd2jYERHnY']
+                            ['price' => $package->stripe_plan]
                         ],
                         'currency' => 'GBP',
                         'default_payment_method' => $request->token,
@@ -109,8 +111,36 @@ class UserManagementController extends Controller
                             'created_by' => auth()->user()->id,
                         ]);
                     endif;
+
+                    
+
+                    $subject = 'Welcome Message from Gas Safety Engineer';
+
+                    $content = 'Hi '.$name.',<br/><br/>';
+                    $content .= '<p>Welcome to the Gas Safety Engineer APP. You are successfully registered. Here hes your login details:</p>';
+                    $content .= '<p>';
+                        $content .= 'Email: <strong>'.$email.'</strong><br/>';
+                        $content .= 'Temporary Password: <strong>'.$request->input('password').'</strong>';
+                    $content .= '</p>';
+                    $content .= '<p>Subscription Details</p>';
+                    $content .= '<p>';
+                        $content .= 'Package: <strong>'.$package->title.'</strong><br/>';
+                        $content .= 'Amount Charged: <strong>'.Number::currency($package->price, 'GBP').'</strong><br/>';
+                        $content .= 'Start From: <strong>'.date('jS F, Y', $subscription->current_period_start).'</strong><br/>';
+                        $content .= 'End To: <strong>'.date('jS F, Y', $subscription->current_period_end).'</strong><br/>';
+                    $content .= '</p>';
+
+                    $content .= 'Thanks & Regards<br/>';
+                    $content .= 'Gas Safety Engineer';
+
+                    $theMail = $this->sendMail([$email], $subject, $content);
+                    
                     return response()->json(['message' => 'User successfully created.', 'red' => ''], 200);
                 }catch(Exception $e){
+                    $deleted = $stripe->customers->delete($customer->id, []);
+
+                    UserPricingPackage::where('user_id', $user->id)->forceDelete();
+                    UserPricingPackageInvoice::where('user_id', $user->id)->forceDelete();
                     $user->companies()->detach(Auth::user()->company->id);
                     $user->forceDelete();
 
@@ -118,6 +148,8 @@ class UserManagementController extends Controller
                     return response()->json(['message' => 'Can not create the user due to payment failure.', 'red' => ''], 304);
                 }
             }catch(Exception $e){
+                UserPricingPackage::where('user_id', $user->id)->forceDelete();
+                UserPricingPackageInvoice::where('user_id', $user->id)->forceDelete();
                 $user->companies()->detach(Auth::user()->company->id);
                 $user->forceDelete();
 
@@ -127,6 +159,30 @@ class UserManagementController extends Controller
         else:
             return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
         endif;
+    }
+
+    public function sendMail($emails, $subject, $content, $attachments = []){
+        $configuration = [
+            'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
+            'smtp_port' => env('MAIL_PORT', '587'),
+            'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
+            'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
+            'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            
+            'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),
+            'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+
+        ];
+
+        try{
+            GCEMailerJob::dispatch($configuration, $emails, new GCESendMail($subject, $content, $attachments));
+            $message = 'Mail Success';
+        }catch(Exception $e){
+            //$message = $e->getMessage();
+
+            $message = 'Mail Error';
+        }
+        return $message;
     }
 
 
@@ -303,17 +359,28 @@ class UserManagementController extends Controller
             $i = 1;
             foreach($Query as $list):
                 $userPackage = UserPricingPackage::with('package')->where('user_id', $list->id)->orderBy('id', 'DESC')->get()->first();
-                $html .= '<div data-id="'.$list->id.'" class="userWrap px-0 py-4 border-b border-b-slate-100 flex items-center">';
+                $html .= '<a data-id="'.$list->id.'" href="'.route('users.navigations', $list->id).'" class="relative userWrap px-0 py-4 border-b border-b-slate-100 flex w-full items-center">';
                     $html .= '<div class="mr-auto">';
-                        $html .= '<div class=" text-slate-500 text-xs leading-none mb-2">'.(isset($userPackage->package->title) ? $userPackage->package->title : 'N/A').'</div>';
+                        $html .= '<div class=" text-slate-500 text-xs leading-none mb-2">';
+                            $html .= (isset($userPackage->package->title) ? $userPackage->package->title : 'N/A');
+                            if(isset($userPackage->active) && $userPackage->active == 1):
+                                if(isset($userPackage->cancellation_requested) && $userPackage->cancellation_requested == 1):
+                                    $html .= '<span class="ml-5 text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Active untill '.date('d F', strtotime($userPackage->end)).'</span>';
+                                else:
+                                    $html .= '<span class="ml-5 text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Active</span>';
+                                endif;
+                            else:
+                                $html .= '<span class="ml-5 text-xs bg-danger-40 text-dark leading-none font-medium px-2 py-0.5">Inactive</span>';
+                            endif;
+                        $html .= '</div>';
                         $html .= '<div class="font-medium text-dark leading-none mb-2">'.$list->name.'</div>';
-                        $html .= '<div class=" text-slate-500 text-xs leading-none mb-4"> Renews '.(isset($userPackage->end) && !empty($userPackage->end) ? date('d F, Y', strtotime($userPackage->end)) : 'N/A').'</div>';
-                        $html .= (isset($userPackage->active) && $userPackage->active == 1 ? '<span class="text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Active</span>' : '<span class="text-xs bg-danger-40 text-dark leading-none font-medium px-2 py-0.5">Inactive</span>');
+                        $html .= '<div class=" text-slate-500 text-xs leading-none"> Renews '.(isset($userPackage->end) && !empty($userPackage->end) ? date('d F, Y', strtotime($userPackage->end)) : 'N/A').'</div>';
+                        
                     $html .= '</div>';
                     $html .= '<div class="ml-auto">';
-                        $html .= '<a href="'.route('users.navigations', $list->id).'" class="text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-ellipsis-vertical-icon lucide-ellipsis-vertical"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></a>';
+                        $html .= '<span class="text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-ellipsis-vertical-icon lucide-ellipsis-vertical"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>';
                     $html .= '</div>';
-                $html .= '</div>';
+                $html .= '</a>';
                 $i++;
                 
             endforeach;
@@ -350,17 +417,18 @@ class UserManagementController extends Controller
         
         $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
         try{
-            $subscription = $stripe->subscriptions->cancel($userPackage->stripe_subscription_id, [
-                'cancellation_details' => [
-                    'comment' => 'Canceled by '.$currentUser->name.' at '.date('Y-m-d H:i:s').'.'
-                ],
-                // 'invoice_now' => true,
-                // 'prorate' => true
-            ]);
-            // $userPackage->update(['active' => 0, 'updated_by' => Auth::user()->id]);
-            // if(isset($userInvoice->id) && $userInvoice->id > 0):
-            //     $userInvoice->update(['status' => 'canceled', 'updated_by' => Auth::user()->id]);
-            // endif;
+            $subscription = $stripe->subscriptions->update(
+                $userPackage->stripe_subscription_id,
+                ['cancel_at_period_end' => true]
+            );
+            // $subscription = $stripe->subscriptions->cancel($userPackage->stripe_subscription_id, [
+            //     'cancellation_details' => [
+            //         'comment' => 'Canceled by '.$currentUser->name.' at '.date('Y-m-d H:i:s').'.'
+            //     ],
+            //     'invoice_now' => true,
+            //     'prorate' => true
+            // ]);
+            $userPackage->update(['cancellation_requested' => 1, 'requested_by' => Auth::user()->id, 'requested_at' => date('Y-m-d H:i:s')]);
 
             return response()->json(['message' => 'Subscription successfully cancelled.', 'red' => route('users.index')], 200);
         }catch(Exception $e){

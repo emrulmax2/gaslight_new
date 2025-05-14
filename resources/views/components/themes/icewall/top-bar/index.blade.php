@@ -62,7 +62,11 @@
                 
                     <x-avatar name="{{ auth('superadmin')->user()->name }}" />
                 @else
-                    <x-avatar name="{{ auth()->user()->name }}" />
+                    @if(!empty(auth()->user()->photo) && Storage::disk('public')->exists('users/'.auth()->user()->id.'/'.auth()->user()->photo))
+                        <img src="{{ auth()->user()->photo_url }}" alt="{{ auth()->user()->name }}"/>
+                    @else
+                        <x-avatar name="{{ auth()->user()->name }}" />
+                    @endif
                 @endif
             </x-base.menu.button>
             <x-base.menu.items

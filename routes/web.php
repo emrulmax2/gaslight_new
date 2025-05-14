@@ -173,8 +173,10 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(CompanyController::class)->group(function() {
         Route::get('company-list', 'list')->name('company.list'); 
         Route::get('initial-setup', 'initialSetup')->name('initial.setup'); 
+        Route::get('initial-staff-setup', 'initialStaffSetup')->name('initial.staff.setup'); 
         Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
         Route::post('company/update', 'update')->name('company.update'); 
+        Route::post('company/update-staff', 'updateStaff')->name('company.update.staff'); 
 
         Route::post('company/update-company-info', 'updateCompanyInfo')->name('company.update.company.info'); 
         Route::post('company/update-registration-info', 'updateRegistrationInfo')->name('company.update.registration.info'); 
@@ -439,6 +441,7 @@ Route::controller(ProfileController::class)->group(function() {
 
     Route::post('profile/update-data','updateData')->name('profile.update.data');
     Route::post('profile/update-password','updatePassword')->name('profile.update.password');
+    Route::post('profile/update-photo','updatePhoto')->name('profile.update.photo');
 });
 
 

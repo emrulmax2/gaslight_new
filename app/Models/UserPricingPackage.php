@@ -19,6 +19,9 @@ class UserPricingPackage extends Model
         'end',
         'price',
         'active',
+        'cancellation_requested',
+        'requested_by',
+        'requested_at',
         
         'created_by',
         'updated_by'

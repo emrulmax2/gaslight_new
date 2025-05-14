@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\UpdatePasswordRequest;
+use App\Http\Requests\UpdateProfileNameRequest;
+use App\Jobs\GCEMailerJob;
+use App\Mail\GCESendMail;
 use App\Models\FileRecord;
 use App\Models\Staff;
 use App\Models\User;
@@ -133,6 +136,37 @@ class ProfileController extends Controller
         if(!empty($request->input('password'))):
             $user = User::find($user_id);
             $user->update(['password' => Hash::make($request->input('password'))]);
+
+            $configuration = [
+                'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
+                'smtp_port' => env('MAIL_PORT', '587'),
+                'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
+                'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
+                'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+                
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),
+                'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+
+            ];
+
+            $subject = 'Your Password Has Been Successfully Changed';
+
+            $content = 'Hi '.$user->name.',<br/><br/>';
+            $content .= '<p>This is to inform you that the password for your account has been successfully changed.</p>';
+            $content .= '<p>
+                            If you made this change, no further action is required.<br/>
+                            If you did not authorize this change, please reset your password immediately and contact our support team for assistance.
+                        </p>';
+            $content .= '<p>';
+                $content .= 'Date & Time of Change: <strong>'.date('jS F, Y h:i A').'</strong><br/>';
+                $content .= 'IP Address: <strong>'.$request->ip().'</strong>';
+            $content .= '</p>';
+            $content .= '<p>For your security, please do not share your password with anyone. If you have any questions, feel free to reach out to us.</p>';
+
+            $content .= 'Thanks & Regards<br/>';
+            $content .= 'Gas Safety Engineer';
+
+            GCEMailerJob::dispatch($configuration, [$user->email], new GCESendMail($subject, $content, []));
             
             return response()->json(['msg' => 'You password successfully updated.'], 200);
         else:
@@ -178,6 +212,29 @@ class ProfileController extends Controller
         endif;
 
         return $paymentData;
+    }
+
+
+    public function updatePhoto(UpdateProfileNameRequest $request){
+        $user_id = $request->id;
+        $user = User::find($user_id);
+        $user->update(['name' => $request->name]);
+
+        if($request->hasFile('photo')):
+            if(isset($user->photo) && !empty($user->photo) && Storage::disk('public')->exists('public/users/'.$user_id.'/'.$user->photo)):
+                Storage::disk('public')->delete('public/users/'.$user_id.'/'.$user->photo);
+            endif;
+
+            $photo = $request->file('photo');
+            $imageName = 'Avatar_'.$user_id.'_'.time() . '.' . $request->photo->getClientOriginalExtension();
+            $path = $photo->storeAs('users/'.$user->id, $imageName, 'public');
+
+            $userUpdate = User::where('id', $user->id)->update([
+                'photo' => $imageName
+            ]);
+        endif;
+
+        return response()->json(['msg' => 'User details successfully updated.'], 200);
     }
 
 }

@@ -626,7 +626,7 @@
                 }).then(response => {
                     $theButton.removeAttr('disabled');
                     $('.theLoader', $theButton).fadeOut();
-
+                    
                     if (response.status == 200) {
                         addnewModal.hide();
 
@@ -646,7 +646,7 @@
                     $theButton.removeAttr('disabled');
                     $('.theLoader', $theButton).fadeOut();
                     if (error.response) {
-                        console.log(error.response);
+                        
                         if (error.response.status == 422) {
                             for (const [key, val] of Object.entries(error.response.data.errors)) {
                                 $(`#userCreateForm .${key}`).addClass('border-danger');
