@@ -1,3 +1,43 @@
+<!-- BEGIN: Update User Name Modal Content -->
+<x-base.dialog id="updateUserNameModal" staticBackdrop>
+    <x-base.dialog.panel class="rounded-none">
+        <form method="post" action="#" id="updateUserNameForm" enctype="multipart/form-data">
+            <x-base.dialog.title>
+                <h2 class="mr-auto text-base font-medium modalTitle">Update Name</h2>
+                <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+            </x-base.dialog.title>
+            <x-base.dialog.description class="">
+                <div class="grid grid-cols-12 gap-x-3 gap-y-2 items-center">
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="w-32 h-32 flex-none image-fit relative">
+                            <img alt="User Photo" class="rounded-full userImageAdd" id="userImageAdd" data-placeholder="{{ $user->photo_url }}" src="{{ $user->photo_url }}">
+                            <label for="userPhotoAdd" class="absolute mb-1 mr-1 flex items-center justify-center bottom-0 right-0 bg-primary rounded-full p-3  cursor-pointer">
+                                <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                            </label>
+                            <input type="file" accept=".jpeg,.jpg,.png,.gif" name="photo" class="absolute w-0 h-0 overflow-hidden opacity-0" id="userPhotoAdd"/>
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-8">
+                        <x-base.form-label>Full Name<span class="text-danger ml-1">*</span></x-base.form-label>
+                        <x-base.form-input value="{{ $user->name }}" name="name" class="w-full h-[35px] rounded-[3px]" />
+                        <div class="acc__input-error error-name text-danger text-xs mt-1"></div>
+                    </div>
+                </div>
+            </x-base.dialog.description>
+            <x-base.dialog.footer>
+                <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
+                <x-base.button class="w-auto" id="updateUNameBtn" type="submit" variant="primary">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Save
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+                <input type="hidden" name="id" value="{{ $user->id }}"/>
+            </x-base.dialog.footer>
+        </form>
+    </x-base.dialog.panel>
+</x-base.dialog>
+<!-- END: Update User Name Modal Content -->
+ 
 <!-- BEGIN: Update Modal Content -->
 <x-base.dialog id="updateUserDataModal" staticBackdrop>
     <x-base.dialog.panel class="rounded-none">

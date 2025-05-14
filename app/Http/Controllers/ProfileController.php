@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\UpdatePasswordRequest;
+use App\Http\Requests\UpdateProfileNameRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\FileRecord;
@@ -211,6 +212,29 @@ class ProfileController extends Controller
         endif;
 
         return $paymentData;
+    }
+
+
+    public function updatePhoto(UpdateProfileNameRequest $request){
+        $user_id = $request->id;
+        $user = User::find($user_id);
+        $user->update(['name' => $request->name]);
+
+        if($request->hasFile('photo')):
+            if(isset($user->photo) && !empty($user->photo) && Storage::disk('public')->exists('public/users/'.$user_id.'/'.$user->photo)):
+                Storage::disk('public')->delete('public/users/'.$user_id.'/'.$user->photo);
+            endif;
+
+            $photo = $request->file('photo');
+            $imageName = 'Avatar_'.$user_id.'_'.time() . '.' . $request->photo->getClientOriginalExtension();
+            $path = $photo->storeAs('users/'.$user->id, $imageName, 'public');
+
+            $userUpdate = User::where('id', $user->id)->update([
+                'photo' => $imageName
+            ]);
+        endif;
+
+        return response()->json(['msg' => 'User details successfully updated.'], 200);
     }
 
 }

@@ -12,11 +12,14 @@ use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Passport\HasApiTokens;
 use Creagia\LaravelSignPad\Concerns\RequiresSignature;
 use Creagia\LaravelSignPad\Contracts\CanBeSigned;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Vite;
 
 class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
 {
     use HasFactory, Notifiable, Impersonate,RequiresSignature, HasApiTokens;
+
+    protected $appends = ['photo_url'];
 
     /**
      * The attributes that are mass assignable.
@@ -59,6 +62,16 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo !== null && Storage::disk('public')->exists('users/'.$this->id.'/'.$this->photo)) {
+            return Storage::disk('public')->url('users/'.$this->id.'/'.$this->photo);
+        } else {
+            return Vite::asset('resources/images/placeholders/200x200.jpg');
+        }
     }
 
     //company relationship

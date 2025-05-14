@@ -441,6 +441,7 @@ Route::controller(ProfileController::class)->group(function() {
 
     Route::post('profile/update-data','updateData')->name('profile.update.data');
     Route::post('profile/update-password','updatePassword')->name('profile.update.password');
+    Route::post('profile/update-photo','updatePhoto')->name('profile.update.photo');
 });
 
 
