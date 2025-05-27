@@ -87,4 +87,14 @@ class GasPowerFlushRecord extends Model
             : false
         );
     }
+
+
+    // api
+    public function powerflush_checklist(){
+        return $this->hasOne(GasPowerFlushRecordChecklist::class, 'id');
+    }
+
+    public function powerflush_rediators(){
+        return $this->hasMany(GasPowerFlushRecordRediator::class, 'id')->orderBy('id', 'ASC');
+    }
 }
