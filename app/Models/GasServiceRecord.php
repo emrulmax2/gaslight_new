@@ -83,4 +83,10 @@ class GasServiceRecord extends Model
             : false
         );
     }
+
+
+    // api
+    public function appliances(){
+        return $this->hasMany(GasServiceRecord::class, 'id')->orderBy('id', 'ASC');
+    }
 }
