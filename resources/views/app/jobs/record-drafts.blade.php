@@ -18,124 +18,109 @@
         </div>
     </div>
 
-    <!-- BEGIN: HTML Table Data -->
-    <form method="post" action="#" id="updateJobForm">
-        <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-9">
-                <div class="intro-y box p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start md:flex-wrap">
-                        <form class="sm:mr-auto lg:flex w-full lg:w-auto" id="tabulator-html-filter-form" >
-                            <input type="hidden" name="job_id" id="job_id" value="{{ $job->id }}">
-                            <div class="items-center sm:mr-4 xl:mt-0 w-auto sm:w-min">
-                                <label class="flex-none xl:flex-initial">Keywords</label>
-                                <x-base.form-input class="w-full sm:w-auto h-[35px] rounded-[3px]" id="query" type="text" placeholder="Search..." />
-                            </div>
-                            <div class="items-center lg:mr-4 mt-2 lg:mt-0 sm:flex sm:flex-col sm:items-start">
-                                <label class="flex-none xl:w-auto xl:flex-initial">Engineer</label>
-                                <x-base.form-select class="mt-1 w-full sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px]" id="engineer" >
-                                    <option value="all">All</option>
-                                    @foreach($engineers as $engineer)
-                                        <option value="{{ $engineer->id }}">{{ $engineer->name }}</option>
-                                    @endforeach
-                                </x-base.form-select>
-                            </div>
-                            <div class="items-center lg:mr-4 mt-2 lg:mt-0 2xl:w-64 sm:flex sm:flex-col sm:items-start">
-                                <label class="flex-none">Certificate Type </label>
-                                <x-base.form-select class="mt-1 w-auto sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px] max-w-full" id="certificate_type" >
-                                    <option value="all">All</option>
-                                    @foreach($certificate_types as $type)
-                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                    @endforeach
-                                </x-base.form-select>
-                            </div>
-                            <div class="items-center  lg:mr-4 mt-2 lg:mt-0 sm:flex sm:flex-col sm:items-start">
-                                <label class="flex-none">Date Range </label>
-                                <x-base.litepicker class="mx-auto w-full h-[35px] rounded-[3px]" id="date_range"  />
-                            </div>
-                            <div class="items-center lg:mr-4 mt-2 lg:mt-0 sm:flex sm:flex-col sm:items-start">
-                                <label class="flex-none">Status </label>
-                                <x-base.form-select class="mt-1 w-full sm:mt-0 sm:w-auto 2xl:w-full h-[35px] rounded-[3px]" id="status" >
-                                    <option value="all">All</option>
-                                    <option value="Draft">Draft</option>
-                                    <option value="Approved">Approved</option>
-                                    <option value="Approved & Sent">Approved & Sent</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-4 lg:mt-0 text-right ml-0 xl:pt-[20px]">
-                                <x-base.button class="w-full sm:w-16 h-[35px]" id="tabulator-html-filter-go" type="button" variant="primary" >Go</x-base.button>
-                                <x-base.button class="mt-1 w-full sm:ml-1 sm:mt-0 sm:w-16 h-[35px]" id="tabulator-html-filter-reset" type="button" variant="secondary" >Reset</x-base.button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="scrollbar-hidden overflow-x-auto">
-                        <div class="mt-5 gca_responsive" id="certificateListTable" ></div>
-                    </div>
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Customer Information</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($job->customer->customer_full_name) && !empty($job->customer->customer_full_name) ? $job->customer->customer_full_name : 'N/A' }}
+                    </span>
                 </div>
-            </div>
-            <div class="col-span-12 sm:col-span-3 z-10">
-                <div class="intro-y box mb-5">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">
-                            Customer
-                        </h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="user" />
-                            <span class="font-medium text-slate-500">
-                                {{ $job->customer->customer_full_name }}
-                            </span>
-                        </div>
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-danger" icon="map-pin" />
-                            <span class="text-slate-500">
-                                {{ $job->customer->address_line_1.' '.$job->customer->address_line_2.', ' }}
-                                {{ (isset($job->customer->city) && !empty($job->customer->city) ? $job->customer->city.', ' : '') }}
-                                {{ (isset($job->customer->state) && !empty($job->customer->state) ? $job->customer->state.', ' : '') }}
-                                {{ (isset($job->customer->postal_code) && !empty($job->customer->postal_code) ? $job->customer->postal_code.', ' : '') }}
-                                {{ (isset($job->customer->country) && !empty($job->customer->country) ? $job->customer->country : '') }}
-                            </span>
-                        </div>
-                        @if(isset($job->customer->contact->mobile) && !empty($job->customer->contact->mobile))
-                        <div class="flex items-start justify-start">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-danger" icon="smartphone" />
-                            <span class="text-slate-500">
-                                {{ (isset($job->customer->contact->mobile) && !empty($job->customer->contact->mobile) ? $job->customer->contact->mobile.', ' : '') }}
-                            </span>
-                        </div>
-                        @endif
-                    </div>
+            </a>
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{!! $job->customer->full_address_with_html !!}</span>
                 </div>
-                <div class="intro-y box mb-5">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">
-                            Job Address
-                        </h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-warning" icon="user" />
-                            <span class="font-medium text-slate-500">
-                                {{ (isset($job->property->customer->customer_full_name) && !empty($job->property->customer->customer_full_name) ? $job->property->customer->customer_full_name : '') }}
-                            </span>
-                        </div>
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="map-pin" />
-                            <span class="text-slate-500">
-                                {{ $job->property->address_line_1.' '.$job->property->address_line_2.', ' }}
-                                {{ (isset($job->property->city) && !empty($job->property->city) ? $job->property->city.', ' : '') }}
-                                {{ (isset($job->property->state) && !empty($job->property->state) ? $job->property->state.', ' : '') }}
-                                {{ (isset($job->property->postal_code) && !empty($job->property->postal_code) ? $job->property->postal_code.', ' : '') }}
-                                {{ (isset($job->property->country) && !empty($job->property->country) ? $job->property->country : '') }}
-                            </span>
-                        </div>
-                    </div>
+            </a>
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mail" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (isset($job->customer->contact->email) ? $job->customer->contact->email : 'N/A') }}</span>
                 </div>
-            </div>
+            </a>
+            <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="smartphone" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->customer->contact->mobile) ? $job->customer->contact->mobile : 'N/A' }}</span>
+                </div>
+            </a>
         </div>
-    </form>
-    <!-- END: HTML Table Data -->
+    </div>
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Job Address</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            @if(isset($job->property->occupant_name) && !empty($job->property->occupant_name))
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($job->property->occupant_name) && !empty($job->property->occupant_name) ? $job->property->occupant_name : 'N/A' }}
+                    </span>
+                </div>
+            </a>
+            @endif
+            <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{!! $job->property->full_address_with_html !!}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="font-medium leading-none mt-5 mb-3 text-dark">Existing Records & Drafts</h3>
+    <div id="searchBox" class="intro-y box p-0 border-none relative">
+        <x-base.form-input class="m-0 w-full" id="query" type="text" autocomplete="off" placeholder="Search..."/>
+        <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+    </div>
+
+    <div class="scrollbar-hidden overflow-x-auto mt-5">
+        <x-base.table data-jobid="{{ $job->id }}" class="border-separate border-spacing-y-[10px] certificateListTable" id="certificateListTable">
+            <x-base.table.thead>
+                <x-base.table.tr class="max-sm:hidden">
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Type
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Serial No
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Inspection Name
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Inspection Address
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Landlord Name
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Landlord Address
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Assigned To
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Created at
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 text-right uppercase px-3 py-2 text-[12px] leading-none">
+                        Status
+                    </x-base.table.th>
+                </x-base.table.tr>
+            </x-base.table.thead>
+            <x-base.table.tbody>
+                <x-base.table.tr data-url="" class="intro-x box bg-pending bg-opacity-10 border border-pending border-opacity-5 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">
+                    <x-base.table.td colspan="9" class="border-none px-3 py-3 rounded">
+                        <div class="flex justify-center items-center text-pending">
+                            No matching records found!
+                        </div>
+                    </x-base.table.td>
+                </x-base.table.tr>
+            </x-base.table.tbody>
+        </x-base.table>
+    </div>
 
     @include('app.jobs.create-modal')
     @include('app.action-modals')

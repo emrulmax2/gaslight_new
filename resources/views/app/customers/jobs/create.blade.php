@@ -17,19 +17,52 @@
     <!-- BEGIN: HTML Table Data -->
     <form method="post" action="#" id="addCustomerJobForm">
         <input type="hidden" name="customer_id" value="{{ $customer->id }}">
-        <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-9 relative z-20">
-                <div class="intro-y box">
-                <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">
-                            Job Details
-                        </h2>
+
+        <div class="settingsBox mt-5">
+            <h3 class="font-medium leading-none mb-3 text-dark">Customer Information</h3>
+            <div class="box rounded-md p-0 overflow-hidden">
+                <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">
+                            {{ isset($customer->customer_full_name) && !empty($customer->customer_full_name) ? $customer->customer_full_name : 'N/A' }}
+                        </span>
                     </div>
-                    <div class="p-5">
-                        <div class="mb-3">
-                            <x-base.form-label for="customer_property_id">Job Address <span class="text-danger">*</span></x-base.form-label>
+                </a>
+                <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">{!! $customer->full_address_with_html !!}</span>
+                    </div>
+                </a>
+                <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mail" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">{{ $customer_contact_info->email }}</span>
+                    </div>
+                </a>
+                <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="smartphone" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">{{ $customer_contact_info->mobile }}</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2">
+            <div class="flex flex-col items-center border-b border-slate-200/60 px-2 py-3 dark:border-darkmode-400 sm:flex-row">
+                <h2 class="mr-auto text-base font-medium">
+                    Job Details
+                </h2>
+            </div>
+            <div class="px-2 py-3 bg-white">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Address <span class="text-danger">*</span></div>
+                        <div class="theDesc w-full relative">
                             <div class="relative searchWrap" data-type="address">
-                                <x-base.form-input autocomplete="off" name="search_input" class="w-full search_input address_name" type="text" placeholder="Search Address..." />
+                                <x-base.form-input autocomplete="off" name="search_input" class="search_input address_name w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text" placeholder="Search Address..." />
                                 <x-base.form-input name="customer_property_id" id="customer_property_id" class="w-full the_id_input" type="hidden" value="0" />
                                 <div class="searchResultCotainter absolute left-0 top-full shadow bg-white border rounded-md w-full z-50" style="display: none;">
                                     <div class="resultWrap">
@@ -41,89 +74,137 @@
                                         Add Address
                                     </x-base.button>
                                 </div>
+                                <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
                             </div>
-                            <div class="acc__input-error error-customer_property_id text-danger text-xs mt-1"></div>
                         </div>
-                        <div class="mb-3">
-                            <x-base.form-label for="description">Job description</x-base.form-label>
-                            <x-base.form-input name="description" id="description" class="w-full cap-fullname" type="text" placeholder="Short Description" />
-                        </div>
-                        <div class="mb-3">
-                            <x-base.form-label for="details">Job Details</x-base.form-label>
-                            <x-base.form-textarea name="details" id="details" class="w-full h-[80px]" placeholder="Details..."></x-base.form-textarea>
-                        </div>
-                        <div class="grid grid-cols-12 gap-x-6 gap-y-3">
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="estimated_amount">Estimated Job Value (Excluding VAT)</x-base.form-label>
-                                <x-base.form-input step="any" name="estimated_amount" id="estimated_amount" class="w-full" type="number" placeholder="0.00" />
-                            </div>
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="customer_job_priority_id">Priority</x-base.form-label>
-                                <x-base.tom-select class="w-full" id="customer_job_priority_id" name="customer_job_priority_id" data-placeholder="Please Select">
-                                    <option value="">Please Select</option>
-                                    @if($priorities->count() > 0)
-                                        @foreach($priorities as $priority)
-                                            <option value="{{ $priority->id }}">{{ $priority->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-base.tom-select>
-                            </div>
-                            {{-- <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="due_date">Due Date</x-base.form-label>
-                                <x-base.litepicker name="due_date" id="due_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />
-                            </div> --}}
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="customer_job_status_id">Job Status</x-base.form-label>
-                                <x-base.tom-select class="w-full" id="customer_job_status_id" name="customer_job_status_id" data-placeholder="Please Select">
-                                    <option value="">Please Select</option>
-                                    @if($statuses->count() > 0)
-                                        @foreach($statuses as $status)
-                                            <option value="{{ $status->id }}">{{ $status->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-base.tom-select>
-                            </div>
-
-                            
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="reference_no">Job Ref No</x-base.form-label>
-                                <x-base.form-input name="reference_no" id="reference_no" class="w-full" type="text" placeholder="Reference No" />
-                            </div>
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="job_calender_date">Appointment Date</x-base.form-label>
-                                <x-base.form-input value="" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
-                                <div class="acc__input-error error-job_calender_date text-danger text-xs mt-1"></div>
-                            </div>
-                            <div class="col-span-12 sm:col-span-4 z-20 hidden calenderSlot">
-                                <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
-                                <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
-                                    <option value="">Please Select</option>
-                                    @if($slots->count() > 0)
-                                        @foreach($slots as $slot)
-                                            <option value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-base.tom-select>
-                                <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs mt-1"></div>
-                            </div>
+                        <div class="acc__input-error error-customer_property_id text-danger text-xs"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job description</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="description" name="description" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="notebook-pen" />
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 sm:col-span-3 relative z-10">
-                <div class="intro-y box p-5">
-                    <x-base.button type="submit" id="jobSaveBtn" class="text-white w-full mb-3" variant="success">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                        Save Job
-                        <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                    </x-base.button>
-                    <x-base.button as="a" href="{{ route('customer.jobs', $customer->id) }}" class="w-full" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
-                        Cancel
-                    </x-base.button>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Details</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="details" name="details" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="notebook" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Estimated Job Value (Excluding VAT)</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="estimated_amount" name="estimated_amount" value="" placeholder="0.0" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" step="any" type="number"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="badge-pound-sterling" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 mt-2 bg-white">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Priority</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.tom-select id="customer_job_priority_id" name="customer_job_priority_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
+                                <option value="">Please Select</option>
+                                @if($priorities->count() > 0)
+                                    @foreach($priorities as $priority)
+                                        <option value="{{ $priority->id }}">{{ $priority->name }}</option>
+                                    @endforeach
+                                @endif
+                            </x-base.tom-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 mt-2 bg-white">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Status</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.tom-select id="customer_job_status_id" name="customer_job_status_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
+                                <option value="">Please Select</option>
+                                @if($statuses->count() > 0)
+                                    @foreach($statuses as $status)
+                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                    @endforeach
+                                @endif
+                            </x-base.tom-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Ref No</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="reference_no" name="reference_no" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="hash" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Appointment Date</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="job_calender_date" name="job_calender_date" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
+                        </div>
+                        <div class="acc__input-error error-job_calender_date text-danger text-xs"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 mt-2 bg-white hidden calenderSlot">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Status</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.tom-select id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
+                                <option value="">Please Select</option>
+                                @if($slots->count() > 0)
+                                    @foreach($slots as $slot)
+                                        <option value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
+                                    @endforeach
+                                @endif
+                            </x-base.tom-select>
+                        </div>
+                        <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs"></div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="intro-y box mt-2 rounded-none border-none px-2 py-2">
+            <div class="flex justify-center items-center">
+                <x-base.button type="submit" id="jobSaveBtn" class="text-white w-auto mr-2" variant="success">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Save Job
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+                <x-base.button as="a" href="{{ route('customer.jobs', $customer->id) }}" class="w-auto" variant="danger">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                    Cancel
+                </x-base.button>
+            </div>
+        </div>
+
     </form>
     <!-- END: HTML Table Data -->
 

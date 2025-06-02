@@ -33,6 +33,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         const form = document.getElementById('customerCreateForm');
         const $theForm = $(this);
         
+        $('#customerCreateForm .acc__input-error').html('').removeClass('mt-1');
         $('#customerSaveBtn', $theForm).attr('disabled', 'disabled');
         $("#customerSaveBtn .theLoader").fadeIn();
 
@@ -80,7 +81,7 @@ import INTAddressLookUps from '../../address_lookup.js';
                 if (error.response.status == 422) {
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
                         $(`#customerCreateForm .${key}`).addClass('border-danger');
-                        $(`#customerCreateForm  .error-${key}`).html(val);
+                        $(`#customerCreateForm  .error-${key}`).html(val).addClass('mt-1');
                     }
                 } else if (error.response.status == 304) {
                     warningModal.show();

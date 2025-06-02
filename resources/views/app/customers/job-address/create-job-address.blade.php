@@ -14,146 +14,225 @@
         </div>
     </div>
     
-    <!-- BEGIN: HTML Table Data -->
-    <div class="grid grid-cols-12 lg:col-span-3">
-        <div class="col-span-12 lg:col-span-3 order-1 lg:order-2">
-            <div class="mt-5 box">
-                <div class="">
+    <form method="post" action="#" id="addJobAddressForm">
+        <div class="settingsBox mt-5">
+            <h3 class="font-medium leading-none mb-3 text-dark">Customer Information</h3>
+            <div class="box rounded-md p-0 overflow-hidden">
+                <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
                     <div>
-                        <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                            <h2 class="text-base font-medium">Customer Information</h2>
+                        <span class="font-normal text-slate-400 text-xs block">
+                            {{ isset($customer->customer_full_name) && !empty($customer->customer_full_name) ? $customer->customer_full_name : 'N/A' }}
+                        </span>
+                    </div>
+                </a>
+                <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">{!! $customer->full_address_with_html !!}</span>
+                    </div>
+                </a>
+                <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mail" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">{{ $customer_contact_info->email }}</span>
+                    </div>
+                </a>
+                <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="smartphone" />
+                    <div>
+                        <span class="font-normal text-slate-400 text-xs block">{{ $customer_contact_info->mobile }}</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2 theAddressWrap" id="jobAddressWrap">
+            <div class="flex flex-col items-center border-b border-slate-200/60 px-2 py-3 dark:border-darkmode-400 sm:flex-row">
+                <h2 class="mr-auto text-base font-medium">
+                    Address
+                </h2>
+                <x-base.button class="coptyCustomerAddress ml-auto text-white" size="sm" type="button" variant="primary" >
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="copy" /> Copy Customer Address 
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#164e63e6" icon="oval" />
+                </x-base.button>
+            </div>
+            <div class="px-2 py-3 bg-white">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Address Lookup</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="customer_address_lookup" name="address_lookup" value="" placeholder="Search address here..." class="theAddressLookup cap-fullname w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
                         </div>
-                       <div class="p-5">
-                        <div class="mb-3">
-                            Name: <span class="font-medium">{{ $customer->customer_full_name }}</span>
-                        </div>
-                        <div class="mb-3">
-                            Email: <span class="font-medium">{{ $customer_contact_info->email }}</span>
-                        </div>
-                        <div class="mb-3">
-                            Phone: <span class="font-medium">{{ $customer_contact_info->mobile }}</span>
-                        </div>
-                        <div class="mb-3">
-                            Address: <span class="font-medium">{{ $customer->full_address }}</span>
-                        </div>
-                       </div>
                     </div>
                 </div>
             </div>
-    
-            <div class="mt-6 box lg:block hidden">
-                <div class="p-5 flex flex-col justify-center gap-3">
-                    <x-base.button class="w-full text-white shadow-md addJobAddrBtn" type="submit" variant="success">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                        Create Address
-                        <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                    </x-base.button>
-                    <x-base.button as="a" href="{{ route('customer.job-addresses', $customer->id) }}" class="mr-1 w-full" data-tw-dismiss="modal" type="button" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" /> Cancel
-                    </x-base.button>
+            <div class="grid grid-cols-12 mt-2 gap-2">
+                <div class="col-span-12 sm:col-span-6">
+                    <div class="px-2 py-3 bg-white">
+                        <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                            <div class="w-full">
+                                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Address Line 1<span class="text-danger ml-1">*</span></div>
+                                <div class="theDesc w-full relative">
+                                    <x-base.form-input id="address_line_1" name="address_line_1" value="" placeholder="" class="address_line_1 w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                    <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
+                                </div>
+                                <div class="acc__input-error error-address_line_1 text-danger text-xs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 sm:col-span-6">
+                    <div class="px-2 py-3 bg-white">
+                        <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                            <div class="w-full">
+                                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Address Line 2<span class="text-danger ml-1">*</span></div>
+                                <div class="theDesc w-full relative">
+                                    <x-base.form-input id="address_line_2" name="address_line_2" value="" placeholder="" class="address_line_2 w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                    <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
+                                </div>
+                                <div class="acc__input-error error-address_line_2 text-danger text-xs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 sm:col-span-4">
+                    <div class="px-2 py-3 bg-white">
+                        <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                            <div class="w-full">
+                                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Town/City<span class="text-danger ml-1">*</span></div>
+                                <div class="theDesc w-full relative">
+                                    <x-base.form-input id="city" name="city" value="" placeholder="" class="city w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                    <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
+                                </div>
+                                <div class="acc__input-error error-city text-danger text-xs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 sm:col-span-4">
+                    <div class="px-2 py-3 bg-white">
+                        <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                            <div class="w-full">
+                                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Region/County</div>
+                                <div class="theDesc w-full relative">
+                                    <x-base.form-input id="state" name="state" value="" placeholder="" class="state w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                    <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 sm:col-span-4">
+                    <div class="px-2 py-3 bg-white">
+                        <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                            <div class="w-full">
+                                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Post Code<span class="text-danger ml-1">*</span></div>
+                                <div class="theDesc w-full relative">
+                                    <x-base.form-input id="postal_code" name="postal_code" value="" placeholder="" class="postal_code w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                    <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="map-pin" />
+                                </div>
+                                <div class="acc__input-error error-postal_code text-danger text-xs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <x-base.form-input name="country" id="country" class="w-full country" type="hidden" value="" />
+            <x-base.form-input name="latitude" id="latitude" class="w-full latitude" type="hidden" value="" />
+            <x-base.form-input name="longitude" id="longitude" class="w-full longitude" type="hidden" value="" />
+        </div>
+
+        <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2">
+            <div class="flex flex-col items-center border-b border-slate-200/60 px-2 py-3 dark:border-darkmode-400 sm:flex-row">
+                <h2 class="mr-auto text-base font-medium">
+                    Occupant's Details
+                </h2>
+            </div>
+            <div class="px-2 py-3 bg-white">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Name</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="occupant_name" name="occupant_name" value="" placeholder="Mr. John Doe" class="cap-fullname w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="user" />
+                        </div>
+                        <div class="acc__input-error error-occupant_name text-danger text-xs"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Phone</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="occupant_phone" name="occupant_phone" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="smartphone" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Email</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="occupant_email" name="occupant_email" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="email"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="mail" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Gas Service Due Date</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.litepicker name="due_date" id="due_date" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-9 order-2 lg:order-1 mt-5">
-            <form method="post" action="#" id="addJobAddressForm">
-                <x-base.dialog.description class="grid grid-cols-12 gap-x-6 gap-y-6 py-0 px-0 lg:px-5">
-                    <x-base.form-input name="customer_id" id="customer_id" class="w-full" type="hidden" value="{{ $customer->id }}" />
-                    <div class="col-span-12 sm:col-span-6 box">
-                        <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                            <h2 class="text-base font-medium">Job Address Details</h2>
-                        </div>
-                        <div class="theAddressWrap" id="jobAddressWrap">
-                            <div class="p-5">
-                            <div class="mb-3">
-                                <x-base.button class="w-full coptyCustomerAddress text-primary" data-tw-dismiss="modal" type="button" variant="secondary" >
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="copy" /> Copy Customer Address 
-                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#164e63e6" icon="oval" />
-                                </x-base.button>
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="customer_address_line_1">Address Lookup</x-base.form-label>
-                                <x-base.form-input name="address_lookup" id="customer_address_lookup" class="w-full theAddressLookup" type="text" placeholder="Search address here..." />
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="customer_address_line_1">Address Line 1</x-base.form-label>
-                                <x-base.form-input name="address_line_1" id="customer_address_line_1" class="w-full address_line_1" type="text" placeholder="Address Line 1" />
-                                <div class="acc__input-error error-address_line_1 text-danger text-xs mt-1"></div>
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="address_line_2">Address Line 2</x-base.form-label>
-                                <x-base.form-input name="address_line_2" id="address_line_2" class="w-full address_line_2" type="text" placeholder="Address Line 2 (Optional)" />
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="city">Town/City</x-base.form-label>
-                                <x-base.form-input name="city" id="city" class="w-full city" type="text" placeholder="Town/City" />
-                                <div class="acc__input-error error-city text-danger text-xs mt-1"></div>
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="state">Region/County</x-base.form-label>
-                                <x-base.form-input name="state" id="state" class="w-full state" type="text" placeholder="Region/County" />
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="postal_code">Post Code</x-base.form-label>
-                                <x-base.form-input name="postal_code" id="postal_code" class="w-full postal_code" type="text" placeholder="Post Code" />
-                                <div class="acc__input-error error-postal_code text-danger text-xs mt-1"></div>
-                            </div>
-                        </div>
-                            <x-base.form-input name="country" id="country" class="w-full country" type="hidden" value="" />
-                            <x-base.form-input name="latitude" class="w-full latitude" type="hidden" value="" />
-                            <x-base.form-input name="longitude" class="w-full longitude" type="hidden" value="" />
+
+        <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2">
+            <div class="flex flex-col items-center border-b border-slate-200/60 px-2 py-3 dark:border-darkmode-400 sm:flex-row">
+                <h2 class="mr-auto text-base font-medium">
+                    Customer Note
+                </h2>
+            </div>
+            <div class="px-2 py-3 bg-white">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Note</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-input id="note" name="note" value="" placeholder="Write a note..." class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="notebook-pen" />
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-6 box">
-                        <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                            <h2 class="text-base font-medium ">Occupant's Details</h2>
-                        </div>
-                        <div class="p-5">
-                            <div class="mb-3">
-                                <x-base.form-label for="occupant_name">Name</x-base.form-label>
-                                <x-base.form-input name="occupant_name" id="occupant_name" class="w-full" type="text" placeholder="Name" />
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="occupant_phone">Phone</x-base.form-label>
-                                <x-base.form-input name="occupant_phone" id="occupant_phone" class="w-full" type="text" placeholder="Phone" />
-                            </div>
-                            <div class="mb-3">
-                                <x-base.form-label for="occupant_email">Email</x-base.form-label>
-                                <x-base.form-input name="occupant_email" id="occupant_email" class="w-full" type="email" placeholder="Email Address" />
-                            </div>
-                            <h2 class="text-base font-medium mb-2 pt-5">Gas Service Due Date</h2>
-                            <div class="mb-3">
-                                <x-base.litepicker name="due_date" id="due_date" class="block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-span-12 box">
-                        <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                            <h2 class="text-base font-medium">Note</h2>
-                        </div>
-                        <div class="p-5">
-                            <x-base.form-textarea name="note" id="note" class="w-full h-[80px]" placeholder="Note..."></x-base.form-textarea>
-                        </div>
-                    </div>
-                </x-base.dialog.description>
-            </form>
-        </div>
-        <div class="col-span-12 lg:hidden order-3 mt-5">
-            <div class="box">
-                <div class="p-5 flex flex-col justify-center gap-3">
-                    <x-base.button class="w-full text-white shadow-md addJobAddrBtn" type="submit" variant="success">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                        Save Address
-                        <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                    </x-base.button>
-                    <x-base.button as="a" href="{{ route('customer.job-addresses', $customer->id) }}" class="mr-1 w-full" data-tw-dismiss="modal" type="button" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-auto" icon="x-circle" /> Cancel
-                    </x-base.button>
                 </div>
             </div>
         </div>
-        
-    </div>
-    <!-- END: HTML Table Data -->
+
+        <div class="intro-y box mt-2 rounded-none border-none px-2 py-2">
+            <div class="flex justify-center items-center">
+                <x-base.button class="w-auto mr-2 text-white shadow-md addJobAddrBtn" type="submit" variant="success">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Save Address
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+                <x-base.button as="a" href="{{ route('customer.job-addresses', $customer->id) }}" class="w-auto" data-tw-dismiss="modal" type="button" variant="danger">
+                    <x-base.lucide class="mr-2 h-4 w-auto" icon="x-circle" /> Cancel
+                </x-base.button>
+            </div>
+        </div>
+        <input type="hidden" name="customer_id" value="{{ $customer->id }}"/>
+    </form>
+
+
 
     @include('app.action-modals')
 @endsection

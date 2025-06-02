@@ -24,39 +24,39 @@
         </div>
     </div>
     
-   <!-- BEGIN: HTML Table Data -->
-   <div class="intro-y box mt-5 p-5">
-    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+    <!-- BEGIN: HTML Table Data -->
+    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative">
+        <x-base.form-input class="m-0 w-full" id="query" type="text" autocomplete="off" placeholder="Search..."/>
+        <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
         <input type="hidden" name="customer_id" id="customer_id" value="{{ $customer->id }}">
-        <form class="sm:mr-auto lg:flex w-full lg:w-auto" id="tabulator-html-filter-form" >
-            <div class="items-center sm:mr-4 sm:flex xl:mt-0 gap-3">
-                <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial hidden lg:block">Keywords</label>
-                <x-base.form-input class="sm:mt-0 2xl:w-full" id="query" type="text" placeholder="Search..." />
-            </div>
-            <div class="items-center hidden lg:mr-4 lg:flex ">
-                <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">Status </label>
-                <x-base.form-select class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full" id="status" >
-                    <option value="1">Active</option>
-                    <option value="2">Archive</option>
-                </x-base.form-select>
-            </div>
-            <div class="xl:mt-0 hidden lg:block">
-                <x-base.button class="w-full sm:w-16" id="tabulator-html-filter-go" type="button" variant="primary" >Go</x-base.button>
-                <x-base.button class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16" id="tabulator-html-filter-reset" type="button" variant="secondary" >Reset</x-base.button>
-            </div>
-        </form>
     </div>
-    <div class="scrollbar-hidden overflow-x-auto">
-        <div class="mt-5 jalt_responsive" id="JobAddressListTable" ></div>
+
+    <div class="box px-5 rounded-none scrollbar-hidden overflow-x-auto mt-5">
+        <div id="JobAddressListTable">
+            <a data-id="38" href="http://127.0.0.1:8003/users/navigations/38" class="relative userWrap px-0 py-4 border-b border-b-slate-100 flex w-full items-center">
+                <div class="mr-auto">
+                    <div class="font-medium text-dark leading-none mb-1.5 flex justify-start items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 mr-2 h-4 w-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>Mr Registration</span>
+                    </div>
+                    <div class=" text-slate-500 text-xs leading-none mb-3 flex justify-start items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone stroke-1.5 mr-2 h-3 w-4"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>
+                        <span>01740149260</span>
+                    </div>
+                    <div class=" text-slate-500 leading-none flex justify-start items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" style="top: -3px;" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 relative"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>1854 PAISLEY ROAD WEST, GLASGOW, G52 3TW</span>
+                    </div>
+                </div>
+                <div class="ml-auto">
+                    <span class="text-slate-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-ellipsis-vertical-icon lucide-ellipsis-vertical"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                    </span>
+                </div>
+            </a>
+        </div>
     </div>
-    <div class="mt-4 flex w-full sm:w-auto lg:hidden justify-center">
-        <x-base.button as="a" href="{{ route('customer.job-addresses.create', $customer->id) }}" class="shadow-md" variant="primary" >
-            <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
-            Add Job Address
-        </x-base.button>
-    </div>
-</div>
-<!-- END: HTML Table Data -->
+    <!-- END: HTML Table Data -->
 
 
 @include('app.action-modals')

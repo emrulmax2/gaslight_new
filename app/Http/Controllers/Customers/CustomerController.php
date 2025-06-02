@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CustomerAddressUpdateRequest;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
 use App\Models\Title;
@@ -257,28 +258,11 @@ class CustomerController extends Controller
         $data = [
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
-            'company_name' => (!empty($request->company_name) ? $request->company_name : null),
-            'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
-            'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
-            'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
-            'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
-            'state' => (!empty($request->state) ? $request->state : null),
-            'city' => (!empty($request->city) ? $request->city : null),
-            'country' => (!empty($request->country) ? $request->country : null),
-            'note' => (!empty($request->note) ? $request->note : null),
-            'auto_reminder' => (isset($request->auto_reminder) && $request->auto_reminder > 0 ? $request->auto_reminder : 0),
             'updated_by' => auth()->user()->id
         ];
         $customer = Customer::where('id', $customer_id)->update($data);
 
-        $contact = CustomerContactInformation::where('customer_id', $customer_id)->update([
-            'mobile' => (!empty($request->mobile) ? $request->mobile : null),
-            'phone' => (!empty($request->phone) ? $request->phone : null),
-            'email' => (!empty($request->email) ? $request->email : null),
-            'other_email' => (!empty($request->other_email) ? $request->other_email : null),
-            'updated_by' => auth()->user()->id
-        ]);
-        return response()->json(['msg' => 'Customer successfully updated.', 'red' => route('customers.edit', $customer_id)], 200);
+        return response()->json(['msg' => 'Customer successfully updated.', 'red' => ''], 200);
     }
 
     public function destroy($customer_id){
@@ -341,6 +325,49 @@ class CustomerController extends Controller
             return response()->json(['suc' => 1, 'html' => $html], 200);
         else:
             return response()->json(['suc' => 2, 'html' => ''], 200);
+        endif;
+    }
+
+    public function updateFieldValue(Request $request){
+        $customer_id = $request->id;
+        $value = (isset($request->fieldValue) && !empty($request->fieldValue) ? $request->fieldValue : null);
+        $field = $request->fieldName;
+
+        if($customer_id > 0 && $field != '' && !empty($request->theModel)):
+            if($request->theModel == 'contact'):
+                $contactInfo = CustomerContactInformation::where('customer_id', $customer_id);
+                $contactInfo->update([$field => $value]);
+            else:
+                $customer = Customer::find($customer_id);
+                $customer->update([$field => $value]);
+            endif;
+
+            return response()->json(['msg' => 'Customer data successfully updated.'], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+        endif;
+    }
+
+    public function updateAddressInfo(CustomerAddressUpdateRequest $request){
+        $customer = Customer::find($request->customer_id);
+        
+        $addressData = [
+            'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
+            'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
+            'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
+            'state' => (!empty($request->state) ? $request->state : null),
+            'city' => (!empty($request->city) ? $request->city : null),
+            'country' => (!empty($request->country) ? $request->country : null),
+            'latitude' => (!empty($request->latitude) ? $request->latitude : null),
+            'longitude' => (!empty($request->longitude) ? $request->longitude : null),
+        ];
+
+        $customerUpdate = Customer::where('id', $customer->id)->update($addressData);
+
+        if($customerUpdate):
+            return response()->json(['msg' => 'Customer Address successfully updated.', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
         endif;
     }
 }

@@ -173,7 +173,7 @@ export default defineConfig({
 
                 "resources/js/app/customers/job-address/job-address-create.js",
                 "resources/js/app/customers/job-address/job-address.js",
-                "resources/js/app/customers/job-address/job-address-create.js",
+                'resources/js/app/customers/job-address/job-address-edit.js',
                 "resources/js/app/customers/job-address/job-address.js",
                 "resources/js/app/customers/customers-create.js",
                 "resources/js/app/customers/customers-edit.js",

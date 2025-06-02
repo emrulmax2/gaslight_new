@@ -14,226 +14,128 @@
         </div>
     </div>
 
-    <form method="post" action="#" id="customerUpdateForm">
-        <div class="mt-5 grid grid-cols-12 gap-6">
-            <!-- Left Column (9 columns on large devices, 12 on small devices) -->
-            <div class="intro-y col-span-12 lg:col-span-9">
-                <!-- Personal Information Section -->
-                <div class="intro-y box">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">Personal Information</h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="grid grid-cols-12 gap-1">
-                            <!-- Title Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="title_id">Title</x-base.form-label>
-                                    <x-base.tom-select class="w-full" id="title_id" name="title_id" data-placeholder="Please Select">
-                                        <option value="">Please Select</option>
-                                        @if($titles->count() > 0)
-                                            @foreach($titles as $title)
-                                                <option {{ $customer->title_id == $title->id ? 'Selected' : '' }} value="{{ $title->id }}">{{ $title->name }}</option>
-                                            @endforeach
-                                        @endif
-                                    </x-base.tom-select>
-                                </div>
-                            </div>
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="full_name">Full Name <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.form-input 
-                                        value="{{ isset($customer->full_name) ? $customer->full_name : '' }}" 
-                                        name="full_name" 
-                                        id="full_name" 
-                                        class="w-full cap-fullname" 
-                                        type="text" 
-                                        placeholder="Last Name" 
-                                        />
-                                    <div class="acc__input-error error-full_name text-danger text-xs mt-1"></div>
-                                </div>
-                            </div>
-    
-                            <!-- Company Name Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="company_name">Company Name</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->company_name) ? $customer->company_name : '' }}" name="company_name" id="company_name" class="w-full cap-fullname" type="text" placeholder="Company Name" />
-                                </div>
-                            </div>
-    
-                            <!-- VAT No Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="vat_no">VAT No</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->vat_no) ? $customer->vat_no : '' }}" name="vat_no" id="vat_no" class="w-full" type="text" placeholder="VAT No" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Personal Info</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#customerNameModal" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($customer->customer_full_name) && !empty($customer->customer_full_name) ? $customer->customer_full_name : 'N/A' }}
+                    </span>
                 </div>
-    
-                <!-- Address Section -->
-                <div class="intro-y box mt-6">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">Address</h2>
-                    </div>
-                    <div class="p-5 theAddressWrap" id="customerAddressWrap">
-                        <div class="grid grid-cols-12 gap-1">
-                            <!-- Address Lookup Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="customer_address_lookup">Address Lookup</x-base.form-label>
-                                    <x-base.form-input name="address_lookup" id="customer_address_lookup" class="w-full theAddressLookup" type="text" placeholder="Search address here..." />
-                                </div>
-                            </div>
-    
-                            <!-- Address Line 1 Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="customer_address_line_1">Address Line 1</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->address_line_1) ? $customer->address_line_1 : '' }}" name="address_line_1" id="customer_address_line_1" class="w-full address_line_1" type="text" placeholder="Address Line 1" />
-                                </div>
-                            </div>
-    
-                            <!-- Address Line 2 Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="address_line_2">Address Line 2</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->address_line_2) ? $customer->address_line_2 : '' }}" name="address_line_2" id="address_line_2" class="w-full address_line_2" type="text" placeholder="Address Line 2 (Optional)" />
-                                </div>
-                            </div>
-    
-                            <!-- Town/City Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="city">Town/City</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->city) ? $customer->city : '' }}" name="city" id="city" class="w-full city" type="text" placeholder="Town/City" />
-                                </div>
-                            </div>
-    
-                            <!-- Region/County Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="state">Region/County</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->state) ? $customer->state : '' }}" name="state" id="state" class="w-full state" type="text" placeholder="Region/County" />
-                                </div>
-                            </div>
-    
-                            <!-- Post Code Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="postal_code">Post Code</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->postal_code) ? $customer->postal_code : '' }}" name="postal_code" id="postal_code" class="w-full postal_code" type="text" placeholder="Post Code" />
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Hidden Fields -->
-                        <x-base.form-input value="{{ isset($customer->country) ? $customer->country : '' }}" name="country" id="country" class="w-full country" type="hidden" value="" />
-                        <x-base.form-input value="{{ isset($customer->latitude) ? $customer->latitude : '' }}" name="latitude" id="latitude" class="w-full latitude" type="hidden" value="" />
-                        <x-base.form-input value="{{ isset($customer->longitude) ? $customer->longitude : '' }}" name="longitude" id="longitude" class="w-full longitude" type="hidden" value="" />
-                    </div>
+            </a>
+            <a href="javascript:void(0);" data-model="customer" data-type="text" data-required="0" data-title="Company Name" data-field="company_name" data-value="{{ $customer->company_name }}" class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="building" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->company_name) ? $customer->company_name : 'N/A' }}</span>
                 </div>
-    
-                <!-- Contact Information Section -->
-                <div class="intro-y box mt-6">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">Contact Information</h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="grid grid-cols-12 gap-1">
-                            <!-- Mobile Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="mobile">Mobile</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->contact->mobile) ? $customer->contact->mobile : '' }}" name="mobile" id="mobile" class="w-full" type="text" placeholder="Mobile" />
-                                </div>
-                            </div>
-    
-                            <!-- Phone Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="phone">Phone</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->contact->phone) ? $customer->contact->phone : '' }}" name="phone" id="phone" class="w-full" type="text" placeholder="Phone" />
-                                </div>
-                            </div>
-    
-                            <!-- Email Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="email">Email</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->contact->email) ? $customer->contact->email : '' }}" name="email" id="email" class="w-full" type="email" placeholder="Email Address" />
-                                </div>
-                            </div>
-    
-                            <!-- Other Email Field -->
-                            <div class="col-span-12 lg:col-span-6">
-                                <div class="m-1">
-                                    <x-base.form-label for="other_email">Other Email</x-base.form-label>
-                                    <x-base.form-input value="{{ isset($customer->contact->other_email) ? $customer->contact->other_email : '' }}" name="other_email" id="other_email" class="w-full" type="email" placeholder="Secondary Email Address" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            </a>
+            <a href="javascript:void(0);" data-model="customer" data-type="text" data-required="0" data-title="VAT Number" data-field="vat_no" data-value="{{ $customer->vat_no }}" class="fieldValueToggler flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="hash" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->vat_no) ? $customer->vat_no : 'N/A' }}</span>
                 </div>
-    
-                <!-- Note Section -->
-                <div class="intro-y box mt-6">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">Note</h2>
-                    </div>
-                    <div class="p-5">
-                        <x-base.form-textarea name="note" id="note" class="w-full h-[120px]" placeholder="Note">{{ isset($customer->note) ? $customer->note : '' }}</x-base.form-textarea>
-                    </div>
-                </div>
-            </div>
-    
-            <div class="intro-y col-span-12 lg:col-span-3">
-                <!-- Automatic Reminder Section -->
-                <div class="intro-y box">
-                    <div class="p-5">
-                        <div class="grid grid-cols-12 gap-4 items-center">
-                            <div class="col-span-12">
-                                <x-base.form-switch class="w-full mt-3 sm:ml-auto sm:mt-0 sm:w-auto">
-                                    <x-base.form-switch.label class="ml-0 sm:ml-2" for="auto_reminder">Automatic Reminder?</x-base.form-switch.label>
-                                    <x-base.form-switch.input checked class="ml-3 mr-0" id="auto_reminder" name="auto_reminder" value="1" type="checkbox" />
-                                </x-base.form-switch>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Save and Cancel Buttons -->
-                <div class="intro-y box mt-6">
-                    <div class="grid grid-cols-12 gap-4 items-center">
-                        <div class="col-span-12 m-5">
-                            <div class="flex flex-col space-y-4">
-                                <x-base.button as="a" href="{{ route('customer.jobs', $customer->id) }}" class="mr-1 w-full" data-tw-dismiss="modal" type="button" variant="primary">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="briefcase" />Jobs
-                                </x-base.button>
-                                <x-base.button as="a" href="{{ route('customer.job-addresses', $customer->id) }}" class="w-full shadow-md" variant="primary">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="MapPin" />
-                                    Job Address
-                                </x-base.button>
-                                <x-base.button type="submit" id="customerUpdateBtn" class="w-full text-white shadow-md" variant="success">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                                    Update Customer
-                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                                </x-base.button>
-                                <x-base.button as="a" href="{{ route('customers') }}" class="w-full shadow-md" variant="danger">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
-                                    Cancel
-                                </x-base.button>
-                
-                                <input type="hidden" name="id" value="{{ $customer->id }}" />
-                            </div>
-                        </div>
-                    </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Customer Address</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#customerAddressModal">
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{!! (!empty($customer->full_address_with_html) ? $customer->full_address_with_html : 'N/A') !!}</span>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Contact Info</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" data-model="contact" data-type="text" data-required="0" data-title="Mobile Number" data-field="mobile" data-value="{{ isset($customer->contact->mobile) ? $customer->contact->mobile : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  icon="smartphone" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($customer->contact->mobile) ? $customer->contact->mobile : 'N/A' }}
+                    </span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-model="contact" data-type="text" data-required="0" data-title="Phone" data-field="phone" data-value="{{ isset($customer->contact->phone) ? $customer->contact->phone : 'N/A' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="phone" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->contact->phone) ? $customer->contact->phone : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-model="contact" data-type="email" data-required="0" data-title="Email" data-field="email" data-value="{{ isset($customer->contact->email) ? $customer->contact->email : 'N/A' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  icon="mail" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->contact->email) ? $customer->contact->email : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-model="contact" data-type="email" data-required="0" data-title="Other Email" data-field="other_email" data-value="{{ isset($customer->contact->other_email) ? $customer->contact->other_email : 'N/A' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mails" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->contact->other_email) ? $customer->contact->other_email : 'N/A' }}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Note</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#customerNoteModal">
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="notebook-pen" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->note) ? $customer->note : 'N/A' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Automatic Reminder</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#reminderModal">
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="bell" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (isset($customer->auto_reminder) && $customer->auto_reminder == 1 ? 'Yes' : 'No') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Jobs Addresses</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer">
+            <a href="{{ route('customer.job-addresses', $customer->id) }}" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="map-pin" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Number of Job Addresses</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->properties) && $customer->properties->count() > 0 ? $customer->properties->count() : '0' }}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Jobs</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer">
+            <a href="{{ route('customer.jobs', $customer->id) }}" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="briefcase" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Number of Jobs</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->jobs) && $customer->jobs->count() > 0 ? $customer->jobs->count() : '0' }}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+    @include('app.customers.edit-modal')
     @include('app.action-modals')
 @endsection
 

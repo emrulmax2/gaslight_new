@@ -13,7 +13,7 @@ use App\Models\CustomerProperty;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Schema; 
 
 class CustomerController extends Controller
 {
@@ -203,33 +203,80 @@ class CustomerController extends Controller
         };
     }
 
-    public function updateCustomer(CustomerCreateRequest $request){
+    public function updateCustomer(Request $request){
         try {
-            $customer = Customer::find($request->id);
-            $customer->update([
-                'title_id' => (!empty($request->title_id) ? $request->title_id : $customer->title_id),
-                'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : $customer->full_name),
-                'company_name' => (!empty($request->company_name) ? $request->company_name : $customer->company_name),
-                'vat_no' => (!empty($request->vat_no) ? $request->vat_no : $customer->vat_no),
-                'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : $customer->address_line_1),
-                'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : $customer->address_line_2),
-                'postal_code' => (!empty($request->postal_code) ? $request->postal_code : $customer->postal_code),
-                'state' => (!empty($request->state) ? $request->state : $customer->state),
-                'city' => (!empty($request->city) ? $request->city : $customer->city),
-                'country' => (!empty($request->country) ? $request->country : $customer->country),
-                'note' => (!empty($request->note) ? $request->note : $customer->note),
-                'auto_reminder' => (isset($request->auto_reminder) && $request->auto_reminder > 0 ? $request->auto_reminder : $customer->auto_reminder),
-                'updated_by' => $request->user()->id
+            $customer = Customer::with(['title', 'contact'])
+                        ->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
+                        ->findOrFail($request->id);
+            $customer->makeHidden([
+                'full_address_html',
+                'full_address_with_html'
             ]);
+
+            $updateData = [];
+
+            if($request->has('title_id')):
+                $updateData['title_id'] = (isset($request->title_id) && !empty($request->title_id) ? $request->title_id : null);
+            endif;
+
+            if($request->has('full_name')):
+                $updateData['full_name'] = (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null);
+            endif;
+
+            if($request->has('company_name')):
+                $updateData['company_name'] = (isset($request->company_name) && !empty($request->company_name) ? $request->company_name : null);
+            endif;
+
+            if($request->has('vat_no')):
+                $updateData['vat_no'] = (isset($request->vat_no) && !empty($request->vat_no) ? $request->vat_no : null);
+            endif;
+
+            // update address
+            if($request->has('address_line_1')):
+                $updateData['address_line_1'] = (isset($request->address_line_1) && !empty($request->address_line_1) ? $request->address_line_1 : null);
+            endif;
+
+            if($request->has('address_line_2')):
+                $updateData['address_line_2'] = (isset($request->address_line_2) && !empty($request->address_line_2) ? $request->address_line_2 : null);
+            endif;
+
+            if($request->has('postal_code')):
+                $updateData['postal_code'] = (isset($request->postal_code) && !empty($request->postal_code) ? $request->postal_code : null);
+            endif;
+
+            if($request->has('state')):
+                $updateData['state'] = (isset($request->state) && !empty($request->state) ? $request->state : null);
+            endif;
+
+            if($request->has('city')):
+                $updateData['city'] = (isset($request->city) && !empty($request->city) ? $request->city : null);
+            endif;
+
+            if($request->has('country')):
+                $updateData['country'] = (isset($request->country) && !empty($request->country) ? $request->country : null);
+            endif;
+
+            if($request->has('note')):
+                $updateData['note'] = (isset($request->note) && !empty($request->note) ? $request->note : null);
+            endif;
+
+            if($request->has('auto_reminder')):
+                $updateData['auto_reminder'] = (isset($request->auto_reminder) && !empty($request->auto_reminder) ? $request->auto_reminder : null);
+            endif;
+
+            $updateData['updated_by'] = $request->user()->id;
+
+            $customer->update($updateData);
+
             return response()->json([
                 'message' => 'Customer successfully updated.', 
                 'data' => $customer
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Customer not found',
+                'message' => 'Customer not found. . The requested Customer (ID: '.$request->id.') does not exist or may have been deleted.',
             ], 404);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Something went wrong. Please try again later or contact with the administrator',
             ], 304);
@@ -324,7 +371,13 @@ class CustomerController extends Controller
     public function getDetails($id)
     {
         try {
-            $customer = Customer::findOrFail($id);
+            $customer = Customer::with(['title', 'contact'])
+                        ->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
+                        ->findOrFail($id);
+            $customer->makeHidden([
+                'full_address_html',
+                'full_address_with_html'
+            ]);
             return response()->json([
                 'success' => true,
                 'data'  => $customer,

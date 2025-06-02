@@ -166,7 +166,6 @@
 </x-base.dialog>
 <!-- END: Update Modal Content -->
 
-
 <!-- BEGIN: Modal Content -->
 <x-base.dialog id="addJobAddressModal" staticBackdrop size="xl">
     <x-base.dialog.panel>

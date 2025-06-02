@@ -479,6 +479,9 @@
     .certificateListTable tbody tr td{
         display: block;
     }
+    .right-12px{
+        right: 12px;
+    }
 }
 
 .packageItems input:checked + label .packageTop{
@@ -503,4 +506,35 @@
 }
 .bg-danger-40 {
     background-color: rgb(var(--color-danger) / 0.4);
+}
+
+.inlineTomSelect.tom-select.ts-wrapper{
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    background-position: center right 0rem;
+}
+.inlineTomSelect.tom-select.ts-wrapper, .inlineTomSelect.tom-select.plugin-dropdown_input.focus.dropdown-active{
+    border: none;
+    border-radius: 0;
+    background-position: center right 0rem;
+}
+.inlineTomSelect.tom-select.ts-wrapper .ts-control{
+    font-size: 14px;
+    line-height: 20px;
+    color: #475569;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    min-height: initial;
+}
+.inlineTomSelect.tom-select.ts-wrapper .inlineTomSelect.ts-control, .tom-select.plugin-dropdown_input.focus.dropdown-active .ts-control{
+    font-size: 14px;
+    line-height: 20px;
+    color: #475569;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    min-height: initial;
 }
