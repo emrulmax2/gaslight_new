@@ -46,8 +46,8 @@ import INTAddressLookUps from '../../../address_lookup.js';
             
             if (response.status == 200) {
                 let row = response.data.row;
-                console.log($("#customer_address_line_1"))
-                console.log(response)
+                // console.log($("#customer_address_line_1"))
+                // console.log(response)
                 $('#jobAddressWrap input[name="address_line_1"]').val(row.address_line_1 ? row.address_line_1 : '');
                 $('#jobAddressWrap input[name="address_line_2"]').val(row.address_line_2 ? row.address_line_2 : '');
                 $('#jobAddressWrap input[name="city"]').val(row.city ? row.city : '');
@@ -79,6 +79,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
         const $theForm = $(this);
         let customer_id = $theForm.find('[name="customer_id"]').val();
         
+        $('#addJobAddressForm .acc__input-error').html('').removeClass('mt-1');
         $('.addJobAddrBtn', $theForm).attr('disabled', 'disabled');
         $(".addJobAddrBtn .theLoader").fadeIn();
 
@@ -111,7 +112,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
                 if (error.response.status == 422) {
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
                         $(`#addJobAddressForm .${key}`).addClass('border-danger');
-                        $(`#addJobAddressForm  .error-${key}`).html(val);
+                        $(`#addJobAddressForm  .error-${key}`).html(val).addClass('mt-1');
                     }
                 } else if (error.response.status == 304) {
                     warningModal.show();
@@ -194,7 +195,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
                     }
                 }
             });
-        })
+    })
 
 
 
