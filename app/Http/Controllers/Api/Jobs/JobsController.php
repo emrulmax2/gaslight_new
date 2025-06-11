@@ -150,55 +150,103 @@ class JobsController extends Controller
             ], 500);
         }
     }
-    public function getJobDetails($id){
+    public function getJobDetails(Request $request, $id){
+       try {
+            $job = CustomerJob::with(['customer', 'property', 'customer.contact'])
+            ->withCount("records as number_of_records")
+            ->findOrFail($id);
 
-        $job = CustomerJob::find($id);
+            $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
+            $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
 
-        return response()->json([
-            'data' => $job
-        ]);
+            if ($job->created_by !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to access this job.'
+                ], 403);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $job
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Job not found. . The requested Job (ID: '.$request->id.') does not exist or may have been deleted.'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator'
+            ], 500);
+        }
+
     }
-
-    public function updateCustomerJob(JobUpdateRequest $request)
+   public function update(JobUpdateRequest $request, $id)
     {
-
-        $validated = $request->validated();
-
+        $customer_job_id = $id;
         try {
             DB::beginTransaction();
 
-            $job = CustomerJob::findOrFail($validated['customer_job_id']);
-            
-            $updateData = [
-                'description' => $validated['description'] ?? null,
-                'details' => $validated['details'] ?? null,
-                'customer_job_priority_id' => $validated['customer_job_priority_id'] ?? null,
-                'due_date' => isset($validated['due_date']) ? date('Y-m-d', strtotime($validated['due_date'])) : null,
-                'customer_job_status_id' => $validated['customer_job_status_id'] ?? null,
-                'reference_no' => $validated['reference_no'] ?? null,
-                'estimated_amount' => $validated['estimated_amount'] ?? null,
-                'updated_by' => $request->user()->id
-            ];
+            $job = CustomerJob::with(['customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot'])
+            ->withCount("records as number_of_records")
+            ->findOrFail($id);
+
+            $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
+            $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
+
+            if ($job->created_by !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to update this job.'
+                ], 403);
+            }
+
+           $updateData = [];
+
+            if($request->has('description')):
+                $updateData['description'] = (isset($request->description) && !empty($request->description) ? $request->description : null);
+            endif;
+
+            if($request->has('details')):
+                $updateData['details'] = (isset($request->details) && !empty($request->details) ? $request->details : null);
+            endif;
+
+            if($request->has('estimated_amount')):
+                $updateData['estimated_amount'] = (isset($request->estimated_amount) && !empty($request->estimated_amount) ? $request->estimated_amount : null);
+            endif;
+
+            if($request->has('customer_job_priority_id')):
+                $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
+            endif;
+
+            if($request->has('customer_job_status_id')):
+                $updateData['customer_job_status_id'] = (isset($request->customer_job_status_id) && !empty($request->customer_job_status_id) ? $request->customer_job_status_id : null);
+            endif;
+
+            if($request->has('reference_no')):
+                $updateData['reference_no'] = (isset($request->reference_no) && !empty($request->reference_no) ? $request->reference_no : null);
+            endif;
 
             $job->update($updateData);
 
-            if (!empty($validated['job_calender_date']) && !empty($validated['calendar_time_slot_id'])) {
+            if(!empty($request->job_calender_date) && !empty($request->calendar_time_slot_id)):
                 CustomerJobCalendar::updateOrCreate(
-                    ['customer_job_id' => $validated['customer_job_id']],
+                    ['customer_job_id' => $customer_job_id],
                     [
                         'customer_id' => $job->customer_id,
-                        'date' => date('Y-m-d', strtotime($validated['job_calender_date'])),
-                        'calendar_time_slot_id' => $validated['calendar_time_slot_id'],
-                        'updated_by' => $request->user()->id
+                        'date' => !empty($request->job_calender_date) ? date('Y-m-d', strtotime($request->job_calender_date)) : null,
+                        'calendar_time_slot_id' => $request->calendar_time_slot_id ?? null,
                     ]
                 );
-            }
+            endif;
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Job successfully updated',
+                'message' => 'Job updated successfully.',
                 'data' => $job
             ], 200);
 
@@ -206,23 +254,19 @@ class JobsController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Job not found',
-                'error' => $e->getMessage()
+                'message' => 'Job not found. . The requested Job (ID: '.$request->id.') does not exist or may have been deleted.',
             ], 404);
 
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update job',
-                'error' => $e->getMessage()
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
             ], 500);
         }
     }
-    public function updateCustomerJobCalendar(Request $request){
+    public function updateCustomerJobCalendar(Request $request, $customer_job_id){
 
-
-        $customer_job_id = $request->customer_job_id;
         $job = CustomerJob::find($customer_job_id);
  
         $customer_job_calendar =   CustomerJobCalendar::updateOrCreate(
@@ -235,7 +279,7 @@ class JobsController extends Controller
         );
 
         return response()->json([
-            'message' => 'Job successfully added to the calendar.',
+            'message' => 'Job calendar updated successfully',
             'data' => $customer_job_calendar
         ], 200);
    
