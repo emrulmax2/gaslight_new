@@ -15,169 +15,132 @@
     </div>
 
     <!-- BEGIN: HTML Table Data -->
-    <form method="post" action="#" id="updateJobForm">
-        <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-9">
-                <div class="intro-y box">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">
-                            Job Details
-                        </h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="mb-3">
-                            <x-base.form-label for="description">Job description</x-base.form-label>
-                            <x-base.form-input value="{{ (!empty($job->description) ? $job->description : '') }}" name="description" id="description" class="w-full cap-fullname" type="text" placeholder="Short Description" />
-                        </div>
-                        <div class="mb-3">
-                            <x-base.form-label for="details">Note</x-base.form-label>
-                            <x-base.form-textarea name="details" id="details" class="w-full h-[80px] cap-fullname" placeholder="Details...">{{ (!empty($job->details) ? $job->details : '') }}</x-base.form-textarea>
-                        </div>
-                        <div class="grid grid-cols-12 gap-x-6 gap-y-3">
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="estimated_amount">Estimated Job Value {{ !$hasVat ? '(Excluding VAT)' : '' }}</x-base.form-label>
-                                <x-base.form-input value="{{ (!empty($job->estimated_amount) ? $job->estimated_amount : '') }}" step="any" name="estimated_amount" id="estimated_amount" class="w-full" type="number" placeholder="0.00" />
-                            </div>
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="customer_job_priority_id">Priority</x-base.form-label>
-                                <x-base.tom-select class="w-full" id="customer_job_priority_id" name="customer_job_priority_id" data-placeholder="Please Select">
-                                    <option value="">Please Select</option>
-                                    @if($priorities->count() > 0)
-                                        @foreach($priorities as $priority)
-                                            <option {{ ($job->customer_job_priority_id == $priority->id ? 'Selected' : '') }} value="{{ $priority->id }}">{{ $priority->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-base.tom-select>
-                            </div>  
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="customer_job_status_id">Job Status</x-base.form-label>
-                                <x-base.tom-select class="w-full" id="customer_job_status_id" name="customer_job_status_id" data-placeholder="Please Select">
-                                    <option value="">Please Select</option>
-                                    @if($statuses->count() > 0)
-                                        @foreach($statuses as $status)
-                                            <option {{ ($job->customer_job_status_id == $status->id ? 'Selected' : '') }} value="{{ $status->id }}">{{ $status->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-base.tom-select>
-                            </div>
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="reference_no">Job Ref No</x-base.form-label>
-                                <x-base.form-input value="{{ (!empty($job->reference_no) ? $job->reference_no : '') }}" name="reference_no" id="reference_no" class="w-full" type="text" placeholder="Reference No" />
-                            </div>
-                            <div class="col-span-12 sm:col-span-4">
-                                <x-base.form-label for="job_calender_date">Appointment Date</x-base.form-label>
-                                <x-base.form-input value="{{ (!empty($job->calendar->date) ? date('d-m-Y', strtotime($job->calendar->date)) : '') }}" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
-                            </div>
-                            <div class="col-span-12 sm:col-span-4 z-20 calenderSlot {{ (!empty($job->calendar->calendar_time_slot_id) ? '' : 'hidden') }}">
-                                <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
-                                <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
-                                    <option value="">Please Select</option>
-                                    @if($slots->count() > 0)
-                                        @foreach($slots as $slot)
-                                            @php
-                                                $time = $slot->start; // Example time in 24-hour format
-                                                $dateTime = new DateTime($time);
-                                                $formattedStartTime = $dateTime->format("h:i A");
-                                                
-                                                $time2 = $slot->end; // Example time in 24-hour format
-                                                $dateTime2 = new DateTime($time2);
-                                                $formattedEndTime = $dateTime2->format("h:i A");
-
-                                            @endphp
-                                            <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $formattedStartTime }} - {{ $formattedEndTime }}</option>
-                                        @endforeach
-                                    @endif
-                                </x-base.tom-select>
-                                <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs mt-1"></div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Customer Information</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($job->customer->customer_full_name) && !empty($job->customer->customer_full_name) ? $job->customer->customer_full_name : 'N/A' }}
+                    </span>
                 </div>
-            </div>
-            <div class="col-span-12 sm:col-span-3 z-10">
-                <div class="intro-y box mb-5">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">
-                            Customer
-                        </h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="user" />
-                            <span class="font-medium text-slate-500">
-                                {{ $job->customer->customer_full_name }}
-                            </span>
-                        </div>
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-danger" icon="map-pin" />
-                            <span class="text-slate-500">
-                                {{ $job->customer->address_line_1.' '.$job->customer->address_line_2.', ' }}
-                                {{ (isset($job->customer->city) && !empty($job->customer->city) ? $job->customer->city.', ' : '') }}
-                                {{ (isset($job->customer->state) && !empty($job->customer->state) ? $job->customer->state.', ' : '') }}
-                                {{ (isset($job->customer->postal_code) && !empty($job->customer->postal_code) ? $job->customer->postal_code.', ' : '') }}
-                                {{ (isset($job->customer->country) && !empty($job->customer->country) ? $job->customer->country : '') }}
-                            </span>
-                        </div>
-                        @if(isset($job->customer->contact->mobile) && !empty($job->customer->contact->mobile))
-                        <div class="flex items-start justify-start">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-danger" icon="smartphone" />
-                            <span class="text-slate-500">
-                                {{ (isset($job->customer->contact->mobile) && !empty($job->customer->contact->mobile) ? $job->customer->contact->mobile.', ' : '') }}
-                            </span>
-                        </div>
-                        @endif
-                    </div>
+            </a>
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{!! $job->customer->full_address_with_html !!}</span>
                 </div>
-                <div class="intro-y box mb-5">
-                    <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
-                        <h2 class="mr-auto text-base font-medium">
-                            Job Address
-                        </h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-warning" icon="user" />
-                            <span class="font-medium text-slate-500">
-                                {{ (isset($job->property->customer->customer_full_name) && !empty($job->property->customer->customer_full_name) ? $job->property->customer->customer_full_name : '') }}
-                            </span>
-                        </div>
-                        <div class="flex items-start justify-start mb-1">
-                            <x-base.lucide class="mr-3 h-4 w-4 text-success" icon="map-pin" />
-                            <span class="text-slate-500">
-                                {{ $job->property->address_line_1.' '.$job->property->address_line_2.', ' }}
-                                {{ (isset($job->property->city) && !empty($job->property->city) ? $job->property->city.', ' : '') }}
-                                {{ (isset($job->property->state) && !empty($job->property->state) ? $job->property->state.', ' : '') }}
-                                {{ (isset($job->property->postal_code) && !empty($job->property->postal_code) ? $job->property->postal_code.', ' : '') }}
-                                {{ (isset($job->property->country) && !empty($job->property->country) ? $job->property->country : '') }}
-                            </span>
-                        </div>
-                    </div>
+            </a>
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mail" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (isset($job->customer->contact->email) ? $job->customer->contact->email : 'N/A') }}</span>
                 </div>
-                <div class="intro-y box p-5">
-                    <!-- <x-base.button type="button" class="mb-3 w-full text-white" variant="twitter" data-tw-toggle="modal" data-tw-target="#jobActionsListModal">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />Create
-                    </x-base.button> -->
-                    <x-base.button type="submit" id="jobUpdateBtn" class="text-white w-full mb-3" variant="success">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                        Update Job
-                        <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                    </x-base.button>
-                    <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs.record.and.drafts', ['record' => request()->record, 'job' => $job->id]) :  route('jobs.record.and.drafts', ['job' => $job->id])) }}" class="text-white w-full mb-3" variant="linkedin">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="layers" />
-                        Existing Records & Drafts
-                    </x-base.button>
-                    <!-- <x-base.button as="a" href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs', ['record' => request()->record]) :  route('jobs')) }}" class="w-full" variant="danger">
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
-                        Cancel
-                    </x-base.button> -->
-                    <x-base.form-input type="hidden" value="{{ $job->id }}" name="customer_job_id" />
+            </a>
+            <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="smartphone" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->customer->contact->mobile) ? $job->customer->contact->mobile : 'N/A' }}</span>
                 </div>
-            </div>
+            </a>
         </div>
-    </form>
+    </div>
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Job Address</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            @if(isset($job->property->occupant_name) && !empty($job->property->occupant_name))
+            <a href="javascript:void(0);" class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($job->property->occupant_name) && !empty($job->property->occupant_name) ? $job->property->occupant_name : 'N/A' }}
+                    </span>
+                </div>
+            </a>
+            @endif
+            <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{!! $job->property->full_address_with_html !!}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Job Details</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Description" data-field="description" data-value="{{ !empty($job->description) ? $job->description : '' }}"  class="textValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="notebook-pen" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($job->description) && !empty($job->description) ? $job->description : 'N/A' }}
+                    </span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Details" data-field="details" data-value="{{ !empty($job->details) ? $job->details : '' }}"  class="textValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  icon="notebook" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->details) && !empty($job->details) ? $job->details : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-type="number" data-required="0" data-title="Estimated Job Value (Excluding VAT)" data-field="estimated_amount" data-value="{{ !empty($job->estimated_amount) ? $job->estimated_amount : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="badge-pound-sterling" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->estimated_amount) && !empty($job->estimated_amount) ? $job->estimated_amount : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updatePriorityModal">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="arrow-down-0-1" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->priority->name) && !empty($job->priority->name) ? $job->priority->name : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updateStatusModal">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="circle-check-big" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->status->name) && !empty($job->status->name) ? $job->status->name : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Job Ref No" data-field="reference_no" data-value="{{ !empty($job->reference_no) ? $job->reference_no : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="hash" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updateApointDateModal">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="calendar" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->calendar->date) && !empty($job->calendar->date) ? date('jS F, Y', strtotime($job->calendar->date)) : 'N/A' }}</span>
+                </div>
+            </a>
+            @if(isset($job->calendar->date) && !empty($job->calendar->date))
+            <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updateApointDateModal">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="clock-alert" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->calendar->slot->slot_title) && !empty($job->calendar->slot->slot_title) ? $job->calendar->slot->slot_title : 'N/A' }}</span>
+                </div>
+            </a>
+            @endif
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Existing Records & Drafts</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer">
+            <a href="{{ (isset(request()->record) && !empty(request()->record) ? route('jobs.record.and.drafts', ['record' => request()->record, 'job' => $job->id]) :  route('jobs.record.and.drafts', ['job' => $job->id])) }}" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="briefcase" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Number of Records</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->records) && $job->records->count() > 0 ? $job->records->count() : '0' }}</span>
+                </div>
+            </a>
+        </div>
+    </div>
     <!-- END: HTML Table Data -->
 
-    @include('app.jobs.create-modal')
+    @include('app.jobs.show-modal')
     @include('app.action-modals')
 @endsection
 

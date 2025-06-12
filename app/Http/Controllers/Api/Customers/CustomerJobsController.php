@@ -7,8 +7,10 @@ use App\Http\Requests\CustomerJobStoreRequest;
 use App\Http\Requests\CustomerJobUpdateRequest;
 use App\Models\CustomerJob;
 use App\Models\CustomerJobCalendar;
+use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CustomerJobsController extends Controller
@@ -100,81 +102,115 @@ class CustomerJobsController extends Controller
         }
     }
 
-    public function getSingleCustomerJob($id) {
-        try {
-            $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact'])->where('id', $id)->first();
+    public function getSingleCustomerJob(Request $request, $id) {
+           try {
+            $job = CustomerJob::with(['customer', 'property', 'customer.contact'])
+            ->where('id', $id)->first();
+
+            $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
+            $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
+
+            if ($job->created_by !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to access this job.'
+                ], 403);
+            }
 
             return response()->json([
                 'success' => true,
                 'data' => $job
-            ]);
+            ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'error' => [
-                    'message' => 'The requested job does not exist'
-                ]
+                'message' => 'Job not found. . The requested Job (ID: '.$request->id.') does not exist or may have been deleted.'
             ], 404);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => [
-                    'message' => 'Something went wrong. Please try again later or contact with the administrator'
-                ]
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
             ], 500);
         }
     }
 
 
-    public function job_update(CustomerJobUpdateRequest $request) {
-
+   public function job_update(CustomerJobUpdateRequest $request, $customer_job_id)
+    {
         try {
-            $customer_job_id = $request->customer_job_id;
-                $data = [
-                    'description' => (!empty($request->description) ? $request->description : null),
-                    'details' => (!empty($request->details) ? $request->details : null),
-                    'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
-                    'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
-                    'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : null),
-                    'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
-                    'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
-                    'updated_by' => $request->user()->id,
-                ];
-                $job = CustomerJob::find($customer_job_id);
-                $job->update($data);
+            DB::beginTransaction();
 
-                if(!empty($request->job_calender_date) && !empty($request->calendar_time_slot_id)):
-                    CustomerJobCalendar::updateOrCreate(
-                        ['customer_job_id' => $customer_job_id],
-                        [
-                            'customer_id' => $job->customer_id,
-                            'date' => !empty($request->job_calender_date) ? date('Y-m-d', strtotime($request->job_calender_date)) : null,
-                            'calendar_time_slot_id' => $request->calendar_time_slot_id ?? null,
-                        ]
-                    );
-                endif;
+            $job = CustomerJob::with(['customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot'])->findOrFail($customer_job_id);
+            $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
+            $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
+
+            if ($job->created_by !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to update this job.'
+                ], 403);
+            }
+
+            $updateData = [];
+
+            if($request->has('description')):
+                $updateData['description'] = (isset($request->description) && !empty($request->description) ? $request->description : null);
+            endif;
+
+            if($request->has('details')):
+                $updateData['details'] = (isset($request->details) && !empty($request->details) ? $request->details : null);
+            endif;
+
+            if($request->has('estimated_amount')):
+                $updateData['estimated_amount'] = (isset($request->estimated_amount) && !empty($request->estimated_amount) ? $request->estimated_amount : null);
+            endif;
+
+            if($request->has('customer_job_priority_id')):
+                $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
+            endif;
+
+            if($request->has('customer_job_status_id')):
+                $updateData['customer_job_status_id'] = (isset($request->customer_job_status_id) && !empty($request->customer_job_status_id) ? $request->customer_job_status_id : null);
+            endif;
+
+            if($request->has('reference_no')):
+                $updateData['reference_no'] = (isset($request->reference_no) && !empty($request->reference_no) ? $request->reference_no : null);
+            endif;
+
+            $job->update($updateData);
+
+            if(!empty($request->job_calender_date) && !empty($request->calendar_time_slot_id)):
+                CustomerJobCalendar::updateOrCreate(
+                    ['customer_job_id' => $customer_job_id],
+                    [
+                        'customer_id' => $job->customer_id,
+                        'date' => !empty($request->job_calender_date) ? date('Y-m-d', strtotime($request->job_calender_date)) : null,
+                        'calendar_time_slot_id' => $request->calendar_time_slot_id ?? null,
+                    ]
+                );
+            endif;
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Job successfully updated.',
+                'message' => 'Customer job successfully updated',
                 'data' => $job
             ], 200);
 
-        }catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'error' => [
-                    'message' => 'The requested job does not exist'
-                ]
+                'message' => 'Customer job not found. . The requested Customer job (ID: '.$customer_job_id.') does not exist or may have been deleted.',
             ], 404);
-        } catch (\Exception $e) {
+
+        } catch (Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'error' => [
-                    'message' => 'Something went wrong. Please try again later or contact with the administrator'
-                ]
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
             ], 500);
         }
-        
     }
 }

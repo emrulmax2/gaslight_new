@@ -210,6 +210,9 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('customers/get-details', 'getDetails')->name('customers.get.details');
         Route::post('customers/search', 'search')->name('customers.search');
+
+        Route::post('customers/update-field-value', 'updateFieldValue')->name('customers.update.field.value');
+        Route::post('customers/update-address-info', 'updateAddressInfo')->name('customers.update.address.info');
     });
 
     Route::controller(CustomerJobAddressController::class)->group(function(){
@@ -221,6 +224,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('customer/{customer_id}/job-addresses/{address_id}/update', 'job_address_update')->name('customer.job-addresses.update');
         Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy')->name('customer.job-addresses.job_address_destroy');
         Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore')->name('customer.job-addresses.job_address_restore');
+
+        Route::post('customer/job-addresses/update-data', 'updateJobAddressData')->name('customer.job-addresses.update.data');
+        Route::post('customer/job-addresses/update-address', 'updateJobAddress')->name('customer.job-addresses.update.address');
     });
 
 
@@ -231,6 +237,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('customer/{customer_id}/jobs/store', 'job_store')->name('customer.jobs.store');
         Route::get('customer/{customer_id}/jobs/{customer_job_id}/show', 'job_edit')->name('customer.jobs.edit');
         Route::post('customer/{customer_id}/jobs/{customer_job_id}/update', 'job_update')->name('customer.jobs.update');
+
+        Route::post('customer/jobs/update-data', 'updateJobsData')->name('customer.jobs.update.data');
+        Route::post('customer/jobs/update-appintment-data', 'updateJobsAppointmentData')->name('customer.jobs.update.appointment.date');
     });
 
     Route::controller(JobsJobController::class)->group(function() {
@@ -248,6 +257,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('jobs/search-address', 'searchAddress')->name('jobs.search.address'); 
         Route::post('jobs/search-customers', 'searchCustomers')->name('jobs.search.customers'); 
         Route::post('jobs/search-customer-addresses', 'getCustomerAddresses')->name('jobs.get.customer.addresses');
+
+        Route::post('jobs/update-data', 'updateJobsData')->name('jobs.update.data');
+        Route::post('jobs/update-appintment-data', 'updateJobsAppointmentData')->name('jobs.update.appointment.date');
     });
 
     Route::controller(CalendarController::class)->group(function() {

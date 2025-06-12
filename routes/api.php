@@ -145,16 +145,17 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::controller(CustomerJobAddressController::class)->group(function(){
             Route::get('customer/{customer_id}/job-addresses/list', 'list');
             Route::post('customer/{customer_id}/job-addresses/store', 'job_address_store');
-            Route::put('customer/{customer_id}/job-addresses/{address_id}/update', 'job_address_update');
+            Route::put('customer-job-address/{address_id}/update', 'job_address_update');
             Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy');
             Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore');
+            Route::get('customer-job-address/{id}', 'single_job_address');
         });
 
         Route::controller(CustomerJobsController::class)->group(function(){
             Route::get('customer/{customer_id}/jobs/list', 'list');
             Route::post('customer/{customer_id}/jobs/store', 'job_store');
             Route::get('customer-job/{id}', 'getSingleCustomerJob');
-            Route::put('customer/{customer_id}/jobs/{customer_job_id}/update', 'job_update');
+            Route::put('customer/jobs/{customer_job_id}/update', 'job_update');
         });
 
         Route::controller(JobsController::class)->group(function() {
@@ -162,8 +163,8 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::post('jobs/store','storeCustomerJob');
             Route::post('job/calendar/store','storeJobCalendar');
             Route::get('job/{id}', 'getJobDetails');
-            Route::put('job/update/{id}','updateCustomerJob');
-            Route::put('job/calendar/update','updateCustomerJobCalendar');
+            Route::put('job/update/{id}','update');
+            Route::put('job/calendar/{customer_job_id}/update','updateCustomerJobCalendar');
             Route::get('job/calendar/{id}', 'getJobCalendarDetails');
             // Route::post('job/calendar/store','addToCalendar');
         });
@@ -228,6 +229,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
 
         Route::controller(RecordAndDraftController::class)->group(function(){
             Route::get('records-and-drafts', 'list');
+            Route::get('records-and-drafts/{id}/download', 'download');
         });
 
 

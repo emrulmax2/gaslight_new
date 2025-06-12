@@ -57,4 +57,8 @@ class CustomerJob extends Model
     public function calendars(){
         return $this->hasMany(CustomerJobCalendar::class, 'customer_job_id', 'id');
     }
+    
+    public function records(){
+        return $this->hasMany(ExistingRecordDraft::class, 'customer_job_id', 'id');
+    }
 }

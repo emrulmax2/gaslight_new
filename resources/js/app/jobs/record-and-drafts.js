@@ -2,164 +2,37 @@
 
 var certificateListTable = (function () {
     var _tableGen = function () {
-    let querystr = $('#query').val() != '' ? $('#query').val() : '';
-    let status = $('#status').val() != '' ? $('#status').val() : '';
-    let engineerId = $('#engineer').val() != '' ? $('#engineer').val() : '';
-    let certificateType = $('#certificate_type').val() != '' ? $('#certificate_type').val() : '';
-    let dateRange = $('#date_range').val() != '' ? $('#date_range').val() : '';
-    let $job_id = $('#job_id').val();
-    
+        let queryStr = $('#query').val() != '' ? $('#query').val() : '';
+        let job_id = $('#certificateListTable').attr('data-jobid') ? $('#certificateListTable').attr('data-jobid') : '';
+        
+        axios({
+            method: 'get',
+            url: route('jobs.record.and.drafts.list', {job : job_id, queryStr : queryStr}),
+            data: {
+                job_id : job_id,
+                queryStr: queryStr
+            },
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            if (response.status == 200) {
+                $('#certificateListTable tbody').html(response.data.html);
 
-
-    const tableData = new Tabulator("#certificateListTable", {
-        ajaxURL: route('jobs.record.and.drafts.list', { job: $job_id }),
-        ajaxParams: {
-            queryStr: querystr,
-            status: status,
-            engineerId: engineerId,
-            certificateType: certificateType,
-            dateRange: dateRange
-        },
-        ajaxFiltering: true,
-        ajaxSorting: true,
-        printAsHtml: true,
-        printStyled: true,
-        pagination: true,
-        paginationMode:"remote",
-        paginationSize: 30,
-        paginationSizeSelector: [true, 30, 50, 100],
-        layout: 'fitColumns',
-        responsiveLayout: 'collapse',
-        placeholder: 'No matching records found',
-        columns: [
-            {
-                title: 'Sl',
-                field: 'id',
-                headerHozAlign: 'left',
-                width: 100
-            },
-            {
-                title: 'Landlord',
-                field: 'landlord_name',
-                headerHozAlign: 'left',
-                formatter(cell, formatterParams) { 
-                    var html = '<div class="font-medium text-slate-500 max-sm:text-xs whitespace-nowrap flex justify-start items-center">';
-                            html += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-                            html += cell.getData().landlord_name;
-                        html += '</div>';
-                    return html;
-                },
-            },
-            {
-                title: 'Landlord Address',
-                field: 'landlord_address',
-                headerHozAlign: 'left',
-                formatter(cell, formatterParams) {
-                    // let theIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
-                    // return (cell.getData().landlord_address != '' ? '<div class="text-slate-500 text-xs whitespace-normal flex justify-start items-start">'+cell.getData().landlord_address+'</div>' : '');
-
-                    var html = '<div class="block whitespace-normal  border-b lg:border-b-0 border-slate-200 pb-2">';
-                        html += '<div class="flex items-start">';
-                            html += '<span class="sm:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
-                            html += (cell.getData().landlord_address != '' ? '<div class="text-slate-500 text-xs">'+cell.getData().landlord_address+'</div>' : '');
-                            html += '</div>';
-                        html += '</div>';
-                    return html;
-                  
-                },
-            },
-            {
-                title: 'Inspection Address',
-                field: 'inspection_address',
-                headerHozAlign: 'left',
-                formatter(cell, formatterParams) {
-                    var html = '<div class="block whitespace-normal">';
-                        html += '<div class="flex items-start">';
-                            html += '<span class="sm:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>';
-                            html += (cell.getData().inspection_address != '' ? '<div class="text-slate-500 text-xs">'+cell.getData().inspection_address+'</div>' : '');
-                            html += '</div>';
-                        html += '</div>';
-                    return html;
-                },
-            },
-            {
-                title: 'Certificate Type',
-                field: 'certificate_type',
-                headerHozAlign: 'left',
-                formatter(cell, formatterParams) { 
-                    // var html = '<div class=" text-slate-500 text-xs whitespace-normal">';
-                    //         html += cell.getData().certificate_type;
-                    //     html += '</div>';
-                    // return html;
-                    var html = '<div class="block whitespace-normal">';
-                    html += '<div class="flex items-start">';
-                        html += '<span class="sm:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="list" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 text-slate-500 sm:hidden"><path d="M3 12h.01"></path><path d="M3 18h.01"></path><path d="M3 6h.01"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M8 6h13"></path></svg></span>';
-                        html += (cell.getData().certificate_type != '' ? '<div class="text-slate-500 text-xs">'+cell.getData().certificate_type+'</div>' : '');
-                        html += '</div>';
-                    html += '</div>';
-                return html;
-                },
-            },
-            {
-                title: 'Created At',
-                field: 'created_at',
-                headerHozAlign: 'left',
-                formatter(cell, formatterParams) {
-                    return (cell.getData().landlord_address != '' ? '<div class="text-slate-500 whitespace-normal text-xs leading-[1.3]">'+cell.getData().created_at+'</div>' : '');
-                },
-            },
-            {
-                title: 'Status',
-                field: 'status',
-                headerHozAlign: 'left',
-                formatter(cell, formatterParams) {
-                    if(cell.getData().status == 'Cancelled'){
-                        return '<button class="font-medium bg-danger rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Cancelled</button>';
-                    }else if(cell.getData().status == 'Approved & Sent'){
-                        return '<button class="font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved & Sent</button>';
-                    }else if(cell.getData().status == 'Approved'){
-                        return '<button class="font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved</button>';
-                    }else{
-                        return '<button class="font-medium bg-pending rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'+cell.getData().status+'</button>';
-                    }
-                }
+                createIcons({
+                    icons,
+                    attrs: { "stroke-width": 1.5 },
+                    nameAttr: "data-lucide",
+                });
             }
-        ],
-        renderComplete() {
-            createIcons({
-                icons,
-                attrs: { "stroke-width": 1.5 },
-                nameAttr: "data-lucide",
-            });
+        }).catch(error =>{
+            console.log(error)
+        });
+
+    };
+    return {
+        init: function () {
+            _tableGen();
         },
-    });
-
-    tableData.on("renderComplete", () => {
-        createIcons({
-            icons,
-            attrs: {
-                "stroke-width": 1.5,
-            },
-            nameAttr: "data-lucide",
-        });
-    });
-
-    // Redraw table onresize
-    window.addEventListener("resize", () => {
-        tableData.redraw();
-        createIcons({
-            icons,
-            "stroke-width": 1.5,
-            nameAttr: "data-lucide",
-        });
-    });
-
-};
-return {
-    init: function () {
-        _tableGen();
-    },
-};
+    };
 })();
 
 (function () {
@@ -171,26 +44,20 @@ return {
         certificateListTable.init();
     }
 
-    $("#tabulator-html-filter-form").on("keypress", function (event) {
-        let keycode = event.keyCode ? event.keyCode : event.which;
-        if (keycode == "13") {
-            event.preventDefault();
-            filtercertificateListTable();
-        }
-    }
-    );
+    // On submit filter form
+    $("#query").on("keypress", function (e) {
+        var key = e.keyCode || e.which;
+        if(key === 13){
+            e.preventDefault();
 
-    $("#tabulator-html-filter-go").on("click", function (event) {
-        filtercertificateListTable();
+            certificateListTable.init();
+        }
     });
 
-    $("#tabulator-html-filter-reset").on("click", function (event) {
-        $('#query').val('');
-        $('#engineer').val('all');
-        $('#certificate_type').val('all');
-        $('#date_range').val('');
-        $('#status').val('all');
-        filtercertificateListTable();
+    $("#certificateListTable").on('click', '.recordRow', function(e){
+        let $theRow = $(this);
+        let theUrl = $theRow.attr('data-url');
+        window.location.href = theUrl;
     });
 
 
