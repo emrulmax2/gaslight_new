@@ -5,10 +5,8 @@ import INTAddressLookUps from '../../address_lookup.js';
     if($('.theAddressWrap').length > 0){
         INTAddressLookUps();
     }
-
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
-    
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');

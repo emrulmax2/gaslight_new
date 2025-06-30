@@ -274,7 +274,7 @@ class CustomerController extends Controller
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Customer not found. . The requested Customer (ID: '.$request->id.') does not exist or may have been deleted.',
+                'message' => 'Customer not found. The requested Customer (ID: '.$request->id.') does not exist or may have been deleted.',
             ], 404);
         } catch (Exception $e) {
             return response()->json([

@@ -172,66 +172,103 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::controller(QuoteController::class)->group(function(){
             Route::get('records/quote/{quote_id}/details', 'getDetails');
             Route::post('records/quote/store', 'store');
+            Route::get('records/quote/{quote_id}/approve', 'approve');
+            Route::get('records/quote/{quote_id}/approve-and-email', 'approve_email');
+            Route::get('records/quote/{quote_id}/download', 'download');
+            Route::get('records/quote/{quote_id}/convert-to-invoice', 'convertToInvoice');
         });
+
+
         Route::controller(InvoiceController::class)->group(function(){
             Route::get('records/invoice/{invoice_id}/details', 'getDetails');
             Route::post('records/invoice/store', 'store');
+            Route::get('records/invoice/{invoice_id}/approve', 'approve');
+            Route::get('records/invoice/{invoice_id}/approve-and-email', 'approve_email');
+            Route::get('records/invoice/{invoice_id}/download', 'download');
         });
-
+        
         Route::controller(HomeOwnerGasSafetyController::class)->group(function(){
             Route::get('records/homeowner-gas-safety-records/{gas_safety_id}/details', 'getDetails');
             Route::post('records/homeowner-gas-safety-records/store', 'store');
+            Route::get('records/homeowner-gas-safety-record/{gsr_id}/approve', 'approve');
+            Route::get('records/homeowner-gas-safety-record/{gsr_id}/approve-and-email', 'approve_email');
+            Route::get('records/homeowner-gas-safety-record/{gsr_id}/download', 'download');
         });
-
+        
         Route::controller(LandlordGasSafetyController::class)->group(function(){
             Route::get('records/landlord-gas-safety-records/{gas_safety_id}/details', 'getDetails');
             Route::post('records/landlord-gas-safety-records/store', 'store');
+            Route::get('records/landlord-gas-safety-record/{gsr_id}/approve', 'approve');
+            Route::get('records/landlord-gas-safety-record/{gsr_id}/approve-and-email', 'approve_email');
+            Route::get('records/landlord-gas-safety-record/{gsr_id}/download', 'download');
         });
-
+        
         Route::controller(GasWarningNoticeController::class)->group(function(){
             Route::get('records/gas-warning-notice/{notice_id}/details', 'getDetails');
             Route::post('records/gas-warning-notice/store', 'store');
+            Route::get('records/gas-warning-notice/{gwn_id}/approve', 'approve');
+            Route::get('records/gas-warning-notice/{gwn_id}/approve-and-email', 'approve_email');
+            Route::get('records/gas-warning-notice/{gwn_id}/download', 'download');
         });
-
+        
         Route::controller(GasServiceRecordController::class)->group(function(){
             Route::get('records/gas-service-record/{record_id}/details', 'getDetails');
             Route::post('records/gas-service-record/store', 'store');
+            Route::get('records/gas-service-record/{record_id}/approve', 'approve');
+            Route::get('records/gas-service-record/{record_id}/approve-and-email', 'approve_email');
+            Route::get('records/gas-service-record/{record_id}/download', 'download');
         });
-
+        
         Route::controller(GasBreakdownRecordController::class)->group(function(){
             Route::get('records/gas-breakdown-record/{record_id}/details', 'getDetails');
             Route::post('records/gas-breakdown-record/store', 'store');
+            Route::get('records/gas-breakdown-record/{record_id}/approve', 'approve');
+            Route::get('records/gas-breakdown-record/{record_id}/approve-and-email', 'approve_email');
+            Route::get('records/gas-breakdown-record/{record_id}/download', 'download');
         });
-
+        
         Route::controller(GasBoilerSystemCommissioningChecklistController::class)->group(function(){
             Route::get('records/gas-boiler-system-commissioning-checklist/{checklist_id}/details', 'getDetails');
             Route::post('records/gas-boiler-system-commissioning-checklist/store', 'store');
+            Route::get('records/gas-boiler-system-commissioning-checklist/{checklist_id}/approve', 'approve');
+            Route::get('records/gas-boiler-system-commissioning-checklist/{checklist_id}/approve-and-email', 'approve_email');
+            Route::get('records/gas-boiler-system-commissioning-checklist/{checklist_id}/download', 'download');
         });
 
         Route::controller(GasPowerFlushRecordController::class)->group(function(){
             Route::get('records/powerflush-certificate/{record_id}/details', 'getDetails');
             Route::post('records/powerflush-certificate/store', 'store');
+            Route::get('records/powerflush-certificate/{record_id}/approve', 'approve');
+            Route::get('records/powerflush-certificate/{record_id}/approve-and-email', 'approve_email');
+            Route::get('records/powerflush-certificate/{record_id}/download', 'download');
         });
 
         Route::controller(GasCommissionDecommissionRecordController::class)->group(function(){
             Route::get('records/installation-commissioning-decommissioning-record/{record_id}/details', 'getDetails');
             Route::post('records/installation-commissioning-decommissioning-record/store', 'store');
+            Route::get('records/installation-commissioning-decommissioning-record/{record_id}/approve', 'approve');
+            Route::get('records/installation-commissioning-decommissioning-record/{record_id}/approve-and-email', 'approve_email');
+            Route::get('records/installation-commissioning-decommissioning-record/{record_id}/download', 'download');
         });
 
         Route::controller(GasUnventedHotWaterCylinderRecordController::class)->group(function(){
             Route::get('records/unvented-hot-water-cylinders/{record_id}/details', 'getDetails');
             Route::post('records/unvented-hot-water-cylinders/store', 'store');
+            Route::get('records/unvented-hot-water-cylinders/{record_id}/approve', 'approve');
+            Route::get('records/unvented-hot-water-cylinders/{record_id}/approve-and-email', 'approve_email');
+            Route::get('records/unvented-hot-water-cylinders/{record_id}/download', 'download');
         });
         Route::controller(GasJobSheetController::class)->group(function(){
             Route::get('records/job-sheet/{sheet_id}/details', 'getDetails');
             Route::post('records/job-sheet/store', 'store');
+            Route::get('records/job-sheet/{record_id}/approve', 'approve');
+            Route::get('records/job-sheet/{record_id}/approve-and-email', 'approve_email');
+            Route::get('records/job-sheet/{record_id}/download', 'download');
         });
 
         Route::controller(RecordAndDraftController::class)->group(function(){
             Route::get('records-and-drafts', 'list');
-            Route::get('records-and-drafts/{id}/download', 'download');
         });
-
 
     });
 });

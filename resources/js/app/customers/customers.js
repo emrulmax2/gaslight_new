@@ -70,8 +70,6 @@ var customerListTable = (function () {
         });
     }
 
- 
-
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));

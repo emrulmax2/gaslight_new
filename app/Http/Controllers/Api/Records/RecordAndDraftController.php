@@ -88,12 +88,4 @@ class RecordAndDraftController extends Controller
             ]
         ]);
     }
-
-
-    public function download($id){
-        return response()->json([
-            'success' => false,
-            'message' => 'Not active yet'
-        ]);
-    }
 }

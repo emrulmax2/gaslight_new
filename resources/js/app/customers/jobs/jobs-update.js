@@ -456,7 +456,6 @@
             errors += 1;
             $theForm.find('.error-fieldValue').html('This field is required.')
         }
-
         let form_data = new FormData(form);
         axios({
             method: "POST",

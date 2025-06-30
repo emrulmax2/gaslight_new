@@ -5,7 +5,6 @@ import INTAddressLookUps from '../../address_lookup.js';
     if($('.theAddressWrap').length > 0){
         INTAddressLookUps();
     }
-
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const updateCustomerDataModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updateCustomerDataModal"));
@@ -13,7 +12,6 @@ import INTAddressLookUps from '../../address_lookup.js';
     const customerNoteModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerNoteModal"));
     const reminderModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#reminderModal"));
     const customerNameModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerNameModal"));
-    
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');

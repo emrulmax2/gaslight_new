@@ -37,8 +37,6 @@ var JobAddressListTable = (function () {
 
 })();
     
-
-
 (function(){
     if($('.theAddressWrap').length > 0){
         INTAddressLookUps();
