@@ -24,7 +24,6 @@ var customerJobListTable = (function () {
             console.log(error)
         });
 
-        
     };
     return {
         init: function () {
@@ -32,7 +31,6 @@ var customerJobListTable = (function () {
         },
     };
 })();
-
 
 (function () {
     if ($("#customerJobListTable").length) {

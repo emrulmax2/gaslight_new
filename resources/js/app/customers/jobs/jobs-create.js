@@ -368,7 +368,6 @@ import INTAddressLookUps from '../../../address_lookup.js';
         })
     });
     /* END: Search Address & Customers */
-
     let dateOption = {
         autoApply: true,
         singleMode: true,
