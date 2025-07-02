@@ -31,7 +31,6 @@ use App\Http\Controllers\Api\Users\UserManagementController;
 use App\Http\Controllers\Api\Users\UserProfileController;
 use App\Http\Controllers\Api\Users\UserSubscriptionController;
 use App\Http\Controllers\UserSubscriptionWebhookController;
-use App\Http\Middleware\loggedin;
 
 Route::prefix('/v1')->name('api.')->group(function() {
 
@@ -85,10 +84,11 @@ Route::prefix('/v1')->name('api.')->group(function() {
         // });
 
         Route::controller(CompanyController::class)->group(function() {
-            Route::post('company', 'store')->name('company.store');
-            Route::get('company/{company}/edit', 'edit')->name('company.edit');
-            Route::put('company/{company}', 'update')->name('company.update');
-            Route::delete('company/{company}', 'destroy')->name('company.destroy');
+            Route::post('company', 'store');
+            Route::get('company/{company}/edit', 'edit');
+            Route::put('company/{company}', 'update');
+            Route::delete('company/{company}', 'destroy');
+            Route::get('bank-details', 'getCompanyBankDetails');
         });
 
         Route::controller(UserProfileController::class)->group(function() {
@@ -156,6 +156,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::post('customer/{customer_id}/jobs/store', 'job_store');
             Route::get('customer-job/{id}', 'getSingleCustomerJob');
             Route::put('customer/jobs/{customer_job_id}/update', 'job_update');
+            Route::put('customer/jobs/{customer_job_id}/status-update', 'jobStatusUpdate');
         });
 
         Route::controller(JobsController::class)->group(function() {
@@ -268,6 +269,10 @@ Route::prefix('/v1')->name('api.')->group(function() {
 
         Route::controller(RecordAndDraftController::class)->group(function(){
             Route::get('records-and-drafts', 'list');
+            Route::get('invoice-number', 'getInvoiceNumber');
+            Route::get('quote-number', 'getQuoteNumber');
+            Route::get('records/jobs/{form_id}', 'getJobs');
+            Route::get('vat-status', 'vatStatusNumber');
         });
 
     });

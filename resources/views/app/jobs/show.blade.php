@@ -138,6 +138,19 @@
             </a>
         </div>
     </div>
+    <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Job Status</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" data-id="{{ $job->id }}" data-status="{{ $job->status }}" class="jobStatusUpdateModal border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="badge-check" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ isset($job->status) && !empty($job->status) ? $job->status : 'N/A' }}
+                    </span>
+                </div>
+            </a>
+        </div>
+    </div>
     <!-- END: HTML Table Data -->
 
     @include('app.jobs.show-modal')

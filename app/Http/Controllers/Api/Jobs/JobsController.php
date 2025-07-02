@@ -12,29 +12,32 @@ use App\Models\CustomerJob;
 use App\Models\CustomerJobCalendar;
 use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
-use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Exception;
 
 class JobsController extends Controller
 {
     public function list(Request $request)
     {
-        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')
-                ->where('created_by', $request->user()->id);
-
-        $status = $request->has('status') && $request->query('status') != '' ? $request->query('status') : 1;
+        
+        $validStatuses = ['Due', 'Completed', 'Cancelled', 'Trashed'];
+        $status = $request->filled('status') && in_array($request->query('status'), $validStatuses) ? $request->query('status') : 'Due';
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
-
+        
+        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')
+                ->where('created_by', $request->user()->id);
 
         $searchableColumns = Schema::getColumnListing((new CustomerJob())->getTable());
 
-        if ($status == 2) {
+        if ($status !== 'Trashed') {
+            $query->where('status', $status);
+        } else {
             $query->onlyTrashed();
         }
 

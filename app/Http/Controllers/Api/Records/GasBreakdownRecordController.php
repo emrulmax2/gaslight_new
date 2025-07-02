@@ -181,15 +181,15 @@ class GasBreakdownRecordController extends Controller
                 $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
                 $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
                 $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
-                $userLastCertificate = GasBreakdownRecord::where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+                $userLastCertificate = GasBreakdownRecord::where('job_form_id', $form->id)->where('created_by', $user_id)->where('id', '!=', $gasBreakdownRecord->id)->orderBy('id', 'DESC')->get()->first();
                 $lastCertificateNo = (isset($userLastCertificate->certificate_number) && !empty($userLastCertificate->certificate_number) ? $userLastCertificate->certificate_number : '');
 
-                $cerSerial = $starting_form;
+               $cerSerial = $starting_form;
                 if(!empty($lastCertificateNo)):
                     preg_match("/(\d+)/", $lastCertificateNo, $certificateNumbers);
-                    $cerSerial = (int) $certificateNumbers[1] + 1;
+                    $cerSerial = isset($certificateNumbers[1]) ? ((int) $certificateNumbers[1]) + 1 : $starting_form;
                 endif;
-                $certificateNumber = $prifix.str_pad($cerSerial, 6, '0', STR_PAD_LEFT);
+                $certificateNumber = $prifix . $cerSerial;
                 GasBreakdownRecord::where('id', $gasBreakdownRecord->id)->update(['certificate_number' => $certificateNumber]);
             endif;
 

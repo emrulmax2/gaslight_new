@@ -37,15 +37,16 @@ class QuoteController extends Controller
                 $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
                 $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
                 $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
-                $userLastQuote = Quote::where('customer_job_id', $quote->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+                $userLastQuote = Quote::where('customer_job_id', $quote->customer_job_id)->where('job_form_id', $form->id)->where('id', '!=', $quote->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
                 $lastQuoteNo = (isset($userLastQuote->quote_number) && !empty($userLastQuote->quote_number) ? $userLastQuote->quote_number : '');
 
                 $qutSerial = $starting_form;
                 if(!empty($lastQuoteNo)):
                     preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
-                    $qutSerial = (int) $quoteNumbers[1] + 1;
+                    $qutSerial = isset($quoteNumbers[1]) ? ((int) $quoteNumbers[1]) + 1 : $starting_form;
                 endif;
-                $quoteNumber = $prifix.str_pad($qutSerial, 6, '0', STR_PAD_LEFT);
+                $quoteNumber = $prifix . $qutSerial;
+                
                 Quote::where('id', $quote->id)->update(['quote_number' => $quoteNumber]);
             endif;
 
@@ -72,6 +73,35 @@ class QuoteController extends Controller
                 'message' => 'Something went wrong. Please try again later or contact with the administrator',
             ], 500);
         }
+    }
+
+
+    protected function generateQuoteNumber(Quote $quote, int $user_id, JobForm $form): string
+    {
+        $prefixData = JobFormPrefixMumbering::where('user_id', $user_id)
+            ->where('job_form_id', $form->id)
+            ->orderBy('id', 'DESC')
+            ->first();
+        
+        $prefix = $prefixData->prefix ?? '';
+        $startingFrom = $prefixData->starting_from ?? 1;
+
+        $userLastQuote = Quote::where('customer_job_id', $quote->customer_job_id)
+            ->where('job_form_id', $form->id)
+            ->where('created_by', $user_id)
+            ->orderBy('id', 'DESC')
+            ->first();
+        
+        $lastQuoteNo = $userLastQuote->quote_number ?? '';
+
+        $quoteSerial = $startingFrom;
+        if(!empty($lastQuoteNo)) {
+            preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+            $quoteSerial = $quoteNumbers[1] ?? $startingFrom;
+            $quoteSerial = (int)$quoteSerial + 1;
+        }
+
+        return $prefix . $quoteSerial;
     }
 
 

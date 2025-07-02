@@ -47,15 +47,15 @@ class InvoiceController extends Controller
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
             $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
             $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
-            $userLastInvoice = Invoice::where('customer_job_id', $inv->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $userLastInvoice = Invoice::where('customer_job_id', $inv->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->where('id', '!=', $inv->id)->orderBy('id', 'DESC')->get()->first();
             $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
 
             $invSerial = $starting_form;
             if(!empty($lastInvoiceNo)):
                 preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
-                $invSerial = (int) $invoiceNumbers[1] + 1;
+                $invSerial = isset($invoiceNumbers[1]) ? ((int) $invoiceNumbers[1]) + 1 : $starting_form;
             endif;
-            $invoiceNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+            $invoiceNumber = $prifix . $invSerial;
             Invoice::where('id', $inv->id)->update(['invoice_number' => $invoiceNumber]);
         endif;
 

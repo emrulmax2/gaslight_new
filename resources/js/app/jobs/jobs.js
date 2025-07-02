@@ -56,6 +56,7 @@ var jobListTable = (function () {
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
     const addJobCalenderModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobCalenderModal"));
+    const statusUpdateModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#statusUpdateModal"));
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -228,6 +229,105 @@ var jobListTable = (function () {
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
                         $(`#addJobCalenderForm .${key}`).addClass('border-danger');
                         $(`#addJobCalenderForm  .error-${key}`).html(val);
+                    }
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    })
+
+    var clickTimeout;
+    var isDoubleClick = false;
+
+    $('#jobListTable').on('click', '.JobListItem', function(e) {
+
+        let $theBtn = $(this);
+        let show_url = $theBtn.attr('show_url');
+
+        clickTimeout = setTimeout(function() {
+            if (!isDoubleClick) {
+                window.location.href = show_url;
+            } else {
+                isDoubleClick = false;
+            }
+        }, 200);
+    });
+
+
+
+    $('#jobListTable').on('dblclick', '.JobListItem', function(e) {
+        clearTimeout(clickTimeout);
+        isDoubleClick = true;
+
+        let $theBtn = $(this);
+        let jobId = $theBtn.attr('data-id');
+        let currentStatus = $theBtn.attr('data-status');
+
+        function updateModalStatus(status) {
+            $('#statusUpdateForm input[name="status"]').prop('checked', false);
+            $('#statusUpdateForm input[name="customer_job_id"]').val(jobId);;
+
+            if (status === 'Due') {
+                $('#status_due').prop('checked', true);
+            } else if (status === 'Completed') {
+                $('#status_completed').prop('checked', true);
+            } else if (status === 'Cancelled') {
+                $('#status_cancelled').prop('checked', true);
+            } else {
+                console.warn('Unknown status:', status);
+            }
+        }
+
+        updateModalStatus(currentStatus);
+
+        statusUpdateModal.show();
+
+        setTimeout(function() { isDoubleClick = false; }, 200);
+    });
+
+    $('#statusUpdateForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('statusUpdateForm');
+        const $theForm = $(this);
+        
+        $('#updateStatusBtn', $theForm).attr('disabled', 'disabled');
+        $("#updateStatusBtn .theLoader").fadeIn();
+        let customerJobId = $theForm.find('[name="customer_job_id"]').val();
+
+        let form_data = new FormData(form);
+        axios({
+            method: "post",
+            url: route('customer.jobs.status.update', {customer_job_id: customerJobId,}),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#updateStatusBtn', $theForm).removeAttr('disabled');
+            $("#updateStatusBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                statusUpdateModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', '');
+                });
+
+                setTimeout(() => {
+                    successModal.hide();
+                }, 1500);
+            }
+            jobListTable.init();
+        }).catch(error => {
+            $('#updateStatusBtn', $theForm).removeAttr('disabled');
+            $("#updateStatusBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#statusUpdateForm .${key}`).addClass('border-danger');
+                        $(`#statusUpdateForm  .error-${key}`).html(val);
                     }
                 } else {
                     console.log('error');

@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\Api\Records;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerJob;
 use App\Models\ExistingRecordDraft;
+use App\Models\Invoice;
+use App\Models\JobFormPrefixMumbering;
+use App\Models\Quote;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RecordAndDraftController extends Controller
 {
@@ -88,4 +94,132 @@ class RecordAndDraftController extends Controller
             ]
         ]);
     }
+
+
+    public function getInvoiceNumber(Request $request){
+        $user_id = Auth::user()->id;
+        $form_id = 4;
+
+        $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
+        $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+        $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+        $userLastInvoice = Invoice::where('job_form_id', $form_id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
+
+        // $invSerial = $starting_form;
+        // if(!empty($lastInvoiceNo)):
+        //     preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+        //     $invSerial = (int) $invoiceNumbers[1] + 1;
+        // endif;
+        // $invoiceNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+
+        $invSerial = $starting_form;
+        if(!empty($lastInvoiceNo)):
+            preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+            $invSerial = isset($invoiceNumbers[1]) ? ((int) $invoiceNumbers[1]) + 1 : $starting_form;
+        endif;
+        $invoiceNumber = $prifix . $invSerial;
+
+        return response()->json(['invoiceNumber' => $invoiceNumber], 200);
+    }
+
+    public function getQuoteNumber(Request $request){
+        $user_id = Auth::user()->id;
+        $form_id = 3;
+
+        $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
+        $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+        $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+        $userLastQuote = Quote::where('job_form_id', $form_id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $lastQuoteNo = (isset($userLastQuote->quote_number) && !empty($userLastQuote->quote_number) ? $userLastQuote->quote_number : '');
+
+        // $invSerial = $starting_form;
+        // if(!empty($lastQuoteNo)):
+        //     preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+        //     $invSerial = (int) $quoteNumbers[1] + 1;
+        // endif;
+        // $quoteNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+
+        $qutSerial = $starting_form;
+        if(!empty($lastQuoteNo)):
+            preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+            $qutSerial = isset($quoteNumbers[1]) ? ((int) $quoteNumbers[1]) + 1 : $starting_form;
+        endif;
+        $quoteNumber = $prifix . $qutSerial;
+
+        return response()->json(['quoteNumber' => $quoteNumber], 200);
+    }
+
+
+    public function getJobs(Request $request)
+    {
+        $user_id = Auth::user()->id;
+        $job_form_id = $request->job_form_id;
+        $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
+
+        $jobsQuery = CustomerJob::with('customer', 'property', 'status')
+            ->where('created_by', $user_id)
+            ->orderBy('id', 'DESC');
+
+        if ($searchKey) {
+            $jobsQuery->where(function($query) use ($searchKey) {
+                $query->where('description', 'like', '%' . $searchKey . '%')
+                    ->orWhereHas('customer', function($q) use ($searchKey) {
+                        $q->where('full_name', 'like', '%' . $searchKey . '%')
+                            ->orWhere('postal_code', 'like', '%' . $searchKey . '%');
+                    });
+            });
+        }
+
+        $jobs = $jobsQuery->get();
+
+        if ($jobs->count() > 0) {
+            $filteredJobs = [];
+            foreach ($jobs as $job) {
+                $recordExist = ExistingRecordDraft::where('customer_job_id', $job->id)
+                    ->where('job_form_id', $job_form_id)
+                    ->exists();
+                
+                if (!$recordExist) {
+                    $filteredJobs[] = [
+                        'id' => $job->id,
+                        'description' => $job->description ?? '',
+                        'customer_name' => $job->customer->full_name ?? '',
+                        'postal_code' => $job->customer->postal_code ?? '',
+                        'status' => $job->status ? $job->status : null,
+                        'property' => $job->property ? [
+                            'id' => $job->property->id,
+                            'address' => $job->property->address ?? ''
+                        ] : null,
+                    ];
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $filteredJobs
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No jobs found.'
+        ], 200);
+    }
+
+    public function vatStatusNumber(){
+        $user = User::find(Auth::user()->id);
+
+        $data = [
+            'vat_status' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1),
+            'vat_number' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : ''),
+        ];
+
+
+         return response()->json([
+            'success' => true,
+            'data' => $data
+        ], 200);
+    }
+
 }

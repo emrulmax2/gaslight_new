@@ -194,6 +194,10 @@ class CompanyController extends Controller
     }
     public function getCompanyBankDetails(Company $company)
     {
+
+        $company = Company::where('user_id', Auth::user()->id)->first();
+
+
         $companyBankDetails = CompanyBankDetails::where('company_id', $company->id)->first();
 
         if ($companyBankDetails) {

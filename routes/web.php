@@ -237,6 +237,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('customer/{customer_id}/jobs/store', 'job_store')->name('customer.jobs.store');
         Route::get('customer/{customer_id}/jobs/{customer_job_id}/show', 'job_edit')->name('customer.jobs.edit');
         Route::post('customer/{customer_id}/jobs/{customer_job_id}/update', 'job_update')->name('customer.jobs.update');
+        Route::post('customer/jobs/{customer_job_id}/update-status', 'job_status_update')->name('customer.jobs.status.update');
 
         Route::post('customer/jobs/update-data', 'updateJobsData')->name('customer.jobs.update.data');
         Route::post('customer/jobs/update-appintment-data', 'updateJobsAppointmentData')->name('customer.jobs.update.appointment.date');
