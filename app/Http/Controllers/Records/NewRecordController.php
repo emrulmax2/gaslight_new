@@ -282,12 +282,19 @@ class NewRecordController extends Controller
         $userLastInvoice = Invoice::where('job_form_id', $form_id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
 
+        // $invSerial = $starting_form;
+        // if(!empty($lastInvoiceNo)):
+        //     preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+        //     $invSerial = (int) $invoiceNumbers[1] + 1;
+        // endif;
+        // $invoiceNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+
         $invSerial = $starting_form;
         if(!empty($lastInvoiceNo)):
             preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
-            $invSerial = (int) $invoiceNumbers[1] + 1;
+            $invSerial = isset($invoiceNumbers[1]) ? ((int) $invoiceNumbers[1]) + 1 : $starting_form;
         endif;
-        $invoiceNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+        $invoiceNumber = $prifix . $invSerial;
 
         return response()->json(['invoiceNumber' => $invoiceNumber], 200);
     }
@@ -302,12 +309,19 @@ class NewRecordController extends Controller
         $userLastQuote = Quote::where('job_form_id', $form_id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
         $lastQuoteNo = (isset($userLastQuote->quote_number) && !empty($userLastQuote->quote_number) ? $userLastQuote->quote_number : '');
 
-        $invSerial = $starting_form;
+        // $invSerial = $starting_form;
+        // if(!empty($lastQuoteNo)):
+        //     preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+        //     $invSerial = (int) $quoteNumbers[1] + 1;
+        // endif;
+        // $quoteNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+
+        $qutSerial = $starting_form;
         if(!empty($lastQuoteNo)):
             preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
-            $invSerial = (int) $quoteNumbers[1] + 1;
+            $qutSerial = isset($quoteNumbers[1]) ? ((int) $quoteNumbers[1]) + 1 : $starting_form;
         endif;
-        $quoteNumber = $prifix.str_pad($invSerial, 6, '0', STR_PAD_LEFT);
+        $quoteNumber = $prifix . $qutSerial;
 
         return response()->json(['quoteNumber' => $quoteNumber], 200);
     }

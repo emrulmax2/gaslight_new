@@ -47,15 +47,22 @@ class QuoteController extends Controller
             $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form->id)->orderBy('id', 'DESC')->get()->first();
             $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
             $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
-            $userLastQuote = Quote::where('customer_job_id', $qut->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->orderBy('id', 'DESC')->get()->first();
+            $userLastQuote = Quote::where('customer_job_id', $qut->customer_job_id)->where('job_form_id', $form->id)->where('created_by', $user_id)->where('id', '!=', $qut->id)->orderBy('id', 'DESC')->get()->first();
             $lastQuoteNo = (isset($userLastQuote->quote_number) && !empty($userLastQuote->quote_number) ? $userLastQuote->quote_number : '');
+
+            //  $qutSerial = $starting_form;
+            // if(!empty($lastQuoteNo)):
+            //     preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
+            //     $qutSerial = (int) $quoteNumbers[1] + 1;
+            // endif;
+            // $quoteNumber = $prifix.str_pad($qutSerial, 6, '0', STR_PAD_LEFT);
 
             $qutSerial = $starting_form;
             if(!empty($lastQuoteNo)):
                 preg_match("/(\d+)/", $lastQuoteNo, $quoteNumbers);
-                $qutSerial = (int) $quoteNumbers[1] + 1;
+                $qutSerial = isset($quoteNumbers[1]) ? ((int) $quoteNumbers[1]) + 1 : $starting_form;
             endif;
-            $quoteNumber = $prifix.str_pad($qutSerial, 6, '0', STR_PAD_LEFT);
+            $quoteNumber = $prifix . $qutSerial;
             Quote::where('id', $qut->id)->update(['quote_number' => $quoteNumber]);
         endif;
 

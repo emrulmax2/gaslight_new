@@ -16,14 +16,16 @@ use Illuminate\Support\Facades\Schema;
 class CustomerJobsController extends Controller
 {
     public function list(Request $request) {
-        $status = $request->has('status') && $request->query('status') != '' ? $request->query('status') : 1;
+        $validStatuses = ['Due', 'Completed', 'Cancelled', 'Trashed'];
+        $status = $request->filled('status') && in_array($request->query('status'), $validStatuses) ? $request->query('status') : 'Due';
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
 
-        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')->where('customer_id', $customer_id);
+        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')
+        ->where('customer_id', $customer_id);
 
        $searchableColumns = Schema::getColumnListing((new CustomerJob)->getTable());
        if (!empty($searchKey)):
@@ -33,9 +35,12 @@ class CustomerJobsController extends Controller
                 }
             });
         endif;
-        if($status == 2):
+
+         if ($status !== 'Trashed') {
+            $query->where('status', $status);
+        } else {
             $query->onlyTrashed();
-        endif;
+        }
 
         $query->orderBy($sortField, $sortOrder);
 
@@ -203,6 +208,48 @@ class CustomerJobsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Customer job not found. . The requested Customer job (ID: '.$customer_job_id.') does not exist or may have been deleted.',
+            ], 404);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 500);
+        }
+    }
+
+
+    public function jobStatusUpdate(Request $request, $job_id)
+    {
+        DB::beginTransaction();
+        try {
+            $status = ucfirst(strtolower($request->status));
+        
+            if (!in_array($status, ['Completed', 'Cancelled'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid status. '.$status.' are not allowed.',
+                ], 422);
+            }
+
+            $job = CustomerJob::findOrFail($job_id);
+            $job->update([
+                'status' => $status
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer job status successfully updated',
+                'data' => $job
+            ]);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer job not found. . The requested Customer job (ID: '.$job_id.') does not exist or may have been deleted.',
             ], 404);
 
         } catch (Exception $e) {

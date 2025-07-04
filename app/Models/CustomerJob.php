@@ -20,7 +20,7 @@ class CustomerJob extends Model
         'customer_job_status_id',
         'reference_no',
         'estimated_amount',
-
+        'status',
         'created_by',
         'updated_by'
     ];
