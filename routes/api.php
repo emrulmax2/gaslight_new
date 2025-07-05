@@ -43,6 +43,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
   
     // Public route for registration
 
+    // for user creation
     Route::controller(RegisteredUserController::class)->group(function() {
         Route::post('register', 'store')->name('register.store');
         Route::post('register/validate-referral', 'validateReferral')->name('register.validate.referral');
