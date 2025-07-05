@@ -115,5 +115,6 @@
 @endPushOnce
 
 @pushOnce('scripts')
+.
     @vite('resources/js/app/users/initial-staff-setup.js')
 @endPushOnce
