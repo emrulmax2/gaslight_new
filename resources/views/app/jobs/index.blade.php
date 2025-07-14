@@ -18,8 +18,26 @@
     </div>
 
     <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative">
-        <x-base.form-input class="m-0 w-full" id="query" type="text" autocomplete="off" placeholder="Search..."/>
-        <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+        <x-base.form-input class="m-0 w-full pl-8" id="query" type="text" autocomplete="off" placeholder="Search..."/>
+        <x-base.lucide class="h-4 w-4 absolute left-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+
+        <x-base.menu class="absolute right-0 top-0" id="jobStatusDropdown">
+            <x-base.menu.button as="x-base.button" class="jobStatsuSelected" variant="secondary"><span class="label">Due</span><x-base.lucide class="ml-2 h-4 w-4" icon="chevron-down" /></x-base.menu.button>
+            <x-base.menu.items class="w-48 jobStatsDropdown">
+                <x-base.menu.item class="jobStatusBtn" data-status="All">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />All Jobs
+                </x-base.menu.item>
+                <x-base.menu.item class="jobStatusBtn active" data-status="Due">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />Due Jobs
+                </x-base.menu.item>
+                <x-base.menu.item class="jobStatusBtn" data-status="Completed">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />Completed Jobs
+                </x-base.menu.item>
+                <x-base.menu.item class="jobStatusBtn" data-status="Cancelled">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />Cancelled Jobs
+                </x-base.menu.item>
+            </x-base.menu.items>
+        </x-base.menu>
     </div>
 
     <div class="mt-5">

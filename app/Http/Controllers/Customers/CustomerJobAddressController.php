@@ -60,17 +60,18 @@ class CustomerJobAddressController extends Controller
             foreach($Query as $list):
                 $html .= '<a data-id="'.$list->id.'" href="'.route('customer.job-addresses.edit', [$list->customer_id, $list->id]).'" class="relative propoertyWrapWrap px-0 py-4 border-b border-b-slate-100 flex w-full items-center">';
                     $html .= '<div class="mr-auto">';
-                        $html .= '<div class="font-medium text-dark leading-none flex justify-start items-start">';
-                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 mr-2 h-4 w-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-                            $html .= '<span>'.$list->customer->customer_full_name.'</span>';
-                        $html .= '</div>';
-                        if(isset($list->contact->mobile) && !empty($list->contact->mobile)):
-                        $html .= '<div class=" text-slate-500 text-xs leading-none mt-1.5 flex justify-start items-start">';
-                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone stroke-1.5 mr-2 h-3 w-4"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>';
-                            $html .= '<span>'.$list->contact->mobile.'</span>';
-                        $html .= '</div>';
-                        endif;
-                        $html .= '<div class="mt-3 text-slate-500 leading-none flex justify-start items-start">';
+                        // $html .= '<div class="font-medium text-dark leading-none flex justify-start items-start">';
+                        //     $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 mr-2 h-4 w-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+                        //     $html .= '<span>'.$list->customer->customer_full_name.'</span>';
+                        // $html .= '</div>';
+                        // if(isset($list->contact->mobile) && !empty($list->contact->mobile)):
+                        // $html .= '<div class=" text-slate-500 text-xs leading-none mt-1.5 flex justify-start items-start">';
+                        //     $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone stroke-1.5 mr-2 h-3 w-4"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>';
+                        //     $html .= '<span>'.$list->contact->mobile.'</span>';
+                        // $html .= '</div>';
+                        // endif;
+                        // $html .= '<div class="mt-3 text-slate-500 leading-none flex justify-start items-start">';
+                        $html .= '<div class=" text-slate-500 leading-none flex justify-start items-start">';
                             $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" style="top: -3px;" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 relative"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>';
                             $html .= '<span>'.$list->full_address.'</span>';
                         $html .= '</div>';

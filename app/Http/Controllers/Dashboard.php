@@ -35,8 +35,8 @@ class Dashboard extends Controller
             'user' => User::with('referral')->find(auth()->user()->id),
             'countries' => Countries::fakeCountries(),
             'first_login' => auth()->user()->first_login,
-            'recent_jobs' => CustomerJob::with('customer', 'property')->where('created_by', $theUser)->orderBy('id', 'DESC')->take(5)->get(),
-            'user_jobs' => CustomerJob::where('created_by', $theUser)->get()->count(),
+            'recent_jobs' => CustomerJob::with('customer', 'property')->where('created_by', $theUser)->where('status', 'Due')->orderBy('id', 'DESC')->take(5)->get(),
+            'user_jobs' => CustomerJob::where('created_by', $theUser)->where('status', 'Due')->get()->count(),
             'user_customers' => Customer::where('created_by', $theUser)->get()->count(),
             //'forms' => JobForm::with('childs')->where('parent_id', 0)->orderBy('id', 'ASC')->get()
         ]);

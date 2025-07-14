@@ -350,19 +350,40 @@ class CustomerController extends Controller
 
     public function updateAddressInfo(CustomerAddressUpdateRequest $request){
         $customer = Customer::find($request->customer_id);
+        $postal_code = (!empty($request->postal_code) ? $request->postal_code : null);
+        $address_line_1 = (!empty($request->address_line_1) ? $request->address_line_1 : null);
+        $address_line_2 = (!empty($request->address_line_2) ? $request->address_line_2 : null);
+        $city = (!empty($request->city) ? $request->city : null);
+
         
         $addressData = [
-            'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
-            'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
-            'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
+            'address_line_1' => $address_line_1,
+            'address_line_2' => $address_line_2,
+            'postal_code' => $postal_code,
             'state' => (!empty($request->state) ? $request->state : null),
-            'city' => (!empty($request->city) ? $request->city : null),
+            'city' => $city,
             'country' => (!empty($request->country) ? $request->country : null),
             'latitude' => (!empty($request->latitude) ? $request->latitude : null),
             'longitude' => (!empty($request->longitude) ? $request->longitude : null),
         ];
 
         $customerUpdate = Customer::where('id', $customer->id)->update($addressData);
+        if($customer->postal_code != $postal_code || $customer->address_line_1 != $address_line_1 || $customer->address_line_2 != $address_line_2 || $customer->city != $city):
+            $CustomerProperty = CustomerProperty::create([
+                'customer_id' => $customer->id,
+                'address_line_1' => $address_line_1,
+                'address_line_2' => $address_line_2,
+                'postal_code' => $postal_code,
+                'state' => (!empty($request->state) ? $request->state : null),
+                'city' => $city,
+                'country' => (!empty($request->country) ? $request->country : null),
+                'note' => null,
+                'latitude' => (!empty($request->latitude) ? $request->latitude : null),
+                'longitude' => (!empty($request->longitude) ? $request->longitude : null),
+    
+                'created_by' => auth()->user()->id,
+            ]);
+        endif;
 
         if($customerUpdate):
             return response()->json(['msg' => 'Customer Address successfully updated.', 'red' => '', ], 200);

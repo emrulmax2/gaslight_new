@@ -212,6 +212,7 @@ class CustomerController extends Controller
                 'full_address_html',
                 'full_address_with_html'
             ]);
+            $hasAddress = false;
 
             $updateData = [];
 
@@ -234,14 +235,17 @@ class CustomerController extends Controller
             // update address
             if($request->has('address_line_1')):
                 $updateData['address_line_1'] = (isset($request->address_line_1) && !empty($request->address_line_1) ? $request->address_line_1 : null);
+                $hasAddress = true;
             endif;
 
             if($request->has('address_line_2')):
                 $updateData['address_line_2'] = (isset($request->address_line_2) && !empty($request->address_line_2) ? $request->address_line_2 : null);
+                $hasAddress = true;
             endif;
 
             if($request->has('postal_code')):
                 $updateData['postal_code'] = (isset($request->postal_code) && !empty($request->postal_code) ? $request->postal_code : null);
+                $hasAddress = true;
             endif;
 
             if($request->has('state')):
@@ -250,10 +254,19 @@ class CustomerController extends Controller
 
             if($request->has('city')):
                 $updateData['city'] = (isset($request->city) && !empty($request->city) ? $request->city : null);
+                $hasAddress = true;
             endif;
 
             if($request->has('country')):
                 $updateData['country'] = (isset($request->country) && !empty($request->country) ? $request->country : null);
+            endif;
+
+            if($request->has('latitude')):
+                $updateData['latitude'] = (isset($request->latitude) && !empty($request->latitude) ? $request->latitude : null);
+            endif;
+
+            if($request->has('longitude')):
+                $updateData['longitude'] = (isset($request->longitude) && !empty($request->longitude) ? $request->longitude : null);
             endif;
 
             if($request->has('note')):
@@ -265,6 +278,23 @@ class CustomerController extends Controller
             endif;
 
             $updateData['updated_by'] = $request->user()->id;
+
+            if($hasAddress && ($customer->postal_code != $updateData['postal_code'] || $customer->address_line_1 != $updateData['address_line_1'] || $customer->address_line_2 != $updateData['address_line_2'] || $customer->city != $updateData['city'])):
+                CustomerProperty::create([
+                    'customer_id' => $customer->id,
+                    'address_line_1' => $updateData['address_line_1'],
+                    'address_line_2' => $updateData['address_line_2'],
+                    'postal_code' => $updateData['postal_code'],
+                    'state' => (isset($updateData['state']) ? $updateData['state'] : null),
+                    'city' => $updateData['city'],
+                    'country' => (isset($updateData['country']) ? $updateData['country'] : null),
+                    'note' => null,
+                    'latitude' => (isset($updateData['latitude']) ? $updateData['latitude'] : null),
+                    'longitude' => (isset($updateData['longitude']) ? $updateData['longitude'] : null),
+        
+                    'created_by' => auth()->user()->id,
+                ]);
+            endif;
 
             $customer->update($updateData);
 

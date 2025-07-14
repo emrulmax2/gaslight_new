@@ -2,12 +2,14 @@
 var jobListTable = (function () {
     var _tableGen = function () {
 
+        let $activeStatus = $(document).find('.jobStatsDropdown .jobStatusBtn.active');
+        let status = $activeStatus.attr('data-status');
         let querystr = $("#query").val() != "" ? $("#query").val() : "";
 
         axios({
             method: 'get',
-            url: route('jobs.list', {querystr: querystr}),
-            data: { querystr: querystr},
+            url: route('jobs.list', {querystr: querystr, status : status}),
+            data: { querystr: querystr, status : status},
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             if (response.status == 200) {
@@ -34,6 +36,8 @@ var jobListTable = (function () {
 
 
 (function () {
+    const jobStatusDropdown = tailwind.Dropdown.getOrCreateInstance(document.querySelector("#jobStatusDropdown"));
+
     if ($("#jobListTable").length) {
         jobListTable.init();
 
@@ -49,6 +53,18 @@ var jobListTable = (function () {
                 jobListTable.init();
             }
         });
+
+        $(document).on('click', '.jobStatusBtn', function(e){
+            let $theBtn = $(this);
+            let theStatus = $theBtn.attr('data-status');
+
+            $(document).find('.jobStatsDropdown .jobStatusBtn').removeClass('active');
+            $theBtn.addClass('active');
+            $(document).find('.jobStatsuSelected .label').html(theStatus);
+            
+            jobStatusDropdown.hide();
+            jobListTable.init();
+        })
 
     }
 
