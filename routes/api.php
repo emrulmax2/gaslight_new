@@ -273,7 +273,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('invoice-number', 'getInvoiceNumber');
             Route::get('quote-number', 'getQuoteNumber');
             Route::get('records/jobs/{form_id}', 'getJobs');
-            Route::get('vat-status', 'vatStatusNumber');
+            Route::get('vat-status/{user_id}', 'vatStatusNumber');
         });
 
     });

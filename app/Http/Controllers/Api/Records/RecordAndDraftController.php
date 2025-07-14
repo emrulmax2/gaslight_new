@@ -207,11 +207,12 @@ class RecordAndDraftController extends Controller
         ], 200);
     }
 
-    public function vatStatusNumber(){
-        $user = User::find(Auth::user()->id);
+    public function vatStatusNumber(Request $request){
+        $user_id = $request->user_id;
+        $user = User::find($user_id);
 
         $data = [
-            'vat_status' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1),
+            'non_vat_status' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1),
             'vat_number' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : ''),
         ];
 

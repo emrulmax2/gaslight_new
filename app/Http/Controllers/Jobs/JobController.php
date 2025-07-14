@@ -40,6 +40,7 @@ class JobController extends Controller
 
     public function list(Request $request){
         $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
+        $status = (isset($request->status) && !empty($request->status) ? $request->status : 'Due');
 
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
         $sorts = [];
@@ -47,7 +48,10 @@ class JobController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
 
-        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')->orderByRaw(implode(',', $sorts))->where('status', 'Due')->where('created_by', auth()->user()->id);
+        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')->orderByRaw(implode(',', $sorts))->where('created_by', auth()->user()->id);
+        if($status != 'All'):
+            $query->where('status', $status);
+        endif;
         if(!empty($queryStr)):
             $query->where(function($q) use($queryStr){
                 $q->where('description','LIKE','%'.$queryStr.'%')->orWhere('details','LIKE','%'.$queryStr.'%')
@@ -59,7 +63,18 @@ class JobController extends Controller
         $html = '';
         if(!empty($Query)):
             foreach($Query as $list):
-                $html .= '<a data-id="'.$list->id.'"  data-status="'.$list->status.'"  show_url="'.route('jobs.show', $list->id).'" class="JobListItem box relative jobItemWrap px-3 py-3 rounded-md block sm:flex w-full items-center mb-1 cursor-pointer">';
+                $itemBG = '';
+                if($status == 'All'):
+                    switch($list->status):
+                        case ('Completed'):
+                            $itemBG = ' bg-success bg-opacity-10 ';
+                            break;
+                        case ('Cancelled'):
+                            $itemBG = ' bg-danger bg-opacity-10 ';
+                            break;
+                    endswitch;
+                endif;
+                $html .= '<a data-id="'.$list->id.'"  data-status="'.$list->status.'"  show_url="'.route('jobs.show', $list->id).'" class="JobListItem '.$itemBG.' box relative jobItemWrap px-3 py-3 rounded-md block sm:flex w-full items-center mb-1 cursor-pointer">';
                     $html .= '<div class="w-full sm:w-3/6">';
                         $html .= '<div class="font-medium text-dark leading-none mb-1 flex justify-start items-start">';
                             $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="notebook-pen" style="top: -2px;" class="lucide lucide-notebook-pen stroke-1.5 mr-2 h-4 w-4 relative text-slate-500"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"></path><path d="M2 6h4"></path><path d="M2 10h4"></path><path d="M2 14h4"></path><path d="M2 18h4"></path><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"></path></svg>';
