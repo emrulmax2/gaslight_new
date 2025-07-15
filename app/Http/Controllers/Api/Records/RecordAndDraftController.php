@@ -183,13 +183,27 @@ class RecordAndDraftController extends Controller
                 if (!$recordExist) {
                     $filteredJobs[] = [
                         'id' => $job->id,
+                        'customer_id' => $job->customer_id,
+                        'customer_property_id' => $job->customer_property_id,
                         'description' => $job->description ?? '',
                         'customer_name' => $job->customer->full_name ?? '',
                         'postal_code' => $job->customer->postal_code ?? '',
                         'status' => $job->status ? $job->status : null,
                         'property' => $job->property ? [
                             'id' => $job->property->id,
-                            'address' => $job->property->address ?? ''
+                            'customer_id' => $job->property->customer_id,
+                            'address_line_1' => $job->property->address_line_1 ?? '',
+                            'address_line_2' => $job->property->address_line_2 ?? '',
+                            'city' => $job->property->city ?? '',
+                            'state' => $job->property->state ?? '',
+                            'postal_code' => $job->property->postal_code ?? '',
+                            'country' => $job->property->country ?? '',
+                            'latitude' => $job->property->latitude ?? '',
+                            'longitude' => $job->property->longitude ?? '',
+                            'note' => $job->property->note ?? '',
+                            'occupant_name' => $job->property->occupant_name ?? '',
+                            'occupant_email' => $job->property->occupant_email ?? '',
+                            'occupant_phone' => $job->property->occupant_phone ?? '',
                         ] : null,
                     ];
                 }
