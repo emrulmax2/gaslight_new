@@ -143,10 +143,10 @@ class GasCommissionDecommissionRecordController extends Controller
         endif;
     }
 
-    public function getDetails($record_id){
+    public function getDetails(Request $request, $record_id){
         try {
             $commission_decommision = GasCommissionDecommissionRecord::with(['customer', 'appliance', 'signature'])->findOrFail($record_id);
-            $user_id = auth()->user()->id;
+            $user_id = $request->user_id;
             $commission_decommision->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($commission_decommision->job_form_id);
             $record = $form->slug;
@@ -194,8 +194,7 @@ class GasCommissionDecommissionRecordController extends Controller
         }
     }
 
-    public function sendEmail($gcdr_id, $job_form_id){
-        $user_id = auth()->user()->id;
+    public function sendEmail($gcdr_id, $job_form_id, $user_id){
         $gcdr = GasCommissionDecommissionRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gcdr_id);
         $customerName = (isset($gcdr->customer->full_name) && !empty($gcdr->customer->full_name) ? $gcdr->customer->full_name : '');
         $customerEmail = (isset($gcdr->customer->contact->email) && !empty($gcdr->customer->contact->email) ? $gcdr->customer->contact->email : '');
@@ -242,7 +241,6 @@ class GasCommissionDecommissionRecordController extends Controller
     }
 
     public function generatePdf($gcdr_id) {
-        $user_id = auth()->user()->id;
         $gcdr = GasCommissionDecommissionRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gcdr_id);
         $gcdra1 = GasCommissionDecommissionRecordAppliance::where('gas_commission_decommission_record_id', $gcdr->id)->where('appliance_serial', 1)->get()->first();
         $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
@@ -731,7 +729,7 @@ class GasCommissionDecommissionRecordController extends Controller
     }
 
 
-    public function approve_email($record_id)
+    public function approve_email(Request $request, $record_id)
     {
         try {
             $gasComDecRecord = GasCommissionDecommissionRecord::findOrFail($record_id);
@@ -748,7 +746,7 @@ class GasCommissionDecommissionRecordController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasComDecRecord->id, $gasComDecRecord->job_form_id);
+                $emailSent = $this->sendEmail($gasComDecRecord->id, $gasComDecRecord->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

@@ -13,7 +13,6 @@ use App\Models\UserPricingPackage;
 use App\Models\UserPricingPackageInvoice;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
@@ -31,7 +30,7 @@ class UserManagementController extends Controller
         $email = $request->input('email');
 
         $user = User::create([
-            'parent_id' => Auth::user()->id,
+            'parent_id' => $request->user()->id,
             'role' => 'staff',
             'name' => $request->input('name'),
             'email' => $request->input('email'),
@@ -42,7 +41,7 @@ class UserManagementController extends Controller
             'active' => 1,
             'first_login' => 1
         ]);
-        $user->companies()->attach(Auth::user()->company->id);
+        $user->companies()->attach($request->user()->company->id);
         $user->save();
 
         if($user->id):
@@ -127,7 +126,7 @@ class UserManagementController extends Controller
 
                     UserPricingPackage::where('user_id', $user->id)->forceDelete();
                     UserPricingPackageInvoice::where('user_id', $user->id)->forceDelete();
-                    $user->companies()->detach(Auth::user()->company->id);
+                    $user->companies()->detach($request->user()->company->id);
                     $user->forceDelete();
 
                     $message = $e->getMessage();
@@ -136,7 +135,7 @@ class UserManagementController extends Controller
             }catch(Exception $e){
                 UserPricingPackage::where('user_id', $user->id)->forceDelete();
                 UserPricingPackageInvoice::where('user_id', $user->id)->forceDelete();
-                $user->companies()->detach(Auth::user()->company->id);
+                $user->companies()->detach($request->user()->company->id);
                 $user->forceDelete();
 
                 $message = $e->getMessage();

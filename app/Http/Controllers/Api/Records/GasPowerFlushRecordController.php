@@ -182,10 +182,10 @@ class GasPowerFlushRecordController extends Controller
         endif;
     }
 
-    public function getDetails($record_id){
+    public function getDetails(Request $request, $record_id){
         try {
             $powerFlush = GasPowerFlushRecord::with(['customer', 'powerflush_checklist', 'powerflush_rediators'])->findOrFail($record_id);
-             $user_id = auth()->user()->id;
+             $user_id = $request->user_id;
             $powerFlush->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($powerFlush->job_form_id);
             $record = $form->slug;
@@ -234,8 +234,7 @@ class GasPowerFlushRecordController extends Controller
         }
     }
 
-    public function sendEmail($gpfr_id, $job_form_id){
-        $user_id = auth()->user()->id;
+    public function sendEmail($gpfr_id, $job_form_id, $user_id){
         $gpfr = GasPowerFlushRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gpfr_id);
         $customerName = (isset($gpfr->customer->full_name) && !empty($gpfr->customer->full_name) ? $gpfr->customer->full_name : '');
         $customerEmail = (isset($gpfr->customer->contact->email) && !empty($gpfr->customer->contact->email) ? $gpfr->customer->contact->email : '');
@@ -282,7 +281,6 @@ class GasPowerFlushRecordController extends Controller
     }
 
     public function generatePdf($gpfr_id) {
-        $user_id = auth()->user()->id;
         $gpfr = GasPowerFlushRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gpfr_id);
         $gpfrc = GasPowerFlushRecordChecklist::where('gas_power_flush_record_id', $gpfr->id)->get()->first();
         $gpfrr = GasPowerFlushRecordRediator::where('gas_power_flush_record_id', $gpfr->id)->orderBy('id', 'ASC')->get();
@@ -874,7 +872,7 @@ class GasPowerFlushRecordController extends Controller
     }
 
 
-    public function approve_email($record_id)
+    public function approve_email(Request $request, $record_id)
     {
         try {
             $gasPowerFlush = GasPowerFlushRecord::findOrFail($record_id);
@@ -891,7 +889,7 @@ class GasPowerFlushRecordController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasPowerFlush->id, $gasPowerFlush->job_form_id);
+                $emailSent = $this->sendEmail($gasPowerFlush->id, $gasPowerFlush->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

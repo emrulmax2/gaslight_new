@@ -292,7 +292,7 @@ class CustomerController extends Controller
                     'latitude' => (isset($updateData['latitude']) ? $updateData['latitude'] : null),
                     'longitude' => (isset($updateData['longitude']) ? $updateData['longitude'] : null),
         
-                    'created_by' => auth()->user()->id,
+                    'created_by' => $request->user()->id,
                 ]);
             endif;
 
