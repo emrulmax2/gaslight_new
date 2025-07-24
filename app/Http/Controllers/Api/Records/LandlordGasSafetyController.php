@@ -18,7 +18,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 
@@ -179,12 +178,12 @@ class LandlordGasSafetyController extends Controller
         }
     }
 
-    public function getDetails($gas_safety_id)
+    public function getDetails(Request $request, $gas_safety_id)
     {
         try {
             $gasSafetyRecord = GasLandlordSafetyRecord::with(['customer','appliance','signature'])->findOrFail($gas_safety_id);
 
-            $user_id = Auth::user()->id;
+            $user_id = $request->user_id;
             $gasSafetyRecord->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($gasSafetyRecord->job_form_id);
             $record = $form->slug;
@@ -235,7 +234,6 @@ class LandlordGasSafetyController extends Controller
     }
 
     public function generatePdf($glsr_id) {
-        $user_id = Auth::user()->id;
         $glsr = GasLandlordSafetyRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($glsr_id);
         $glsra1 = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 1)->get()->first();
         $glsra2 = GasLandlordSafetyRecordAppliance::where('gas_landlord_safety_record_id', $glsr->id)->where('appliance_serial', 2)->get()->first();
@@ -1000,8 +998,7 @@ class LandlordGasSafetyController extends Controller
         return Storage::disk('public')->url('glsr/'.$glsr->customer_job_id.'/'.$glsr->job_form_id.'/'.$fileName);
     }
 
-    public function sendEmail($glsr_id, $job_form_id){
-        $user_id = Auth::user()->id;
+    public function sendEmail($glsr_id, $job_form_id, $user_id){
         $glsr = GasLandlordSafetyRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($glsr_id);
         $customerName = (isset($glsr->customer->full_name) && !empty($glsr->customer->full_name) ? $glsr->customer->full_name : '');
         $customerEmail = (isset($glsr->customer->contact->email) && !empty($glsr->customer->contact->email) ? $glsr->customer->contact->email : '');
@@ -1075,7 +1072,7 @@ class LandlordGasSafetyController extends Controller
     }
 
 
-    public function approve_email($gsr_id)
+    public function approve_email(Request $request, $gsr_id)
     {
         try {
             $gasSafetyRecord = GasLandlordSafetyRecord::findOrFail($gsr_id);
@@ -1092,7 +1089,7 @@ class LandlordGasSafetyController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasSafetyRecord->id, $gasSafetyRecord->job_form_id);
+                $emailSent = $this->sendEmail($gasSafetyRecord->id, $gasSafetyRecord->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

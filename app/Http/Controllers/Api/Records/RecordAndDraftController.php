@@ -10,7 +10,6 @@ use App\Models\JobFormPrefixMumbering;
 use App\Models\Quote;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class RecordAndDraftController extends Controller
 {
@@ -97,7 +96,7 @@ class RecordAndDraftController extends Controller
 
 
     public function getInvoiceNumber(Request $request){
-        $user_id = Auth::user()->id;
+        $user_id = $request->user()->id;
         $form_id = 4;
 
         $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
@@ -124,7 +123,7 @@ class RecordAndDraftController extends Controller
     }
 
     public function getQuoteNumber(Request $request){
-        $user_id = Auth::user()->id;
+        $user_id = $request->user()->id;
         $form_id = 3;
 
         $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $form_id)->orderBy('id', 'DESC')->get()->first();
@@ -153,8 +152,8 @@ class RecordAndDraftController extends Controller
 
     public function getJobs(Request $request)
     {
-        $user_id = Auth::user()->id;
-        $job_form_id = $request->job_form_id;
+        $user_id = $request->user_id;
+        $job_form_id = $request->form_id;
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
         $jobsQuery = CustomerJob::with('customer', 'property', 'status')

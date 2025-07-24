@@ -162,10 +162,10 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
         endif;
     }
 
-    public function getDetails($record_id){
+    public function getDetails(Request $request, $record_id){
         try {
             $guhwc_record = GasUnventedHotWaterCylinderRecord::with(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])->findOrFail($record_id);
-            $user_id = auth()->user()->id;
+            $user_id = $request->user_id;
             $guhwc_record->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($guhwc_record->job_form_id);
             $record = $form->slug;
@@ -214,8 +214,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
         }
     }
 
-     public function sendEmail($guhwcr_id, $job_form_id){
-        $user_id = auth()->user()->id;
+     public function sendEmail($guhwcr_id, $job_form_id, $user_id){
         $guhwcr = GasUnventedHotWaterCylinderRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($guhwcr_id);
         $customerName = (isset($guhwcr->customer->full_name) && !empty($guhwcr->customer->full_name) ? $guhwcr->customer->full_name : '');
         $customerEmail = (isset($guhwcr->customer->contact->email) && !empty($guhwcr->customer->contact->email) ? $guhwcr->customer->contact->email : '');
@@ -262,7 +261,6 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
     }
 
     public function generatePdf($guhwcr_id) {
-        $user_id = auth()->user()->id;
         $guhwcr = GasUnventedHotWaterCylinderRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($guhwcr_id);
         $guhwcrs = GasUnventedHotWaterCylinderRecordSystem::where('gas_unvented_hot_water_cylinder_record_id', $guhwcr->id)->orderBy('id', 'DESC')->get()->first();
         $guhwcri = GasUnventedHotWaterCylinderRecordInspection::where('gas_unvented_hot_water_cylinder_record_id', $guhwcr->id)->orderBy('id', 'DESC')->get()->first();
@@ -910,7 +908,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
     }
 
 
-    public function approve_email($record_id)
+    public function approve_email(Request $request, $record_id)
     {
         try {
             $gasUnvenHWCRecord = GasUnventedHotWaterCylinderRecord::findOrFail($record_id);
@@ -927,7 +925,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasUnvenHWCRecord->id, $gasUnvenHWCRecord->job_form_id);
+                $emailSent = $this->sendEmail($gasUnvenHWCRecord->id, $gasUnvenHWCRecord->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

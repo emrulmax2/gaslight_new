@@ -169,10 +169,10 @@ class GasBreakdownRecordController extends Controller
         }
     }
 
-    public function getDetails($record_id){
+    public function getDetails(Request $request, $record_id){
         try {
             $gasBreakdownRecord = GasBreakdownRecord::with(['customer', 'appliance', 'signature'])->findOrFail($record_id);
-            $user_id = auth()->user()->id;
+            $user_id = $request->user_id;
             $gasBreakdownRecord->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($gasBreakdownRecord->job_form_id);
             $record = $form->slug;
@@ -220,8 +220,7 @@ class GasBreakdownRecordController extends Controller
         }
     }
 
-    public function sendEmail($gsr_id, $job_form_id){
-        $user_id = auth()->user()->id;
+    public function sendEmail($gsr_id, $job_form_id, $user_id){
         $gbr = GasBreakdownRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gsr_id);
         $customerName = (isset($gbr->customer->full_name) && !empty($gbr->customer->full_name) ? $gbr->customer->full_name : '');
         $customerEmail = (isset($gbr->customer->contact->email) && !empty($gbr->customer->contact->email) ? $gbr->customer->contact->email : '');
@@ -268,7 +267,6 @@ class GasBreakdownRecordController extends Controller
     }
 
     public function generatePdf($gbr_id) {
-        $user_id = auth()->user()->id;
         $gbr = GasBreakdownRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gbr_id);
         $gbra1 = GasBreakdownRecordAppliance::where('gas_breakdown_record_id', $gbr->id)->where('appliance_serial', 1)->get()->first();
 
@@ -903,7 +901,7 @@ class GasBreakdownRecordController extends Controller
     }
 
 
-    public function approve_email($record_id)
+    public function approve_email(Request $request, $record_id)
     {
         try {
             $gasBreakdownRecord = GasBreakdownRecord::findOrFail($record_id);
@@ -920,7 +918,7 @@ class GasBreakdownRecordController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasBreakdownRecord->id, $gasBreakdownRecord->job_form_id);
+                $emailSent = $this->sendEmail($gasBreakdownRecord->id, $gasBreakdownRecord->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

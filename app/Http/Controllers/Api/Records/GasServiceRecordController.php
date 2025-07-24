@@ -20,7 +20,6 @@ use Illuminate\Support\Str;
 use Creagia\LaravelSignPad\Signature;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 
 class GasServiceRecordController extends Controller
 {
@@ -210,10 +209,10 @@ class GasServiceRecordController extends Controller
         }
     }
 
-    public function getDetails($record_id){
+    public function getDetails(Request $request, $record_id){
         try {
             $gasServiceRecord = GasServiceRecord::with(['customer', 'appliances', 'signature'])->findOrFail($record_id);
-            $user_id = auth()->user()->id;
+            $user_id = $request->user_id;
             $gasServiceRecord->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($gasServiceRecord->job_form_id);
             $record = $form->slug;
@@ -261,8 +260,7 @@ class GasServiceRecordController extends Controller
         }
     }
 
-    public function sendEmail($gsr_id, $job_form_id){
-        $user_id = Auth::user()->id;
+    public function sendEmail($gsr_id, $job_form_id, $user_id){
         $gsr = GasServiceRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gsr_id);
         $customerName = (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '');
         $customerEmail = (isset($gsr->customer->contact->email) && !empty($gsr->customer->contact->email) ? $gsr->customer->contact->email : '');
@@ -309,7 +307,6 @@ class GasServiceRecordController extends Controller
     }
 
     public function generatePdf($gsr_id) {
-        $user_id = auth()->user()->id;
         $gsr = GasServiceRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gsr_id);
         $gsra1 = GasServiceRecordAppliance::where('gas_service_record_id', $gsr->id)->where('appliance_serial', 1)->get()->first();
 
@@ -1063,7 +1060,7 @@ class GasServiceRecordController extends Controller
     }
 
 
-    public function approve_email($record_id)
+    public function approve_email(Request $request, $record_id)
     {
         try {
             $gasServiceRecord = GasServiceRecord::findOrFail($record_id);
@@ -1080,7 +1077,7 @@ class GasServiceRecordController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasServiceRecord->id, $gasServiceRecord->job_form_id);
+                $emailSent = $this->sendEmail($gasServiceRecord->id, $gasServiceRecord->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

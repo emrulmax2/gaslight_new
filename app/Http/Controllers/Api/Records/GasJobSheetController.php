@@ -146,10 +146,10 @@ class GasJobSheetController extends Controller
         endif;
     }
 
-    public function getDetails($sheet_id){
+    public function getDetails(Request $request, $sheet_id){
         try {
             $job_sheet_record = GasJobSheetRecord::with(['customer', 'documents', 'signature'])->findOrFail($sheet_id);
-             $user_id = auth()->user()->id;
+             $user_id = $request->user_id;
             $job_sheet_record->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($job_sheet_record->job_form_id);
             $record = $form->slug;
@@ -199,8 +199,7 @@ class GasJobSheetController extends Controller
         }
     }
 
-     public function sendEmail($gjsr_id, $job_form_id){
-        $user_id = auth()->user()->id;
+     public function sendEmail($gjsr_id, $job_form_id, $user_id){
         $gjsr = GasJobSheetRecord::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gjsr_id);
         $customerName = (isset($gjsr->customer->full_name) && !empty($gjsr->customer->full_name) ? $gjsr->customer->full_name : '');
         $customerEmail = (isset($gjsr->customer->contact->email) && !empty($gjsr->customer->contact->email) ? $gjsr->customer->contact->email : '');
@@ -247,7 +246,6 @@ class GasJobSheetController extends Controller
     }
 
     public function generatePdf($gjsr_id) {
-        $user_id = auth()->user()->id;
         $gjsr = GasJobSheetRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gjsr_id);
         $gjsrd = GasJobSheetRecordDetail::where('gas_job_sheet_record_id', $gjsr->id)->get()->first();
 
@@ -737,7 +735,7 @@ class GasJobSheetController extends Controller
     }
 
 
-    public function approve_email($sheet_id)
+    public function approve_email(Request $request, $sheet_id)
     {
         try {
             $gasJobSheetRecord = GasJobSheetRecord::findOrFail($sheet_id);
@@ -754,7 +752,7 @@ class GasJobSheetController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasJobSheetRecord->id, $gasJobSheetRecord->job_form_id);
+                $emailSent = $this->sendEmail($gasJobSheetRecord->id, $gasJobSheetRecord->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

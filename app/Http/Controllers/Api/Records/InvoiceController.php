@@ -18,7 +18,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
@@ -39,10 +38,10 @@ class InvoiceController extends Controller
         ]); 
     }
 
-    public function getDetails($invoice_id){
+    public function getDetails(Request $request, $invoice_id){
         try {
             $invoice = Invoice::with(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'items'])->findOrFail($invoice_id);
-            $user_id = Auth::user()->id;
+            $user_id = $request->user_id;
             $form = JobForm::find($invoice->job_form_id);
             $record = $form->slug;
 
@@ -91,7 +90,7 @@ class InvoiceController extends Controller
         try {
             $job_form_id = 4;
             
-            $user_id = request()->user()->id;
+            $user_id = $request->user_id;
             $user = User::find($user_id);
             $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
             $form = JobForm::find($job_form_id);
@@ -198,6 +197,7 @@ class InvoiceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again later or contact with the administrator.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -480,8 +480,7 @@ class InvoiceController extends Controller
         
     }
 
-    public function sendEmail($invoice_id, $job_form_id){
-        $user_id = Auth::user()->id;
+    public function sendEmail($invoice_id, $job_form_id, $user_id){
         $invoice = Invoice::with('items', 'job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($invoice_id);
         $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
         $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
@@ -556,7 +555,7 @@ class InvoiceController extends Controller
     }
 
 
-    public function approve_email($invoice_id)
+    public function approve_email(Request $request, $invoice_id)
     {
         try {
             $invoice = Invoice::findOrFail($invoice_id);
@@ -573,7 +572,7 @@ class InvoiceController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($invoice->id, $invoice->job_form_id);
+                $emailSent = $this->sendEmail($invoice->id, $invoice->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

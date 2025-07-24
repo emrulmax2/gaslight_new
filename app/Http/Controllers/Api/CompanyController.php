@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Company;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\CompanyBankDetails;
 use App\Models\RegisterBody;
 use Creagia\LaravelSignPad\Signature;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class CompanyController extends Controller
@@ -37,12 +37,12 @@ class CompanyController extends Controller
             ]);
         }
 
-        $validatedData['user_id'] = Auth::user()->id;
+        $validatedData['user_id'] = $request->user()->id;
         $validatedData['gas_safe_registration_no'] = (isset($request->gas_safe_registration_no) && !empty($request->gas_safe_registration_no)) ? $request->gas_safe_registration_no : null;
         $validatedData['gas_safe_id_card'] = (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card)) ? $request->gas_safe_id_card : null;
         
         $company = Company::create($validatedData);
-        $user = User::find(Auth::user()->id);
+        $user = User::find($request->user()->id);
         $user->first_login = 0;
         $user->save();
 
@@ -192,11 +192,9 @@ class CompanyController extends Controller
             'message' => 'Company deleted successfully.',
         ], 200);
     }
-    public function getCompanyBankDetails(Company $company)
+    public function getCompanyBankDetails(Request $request)
     {
-
-        $company = Company::where('user_id', Auth::user()->id)->first();
-
+        $company = Company::where('user_id', $request->user()->id)->first();
 
         $companyBankDetails = CompanyBankDetails::where('company_id', $company->id)->first();
 

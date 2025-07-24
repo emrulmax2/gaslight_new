@@ -19,7 +19,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Creagia\LaravelSignPad\Signature;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class GasWarningNoticeController extends Controller
@@ -155,10 +154,10 @@ class GasWarningNoticeController extends Controller
         }
     }
 
-    public function getDetails($notice_id){
+    public function getDetails(Request $request, $notice_id){
         try {
             $gasWarningNotice = GasWarningNotice::with(['customer', 'appliance'])->findOrFail($notice_id);
-            $user_id = Auth::user()->id;
+            $user_id = $request->user_id;
             $gasWarningNotice->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($gasWarningNotice->job_form_id);
             $record = $form->slug;
@@ -206,8 +205,7 @@ class GasWarningNoticeController extends Controller
         }
     }
 
-    public function sendEmail($gwn_id, $job_form_id){
-        $user_id = auth()->user()->id;
+    public function sendEmail($gwn_id, $job_form_id, $user_id){
         $gwn = GasWarningNotice::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gwn_id);
         $customerName = (isset($gwn->customer->full_name) && !empty($gwn->customer->full_name) ? $gwn->customer->full_name : '');
         $customerEmail = (isset($gwn->customer->contact->email) && !empty($gwn->customer->contact->email) ? $gwn->customer->contact->email : '');
@@ -254,7 +252,6 @@ class GasWarningNoticeController extends Controller
     }
 
     public function generatePdf($gsr_id) {
-        $user_id = auth()->user()->id;
         $gwn = GasWarningNotice::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gsr_id);
         $gwna1 = GasWarningNoticeAppliance::where('gas_warning_notice_id', $gwn->id)->where('appliance_serial', 1)->get()->first();
 
@@ -809,7 +806,7 @@ class GasWarningNoticeController extends Controller
     }
 
 
-    public function approve_email($gwn_id)
+    public function approve_email(Request $request, $gwn_id)
     {
         try {
             $gasWarningNotice = GasWarningNotice::findOrFail($gwn_id);
@@ -826,7 +823,7 @@ class GasWarningNoticeController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gasWarningNotice->id, $gasWarningNotice->job_form_id);
+                $emailSent = $this->sendEmail($gasWarningNotice->id, $gasWarningNotice->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

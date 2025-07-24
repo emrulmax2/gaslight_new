@@ -168,10 +168,10 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
         endif;
     }
 
-    public function getDetails($checklist_id){
+    public function getDetails(Request $request, $checklist_id){
         try {
             $boilerCommChecklist = GasBoilerSystemCommissioningChecklist::with(['customer', 'appliance', 'signature'])->findOrFail($checklist_id);
-             $user_id = auth()->user()->id;
+             $user_id = $request->user_id;
             $boilerCommChecklist->load(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
             $form = JobForm::find($boilerCommChecklist->job_form_id);
             $record = $form->slug;
@@ -219,8 +219,7 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
         }
     }
 
-    public function sendEmail($gbscc_id, $job_form_id){
-        $user_id = auth()->user()->id;
+    public function sendEmail($gbscc_id, $job_form_id, $user_id){
         $gbscc = GasBoilerSystemCommissioningChecklist::with('job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($gbscc_id);
         $customerName = (isset($gbscc->customer->full_name) && !empty($gbscc->customer->full_name) ? $gbscc->customer->full_name : '');
         $customerEmail = (isset($gbscc->customer->contact->email) && !empty($gbscc->customer->contact->email) ? $gbscc->customer->contact->email : '');
@@ -267,7 +266,6 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
     }
 
     public function generatePdf($gbscc_id) {
-        $user_id = auth()->user()->id;
         $gbscc = GasBoilerSystemCommissioningChecklist::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gbscc_id);
         $gbscca1 = GasBoilerSystemCommissioningChecklistAppliance::where('gas_boiler_system_commissioning_checklist_id', $gbscc->id)->where('appliance_serial', 1)->get()->first();
 
@@ -936,7 +934,7 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
     }
 
 
-    public function approve_email($checklist_id)
+    public function approve_email(Request $request, $checklist_id)
     {
         try {
             $gbscc = GasBoilerSystemCommissioningChecklist::findOrFail($checklist_id);
@@ -953,7 +951,7 @@ class GasBoilerSystemCommissioningChecklistController extends Controller
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($gbscc->id, $gbscc->job_form_id);
+                $emailSent = $this->sendEmail($gbscc->id, $gbscc->job_form_id, $request->user_id);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }

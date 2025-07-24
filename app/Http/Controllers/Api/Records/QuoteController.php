@@ -15,21 +15,21 @@ use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\Quote;
 use App\Models\QuoteItem;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Exception;
 
 class QuoteController extends Controller
 {
-    public function getDetails($quote_id)
+    public function getDetails(Request $request, $quote_id)
     {
         try {
             $quote = Quote::with(['customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'items'])->findOrFail($quote_id);
-            $user_id = Auth::user()->id;
+            $user_id = $request->user_id;
             $form = JobForm::find($quote->job_form_id);
             $record = $form->slug;
 
@@ -110,8 +110,8 @@ class QuoteController extends Controller
         try {
             $job_form_id = 3;
 
-            $user = $request->user();
-            $user_id = $user->id;
+            $user_id = $request->user_id;
+            $user = User::findOrFail($user_id);
             $company = $user->companies->first() ?? [];
 
             $form = JobForm::findOrFail($job_form_id);
@@ -541,8 +541,7 @@ class QuoteController extends Controller
    
     }
 
-    public function sendEmail($quote_id, $job_form_id){
-        $user_id = Auth::user()->id;
+    public function sendEmail($quote_id, $job_form_id, $user_id){
         $quote = Quote::with('items', 'job', 'job.property', 'customer', 'customer.contact', 'user', 'user.company')->find($quote_id);
         $customerName = (isset($quote->customer->full_name) && !empty($quote->customer->full_name) ? $quote->customer->full_name : '');
         $customerEmail = (isset($quote->customer->contact->email) && !empty($quote->customer->contact->email) ? $quote->customer->contact->email : '');
@@ -588,7 +587,7 @@ class QuoteController extends Controller
     }
 
 
-    public function approve_email($quote_id)
+    public function approve_email(Request $request, $quote_id)
     {
         try {
             $quote = Quote::findOrFail($quote_id);
@@ -596,7 +595,7 @@ class QuoteController extends Controller
                 'status' => 'Approved & Sent'
             ]);
                 
-            $email = $this->sendEmail($quote->id, $quote->job_form_id);
+            $email = $this->sendEmail($quote->id, $quote->job_form_id, $request->user_id);
             $message = (!$email ? 'Quote has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Quote has been approved and a copy of the certificate mailed to the customer');
 
             return response()->json([
@@ -645,13 +644,14 @@ class QuoteController extends Controller
     }
 
     public function convertToInvoice(Request $request){
+       try {
         $quote = Quote::with('items')->find($request->quote_id);
         $invoiceForm = JobForm::where('slug', 'invoice')->get()->first();
 
         $customer_job_id = $quote->customer_job_id;
         $customer_id = $quote->customer_id;
         $job_form_id = $quote->job_form_id;
-        $user_id = (isset($quote->created_by) && $quote->created_by > 0 ? $quote->created_by : auth()->user()->id);
+        $user_id = (isset($quote->created_by) && $quote->created_by > 0 ? $quote->created_by : $request->user_id);
 
         $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $job_form_id)->orderBy('id', 'DESC')->get()->first();
         $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
@@ -784,5 +784,12 @@ class QuoteController extends Controller
                 'message' => 'Something went wrong. Please try again later or contact with the administrator.'
             ], 422);
         endif;
+       } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+                'error' => $e->getMessage()
+            ], 500);
+       }
     }
 }
