@@ -154,7 +154,7 @@ class GasServiceRecordController extends Controller
         $gsr = GasServiceRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gsr_id);
         $gsra1 = GasServiceRecordAppliance::where('gas_service_record_id', $gsr->id)->where('appliance_serial', 1)->get()->first();
 
-        $logoPath = resource_path('images/gas_safe_register_dark.png');
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
         $userSignBase64 = (isset($gsr->user->signature) && Storage::disk('public')->exists($gsr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gsr->user->signature->filename)) : '');
@@ -319,8 +319,9 @@ class GasServiceRecordController extends Controller
                     $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
                         $PDFHTML .= '<tbody>';
                             $PDFHTML .= '<tr>';
-                                $PDFHTML .= '<td class="w-col2 align-middle">';
-                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
+                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
+                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gsr->certificate_number.'</div>';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
                                     $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Service/Maintenance Record</h1>';
@@ -331,9 +332,8 @@ class GasServiceRecordController extends Controller
                                                     Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
                                     $PDFHTML .= '</div>';
                                 $PDFHTML .= '</td>';
-                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
-                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gsr->certificate_number.'</div>';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-right" style="padding-right: 30px;">';
+                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                             $PDFHTML .= '</tr>';
                         $PDFHTML .= '</tbody>';

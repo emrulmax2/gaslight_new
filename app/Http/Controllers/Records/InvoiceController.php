@@ -186,7 +186,7 @@ class InvoiceController extends Controller
         $invoice = Invoice::with('items', 'job', 'job.property', 'customer', 'user', 'user.company')->find($invoice_id);
         $isNonVatCheck = ($invoice->vat_registerd == 1 ? true : false);
     
-        $logoPath = resource_path('images/gas_safe_register.png');
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
         $report_title = 'Invoice of '.$invoice->invoice_number;

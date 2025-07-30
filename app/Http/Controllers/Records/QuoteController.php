@@ -116,7 +116,7 @@ class QuoteController extends Controller
         $quote = Quote::with('items', 'job', 'job.property', 'customer', 'user', 'user.company')->find($quote_id);
         $isNonVatCheck = ($quote->vat_registerd == 1 ? true : false);
     
-        $logoPath = resource_path('images/gas_safe_register.png');
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
         $report_title = 'Quote of '.$quote->quote_number;

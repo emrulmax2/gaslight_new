@@ -158,7 +158,7 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
         $guhwcrs = GasUnventedHotWaterCylinderRecordSystem::where('gas_unvented_hot_water_cylinder_record_id', $guhwcr->id)->orderBy('id', 'DESC')->get()->first();
         $guhwcri = GasUnventedHotWaterCylinderRecordInspection::where('gas_unvented_hot_water_cylinder_record_id', $guhwcr->id)->orderBy('id', 'DESC')->get()->first();
 
-        $logoPath = resource_path('images/gas_safe_register_dark.png');
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
         $userSignBase64 = (isset($guhwcr->user->signature) && Storage::disk('public')->exists($guhwcr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($guhwcr->user->signature->filename)) : '');
@@ -323,8 +323,9 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
                     $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
                         $PDFHTML .= '<tbody>';
                             $PDFHTML .= '<tr>';
-                                $PDFHTML .= '<td class="w-col2 align-middle">';
-                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
+                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
+                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$guhwcr->certificate_number.'</div>';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
                                     $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Mains Pressure Hot Water Cylinder Commissioning Checklist</h1>';
@@ -332,9 +333,8 @@ class GasUnventedHotWaterCylinderRecordController extends Controller
                                         $PDFHTML .= 'Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
                                     $PDFHTML .= '</div>';
                                 $PDFHTML .= '</td>';
-                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
-                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$guhwcr->certificate_number.'</div>';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-right" style="padding-right: 30px;">';
+                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                             $PDFHTML .= '</tr>';
                         $PDFHTML .= '</tbody>';

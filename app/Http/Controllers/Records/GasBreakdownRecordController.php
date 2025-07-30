@@ -155,7 +155,7 @@ class GasBreakdownRecordController extends Controller
         $gbr = GasBreakdownRecord::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gbr_id);
         $gbra1 = GasBreakdownRecordAppliance::where('gas_breakdown_record_id', $gbr->id)->where('appliance_serial', 1)->get()->first();
 
-        $logoPath = resource_path('images/gas_safe_register_dark.png');
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
         $userSignBase64 = (isset($gbr->user->signature) && Storage::disk('public')->exists($gbr->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gbr->user->signature->filename)) : '');
@@ -320,15 +320,15 @@ class GasBreakdownRecordController extends Controller
                     $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
                         $PDFHTML .= '<tbody>';
                             $PDFHTML .= '<tr>';
-                                $PDFHTML .= '<td class="w-col2 align-middle">';
-                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
+                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
+                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gbr->certificate_number.'</div>';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
                                     $PDFHTML .= '<h1 class="text-white text-2xl leading-none mt-0 mb-0">Breakdown Record</h1>';
                                 $PDFHTML .= '</td>';
-                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
-                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gbr->certificate_number.'</div>';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-right" style="padding-right: 30px;">';
+                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                             $PDFHTML .= '</tr>';
                         $PDFHTML .= '</tbody>';
