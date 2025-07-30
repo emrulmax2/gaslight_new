@@ -13,13 +13,12 @@
         ])>
             <div class="relative z-10 flex flex-col justify-center w-full h-full py-2 lg:py-32">
                 <div class="flex h-[55px] w-[55px] items-center justify-center rounded-[0.8rem] border border-primary/30">
-                    <div
-                        class="relative flex h-[50px] w-[50px] items-center justify-center rounded-[0.6rem] bg-white bg-gradient-to-b from-theme-1/90 to-theme-2/90">
-                        <div class="relative h-[26px] w-[26px] -rotate-45 [&_div]:bg-white">
-                            <div class="absolute inset-y-0 left-0 my-auto h-[75%] w-[20%] rounded-full opacity-50"></div>
-                            <div class="absolute inset-0 m-auto h-[120%] w-[20%] rounded-full"></div>
-                            <div class="absolute inset-y-0 right-0 my-auto h-[75%] w-[20%] rounded-full opacity-50"></div>
-                        </div>
+                    <div class="relative flex  items-center justify-center rounded-[0.6rem] bg-white bg-gradient-to-b from-theme-1/90 to-theme-2/90">
+                        <img
+                            class="rounded-[0.6rem]"
+                            src="{{ Vite::asset('resources/images/logo_icon.png') }}"
+                            alt="Gas Engineer APP"
+                        />
                     </div>
                 </div>
                 <div class="mt-10">
