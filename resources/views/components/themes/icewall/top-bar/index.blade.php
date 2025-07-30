@@ -8,13 +8,13 @@
             href="{{ route('company.dashboard') }}"
         >
             <img
-                class="w-auto h-[65px] hidden sm:block"
-                src="{{ Vite::asset('resources/images/logo_1.png') }}"
+                class="w-auto h-[45px] hidden sm:block"
+                src="{{ Vite::asset('resources/images/logo_1_new.png') }}"
                 alt="Gas Engineer APP"
             />
             <img
-                class="w-auto h-[50px] sm:hidden"
-                src="{{ Vite::asset('resources/images/logo_3.png') }}"
+                class="w-auto h-[40px] sm:hidden ml-[5px]"
+                src="{{ Vite::asset('resources/images/logo_3_1.png') }}"
                 alt="Gas Engineer APP"
             />
             {{--<span class="ml-3 text-lg text-white max-sm:hidden"> Icewall </span>--}}

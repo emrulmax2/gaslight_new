@@ -20,6 +20,7 @@
     <meta name="keywords" content="admin template, midone Admin Template, dashboard template, flat admin template, responsive admin template, web app"
     >
     <meta name="author" content="LCC Team">
+    <link rel="icon" type="image/png" href="{{ Vite::asset('resources/images/logo_icon.png') }}">
     
     @yield('head')
 

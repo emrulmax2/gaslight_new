@@ -155,7 +155,7 @@ class GasWarningNoticeController extends Controller
         $gwn = GasWarningNotice::with('customer', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company')->find($gsr_id);
         $gwna1 = GasWarningNoticeAppliance::where('gas_warning_notice_id', $gwn->id)->where('appliance_serial', 1)->get()->first();
 
-        $logoPath = resource_path('images/gas_safe_register_dark.png');
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
 
         $userSignBase64 = (isset($gwn->user->signature) && Storage::disk('public')->exists($gwn->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($gwn->user->signature->filename)) : '');
@@ -318,21 +318,21 @@ class GasWarningNoticeController extends Controller
                     $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
                         $PDFHTML .= '<tbody>';
                             $PDFHTML .= '<tr>';
-                                $PDFHTML .= '<td class="w-col2 align-middle">';
-                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
+                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
+                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gwn->certificate_number.'</div>';
                                 $PDFHTML .= '</td>';
                                 $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
                                     $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">';
                                         $PDFHTML .= '<span class="bg-danger inline-block py-1 px-2 mr-1">Danger Do Not Use</span>';
-                                        $PDFHTML .= '<span class="bg-warning inline-block py-1 px-2">Warning Notice</span>';
+                                        $PDFHTML .= '<span class="bg-warning inline-block py-1 px-2">CP14 Gas Warning Notice</span>';
                                     $PDFHTML .= '</h1>';
                                     $PDFHTML .= '<div class="text-white text-12px leading-1-3">';
                                         $PDFHTML .= 'Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
                                     $PDFHTML .= '</div>';
                                 $PDFHTML .= '</td>';
-                                $PDFHTML .= '<td class="w-col2 align-middle text-center">';
-                                    $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                                    $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gwn->certificate_number.'</div>';
+                                $PDFHTML .= '<td class="w-col2 align-middle text-right" style="padding-right: 30px;">';
+                                    $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
                                 $PDFHTML .= '</td>';
                             $PDFHTML .= '</tr>';
                         $PDFHTML .= '</tbody>';
@@ -533,11 +533,11 @@ class GasWarningNoticeController extends Controller
                                     $PDFHTML .= '</thead>';
                                     $PDFHTML .= '<tbody>';
                                         $PDFHTML .= '<tr>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->gas_escape_issue) && !empty($gwna1->gas_escape_issue) ? $gwna1->gas_escape_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->pipework_issue) && !empty($gwna1->pipework_issue) ? $gwna1->pipework_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->ventilation_issue) && !empty($gwna1->ventilation_issue) ? $gwna1->ventilation_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->meter_issue) && !empty($gwna1->meter_issue) ? $gwna1->meter_issue : '').'</td>';
-                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->chimeny_issue) && !empty($gwna1->chimeny_issue) ? $gwna1->chimeny_issue : '').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->gas_escape_issue) && !empty($gwna1->gas_escape_issue) ? $gwna1->gas_escape_issue : '&nbsp;').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->pipework_issue) && !empty($gwna1->pipework_issue) ? $gwna1->pipework_issue : '&nbsp;').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->ventilation_issue) && !empty($gwna1->ventilation_issue) ? $gwna1->ventilation_issue : '&nbsp;').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->meter_issue) && !empty($gwna1->meter_issue) ? $gwna1->meter_issue : '&nbsp;').'</td>';
+                                            $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">'.(isset($gwna1->chimeny_issue) && !empty($gwna1->chimeny_issue) ? $gwna1->chimeny_issue : '&nbsp;').'</td>';
                                         $PDFHTML .= '</tr>';
                                     $PDFHTML .= '</tbody>';
                                 $PDFHTML .= '</table>';
