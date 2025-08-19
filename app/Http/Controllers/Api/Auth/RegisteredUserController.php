@@ -90,14 +90,38 @@ class RegisteredUserController extends Controller
                 
                 'created_by' => $user->id,
             ]);
+            event(new Registered($user));
+
+            if (!Auth::attempt([
+                'email' => $request->input('email'),
+                'password' => $request->input('password')
+            ])):
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Registration successfull but can not logged in!',
+                ], 200);
+            else:
+                User::where('id', auth()->user()->id)->update([
+                    'last_login_ip' => $request->getClientIp(),
+                    'last_login_at' => Carbon::now()
+                ]);
+
+                $token = $user->createToken('gasCertifiedToken')->accessToken;
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Registration & Login successful',
+                    'token' => $token,
+                    'user' => $user,
+                    'redirect_url' => route('api.user.dashboard'),
+                ], 200);
+            endif;
+        else:
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration Failed!',
+            ], 200);
         endif;
-        event(new Registered($user));
-
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Registration successful!',
-        ], 200);
     }
 
     public function validateReferral(Request $request){
