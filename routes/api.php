@@ -86,9 +86,9 @@ Route::prefix('/v1')->name('api.')->group(function() {
 
         Route::controller(CompanyController::class)->group(function() {
             Route::post('company', 'store');
-            Route::get('company/{company}/edit', 'edit');
-            Route::put('company/{company}', 'update');
-            Route::delete('company/{company}', 'destroy');
+            Route::get('company/{company}/details', 'getDetails');
+            Route::put('company/{company}/update', 'update');
+            Route::delete('company/{company}/destroy', 'destroy');
             Route::get('bank-details', 'getCompanyBankDetails');
         });
 

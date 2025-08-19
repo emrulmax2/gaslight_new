@@ -7,6 +7,7 @@ use App\Http\Requests\Api\UserStoreRequest;
 use App\Http\Requests\Api\UserUpdateRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
+use App\Models\Company;
 use App\Models\PricingPackage;
 use App\Models\User;
 use App\Models\UserPricingPackage;
@@ -17,13 +18,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class UserManagementController extends Controller
 {
-    public function store(UserStoreRequest $request)
+   public function store(UserStoreRequest $request)
     {
-       $package = PricingPackage::find($request->pricing_package_id);
+        $package = PricingPackage::find($request->pricing_package_id);
         $hashPassword = Hash::make($request->input('password'));
 
         $name = $request->input('name');
@@ -120,101 +122,89 @@ class UserManagementController extends Controller
 
                     $theMail = $this->sendMail([$email], $subject, $content);
                     
-                    return response()->json(['message' => 'User successfully created.', 'red' => ''], 200);
+                    return response()->json(['message' => 'User successfully created.'], 200);
                 }catch(Exception $e){
                     $deleted = $stripe->customers->delete($customer->id, []);
 
                     UserPricingPackage::where('user_id', $user->id)->forceDelete();
                     UserPricingPackageInvoice::where('user_id', $user->id)->forceDelete();
-                    $user->companies()->detach($request->user()->company->id);
+                    $user->companies()->detach(Auth::user()->company->id);
                     $user->forceDelete();
 
                     $message = $e->getMessage();
-                    return response()->json(['message' => 'Can not create the user due to payment failure.', 'red' => ''], 304);
+                    return response()->json(['message' => $message], 500);
                 }
             }catch(Exception $e){
                 UserPricingPackage::where('user_id', $user->id)->forceDelete();
                 UserPricingPackageInvoice::where('user_id', $user->id)->forceDelete();
-                $user->companies()->detach($request->user()->company->id);
+                $user->companies()->detach(Auth::user()->company->id);
                 $user->forceDelete();
 
-                $message = $e->getMessage();
-                return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
+                 return response()->json([
+                    'message' => 'Payment failed: ' . $e->getMessage(),
+                    'error_details' => $e
+                ], 500);
             }
         else:
-            return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
+            return response()->json(['message' => 'Somthing went wrong. Please try again later.'], 500);
         endif;
     }
 
-        public function sendMail($emails, $subject, $content, $attachments = []){
-        $configuration = [
-            'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
-            'smtp_port' => env('MAIL_PORT', '587'),
-            'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
-            'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
-            'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
-            
-            'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),
-            'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
-
-        ];
-
-        try{
-            GCEMailerJob::dispatch($configuration, $emails, new GCESendMail($subject, $content, $attachments));
-            $message = 'Mail Success';
-        }catch(Exception $e){
-            $message = 'Mail Error';
-        }
-        return $message;
-    }
 
 
-
-    public function list(Request $request)
+   public function list(Request $request)
     {
         $user = $request->user();
-        $user_company_id = (isset($user->companies[0]->id) && $user->companies[0]->id > 0) ? $user->companies[0]->id : 0;
-        $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
-        $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? $request->query('order') : 'DESC';
-        $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
-        $searchableColumns = Schema::getColumnListing((new User)->getTable());
+        $userCompany = $user->companies->first();
+        $userCompanyId = $userCompany ? $userCompany->id : 0;
 
-        
-        $query = User::leftJoin('company_staff', 'users.id', '=', 'company_staff.user_id')
-        ->leftJoin('companies', 'company_staff.company_id', '=', 'companies.id')
-        ->select('users.*', 'companies.company_name as company_name', 'companies.id as company_id')
-        ->where('company_staff.company_id', $user_company_id)
-        ->whereNot('users.id', $user->id)
-        ->orderBy($sortField, $sortOrder);
-        
+        $sortField = $request->query('sort', 'users.id');
+        $sortOrder = $request->query('order', 'DESC');
+        $searchKey = $request->query('search', '');
+
+        $query = User::with(['companies'])
+            ->whereHas('companies', function($query) use ($userCompanyId) {
+                $query->where('companies.id', $userCompanyId);
+            })
+            ->where('users.id', '!=', $user->id)
+            ->orderBy($sortField, $sortOrder);
+
         if (!empty($searchKey)) {
-            $query->where(function($q) use ($searchableColumns, $searchKey) {
-                foreach ($searchableColumns as $field) {
-                    $q->orWhere($field, 'LIKE', '%' . $searchKey . '%');
-                }
+            $query->where(function($q) use ($searchKey) {
+                $q->where('users.name', 'LIKE', '%' . $searchKey . '%')
+                ->orWhere('users.email', 'LIKE', '%' . $searchKey . '%');
+                
+                $q->orWhereHas('companies', function($companyQuery) use ($searchKey) {
+                    $companyQuery->where('companies.company_name', 'LIKE', '%' . $searchKey . '%')
+                                ->orWhere('companies.company_email', 'LIKE', '%' . $searchKey . '%')
+                                ->orWhere('companies.company_phone', 'LIKE', '%' . $searchKey . '%');
+                });
             });
         }
 
-        $limit = $request->query('limit', 10);
-        $page = $request->query('page', 1);
-        $limit = max(1, (int)$limit);
-        $page = max(1, (int)$page);
+        $limit = max(1, (int)$request->query('limit', 10));
+        $page = max(1, (int)$request->query('page', 1));
         
-        $users = $query->paginate($limit, ['*'], 'page', $page);
+        $users = $query->paginate($limit, ['users.*'], 'page', $page);
 
         $transformedData = $users->getCollection()->map(function($user) {
-            $userPackage = UserPricingPackage::with('package')->where('user_id', $user->id)->orderBy('id', 'DESC')->first();
+            $userPackage = UserPricingPackage::with('package')
+                ->where('user_id', $user->id)
+                ->latest()
+                ->first();
+
+            $company = $user->companies->first();
+
             return [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'company_name' => $user->company_name,
-                'company_id' => $user->company_id,
+                'company' => $company ? $company->toArray() : null,
                 'package' => $userPackage ? [
                     'title' => $userPackage->package->title ?? 'N/A',
                     'active' => $userPackage->active ?? 0,
                     'cancellation_requested' => $userPackage->cancellation_requested ?? 0,
-                    'end_date' => isset($userPackage->end) ? $userPackage->end : null,
+                    'end_date' => $userPackage->end ?? null,
                     'status' => $this->getPackageStatus($userPackage)
                 ] : null
             ];
@@ -249,11 +239,10 @@ class UserManagementController extends Controller
     public function getSingleUser(Request $request, $id)
     {
         try {
-            $userCompanyId = $request->user()->companies->first()->id ?? 0;
+            $userCompanyId = $request->user()->company->first()->id ?? 0;
         
             $user = User::with(['companies' => function($query) use ($userCompanyId) {
-                    $query->where('company_id', $userCompanyId)
-                          ->select('companies.id', 'company_name');
+                    $query->where('company_id', $userCompanyId);
                 }])
                 ->whereHas('companies', function($query) use ($userCompanyId) {
                     $query->where('company_id', $userCompanyId);

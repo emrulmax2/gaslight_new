@@ -17,9 +17,6 @@ use Illuminate\Validation\ValidationException;
 
 class CompanyController extends Controller
 {
-
-
-
     /**
      * Store a newly created resource in storage.
      */
@@ -27,7 +24,6 @@ class CompanyController extends Controller
     {
 
         $validatedData = $request->validated();
-
         $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
         $decodedData = base64_decode($signatureData, true);
 
@@ -81,26 +77,25 @@ class CompanyController extends Controller
             $signature->save();
         }
 
-        return response()->json(['msg' => 'Company created successfully.', 'red' => route('company.dashboard')], 200);
+        return response()->json([
+            'message' => 'Company details stored successfully.', 
+            'data' => $company
+        ], 200);
     }
 
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Company $company)
+    public function getDetails(Company $company)
     {
         $company->load('companyBankDetails');
-
-        // Check if the company exists
         if (!$company) {
             return response()->json([
                 'success' => false,
                 'message' => 'Company not found.',
             ], 404);
         }
-
-        // Return the company details and register bodies
         return response()->json([
             'success' => true,
             'data' => [
@@ -116,12 +111,12 @@ class CompanyController extends Controller
     public function update(UpdateCompanyRequest $request, Company $company)
     {
 
-        //$company = Company::find($request->company_id);
+        $company->load('bank');
         $companyLogoName = (isset($company->company_logo) && !empty($company->company_logo) ? $company->company_logo : '');
-        $companyData = [
-            'company_name' => (!empty($request->company_name) ? $request->company_name : null),
-            'vat_number' => (!empty($request->vat_number) ? $request->vat_number : null),
-            'business_type' => (!empty($request->business_type) ? $request->business_type : null),
+        $company->update([
+            'company_name' => $request->company_name,
+            'vat_number' => $request->vat_number,
+            'business_type' => $request->business_type,
             'company_registration' => ($request->business_type == 'Company' && !empty($request->company_registration) ? $request->company_registration : null),
             'display_company_name' => (!empty($request->display_company_name) && $request->display_company_name > 0 ? $request->display_company_name : 0),
 
@@ -142,8 +137,7 @@ class CompanyController extends Controller
             'company_state' => (!empty($request->company_state) ? $request->company_state : null),
             'company_postal_code' => (!empty($request->company_postal_code) ? $request->company_postal_code : null),
             'company_country' => (!empty($request->company_country) ? $request->company_country : null),
-        ];
-        $companyUpdate = Company::where('id', $company->id)->update($companyData);
+        ]);
 
         if ($request->hasFile('company_logo')):
             if (!empty($company->company_logo) && Storage::disk('public')->exists('companies/'.$company->id.'/'.$companyLogoName)):
@@ -168,7 +162,10 @@ class CompanyController extends Controller
         ]);
 
 
-        return response()->json(['msg' => 'Company Settings updated successfully', 'red' => '', ], 200);
+        return response()->json([
+            'message' => 'Company Settings updated successfully',
+            'data' => $company,
+        ], 200);
     }
 
     /**
@@ -176,15 +173,12 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        // Check if the company exists
         if (!$company) {
             return response()->json([
                 'success' => false,
                 'message' => 'Company not found.',
             ], 404);
         }
-
-        // Delete the company
         $company->delete();
 
         return response()->json([

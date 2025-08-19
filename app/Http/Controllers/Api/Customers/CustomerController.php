@@ -83,7 +83,7 @@ class CustomerController extends Controller
         ];
         $customer = Customer::create($data);
         if($customer->id):
-            $CustomerProperty = CustomerProperty::create([
+            $customerProperty = CustomerProperty::create([
                 'customer_id' => $customer->id,
                 'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
                 'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
@@ -107,20 +107,13 @@ class CustomerController extends Controller
                 'created_by' => $request->user()->id
             ]);
 
-            $customerData = [
-                'id' => $customer->id,
-                'full_name' => $customer->full_name,
-                'address_line_1' => $customer->address_line_1,
-                'address_line_2' => $customer->address_line_2,
-                'postal_code' => $customer->postal_code,
-                'state' => $customer->state,
-                'city' => $customer->city,
-                'country' => $customer->country,
-                'mobile' => (!empty($request->mobile) ? $request->mobile : ''),
-            ];
             return response()->json([
                 'message' => 'Customer successfully created.',
-                'data' => $customerData
+                'data' => [
+                    'customer' => $customer,
+                    'customerProperty' => $customerProperty,
+                    'contact' => $contact
+                ]
             ], 200);
         else:
             return response()->json([
