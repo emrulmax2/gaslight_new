@@ -20,6 +20,7 @@ use Illuminate\Support\Number;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class UserManagementController extends Controller
 {
@@ -154,73 +155,142 @@ class UserManagementController extends Controller
 
    public function list(Request $request)
     {
-        $user = $request->user();
-        $userCompany = $user->companies->first();
-        $userCompanyId = $userCompany ? $userCompany->id : 0;
+        try {
+            $validated = $request->validate([
+                'user_id' => 'required|integer|exists:users,id',
+                'sort' => 'sometimes|string|in:users.id,users.name,users.email,companies.company_name',
+                'order' => 'sometimes|string|in:ASC,DESC',
+                'search' => 'sometimes|string|max:255',
+                'limit' => 'sometimes|integer|min:1|max:100',
+                'page' => 'sometimes|integer|min:1'
+            ]);
 
-        $sortField = $request->query('sort', 'users.id');
-        $sortOrder = $request->query('order', 'DESC');
-        $searchKey = $request->query('search', '');
+            $user = User::findOrFail($request->query('user_id'));
+            
+            if ($user->companies->isEmpty()) {
+                return response()->json([
+                    'error' => 'User has no associated companies',
+                    'data' => [],
+                    'meta' => [
+                        'total' => 0,
+                        'per_page' => 10,
+                        'current_page' => 1,
+                        'last_page' => 1,
+                        'from' => null,
+                        'to' => null,
+                    ]
+                ], 200);
+            }
 
-        $query = User::with(['companies'])
-            ->whereHas('companies', function($query) use ($userCompanyId) {
-                $query->where('companies.id', $userCompanyId);
-            })
-            ->where('users.id', '!=', $user->id)
-            ->orderBy($sortField, $sortOrder);
+            $userCompany = $user->companies->first();
+            $userCompanyId = $userCompany->id;
 
-        if (!empty($searchKey)) {
-            $query->where(function($q) use ($searchKey) {
-                $q->where('users.name', 'LIKE', '%' . $searchKey . '%')
-                ->orWhere('users.email', 'LIKE', '%' . $searchKey . '%');
-                
-                $q->orWhereHas('companies', function($companyQuery) use ($searchKey) {
-                    $companyQuery->where('companies.company_name', 'LIKE', '%' . $searchKey . '%')
-                                ->orWhere('companies.company_email', 'LIKE', '%' . $searchKey . '%')
-                                ->orWhere('companies.company_phone', 'LIKE', '%' . $searchKey . '%');
+            $sortField = $request->query('sort', 'users.id');
+            $sortOrder = $request->query('order', 'DESC');
+            $searchKey = $request->query('search', '');
+
+            $allowedSortFields = ['users.id', 'users.name', 'users.email', 'companies.company_name'];
+            $safeSortField = in_array($sortField, $allowedSortFields) ? $sortField : 'users.id';
+            
+            $safeSortOrder = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+            $query = User::with(['companies'])
+                ->whereHas('companies', function($query) use ($userCompanyId) {
+                    $query->where('companies.id', $userCompanyId);
+                })
+                ->where('users.id', '!=', $user->id)
+                ->orderBy($safeSortField, $safeSortOrder);
+
+            if (!empty($searchKey)) {
+                $query->where(function($q) use ($searchKey) {
+                    $q->where('users.name', 'LIKE', '%' . $searchKey . '%')
+                    ->orWhere('users.email', 'LIKE', '%' . $searchKey . '%');
+                    
+                    $q->orWhereHas('companies', function($companyQuery) use ($searchKey) {
+                        $companyQuery->where('companies.company_name', 'LIKE', '%' . $searchKey . '%')
+                                    ->orWhere('companies.company_email', 'LIKE', '%' . $searchKey . '%')
+                                    ->orWhere('companies.company_phone', 'LIKE', '%' . $searchKey . '%');
+                    });
                 });
+            }
+
+            $limit = max(1, min(100, (int)$request->query('limit', 10)));
+            $page = max(1, (int)$request->query('page', 1));
+            
+            $users = $query->paginate($limit, ['users.*'], 'page', $page);
+
+            $transformedData = $users->getCollection()->map(function($user) {
+                try {
+                    $userPackage = UserPricingPackage::with('package')
+                        ->where('user_id', $user->id)
+                        ->latest()
+                        ->first();
+
+                    $company = $user->companies->first();
+
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'company' => $company ? $company->toArray() : null,
+                        'package' => $userPackage ? [
+                            'title' => $userPackage->package->title ?? 'N/A',
+                            'active' => $userPackage->active ?? 0,
+                            'cancellation_requested' => $userPackage->cancellation_requested ?? 0,
+                            'end_date' => $userPackage->end ?? null,
+                            'status' => $this->getPackageStatus($userPackage)
+                        ] : null
+                    ];
+                } catch (\Exception $e) {
+                    Log::warning('Error transforming user data', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'company' => null,
+                        'package' => null,
+                        'error' => 'Failed to load complete user data'
+                    ];
+                }
             });
+
+            return response()->json([
+                'data' => $transformedData,
+                'meta' => [
+                    'total' => $users->total(),
+                    'per_page' => $users->perPage(),
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'from' => $users->firstItem(),
+                    'to' => $users->lastItem(),
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Invalid query params',
+                'messages' => $e->errors()
+            ], 422);
+            
+        }catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error in user list method: ' . $e->getMessage());
+            
+            return response()->json([
+                'error' => 'Database error occurred',
+                'message' => config('app.debug') ? $e->getMessage() : 'Please try again later'
+            ], 500);
+            
+        } catch (\Exception $e) {
+            Log::error('Unexpected error in user list method: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'An unexpected error occurred',
+                'message' => config('app.debug') ? $e->getMessage() : 'Please try again later'
+            ], 500);
         }
-
-        $limit = max(1, (int)$request->query('limit', 10));
-        $page = max(1, (int)$request->query('page', 1));
-        
-        $users = $query->paginate($limit, ['users.*'], 'page', $page);
-
-        $transformedData = $users->getCollection()->map(function($user) {
-            $userPackage = UserPricingPackage::with('package')
-                ->where('user_id', $user->id)
-                ->latest()
-                ->first();
-
-            $company = $user->companies->first();
-
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'company' => $company ? $company->toArray() : null,
-                'package' => $userPackage ? [
-                    'title' => $userPackage->package->title ?? 'N/A',
-                    'active' => $userPackage->active ?? 0,
-                    'cancellation_requested' => $userPackage->cancellation_requested ?? 0,
-                    'end_date' => $userPackage->end ?? null,
-                    'status' => $this->getPackageStatus($userPackage)
-                ] : null
-            ];
-        });
-
-        return response()->json([
-            'data' => $transformedData,
-            'meta' => [
-                'total' => $users->total(),
-                'per_page' => $users->perPage(),
-                'current_page' => $users->currentPage(),
-                'last_page' => $users->lastPage(),
-                'from' => $users->firstItem(),
-                'to' => $users->lastItem(),
-            ]
-        ]);
     }
 
     private function getPackageStatus($userPackage)
