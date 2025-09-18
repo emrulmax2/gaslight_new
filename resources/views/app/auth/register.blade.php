@@ -43,12 +43,13 @@
                                     </x-base.input-group.text>
                                     <x-base.form-input type="number" id="mobileNumber" name="mobile" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="11" placeholder="07123456789" />
                                 </x-base.input-group>
-                                <div class="acc__input-error error-mobile mt-2 text-danger text-xs"></div>
+                                <div class="acc__input-error error-mobile mt-2 text-danger text-xs" style="display: none;"></div>
                             </div>
 
                             <div class="intro-y col-span-12 mt-5 flex items-center justify-center sm:justify-between">
-                                <x-base.button type="button" disabled class="ml-2 sm:ml-auto w-24 form-wizard-next-btn" variant="primary" >
+                                <x-base.button type="button" disabled class="ml-2 sm:ml-auto w-auto min-w-24 form-wizard-next-btn disabled:cursor-not-allowed" variant="primary" >
                                     Get OTP
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
                             </div>
                         </div>
@@ -81,10 +82,11 @@
                                     Previous
                                 </x-base.button>
                                 <x-base.button type="button"
-                                    class="ml-2 sm:ml-auto w-24 form-wizard-next-btn"
+                                    class="ml-2 sm:ml-auto w-auto min-w-24 form-wizard-next-btn disabled:cursor-not-allowed"
                                     variant="primary"
                                 >
                                     Next
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
                             </div>
                         </div>
@@ -168,10 +170,11 @@
                                     Previous
                                 </x-base.button>
                                 <x-base.button type="button"
-                                    class="ml-2 sm:ml-auto w-24 form-wizard-next-btn"
+                                    class="ml-2 sm:ml-auto w-auto min-w-24 form-wizard-next-btn disabled:cursor-not-allowed"
                                     variant="primary"
                                 >
                                     Next
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
                             </div>
                         </div>
@@ -217,10 +220,11 @@
                                     Previous
                                 </x-base.button>
                                 <x-base.button type="button"
-                                    class="ml-2 sm:ml-auto w-24 form-wizard-next-btn"
+                                    class="ml-2 sm:ml-auto w-auto min-w-24 form-wizard-next-btn disabled:cursor-not-allowed"
                                     variant="primary"
                                 >
                                     Next
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
                             </div>
                         </div>
@@ -252,10 +256,11 @@
                                     Previous
                                 </x-base.button>
                                 <x-base.button type="button"
-                                    class="ml-2 sm:ml-auto w-24 form-wizard-next-btn"
+                                    class="ml-2 sm:ml-auto w-auto min-w-24 form-wizard-next-btn disabled:cursor-not-allowed"
                                     variant="primary"
                                 >
                                     Next
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
                             </div>
                         </div>
@@ -322,7 +327,7 @@
                                 </x-base.button>
                                 <x-base.button type="button"
                                     id="submitTheFormWithSignature"
-                                    class="ml-2 sm:ml-auto w-24 text-white"
+                                    class="ml-2 sm:ml-auto w-auto min-w-24 text-white"
                                     variant="success"
                                 >
                                     Submit

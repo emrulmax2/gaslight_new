@@ -75,13 +75,17 @@ import INTAddressLookUps from '../address_lookup.js';
         }
     });
 
-    $('.form-wizard-next-btn').on('click', function () {
+    $('.form-wizard-next-btn').on('click', function (e) {
+        e.preventDefault();
         var parentFieldset = $(this).parents('.wizard-fieldset');
         let the_id = parentFieldset.attr('id');
         let $theStep = $('#'+the_id);
         var next = $(this);
         let nextWizardStep = true;
 
+        
+        next.attr('disabled', 'disabled');
+        $('.theLoader', next).fadeIn();
         if(the_id == 'stepMobileNumber'){
             let $theMobileInput = $('#mobileNumber');
             let theName = $theMobileInput.attr('name');
@@ -90,7 +94,7 @@ import INTAddressLookUps from '../address_lookup.js';
             if(theMobileNumber.length == 11){
                 var startWith = theMobileNumber.substr(0, 2);
                 if(startWith == '07'){
-                    $theStep.find('.error-mobile').html('');
+                    $theStep.find('.error-mobile').fadeOut().html('');
 
                     $.ajax({
                         type: 'POST',
@@ -99,6 +103,10 @@ import INTAddressLookUps from '../address_lookup.js';
                         headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                         async: false,
                         success: function(data) {
+                            next.removeAttr('disabled');
+                            next.find('.theLoader').fadeOut();
+
+                            $theStep.find('.error-mobile').fadeOut().html('');
                             $theStep.find('.otpCodes').val('');
                             $('#stepVerifiedOtp .mobileNumberShow').text('+44('+theMobileNumber.substr(0, 1)+')'+theMobileNumber.substr(1, 10));
                             $('#countDownHtml').fadeOut('fast', function(){
@@ -107,8 +115,13 @@ import INTAddressLookUps from '../address_lookup.js';
                             countDownClock('countdown', 180);
                             nextWizardStep = true;
                         },
-                        error:function(e){
-                            $theStep.find('.error-mobile').html('Mobile number already exist.');
+                        error:function(jqXHR, textStatus, errorThrown){
+                            var responseData = JSON.parse(jqXHR.responseText);
+                            $theStep.find('.error-mobile').fadeIn().html(responseData.message);
+                            
+                            next.removeAttr('disabled');
+                            next.find('.theLoader').fadeOut();
+
                             clearInterval(countDowns);
                             $('#countdown').fadeOut().html('');
                             $theStep.find('.otpCodes').val('');
@@ -117,12 +130,18 @@ import INTAddressLookUps from '../address_lookup.js';
                         }
                     });
                 }else{
-                    $theStep.find('.error-mobile').html('The number should began with 07.');
+                    next.removeAttr('disabled');
+                    next.find('.theLoader').fadeOut();
+
+                    $theStep.find('.error-mobile').fadeIn().html('The number should began with 07.');
                     nextWizardStep = false;
                 }
             }else{
+                next.removeAttr('disabled');
+                next.find('.theLoader').fadeOut();
+
                 $theStep.find('.form-wizard-next-btn').attr('disabled', 'disabled');
-                $theStep.find('.error-mobile').html('Please enter an 11 digit number.');
+                $theStep.find('.error-mobile').fadeOut().html('Please enter an 11 digit number.');
                 nextWizardStep = false;
             }
         }else if(the_id == 'stepVerifiedOtp'){
@@ -142,16 +161,25 @@ import INTAddressLookUps from '../address_lookup.js';
                     headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                     async: false,
                     success: function(data) {
+                        next.removeAttr('disabled');
+                        next.find('.theLoader').fadeOut();
+
                         $theStep.find('.otpCodes').val('');
                         nextWizardStep = true;
                     },
                     error:function(e){
+                        next.removeAttr('disabled');
+                        next.find('.theLoader').fadeOut();
+
                         $theStep.find('.error-otp').html('OTP does not match.');
                         nextWizardStep = false;
                         console.log('Error');
                     }
                 });
             }else{
+                next.removeAttr('disabled');
+                next.find('.theLoader').fadeOut();
+
                 $theStep.find('.error-otp').html('Please enter a 4 digit OTP.');
                 nextWizardStep = false;
             }
@@ -232,9 +260,11 @@ import INTAddressLookUps from '../address_lookup.js';
                     headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                     async: false,
                     success: function(data) {
+
                         $theStep.find('.acc__input-error.error-email').html('');
                     },
                     error:function(e){
+
                         $theStep.find('.acc__input-error.error-email').html('Email id already exist.');
                         theSetpError += 1;
                         console.log('Error');
@@ -245,6 +275,8 @@ import INTAddressLookUps from '../address_lookup.js';
             if(theSetpError > 0){
                 nextWizardStep = false;
             }
+            next.removeAttr('disabled');
+            next.find('.theLoader').fadeOut();
         }else if(the_id == 'stepContactDetails'){
             let theSetpError = 0;
 
@@ -263,6 +295,8 @@ import INTAddressLookUps from '../address_lookup.js';
             if(theSetpError > 0){
                 nextWizardStep = false;
             }
+            next.removeAttr('disabled');
+            next.find('.theLoader').fadeOut();
         }else if(the_id == 'stepOtherInfo'){
             let theSetpError = 0;
 
@@ -305,6 +339,8 @@ import INTAddressLookUps from '../address_lookup.js';
             if(theSetpError > 0){
                 nextWizardStep = false;
             }
+            next.removeAttr('disabled');
+            next.find('.theLoader').fadeOut();
         }
          
         if (nextWizardStep) {

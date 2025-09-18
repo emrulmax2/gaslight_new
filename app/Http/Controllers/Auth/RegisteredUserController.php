@@ -48,6 +48,9 @@ class RegisteredUserController extends Controller
         ]);
 
         if($user->id):
+            $regOtp = RegistrationOtp::where('mobile', $request->input('mobile'))->orderBy('id', 'desc')->get()->first();
+            $regOtp->update(['expire_at' => now()]);
+
             $vat_number_check = (isset($request->vat_number_check) && $request->vat_number_check > 0 ? $request->vat_number_check : 0);
             $business_type = (!empty($request->business_type) ? $request->business_type : null);
             $company = Company::create([
@@ -251,9 +254,12 @@ class RegisteredUserController extends Controller
             return response()->json(['message' => 'Mobile number already exist.'], 422);
         }else{
             $regOtp = $this->createOtp($MobileNumber);
-            $regOtp->sendSMS($MobileNumber);
-
-            return response()->json(['message' => 'Otp successfully created and sent to your phone.'], 200);
+            $response = $regOtp->sendSMS($MobileNumber);
+            if(!isset($response['success']) || !$response['success']):
+                return response()->json(['message' => 'Something went wrong. Please try later.', 'response' => $response], 422);
+            else:
+                return response()->json(['message' => 'Otp successfully created and sent to your phone.', 'response' => $response], 200);
+            endif;
         }
     }
 
