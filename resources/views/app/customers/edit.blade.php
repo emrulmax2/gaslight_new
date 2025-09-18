@@ -31,12 +31,12 @@
                     <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->company_name) ? $customer->company_name : 'N/A' }}</span>
                 </div>
             </a>
-            <a href="javascript:void(0);" data-model="customer" data-type="text" data-required="0" data-title="VAT Number" data-field="vat_no" data-value="{{ $customer->vat_no }}" class="fieldValueToggler flex w-full items-start px-5 py-3">
+            <!-- <a href="javascript:void(0);" data-model="customer" data-type="text" data-required="0" data-title="VAT Number" data-field="vat_no" data-value="{{ $customer->vat_no }}" class="fieldValueToggler flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="hash" />
                 <div>
                     <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->vat_no) ? $customer->vat_no : 'N/A' }}</span>
                 </div>
-            </a>
+            </a> -->
         </div>
     </div>
 
@@ -75,12 +75,12 @@
                     <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->contact->email) ? $customer->contact->email : 'N/A' }}</span>
                 </div>
             </a>
-            <a href="javascript:void(0);" data-model="contact" data-type="email" data-required="0" data-title="Other Email" data-field="other_email" data-value="{{ isset($customer->contact->other_email) ? $customer->contact->other_email : 'N/A' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+            <!-- <a href="javascript:void(0);" data-model="contact" data-type="email" data-required="0" data-title="Other Email" data-field="other_email" data-value="{{ isset($customer->contact->other_email) ? $customer->contact->other_email : 'N/A' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mails" />
                 <div>
                     <span class="font-normal text-slate-400 text-xs block">{{ isset($customer->contact->other_email) ? $customer->contact->other_email : 'N/A' }}</span>
                 </div>
-            </a>
+            </a> -->
         </div>
     </div>
 

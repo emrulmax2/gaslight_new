@@ -60,7 +60,7 @@
                     </div>
                 </div>
             </div>
-            <div class="px-2 py-3 bg-white mt-2">
+            {{--<div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">VAT Number</div>
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>--}}
         </div>
 
         <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2 theAddressWrap" id="customerAddressWrap">
@@ -204,7 +204,7 @@
                     </div>
                 </div>
             </div>
-            <div class="px-2 py-3 bg-white mt-2">
+            {{--<div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Other Email Address</div>
@@ -214,7 +214,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>--}}
         </div>
 
         <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2">

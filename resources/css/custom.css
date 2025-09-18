@@ -290,6 +290,7 @@
     margin: 0;
     padding: 0;
     font-size: 0;
+    position: absolute;
 }
 .gsfSignature .sign-pad-button-clear{
     margin: 0;
@@ -302,6 +303,7 @@
 .gsfSignature .e-signpad > div {
     display: block;
     width: 100%;
+    position: relative;
 }
 .gsfSignatureBtns button.active:hover{
     background: #259E94 !important;
@@ -537,4 +539,15 @@
     border-radius: 0;
     padding: 0;
     min-height: initial;
+}
+
+
+.form-wizard input[type=number]::-webkit-inner-spin-button, 
+.form-wizard input[type=number]::-webkit-outer-spin-button ,
+#otpLoginForm input[type=number]::-webkit-inner-spin-button, 
+#otpLoginForm input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
 }
