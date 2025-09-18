@@ -99,17 +99,20 @@ import INTAddressLookUps from '../address_lookup.js';
                         headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                         async: false,
                         success: function(data) {
+                            $theStep.find('.otpCodes').val('');
                             $('#stepVerifiedOtp .mobileNumberShow').text('+44('+theMobileNumber.substr(0, 1)+')'+theMobileNumber.substr(1, 10));
                             $('#countDownHtml').fadeOut('fast', function(){
                                 $('#resendOtp', this).removeClass('processing opacity-7');
                             });
                             countDownClock('countdown', 180);
+                            nextWizardStep = true;
                         },
                         error:function(e){
                             $theStep.find('.error-mobile').html('Mobile number already exist.');
                             clearInterval(countDowns);
                             $('#countdown').fadeOut().html('');
-                            nextWizardStep = true;
+                            $theStep.find('.otpCodes').val('');
+                            nextWizardStep = false;
                             console.log('Error');
                         }
                     });
@@ -313,6 +316,7 @@ import INTAddressLookUps from '../address_lookup.js';
     $('.form-wizard-previous-btn').on('click', function () {
         var prev = $(this);
         let the_id = prev.parents('.wizard-fieldset').attr('id');
+        let $theStep = prev.parents('.wizard-fieldset');
         prev.parents('.wizard-fieldset').removeClass("show");
         prev.parents('.wizard-fieldset').prev('.wizard-fieldset').addClass("show");
 
@@ -322,6 +326,7 @@ import INTAddressLookUps from '../address_lookup.js';
             });
             clearInterval(countDowns);
             $('#countdown').fadeOut().html('');
+            $theStep.find('.otpCodes').val('');
         }else if(the_id == 'stepBusinessInfo'){
             $('#countDownHtml').fadeIn('fast', function(){
                 $('#resendOtp', this).removeClass('processing opacity-7');
@@ -508,7 +513,7 @@ import INTAddressLookUps from '../address_lookup.js';
 
 
     let countDowns;
-    function countDownClock(element_id, timeLeft = 30) {
+    function countDownClock(element_id, timeLeft = 180) {
         let $element = $('#'+element_id);
         $element.fadeIn().html('');
         countDowns = setInterval(function() { // removed var keyword
