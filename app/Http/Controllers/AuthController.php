@@ -161,7 +161,7 @@ class AuthController extends Controller
         ]);
 
         $userOtp = $this->generateOtp($request->mobile);
-        //$userOtp->sendSMS($request->mobile_no);
+        $userOtp->sendSMS($request->mobile_no);
 
         return response()->json(['msg' => 'OTP has been sent on your mobile number', 'user_id' => $userOtp->user_id], 200);
     }

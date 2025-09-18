@@ -251,7 +251,7 @@ class RegisteredUserController extends Controller
             return response()->json(['message' => 'Mobile number already exist.'], 422);
         }else{
             $regOtp = $this->createOtp($MobileNumber);
-            //$regOtp->sendSMS($MobileNumber);
+            $regOtp->sendSMS($MobileNumber);
 
             return response()->json(['message' => 'Otp successfully created and sent to your phone.'], 200);
         }
