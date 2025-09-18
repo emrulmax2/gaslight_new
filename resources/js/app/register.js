@@ -334,7 +334,7 @@ import INTAddressLookUps from '../address_lookup.js';
             clearInterval(countDowns);
             $('#countdown').fadeOut().html('');
         }else if(the_id == 'stepSignature'){
-            $("#registerSuccess").fadeOut();
+            $("#registerSuccess").fadeOut(); 
         }
     });
 
