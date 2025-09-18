@@ -40,13 +40,21 @@ Route::prefix('/v1')->name('api.')->group(function() {
 
 
     Route::post('/login', [LoginController::class, 'login']);
-  
-    // Public route for registration
+    Route::post('/login/otp-login',[LoginController::class, 'otpLogin']);
+    Route::post('/login/send-otp',[LoginController::class, 'sendOtp']);
 
+
+    
+    // Public route for registration
+    
     // for user creation
     Route::controller(RegisteredUserController::class)->group(function() {
         Route::post('register', 'store')->name('register.store');
         Route::post('register/validate-referral', 'validateReferral')->name('register.validate.referral');
+        Route::post('register/send-otp', 'generateOtp')->name('register.generate.otp');
+        Route::post('register/validate-otp', 'validateOtp')->name('register.validate.otp');
+        Route::post('register/validate-email', 'validateEmail')->name('register.validate.email');
+        Route::post('register-new', 'registerNew')->name('register.new');
     });
 
     // Protected routes (require Bearer Token)

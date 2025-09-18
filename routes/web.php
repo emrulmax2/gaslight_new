@@ -94,8 +94,11 @@ Route::post('/email/resend', function (Request $request) {
 
 Route::controller(AuthController::class)->middleware(loggedin::class)->group(function() {
     Route::get('login', 'loginView')->name('login');
+    Route::get('login-with-email', 'emailLoginView')->name('login.with.email');
     Route::post('login', 'login')->name('login.check');
-    
+
+    Route::post('login/otp-login', 'otpLogin')->name('login.otp.check');
+    Route::post('login/send-otp', 'sendOtp')->name('login.send.otp');
 });
 
 Route::prefix('/super-admin')->name('superadmin.')->group(function() {
@@ -145,6 +148,10 @@ Route::controller(RegisteredUserController::class)->middleware(loggedin::class)-
     Route::get('register', 'index')->name('register.index');
     Route::post('register', 'store')->name('register');
     Route::post('register/validate-referral', 'validateReferral')->name('register.validate.referral');
+
+    Route::post('register/generate-top', 'generateOtp')->name('register.generate.otp');
+    Route::post('register/validate-top', 'validateOtp')->name('register.validate.otp');
+    Route::post('register/validate-email', 'validateEmail')->name('register.validate.email');
 });
 
 Route::middleware(Authenticate::class)->group(function() {
@@ -438,6 +445,22 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('settings/user-subscriptions-manager/list', 'list')->name('user.subscriptions.list');
         Route::get('settings/user-subscriptions-manager/download-invoice/{inv}', 'downloadInvoice')->name('user.subscriptions.download.invoice');
     });
+
+    Route::controller(ProfileController::class)->group(function() {
+        Route::get('profile', 'index')->name('profile');
+        Route::post('profile/update', 'update')->name('profile.update');
+        Route::post('profile-draw-signature/','drawSignatureStore')->name('profile.draw-signature'); 
+        Route::post('profile-signature-upload/','fileUploadStore')->name('profile.upload-signature');
+
+        Route::post('profile/update-data','updateData')->name('profile.update.data');
+        Route::post('profile/update-password','updatePassword')->name('profile.update.password');
+        Route::post('profile/update-photo','updatePhoto')->name('profile.update.photo');
+    });
+
+
+    Route::controller(UserController::class)->group(function() {
+        Route::post('user/update/{user}', 'update')->name('user.update');
+    });
 });
 
 
@@ -445,23 +468,6 @@ Route::controller(FileUploadController::class)->group(function() {
     Route::post('/file-upload', 'upload')->name('file.upload');
     Route::delete('/file-delete/{id}', 'delete')->name('file.delete');
 });
-
-Route::controller(ProfileController::class)->group(function() {
-    Route::get('profile', 'index')->name('profile');
-    Route::post('profile/update', 'update')->name('profile.update');
-    Route::post('profile-draw-signature/','drawSignatureStore')->name('profile.draw-signature'); 
-    Route::post('profile-signature-upload/','fileUploadStore')->name('profile.upload-signature');
-
-    Route::post('profile/update-data','updateData')->name('profile.update.data');
-    Route::post('profile/update-password','updatePassword')->name('profile.update.password');
-    Route::post('profile/update-photo','updatePhoto')->name('profile.update.photo');
-});
-
-
-Route::controller(UserController::class)->group(function() {
-    Route::post('user/update/{user}', 'update')->name('user.update');
-});
-
 
 Route::view('calculator', 'app.calculator.index')->name('calculator');
 

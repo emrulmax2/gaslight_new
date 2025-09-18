@@ -15,8 +15,7 @@
             <div class="intro-x z-10 flex flex-1 items-center lg:block lg:text-center">
                 <x-base.button
                     class="h-10 w-10 rounded-full"
-                    variant="primary"
-                >
+                    variant="primary">
                     1
                 </x-base.button>
                 <div class="ml-3 text-base font-medium lg:mx-auto lg:mt-3 lg:w-32">

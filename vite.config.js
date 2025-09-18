@@ -237,6 +237,9 @@ export default defineConfig({
                 "resources/js/app/users/profile.js",
                 "resources/js/app/users/subscription.js",
                 "resources/js/app/users/initial-staff-setup.js",
+
+                "resources/js/app/register.js",
+                "resources/js/app/otp-login.js",
             ],
             refresh: true,
         }),

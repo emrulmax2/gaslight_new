@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Option;
 use App\Models\User;
+use App\Models\UserOtp;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -29,6 +30,18 @@ class AuthController extends Controller
 
         $env= env('APP_ENV');
         return view('app.auth.login', [
+            'env' => $env,
+            'users' => $users,
+            'opt' => Option::where('category', 'SITE_SETTINGS')->pluck('value', 'name')->toArray()
+        ]);
+    }
+    public function emailLoginView()
+    {
+        // Fetch users data
+        $users = User::all();
+
+        $env= env('APP_ENV');
+        return view('app.auth.login-email', [
             'env' => $env,
             'users' => $users,
             'opt' => Option::where('category', 'SITE_SETTINGS')->pluck('value', 'name')->toArray()
@@ -139,6 +152,66 @@ class AuthController extends Controller
 
        return response()->json(['success' => 'Registration successful!'], 200);
 
+    }
+
+
+    public function sendOtp(Request $request){
+        $request->validate([
+            'mobile' => 'required|exists:users,mobile'
+        ]);
+
+        $userOtp = $this->generateOtp($request->mobile);
+        //$userOtp->sendSMS($request->mobile_no);
+
+        return response()->json(['msg' => 'OTP has been sent on your mobile number', 'user_id' => $userOtp->user_id], 200);
+    }
+
+
+    public function generateOtp($mobile){
+        $user = User::where('mobile', $mobile)->first();
+
+        $userOtp = UserOtp::where('user_id', $user->id)->latest()->first();
+        $now = now();
+        if($userOtp && $now->isBefore($userOtp->expire_at)){
+            return $userOtp;
+        }
+
+        return UserOtp::create([
+            'user_id' => $user->id,
+            'otp' => rand(1000, 9999),
+            'expire_at' => $now->addMinutes(10)
+        ]);
+    }
+
+    public function otpLogin(Request $request){
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'otp' => 'required'
+        ]);
+
+        $userOtp = UserOtp::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
+        $now = now();
+        if (!$userOtp) {
+            return response()->json(['message' => 'Invalid OTP.'], 304);
+        }else if($userOtp && $now->isAfter($userOtp->expire_at)){
+            return response()->json(['message' => 'Your OTP has been expired.'], 304);
+        }
+
+        
+        $user = User::whereId($request->user_id)->first();
+        if($user){
+            $userOtp->update(['expire_at' => now()]);
+            Auth::login($user);
+
+            $user->update([
+                'last_login_ip' => $request->getClientIp(),
+                'last_login_at' => Carbon::now()
+            ]);
+
+            return response()->json(['message' => 'Successfully logged in.', 'first_login' => $user->first_login], 200);
+        }
+
+        return response()->json(['message' => 'Invalid OTP.'], 304);
     }
     
 }

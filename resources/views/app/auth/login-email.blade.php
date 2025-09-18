@@ -34,58 +34,7 @@
                     </div>
                     
                     <div class="mt-6">
-                        <form id="otpLoginForm" action="#" method="post">
-                            <input type="hidden" name="user_id" id="uid" value="0"/>
-                            <div id="mobileNumberWrap">
-                                <div class="mobileNumberInput">
-                                    <x-base.form-label>Mobile Number <span class="text-danger">*</span></x-base.form-label>
-                                    <x-base.input-group inputGroup>
-                                        <x-base.input-group.text id="input-group-email" class="inline-flex items-center pr-5">
-                                            <img src="{{ Vite::asset('resources/images/flags/uk.svg') }}" class="w-5 h-auto mr-2" alt="UK Flag"/>
-                                            +44
-                                        </x-base.input-group.text>
-                                        <x-base.form-input type="number" id="mobileNumber" name="mobile" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="11" placeholder="07123456789" />
-                                    </x-base.input-group>
-                                    <div class="acc__input-error error-mobile mt-2 text-danger text-xs" style="display: none;"></div>   
-                                </div>
-                                <div class="mt-5">
-                                    <x-base.button id="sendOtp" class="w-full" variant="primary">
-                                        <span class="signin-text">Send OTP</span>
-                                        <x-base.loading-icon class="h-4 w-4 ml-2 hidden login__loading" icon="oval" color="#fff"/>
-                                    </x-base.button>
-                                </div>
-                            </div>
-                            <div id="otpWrap" style="display: none;">
-                                <div class="otpInput">
-                                    <div id="countdown" class="font-medium text-center text-success leading-none mb-3" style="display: none;">03:00</div>
-                                    <div class="flex justify-center items-center">
-                                        <x-base.form-input id="otp1" name="otp_1" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
-                                        <x-base.form-input id="otp2" name="otp_2" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
-                                        <x-base.form-input id="otp3" name="otp_3" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
-                                        <x-base.form-input id="otp4" name="otp_4" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
-                                    </div>
-                                    <div class="acc__input-error error-otp mt-2 text-danger text-center text-xs" style="display: none;"></div>
-                                    <div id="countDownHtml" class="text-center leading-none mt-5" style="display: none;">
-                                        Don't received the OTP? <a href="javascript:void(0);" class="font-medium text-primary underline" id="resendOtp">RESEND</a>
-                                    </div>
-                                </div>
-                                <div class="mt-5">
-                                    <x-base.button type="submit" id="loginWithOtp" class="w-full text-white" variant="success">
-                                        <span class="signin-text">Login</span>
-                                        <x-base.loading-icon class="h-4 w-4 ml-2 hidden login__loading" icon="oval" color="#fff"/>
-                                    </x-base.button>
-                                </div>
-                            </div>
-                        </form>
-                        <div class="border-t border-slate-200 h-[1px] relative mt-7 mb-7">
-                            <span class="font-medium leading-none italic absolute left-0 right-0 mx-auto w-[35px] top-[-6px] bg-white text-center">OR</span>
-                        </div>
-                        <x-base.button as="a" href="{{ route('login.with.email') }}" class="w-full" variant="outline-success">
-                            <x-base.lucide class="w-4 h-4 mr-2" icon="mail" />
-                            <span class="signin-text">Continue with Email</span>
-                        </x-base.button>
-
-                        {{--<form id="login-form">
+                        <form id="login-form">
                             <x-base.form-label>Email*</x-base.form-label>
                             <x-base.form-input id="email"
                                 class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5 login__input"
@@ -135,7 +84,15 @@
                             >
                                 Sign Up
                             </a>-->
-                        </div> --}}
+                        </div>
+                        
+                        <div class="border-t border-slate-200 h-[1px] relative mt-7 mb-7">
+                            <span class="font-medium leading-none italic absolute left-0 right-0 mx-auto w-[35px] top-[-6px] bg-white text-center">OR</span>
+                        </div>
+                        <x-base.button as="a" href="{{ route('login') }}" class="w-full" variant="outline-success">
+                            <x-base.lucide class="w-4 h-4 mr-2" icon="smartphone" />
+                            <span class="signin-text">Continue with Mobile</span>
+                        </x-base.button>
                     </div>
                 </div>
             </div>

@@ -38,7 +38,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
         'oil_registration_number',
         'installer_ref_no',
         'parent_id',
-        'role'
+        'role',
+        'mobile',
+        'first_login'
     ];
 
     /**

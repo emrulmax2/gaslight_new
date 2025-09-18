@@ -176,7 +176,7 @@ class CustomerController extends Controller
             'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
-            'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
+            //'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
             'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
             'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
@@ -211,7 +211,7 @@ class CustomerController extends Controller
                 'mobile' => (!empty($request->mobile) ? $request->mobile : null),
                 'phone' => (!empty($request->phone) ? $request->phone : null),
                 'email' => (!empty($request->email) ? $request->email : null),
-                'other_email' => (!empty($request->other_email) ? $request->other_email : null),
+                //'other_email' => (!empty($request->other_email) ? $request->other_email : null),
                 'created_by' => auth()->user()->id
             ]);
 
