@@ -161,9 +161,13 @@ class AuthController extends Controller
         ]);
 
         $userOtp = $this->generateOtp($request->mobile);
-        $userOtp->sendSMS($request->mobile_no);
+        $response = $userOtp->sendSMS($request->mobile);
 
-        return response()->json(['msg' => 'OTP has been sent on your mobile number', 'user_id' => $userOtp->user_id], 200);
+        if(!isset($response['success']) || !$response['success']):
+            return response()->json(['message' => 'Something went wrong. Please try later.', 'user_id' => 0, 'response' => $response], 422);
+        else:
+            return response()->json(['msg' => 'OTP has been sent on your mobile number', 'user_id' => $userOtp->user_id], 200);
+        endif;
     }
 
 

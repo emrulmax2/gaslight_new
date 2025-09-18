@@ -34,12 +34,12 @@
                         })
                     },
                     error:function(jqXHR, textStatus, errorThrown){
-                        const errorMessage = jqXHR.responseText;
+                        var responseData = JSON.parse(jqXHR.responseText);
 
                         $theForm.find('#uid').val(0);
                         $theBtn.removeAttr('disabled');
                         $theBtn.find('.login__loading').fadeOut();
-                        $theForm.find('.error-mobile').fadeIn().html('Invalid mobile number given.');
+                        $theForm.find('.error-mobile').fadeIn().html(responseData.message);
                     }
                 });
             }else{
