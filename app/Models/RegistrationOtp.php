@@ -34,8 +34,10 @@ class RegistrationOtp extends Model
                             'text' => $message
                         ]);
             info('SMS Sent Successfully.');
+            return ['success' => true, 'message' => 'SMS Sent Successfully.'];
         } catch (Exception $e) {
             info("Error: ". $e->getMessage());
+            return ['success' => false, 'message' => "Error: ". $e->getMessage()];
         }
     }
 }
