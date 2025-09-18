@@ -30,7 +30,7 @@
                         $theForm.find('#mobileNumberWrap').fadeOut('fast', function(){
                             $theForm.find('#otpWrap').fadeIn();
 
-                            countDownClock('countdown', 10);
+                            countDownClock('countdown', 180);
                         })
                     },
                     error:function(jqXHR, textStatus, errorThrown){

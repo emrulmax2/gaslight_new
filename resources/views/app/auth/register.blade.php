@@ -57,7 +57,7 @@
                         <div class="text-base font-medium">OTP Verification</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5">
                             <div class="intro-y col-span-12">
-                                Enter the code from the SMS we sent to <span class="mobileNumberShow font-bold text-dark">+4407123456789</span>
+                                Enter the code from the SMS we sent to <span class="mobileNumberShow font-bold text-dark"></span>
                             </div>
                             <div class="intro-y col-span-12">
                                 <div id="countdown" class="font-medium text-center text-success leading-none mb-3">03:00</div>
