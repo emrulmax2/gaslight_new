@@ -142,6 +142,20 @@ import INTAddressLookUps from '../address_lookup.js';
         }
     })
 
+
+    $('#companyInformationForm #business_type').on('change', function(){
+        console.log('changed');
+        if($(this).val() == 'Company'){
+            $('#companyInformationForm .registrationWrap').fadeIn('fast', function(){
+                $('input', this).val('');
+            });
+        }else{
+            $('#companyInformationForm .registrationWrap').fadeOut('fast', function(){
+                $('input', this).val('');
+            });
+        }
+    });
+
     // Store Company Information
     $('#companyInformationForm').on('submit', function(e){
         e.preventDefault();
