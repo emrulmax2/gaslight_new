@@ -23,22 +23,27 @@ var BoilerBrandListTable = (function () {
                 sortMode: "remote",
                 printAsHtml: true,
                 printStyled: true,
-                paginationSize: 10,
-                paginationSizeSelector: [true, 5, 10, 20, 30, 40],
+                paginationSize: 50,
+                paginationSizeSelector: [true, 20, 30, 50, 100, 200, 500],
                 layout: "fitColumns",
                 responsiveLayout: "collapse",
                 placeholder: "No matching records found",
-
                 columns: [
                     
                     {
                         title: 'Sl',
                         field: 'id',
                         headerHozAlign: 'left',
+                        width: 120
                     },
                     {
                         title: 'Name',
                         field: 'name',
+                        headerHozAlign: 'left',
+                    },
+                    {
+                        title: 'Number of Manuals',
+                        field: 'manuals',
                         headerHozAlign: 'left',
                     },
                     {

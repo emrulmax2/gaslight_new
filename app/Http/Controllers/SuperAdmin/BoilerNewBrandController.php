@@ -118,10 +118,10 @@ class BoilerNewBrandController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(BoilerNewBrand $boilerBrand)
+    public function show($id)
     {
         return view('app.superadmin.boiler_new_brands.show',[
-            'boilerBrand' => $boilerBrand,
+            'boilerBrand' => BoilerNewBrand::find($id),
         ]);
     }
 
@@ -213,6 +213,7 @@ class BoilerNewBrandController extends Controller
                     'id' => $list->id,
                     'sl' => $i,
                     'name' => $list->name,
+                    'manuals' => (isset($list->boilerNewManuals) && $list->boilerNewManuals->count() > 0 ? $list->boilerNewManuals->count() : ''),
                     'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
                 ];
                 $i++;
