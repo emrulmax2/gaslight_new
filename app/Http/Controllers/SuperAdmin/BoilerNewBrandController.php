@@ -63,7 +63,7 @@ class BoilerNewBrandController extends Controller
                 $gcNo  = $data[1] ?? null;
                 $pdfUrl = $data[2] ?? null;
 
-                if (empty($gcNo) || empty($pdfUrl)) {
+                if (empty($pdfUrl)) {
                     $results[] = "Skipped row {$row}: Invalid GC No or PDF URL";
                     continue;
                 }
