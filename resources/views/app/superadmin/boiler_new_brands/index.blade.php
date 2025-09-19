@@ -8,9 +8,6 @@
     <div class="intro-y mt-8 flex items-center flex-row">
         <h2 class="mr-auto text-lg font-medium">Brand List</h2>
         <div class="flex mt-0 w-auto">
-            <x-base.button as="a" href="{{ route('superadmin.boiler-new-brand.index') }}" class="shadow-md mr-2" variant="success">
-                <x-base.lucide class="h-4 w-4 mr-3" icon="plus-circle" /> Boiler Manuals
-            </x-base.button>
             <x-base.button as="a" href="{{ route('superadmin.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
@@ -51,7 +48,7 @@
     <!-- END: HTML Table Data -->
 
     
-    @include('app.superadmin.boiler_brands.modal')
+    @include('app.superadmin.boiler_new_brands.modal')
     @include('app.action-modals')
 @endsection
 
@@ -70,6 +67,6 @@
 
 @pushOnce('scripts')
 
-    @vite('resources/js/app/boiler-brands/list.js')
-    @vite('resources/js/app/boiler-brands/crud.js')
+    @vite('resources/js/app/boiler-new-brands/list.js')
+    @vite('resources/js/app/boiler-new-brands/crud.js')
 @endPushOnce

@@ -149,17 +149,36 @@ class RegisteredUserController extends Controller
                 'message' => 'Mobile number already exist.'
             ], 422);
         }else{
-            $theOtp = rand(1000, 9999);
-            // $otp = RegistrationOtp::create([
-            //     'mobile' => $MobileNumber,
-            //     'otp' => $theOtp
-            // ]);
-            return response()->json([
-                'success' => true,
-                'message' => 'Otp successfully created and sent to your phone.',
-                'otp' => $theOtp
-            ], 200);
+            $theOtp = $this->createOtp($request->mobile);
+            $response = $theOtp->sendSMS($request->mobile);
+
+             if(!isset($response['success']) || !$response['success']):
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong. Please try later.'
+                ], 422);
+            else:
+                 return response()->json([
+                    'success' => true,
+                    'message' => 'Otp successfully created and sent to your phone.',
+                    'otp' => $theOtp->otp
+                ], 200);
+            endif;
         }
+    }
+
+    public function createOtp($mobile){
+        $regOtp = RegistrationOtp::where('mobile', $mobile)->latest()->first();
+        $now = now();
+        if($regOtp && $now->isBefore($regOtp->expire_at)){
+            return $regOtp;
+        }
+
+        return RegistrationOtp::create([
+            'mobile' => $mobile,
+            'otp' => rand(1000, 9999),
+            'expire_at' => $now->addMinutes(10)
+        ]);
     }
 
     public function validateOtp(Request $request){
@@ -230,6 +249,11 @@ class RegisteredUserController extends Controller
         ]);
 
         if($user->id):
+            $regOtp = RegistrationOtp::where('mobile', $request->input('mobile'))->orderBy('id', 'desc')->get()->first();
+            if ($regOtp) {
+                $regOtp->update(['expire_at' => now()]);
+            }
+
             $vat_number_check = (isset($request->vat_number_check) && $request->vat_number_check > 0 ? $request->vat_number_check : 0);
             $business_type = (!empty($request->business_type) ? $request->business_type : null);
             $company = Company::create([
@@ -258,7 +282,6 @@ class RegisteredUserController extends Controller
                 'user_id' => $user->id,
                 'code' => $prefix.random_int(100000, 999999),
                 'active' => 1,
-
                 'created_by' => $user->id,
             ]);
 
@@ -286,7 +309,6 @@ class RegisteredUserController extends Controller
                 'end' => date('Y-m-d', strtotime('+'.$TRAIL_PERIOD.' days')),
                 'price' => (isset($defaultPeriod->price) && $defaultPeriod->price > 0 ? $defaultPeriod->price : 0),
                 'active' => 1,
-                
                 'created_by' => $user->id,
             ]);
 
