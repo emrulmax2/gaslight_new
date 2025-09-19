@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Models\SuperAdmin;
 use App\Http\Requests\StoreSuperAdminRequest;
+use App\Http\Requests\SuperAdminLoginRequest;
 use App\Http\Requests\UpdateSuperAdminRequest;
 use App\Models\Option;
 use Carbon\Carbon;
@@ -33,7 +34,7 @@ class SuperAdminAuthController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function login(LoginRequest $request)
+    public function login(SuperAdminLoginRequest $request)
     {
         if (!Auth::guard('superadmin')->attempt([
             'email' => $request->email,
