@@ -53,6 +53,8 @@ use App\Http\Controllers\Records\LandlordGasSafetyController;
 use App\Http\Controllers\Records\NewRecordController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
+use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
+use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Middleware\CheckSubscription;
@@ -132,6 +134,24 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
             Route::post('boiler-manual-import', 'import')->name('boiler-manual.import'); 
             Route::get('boiler-manual-export/{id}', 'export')->name('boiler-manual.export'); 
             Route::post('boiler-manual-restore/{id}', 'restore')->name('boiler-manual.restore'); 
+        });
+
+
+        Route::resource('boiler-new-brand', BoilerNewBrandController::class)->except(['create']);
+
+        Route::controller(BoilerNewBrandController::class)->group(function() {
+    
+            Route::get('boiler-new-brand-list', 'list')->name('boiler-new-brand.list'); 
+            Route::post('boiler-new-brand-restore/{id}', 'restore')->name('boiler-new-brand.restore'); 
+            Route::get('download-sample/boiler-new-brand', 'downloadSample')->name('boiler-new-brand.download.sample');
+        });
+
+        Route::resource('boiler-new-manual', BoilerNewManualController::class)->except(['create']);
+        Route::controller(BoilerNewManualController::class)->group(function() {
+            Route::get('boiler-new-manual-list', 'list')->name('boiler-new-manual.list'); 
+            Route::post('boiler-new-manual-import', 'import')->name('boiler-new-manual.import'); 
+            Route::get('boiler-new-manual-export/{id}', 'export')->name('boiler-new-manual.export'); 
+            Route::post('boiler-new-manual-restore/{id}', 'restore')->name('boiler-new-manual.restore'); 
         });
 
     });

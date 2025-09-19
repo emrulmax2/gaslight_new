@@ -240,6 +240,15 @@ export default defineConfig({
 
                 "resources/js/app/register.js",
                 "resources/js/app/otp-login.js",
+
+
+                "resources/js/app/boiler-new-brands/crud.js",
+                "resources/js/app/boiler-new-brands/list.js",
+
+                "resources/js/app/boiler-new-manuals/crud.js",
+                "resources/js/app/boiler-new-manuals/list.js",
+                "resources/js/app/boiler-new-manuals/dropzone.js",
+                "resources/js/app/boiler-new-manuals/upload-excel.js"
             ],
             refresh: true,
         }),

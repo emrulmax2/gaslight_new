@@ -1,4 +1,5 @@
 <?php
+// filepath: c:\wamp64\www\gaslight_new\app\Http\Controllers\Auth\LoginController.php
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
@@ -60,13 +61,21 @@ class LoginController extends Controller
             ]);
 
             $userOtp = $this->generateOtp($validated['mobile']);
+            $smsResponse = $userOtp->sendSMS($validated['mobile']);
+
+            if ($smsResponse['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OTP has been sent to your mobile number',
+                    'otp' => $userOtp->otp,
+                    'user_id' => $userOtp->user_id
+                ], 200);
+            }
 
             return response()->json([
-                'success' => true,
-                'message' => 'OTP has been sent on your mobile number',
-                'otp' => $userOtp->otp,
-                'user_id' => $userOtp->user_id
-            ], 200);
+                'success' => false,
+                'message' => $smsResponse['message']
+            ], 500);
 
         } catch (ValidationException $e) {
             return response()->json([
