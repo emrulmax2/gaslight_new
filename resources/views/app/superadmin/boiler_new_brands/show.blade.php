@@ -8,7 +8,7 @@
     <div class="intro-y mt-8 flex items-center flex-row">
         <h2 class="mr-auto text-lg font-medium">{{ $boilerBrand->name }} Brand</h2>
         <div class="flex mt-0 w-auto">
-            <x-base.button as='a' href="{{ route('superadmin.boiler-brand.index') }}" id="back"  class="mr-1" variant="linkedin" >
+            <x-base.button as='a' href="{{ route('superadmin.boiler-new-brand.index') }}" id="back"  class="mr-1" variant="linkedin" >
                 <x-base.lucide class="mr-2 h-4 w-4" icon="circle-arrow-left" />
                 Back To Boiler Brand
             </x-base.button>

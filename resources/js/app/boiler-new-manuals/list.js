@@ -10,26 +10,24 @@ var BoilerBrandListTable = (function () {
     var _tableGen = function () {        
             let querystr = $("#query").val() != "" ? $("#query").val() : "";
             let status = $("#status").val() != "" ? $("#status").val() : "";
-            let boiler_new_brand_id = $("#boiler_new_brand_id").val() != "" ? $("#boiler_new_brand_id").val() : "";
+            let boiler_new_brand_id = $("#boilerBrandListTable").attr('data-boiler_new_brand_id') != "" ? $("#boilerBrandListTable").attr('data-boiler_new_brand_id') : "";
 
-            console.log(boiler_new_brand_id)
             // Setup Tabulator
             const tabulator = new Tabulator("#boilerBrandListTable", {
                 ajaxURL: route('superadmin.boiler-new-manual.list'),
                 ajaxParams: {
                     queryStr: querystr,
                     status: status,
-                    'boiler_new_brand_id': boiler_new_brand_id
+                    boiler_new_brand_id: boiler_new_brand_id
                 },
                 pagination: true,
                 paginationMode:"remote",
-
                 filterMode: "remote",
                 sortMode: "remote",
                 printAsHtml: true,
                 printStyled: true,
-                paginationSize: 10,
-                paginationSizeSelector: [true, 5, 10, 20, 30, 40],
+                paginationSize: 50,
+                paginationSizeSelector: [true, 20, 30, 50, 100, 200, 500],
                 layout: "fitColumns",
                 responsiveLayout: "collapse",
                 placeholder: "No matching records found",
@@ -39,30 +37,21 @@ var BoilerBrandListTable = (function () {
                         title: 'Sl',
                         field: 'id',
                         headerHozAlign: 'left',
+                        width: '120'
                     },
                     {
                         title: 'GC No',
                         field: 'gc_no',
                         headerHozAlign: 'left',
                     },
-                    {
-                        title: 'URL',
-                        field: 'url',
-                        headerHozAlign: 'left',
-                    },
+                    // {
+                    //     title: 'URL',
+                    //     field: 'url',
+                    //     headerHozAlign: 'left',
+                    // },
                     {
                         title: 'Model',
                         field: 'model',
-                        headerHozAlign: 'left',
-                    },
-                    {
-                        title: 'Fuel Type',
-                        field: 'fuel_type',
-                        headerHozAlign: 'left',
-                    },
-                    {
-                        title: 'Year of Manufacture',
-                        field: 'year_of_manufacture',
                         headerHozAlign: 'left',
                     },
 

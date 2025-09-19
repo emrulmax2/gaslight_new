@@ -35,7 +35,7 @@ class BoilerNewManualController extends Controller
     public function store(Request $request)
     {
         $boilerManual = BoilerNewManual::create([
-            'boiler_brand_id' => $request->input('boiler_brand_id'),
+            'boiler_new_brand_id' => $request->input('boiler_brand_id'),
             'gc_no' => $request->input('gc_no'),
             'url' => $request->input('url'),
             'model' => $request->input('model'),
@@ -45,7 +45,7 @@ class BoilerNewManualController extends Controller
         if($boilerManual->id && $request->hasFile('document')):
             $document = $request->file('document');
             $documentName = $boilerManual->id.'_'.$document->getClientOriginalName();
-            $path = $document->storeAs('boiler_manual/'.$boilerManual->id, $documentName, 'public');
+            $path = $document->storeAs('boiler-new-brand/'.$request->input('boiler_brand_id'), $documentName, 'public');
 
             BoilerNewManual::where('id', $boilerManual->id)->update(['document' => $documentName]);
         endif;
@@ -76,15 +76,15 @@ class BoilerNewManualController extends Controller
     {
         $documentName = $boilerManual->document;
         if($request->hasFile('document')):
-            if (!empty($documentName) && Storage::disk('public')->exists('boiler_manual/'.$boilerManual->id.'/'.$documentName)):
-                Storage::disk('public')->delete('boiler_manual/'.$boilerManual->id.'/'.$documentName);
+            if (!empty($documentName) && Storage::disk('public')->exists('boiler-new-brand/'.$boilerManual->boiler_new_brand_id.'/'.$documentName)):
+                Storage::disk('public')->delete('boiler-new-brand/'.$boilerManual->boiler_new_brand_id.'/'.$documentName);
             endif;
             $document = $request->file('document');
-            $documentName = $boilerManual->id.'_'.$document->getClientOriginalName();
-            $path = $document->storeAs('boiler_manual/'.$boilerManual->id, $documentName, 'public');
+            $documentName = $boilerManual->boiler_new_brand_id.'_'.$document->getClientOriginalName();
+            $path = $document->storeAs('boiler-new-brand/'.$boilerManual->boiler_new_brand_id, $documentName, 'public');
         endif;
 
-        $boilerManual->boiler_brand_id = $request->input('boiler_brand_id');
+        $boilerManual->boiler_new_brand_id = $request->input('boiler_brand_id');
         $boilerManual->gc_no = $request->input('gc_no');
         $boilerManual->url = $request->input('url');
         $boilerManual->model = $request->input('model');
@@ -137,7 +137,7 @@ class BoilerNewManualController extends Controller
         $query->where('boiler_new_brand_id', $request->boiler_new_brand_id);
         if(!empty($queryStr)):
             $query->where(function($q) use ($queryStr){
-                $q->where('name', 'LIKE', '%'.$queryStr.'%');
+                $q->where('model', 'LIKE', '%'.$queryStr.'%')->orWhere('gc_no', 'LIKE', '%'.$queryStr.'%');
             });
         endif;
         if($status == 2):
@@ -162,8 +162,8 @@ class BoilerNewManualController extends Controller
             $i = 1;
             foreach($Query as $list):
                 $document_url = '';
-                if (!empty($list->document) && Storage::disk('public')->exists('boiler_manual/'.$list->id.'/'.$list->document)):
-                    $document_url = Storage::disk('public')->url('boiler_manual/'.$list->id.'/'.$list->document);
+                if (!empty($list->document) && Storage::disk('public')->exists('boiler-new-brand/'.$list->boiler_new_brand_id.'/'.$list->document)):
+                    $document_url = Storage::disk('public')->url('boiler-new-brand/'.$list->boiler_new_brand_id.'/'.$list->document);
                 endif;
                 $data[] = [
                     'id' => $list->id,
@@ -181,7 +181,7 @@ class BoilerNewManualController extends Controller
             endforeach;
         endif;
         
-        return response()->json(['last_page' => $last_page,"current_page"=> $page*1 , 'data' => $data]);
+        return response()->json(['last_page' => $last_page, 'data' => $data]);
     }
 
     public function import(Request $request) {
@@ -193,11 +193,8 @@ class BoilerNewManualController extends Controller
         $filePath = $fileRecords->path;
         // remove from file record
         if (Storage::disk('public')->exists($filePath)) {
-
             Storage::disk('public')->delete($filePath);
-
             $fileRecords->delete();
-
             return response()->json(['message' => "file cleared successfully with imported data "], 201);
         }
 

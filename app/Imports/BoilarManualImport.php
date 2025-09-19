@@ -22,7 +22,7 @@ class BoilarManualImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         return new BoilerManual([
-            'boiler_brand_id' => $this->boilerBrandId,
+            'boiler_new_brand_id' => $this->boilerBrandId,
             'gc_no' => $row['gc_no'],
             'url' => $row['url'],
             'model' => $row['model'],
