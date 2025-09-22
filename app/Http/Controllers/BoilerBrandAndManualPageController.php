@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BoilerBrand;
+use App\Models\BoilerNewBrand;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -11,7 +12,7 @@ class BoilerBrandAndManualPageController extends Controller
 {
     public function index()
     {
-        $boilerBrands = BoilerBrand::orderBy('name','asc')->get();
+        $boilerBrands = BoilerNewBrand::orderBy('name','asc')->get();
         return view('app.boiler-brand-and-manual.index',compact('boilerBrands'));
     }
 
@@ -20,8 +21,8 @@ class BoilerBrandAndManualPageController extends Controller
     {
         $cacheKey = 'boiler_manuals_' . $id;
         $boilerManuals = Cache::remember($cacheKey, 60, function () use ($id) {
-            $boilerBrand = BoilerBrand::find($id);
-            return $boilerBrand->boilerManuals;
+            $boilerBrand = BoilerNewBrand::find($id);
+            return $boilerBrand->boilerNewManuals;
         });
         return response()->json($boilerManuals);
     }

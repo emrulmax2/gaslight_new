@@ -40,6 +40,17 @@ var BoilerBrandListTable = (function () {
                         title: 'Name',
                         field: 'name',
                         headerHozAlign: 'left',
+                        formatter(cell, formatterParams) { 
+                            var html = '<div class="flex justify-start items-center">';
+                                    html += '<div class="w-10 h-10 intro-x image-fit mr-5">';
+                                        html += '<img alt="'+cell.getData().name+'" class="rounded-full shadow" src="'+cell.getData().logo_url+'">';
+                                    html += '</div>';
+                                    html += '<div>';
+                                        html += '<div class="font-medium whitespace-nowrap">'+cell.getData().name+'</div>';
+                                    html += '</div>';
+                                html += '</div>';
+                            return html;
+                        }
                     },
                     {
                         title: 'Number of Manuals',
@@ -72,10 +83,12 @@ var BoilerBrandListTable = (function () {
 
                                 //editUserModal.toggle();
 
+                                var placeholders = $('#edit-modal #boilerBrandLogoImgEdit').attr('data-placeholder')
                                 let id = cell.getData().id;
                                 let name = cell.getData().name;
                                 $('#edit-modal input[name="id"]').val(id);
                                 $('#edit-modal input[name="name"]').val(name);
+                                $('#edit-modal #boilerBrandLogoImgEdit').attr('src', cell.getData().logo_url ? cell.getData().logo_url : placeholders);
                                 editModal.toggle();
                                 //location.href = route('staff.edit', id);
 
@@ -94,6 +107,13 @@ var BoilerBrandListTable = (function () {
                             .on("click", function () {
                                 
                                 let id = cell.getData().id;
+                                confirmModal.show();
+                                document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event) {
+                                    $('#confirmModal .confirmModalTitle').html('Are you sure?');
+                                    $('#confirmModal .confirmModalDesc').html('Do you really want to delete these record? If yes then please click on the agree btn.');
+                                    $('#confirmModal .agreeWith').attr('data-id', id);
+                                    $('#confirmModal .agreeWith').attr('data-action', 'DELETE');
+                                });
                             });
 
                         
@@ -200,4 +220,33 @@ var BoilerBrandListTable = (function () {
         $("#status").val("1");
         filterBoilerBrandListTable();
     }); 
+
+    $('#confirmModal .agreeWith').on('click', function(){
+        let $agreeBTN = $(this);
+        let row_id = $agreeBTN.attr('data-id');
+        let action = $agreeBTN.attr('data-action');
+
+        $('#confirmModal button').attr('disabled', 'disabled');
+        if(action == 'DELETE'){
+            axios({
+                method: 'delete',
+                url: route('superadmin.boiler-new-brand.destroy', row_id),
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    $('#confirmModal button').removeAttr('disabled');
+                    confirmModal.hide();
+
+                    successModal.show();
+                    document.getElementById('successModal').addEventListener('shown.tw.modal', function(event){
+                        $('#successModal .successModalTitle').html('WOW!');
+                        $('#successModal .successModalDesc').html(response.data.msg);
+                    });
+                }
+                BoilerBrandListTable.init();
+            }).catch(error =>{
+                console.log(error)
+            });
+        }
+    })
 })();

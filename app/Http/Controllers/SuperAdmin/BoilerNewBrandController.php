@@ -48,6 +48,16 @@ class BoilerNewBrandController extends Controller
             'name' => $request->input('name')
         ]);
 
+        if($boilerBrand->id && $request->hasFile('logo')):
+            $logo = $request->file('logo');
+            $imageName = 'Logo_'.$boilerBrand->id.'_'.time() . '.' . $logo->getClientOriginalExtension();
+            $logo->storeAs('boiler-new-brand/'.$boilerBrand->id, $imageName, 'public');
+
+            BoilerNewBrand::where('id', $boilerBrand->id)->update([
+                'logo' => $imageName
+            ]);
+        endif;
+
         $csvPath = $request->file('document')->getRealPath();
         $results = [];
         $insertCount = 0;
@@ -136,10 +146,22 @@ class BoilerNewBrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, BoilerNewBrand $boilerBrand)
+    public function update(Request $request)
     {
+        $boilerBrand = BoilerNewBrand::find($request->id);
+        $logoName = $boilerBrand->logo;
+        if($request->hasFile('logo')):
+            if(isset($boilerBrand->logo) && !empty($boilerBrand->logo) && Storage::disk('public')->exists('boiler-new-brand/'.$boilerBrand->id.'/'.$boilerBrand->logo)):
+                Storage::disk('public')->delete('boiler-new-brand/'.$boilerBrand->id.'/'.$boilerBrand->logo);
+            endif;
+
+            $logo = $request->file('logo');
+            $logoName = 'Logo_'.$boilerBrand->id.'_'.time() . '.' . $logo->getClientOriginalExtension();
+            $logo->storeAs('boiler-new-brand/'.$boilerBrand->id, $logoName, 'public');
+        endif;
 
         $boilerBrand->name = $request->input('name');
+        $boilerBrand->logo = $logoName;
         $boilerBrand->save();
 
         if($boilerBrand->wasChanged()) {
@@ -153,9 +175,9 @@ class BoilerNewBrandController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BoilerNewBrand $boilerBrand)
+    public function destroy(BoilerNewBrand $boilerNewBrand)
     {
-        $boilerBrand->delete();
+        $boilerNewBrand->delete();
         return response()->json(['message' => 'Boiler Brand deleted successfully'], 200);
 
     }
@@ -213,6 +235,7 @@ class BoilerNewBrandController extends Controller
                     'id' => $list->id,
                     'sl' => $i,
                     'name' => $list->name,
+                    'logo_url' => $list->logo_url,
                     'manuals' => (isset($list->boilerNewManuals) && $list->boilerNewManuals->count() > 0 ? $list->boilerNewManuals->count() : ''),
                     'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
                 ];
