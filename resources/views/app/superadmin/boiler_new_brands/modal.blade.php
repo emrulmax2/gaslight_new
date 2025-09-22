@@ -28,6 +28,18 @@ staticBackdrop
             <div>
                 <div class="mb-4">
                     <form id="createForm" enctype="multipart/form-data" class="mb-4">
+                        <div class="">
+                            <label data-tw-merge for="name"  class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                                Upload Logo <span class="text-danger">*</span>
+                            </label>
+                            <div class="w-40 h-40 flex-none image-fit relative">
+                                <img alt="User Photo" class="rounded boilerBrandLogoImgAdd" id="boilerBrandLogoImgAdd" data-placeholder="{{ Vite::asset('resources/images/placeholders/200x200.jpg') }}" src="{{ Vite::asset('resources/images/placeholders/200x200.jpg') }}">
+                                <label for="boilerBrandLogoAdd" class="absolute mb-0 mr-0 flex items-center justify-center bottom-0 right-0 bg-primary rounded p-3  cursor-pointer">
+                                    <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                                </label>
+                                <input type="file" accept=".jpeg,.jpg,.png" name="logo" class="absolute w-0 h-0 overflow-hidden opacity-0" id="boilerBrandLogoAdd"/>
+                            </div>
+                        </div>
                         
                         <div class="mt-3">
                             <label data-tw-merge for="name"  class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
@@ -111,6 +123,18 @@ staticBackdrop
             <div>
                 <div class="mb-4">
                     <form id="updateForm" enctype="multipart/form-data" class="mb-4">
+                        <div class="">
+                            <label data-tw-merge for="name"  class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                                Upload Logo <span class="text-danger">*</span>
+                            </label>
+                            <div class="w-40 h-40 flex-none image-fit relative">
+                                <img alt="User Photo" class="rounded boilerBrandLogoImgEdit" id="boilerBrandLogoImgEdit" data-placeholder="{{ Vite::asset('resources/images/placeholders/200x200.jpg') }}" src="{{ Vite::asset('resources/images/placeholders/200x200.jpg') }}">
+                                <label for="boilerBrandLogoEdit" class="absolute mb-0 mr-0 flex items-center justify-center bottom-0 right-0 bg-primary rounded p-3  cursor-pointer">
+                                    <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                                </label>
+                                <input type="file" accept=".jpeg,.jpg,.png" name="logo" class="absolute w-0 h-0 overflow-hidden opacity-0" id="boilerBrandLogoEdit"/>
+                            </div>
+                        </div>
                         
                         <div class="mt-3">
                             <label data-tw-merge for="name"  class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">

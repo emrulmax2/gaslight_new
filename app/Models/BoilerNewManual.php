@@ -47,8 +47,8 @@ class BoilerNewManual extends Model
      * @return string|false
     */
     public function getPdfUrlAttribute(){
-        if (!empty($this->document) && Storage::disk('public')->exists('boiler_manual/'.$this->id.'/'.$this->document)):
-            return Storage::disk('public')->url('boiler_manual/'.$this->id.'/'.$this->document);
+        if (!empty($this->document) && Storage::disk('public')->exists('boiler-new-brand/'.$this->boiler_new_brand_id.'/'.$this->document)):
+            return Storage::disk('public')->url('boiler-new-brand/'.$this->boiler_new_brand_id.'/'.$this->document);
         else:
             return false;
         endif;

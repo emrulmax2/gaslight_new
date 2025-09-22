@@ -72,8 +72,9 @@ class BoilerNewManualController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, BoilerNewManual $boilerManual)
+    public function update( Request $request)
     {
+        $boilerManual = BoilerNewManual::find($request->id);
         $documentName = $boilerManual->document;
         if($request->hasFile('document')):
             if (!empty($documentName) && Storage::disk('public')->exists('boiler-new-brand/'.$boilerManual->boiler_new_brand_id.'/'.$documentName)):
@@ -103,9 +104,9 @@ class BoilerNewManualController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BoilerNewManual $boilerManual)
+    public function destroy(BoilerNewManual $boilerNewManual)
     {
-        $boilerManual->delete();
+        $boilerNewManual->delete();
         return response()->json(['message' => 'Boiler Manual deleted successfully'], 200);
 
     }

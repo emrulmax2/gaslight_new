@@ -78,7 +78,7 @@
                     $('#search-box').removeClass('hidden');
                     let innerHtml = '';
                     boilerBrandsManual.forEach(manual => {
-                        innerHtml += '<a href="'+(manual.pdf_url != '' ? manual.pdf_url : 'javascript:void(0);')+'" id="'+manual.model+'" class="containerItems block mb-3">';
+                        innerHtml += '<a target="_blank" href="'+(manual.pdf_url != '' ? manual.pdf_url : 'javascript:void(0);')+'" id="'+manual.model+'" class="containerItems block mb-3">';
                             innerHtml += '<div class="intro-y box p-5">';
                                 innerHtml += '<div class="grid grid-cols-12 gap-x-4 gap-y-2">';
                                     innerHtml += '<div class="col-span-12 sm:col-span-3">';

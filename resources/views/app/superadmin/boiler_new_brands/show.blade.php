@@ -42,13 +42,13 @@
                     <x-base.lucide class="mr-2 h-4 w-4" icon="circle-plus" />
                     Add Manual
                 </x-base.button>
-                <x-base.button id="upload-excel" class="upload_excel mr-1" variant="instagram" >
+                <!-- <x-base.button id="upload-excel" class="upload_excel mr-1" variant="instagram" >
                     <x-base.lucide class="mr-2 h-4 w-4" icon="file-spreadsheet" />
                     Upload Excel
                 </x-base.button>
                 <x-base.button as='a' href="" class="w-full sm:w-36" id="tabulator-html-filter-go" type="button" variant="secondary" >
                     <x-base.lucide class="mr-2 h-5 w-5" icon="file-down" />Sample Excel
-                </x-base.button>
+                </x-base.button> -->
             </div>
         </div>
         <div class="scrollbar-hidden overflow-x-auto">

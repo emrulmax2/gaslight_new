@@ -33,6 +33,15 @@
         const modal = tailwind.Modal.getOrCreateInstance(el);
         modal.toggle();
     });
+
+    $('#createForm').on('change', '#boilerBrandLogoAdd', function(){
+        showPreview('boilerBrandLogoAdd', 'boilerBrandLogoImgAdd')
+    })
+
+    $('#updateForm').on('change', '#boilerBrandLogoEdit', function(){
+        showPreview('boilerBrandLogoEdit', 'boilerBrandLogoImgEdit')
+    })
+
     $('#createForm').on('submit', function(e) {
         e.preventDefault();
         const form = document.getElementById('createForm');
@@ -43,6 +52,7 @@
         $("#userSaveBtn .theLoader").fadeIn();
 
         let formData = new FormData(form);
+        formData.append('file', $('#createForm input[name="logo"]')[0].files[0]); 
         axios({
             method: "post",
             url: route('superadmin.boiler-new-brand.store'),
@@ -106,6 +116,7 @@
         $("#UpdateBtn .theLoader").fadeIn();
 
         let formData = new FormData(form);
+        formData.append('file', $('#updateForm input[name="logo"]')[0].files[0]); 
         let $editId =  $('#edit-modal input[name="id"]').val();
         axios({
             method: "post",
@@ -190,5 +201,15 @@
             $btn.find('.theLoader').fadeOut();
         });
     });
+
+    function showPreview(inputId, targetImageId) {
+        var src = document.getElementById(inputId);
+        var target = document.getElementById(targetImageId);
+        var fr = new FileReader();
+        fr.onload = function () {
+            target.src = fr.result;
+        }
+        fr.readAsDataURL(src.files[0]);
+    };
 
 })();
