@@ -128,7 +128,7 @@
  
 <!-- BEGIN: Update Modal Content -->
 <x-base.dialog id="updateApointDateModal" staticBackdrop size="sm">
-    <x-base.dialog.panel class="rounded-none">
+    <x-base.dialog.panel class="rounded-none sm:w-[320px]">
         <form method="post" action="#" id="updateApointDateForm">
             <x-base.dialog.title>
                 <h2 class="mr-auto text-base font-medium">Update Appointment Details</h2>
@@ -136,19 +136,24 @@
             </x-base.dialog.title>
             <x-base.dialog.description class="">
                 <div>
-                    <x-base.form-label for="job_calender_date">Appointment Date</x-base.form-label>
-                    <x-base.form-input value="{{ (!empty($job->calendar->date) ? date('d-m-Y', strtotime($job->calendar->date)) : '') }}" name="job_calender_date" id="job_calender_date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                    <x-base.form-label for="job_calender_date">Date <span class="text-danger">*</span></x-base.form-label>
+                    <x-base.form-input type="text" name="job_calender_date" id="job_calender_date" value="{{  isset($job->calendar->date) && !empty($job->calendar->date) ? date('d-m-Y', strtotime($job->calendar->date)) : '' }}" class="w-full" />
+                    <div class="acc__input-error error-job_calender_date text-danger text-xs mt-1"></div>
                 </div>
-                <div class="mt-3 calenderSlot {{ (!empty($job->calendar->calendar_time_slot_id) ? '' : 'hidden') }}">
-                    <x-base.form-label for="calendar_time_slot_id">Slot</x-base.form-label>
-                    <x-base.tom-select class="w-full" id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select">
-                        <option value="">Please Select</option>
-                        @if($slots->count() > 0)
-                            @foreach($slots as $slot)
-                                <option {{ (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slot->id ? 'Selected' : '') }} value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
+                <div class="mt-3 jobSlotWrap" style="display: {{ isset($job->calendar->date) && !empty($job->calendar->date) ? 'block' : 'none' }};">
+                    <x-base.form-label for="slot">Slot <span class="text-danger">*</span></x-base.form-label>
+                    @if($slots->count() > 0)
+                        <div class="flex justify-start flex-wrap gap-1 mb-2 jobCalSlot">
+                            @foreach($slots as $slt)
+                                <div class="slitItems relative">
+                                    <input {{ !empty($blocked) && in_array($slt->id, $blocked) ? 'disabled' : '' }} {{ isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id == $slt->id ? 'checked' : '' }} type="radio" name="calendar_time_slot_id" value="{{ $slt->id }}" id="calendar_time_slots_{{$slt->id}}" class="absolute opacity-0 w-0 h-0 left-0 top-0"/>
+                                    <label class="inline-flex border-2 border-success rounded-full px-3 py-1 font-medium text-success cursor-pointer" for="calendar_time_slots_{{$slt->id}}">
+                                        {{ date('H:i', strtotime($slt->start))}}
+                                    </label>
+                                </div>
                             @endforeach
-                        @endif
-                    </x-base.tom-select>
+                        </div>
+                    @endif
                     <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs mt-1"></div>
                 </div>
             </x-base.dialog.description>

@@ -22,7 +22,7 @@ class JobAppointmentDataUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'job_calender_date' => 'nullable|date',
+            'job_calender_date' => 'required|date',
             'calendar_time_slot_id' => 'required_with:job_calender_date|nullable',
         ];
     }
@@ -30,8 +30,9 @@ class JobAppointmentDataUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'job_calender_date.date' => 'Please enter a valid date.',
-            'calendar_time_slot_id.required_with' => 'The slot field is required when appointment date is selected.',
+            'job_calender_date.required' => 'Please select a date.',
+            'job_calender_date.date' => 'Please select a date.',
+            'calendar_time_slot_id.required_with' => 'The slot field is required.',
         ];
     }
 }

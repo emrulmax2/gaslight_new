@@ -4,14 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BoilerNewBrand;
+use App\Models\BoilerNewManual;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class BoilerBrandAndManualPageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
 
-        $boilerBrands = BoilerNewBrand::orderBy('name', 'asc')->get();
+        $queryStr = (isset($request->search) && !empty($request->search) ? $request->search : null);
+        $orderBy = (isset($request->orderBy) && !empty($request->orderBy) ? $request->orderBy : 'name');
+        $order = (isset($request->orderBy) && !empty($request->order) ? $request->order : 'asc');
+        $query = BoilerNewBrand::orderBy($orderBy, $order);
+        if(!empty($queryStr)):
+            $query->where('name', 'LIKE', '%'.$queryStr.'%');
+        endif;
+        $boilerBrands = $query->get();
 
         if ($boilerBrands->isEmpty()) {
             return response()->json([
@@ -27,8 +36,21 @@ class BoilerBrandAndManualPageController extends Controller
     }
 
 
-    public function brand_manual($id)
+    public function brand_manual($id, Request $request)
     {
+
+
+        $queryStr = (isset($request->search) && !empty($request->search) ? $request->search : null);
+        $orderBy = (isset($request->orderBy) && !empty($request->orderBy) ? $request->orderBy : 'name');
+        $order = (isset($request->orderBy) && !empty($request->order) ? $request->order : 'asc');
+
+        $query = BoilerNewManual::where('boiler_new_brand_id', $id)->orderBy($orderBy, $order);
+        if(!empty($queryStr)):
+            $query->where(function($q) use($queryStr){
+                $q->where('gc_no','LIKE', '%'.$queryStr.'%')->orWhere('model','LIKE', '%'.$queryStr.'%');
+            });
+        endif;
+        $boilerManuals = $query->get();
 
         $boilerBrands = BoilerNewBrand::with('boilerNewManuals')->find($id);
         $boilerManuals = (isset($boilerBrands->boilerNewManuals) ? $boilerBrands->boilerNewManuals : FALSE);

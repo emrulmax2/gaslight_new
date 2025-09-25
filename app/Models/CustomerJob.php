@@ -47,7 +47,7 @@ class CustomerJob extends Model
         return $this->belongsTo(CustomerJobPriority::class, 'customer_job_priority_id');
     }
 
-    public function status(){
+    public function thestatus(){
         return $this->belongsTo(CustomerJobStatus::class, 'customer_job_status_id');
     }
 

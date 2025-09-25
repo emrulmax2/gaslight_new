@@ -77,6 +77,8 @@
             }
             if(theType == 'email'){
                 $('#updateUserDataModal input[name="fieldValue"]').attr('type', 'email');
+            }else if(theType == 'number'){
+                $('#updateUserDataModal input[name="fieldValue"]').attr('type', 'number');
             }else{
                 $('#updateUserDataModal input[name="fieldValue"]').attr('type', 'text');
             }

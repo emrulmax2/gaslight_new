@@ -262,6 +262,9 @@
                 axios.post(route('login.check'), {
                     email: email,
                     password: password
+                }, { 
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                    withCredentials: true
                 }).then(res => {
                     location.href = route('company.dashboard');
                 }).catch(err => {

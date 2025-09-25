@@ -288,6 +288,8 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('jobs/update-data', 'updateJobsData')->name('jobs.update.data');
         Route::post('jobs/update-appintment-data', 'updateJobsAppointmentData')->name('jobs.update.appointment.date');
+
+        Route::post('jobs/get-slot-status', 'getCalendarSlotStatus')->name('jobs.get.slot.status');
     });
 
     Route::controller(CalendarController::class)->group(function() {

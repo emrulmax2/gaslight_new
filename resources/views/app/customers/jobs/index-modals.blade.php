@@ -10,18 +10,22 @@
                 <x-base.form-input name="customer_job_id" class="w-full" type="hidden" value="0" />
                 <div class="mb-4">
                     <x-base.form-label for="date">Date <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.litepicker name="date" id="date" class="mx-auto block w-full" data-single-mode="true" data-format="DD-MM-YYYY" />
+                    <x-base.form-input type="text" name="date" id="job_calender_date" class="w-full" />
                     <div class="acc__input-error error-city text-danger text-xs mt-1"></div>
                 </div>
-                <div>
+                <div class="jobSlotWrap" style="display: none;">
                     <x-base.form-label for="slot">Slot <span class="text-danger">*</span></x-base.form-label>
                     @if($slots->count() > 0)
-                        @foreach($slots as $slot)
-                            <x-base.form-check class="mt-{{ $loop->first ? '0' : '2' }}">
-                                <x-base.form-check.input id="slot-{{ $slot->id }}" name="calendar_time_slot_id" type="radio" value="{{ $slot->id }}" />
-                                <x-base.form-check.label for="slot-{{ $slot->id }}">{{ $slot->title.' '.(!empty($slot->start) ? date('H:i', strtotime($slot->start)) : '').' - '.(!empty($slot->end) ? date('H:i', strtotime($slot->end)) : '') }} </x-base.form-check.label>
-                            </x-base.form-check>
-                        @endforeach
+                        <div class="flex justify-start flex-wrap gap-1 mb-2 jobCalSlot">
+                            @foreach($slots as $slt)
+                                <div class="slitItems relative">
+                                    <input type="radio" name="calendar_time_slot_id" value="{{ $slt->id }}" id="calendar_time_slots_{{$slt->id}}" class="absolute opacity-0 w-0 h-0 left-0 top-0"/>
+                                    <label class="inline-flex border-2 border-success rounded-full px-3 py-1.5 font-medium text-success cursor-pointer" for="calendar_time_slots_{{$slt->id}}">
+                                        {{ date('H:i', strtotime($slt->start))}}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
                     <div class="acc__input-error error-city text-danger text-xs mt-1"></div>
                 </div>

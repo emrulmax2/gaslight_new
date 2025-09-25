@@ -84,7 +84,7 @@
             <div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job description</div>
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Name</div>
                         <div class="theDesc w-full relative">
                             <x-base.form-input id="description" name="description" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
                             <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="notebook-pen" />
@@ -95,18 +95,7 @@
             <div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Details</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.form-input id="details" name="details" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
-                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="notebook" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2 py-3 bg-white mt-2">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Estimated Job Value (Excluding VAT)</div>
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Amount</div>
                         <div class="theDesc w-full relative">
                             <x-base.form-input id="estimated_amount" name="estimated_amount" value="" placeholder="0.0" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" step="any" type="number"  autocomplete="off"/>
                             <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="badge-pound-sterling" />
@@ -114,44 +103,10 @@
                     </div>
                 </div>
             </div>
-            <div class="px-2 py-3 mt-2 bg-white">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Priority</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.tom-select id="customer_job_priority_id" name="customer_job_priority_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
-                                <option value="">Please Select</option>
-                                @if($priorities->count() > 0)
-                                    @foreach($priorities as $priority)
-                                        <option value="{{ $priority->id }}">{{ $priority->name }}</option>
-                                    @endforeach
-                                @endif
-                            </x-base.tom-select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2 py-3 mt-2 bg-white">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Status</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.tom-select id="customer_job_status_id" name="customer_job_status_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
-                                <option value="">Please Select</option>
-                                @if($statuses->count() > 0)
-                                    @foreach($statuses as $status)
-                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
-                                    @endforeach
-                                @endif
-                            </x-base.tom-select>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Ref No</div>
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Refference</div>
                         <div class="theDesc w-full relative">
                             <x-base.form-input id="reference_no" name="reference_no" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
                             <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="hash" />
@@ -164,28 +119,47 @@
                     <div class="w-full">
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Appointment Date</div>
                         <div class="theDesc w-full relative">
-                            <x-base.form-input id="job_calender_date" name="job_calender_date" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                            <x-base.form-input readonly id="job_calender_date" name="job_calender_date" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
                             <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
                         </div>
                         <div class="acc__input-error error-job_calender_date text-danger text-xs"></div>
                     </div>
                 </div>
             </div>
-            <div class="px-2 py-3 mt-2 bg-white hidden calenderSlot">
+            <div class="px-2 py-3 bg-white mt-2 timeSloatWrap" style="display: none;">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Status</div>
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel relative">
+                            Time Slots
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="clock" />
+                        </div>
                         <div class="theDesc w-full relative">
-                            <x-base.tom-select id="calendar_time_slot_id" name="calendar_time_slot_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
-                                <option value="">Please Select</option>
-                                @if($slots->count() > 0)
-                                    @foreach($slots as $slot)
-                                        <option value="{{ $slot->id }}">{{ $slot->title }} {{ $slot->start }} {{ $slot->end }}</option>
+                            @if($slots->count() > 0)
+                                <div class="flex justify-start flex-wrap gap-2 mt-4 mb-2 jobCalSlot">
+                                    @foreach($slots as $slt)
+                                        <div class="slitItems relative">
+                                            <input type="radio" name="calendar_time_slot_id" value="{{ $slt->id }}" id="calendar_time_slots_{{$slt->id}}" class="absolute opacity-0 w-0 h-0 left-0 top-0"/>
+                                            <label class="inline-flex border-2 border-success rounded-full px-3 py-1.5 font-medium text-success cursor-pointer" for="calendar_time_slots_{{$slt->id}}">
+                                                {{ date('H:i', strtotime($slt->start))}}
+                                            </label>
+                                        </div>
                                     @endforeach
-                                @endif
-                            </x-base.tom-select>
+                                </div>
+                            @endif
                         </div>
                         <div class="acc__input-error error-calendar_time_slot_id text-danger text-xs"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-2 py-3 bg-white mt-2">
+                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Note</div>
+                        <div class="theDesc w-full relative">
+                            <x-base.form-textarea id="details" name="details" class="w-full h-[150px] resize-none text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none"></x-base.form-textarea>
+                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="notebook" />
+                        </div>
                     </div>
                 </div>
             </div>

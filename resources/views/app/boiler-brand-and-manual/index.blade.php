@@ -126,7 +126,7 @@
                                                 innerHtml += '</span>';
                                                 innerHtml += '<div>';
                                                     innerHtml += '<div class="text-gray-600 text-xs">GC No</div>';
-                                                    innerHtml += '<div class="text-base font-medium">'+manual.gc_no+'</div>';
+                                                    innerHtml += '<div class="gc-no text-base font-medium">'+manual.gc_no+'</div>';
                                                 innerHtml += '</div>';
                                             innerHtml += '</div>';
                                         innerHtml += '</div>';
@@ -163,7 +163,8 @@
         const boilerBrands = document.querySelectorAll('.boiler-brands-container .containerItems');
         boilerBrands.forEach(brand => {
             const brandName = brand.querySelector('.model-name').textContent.toLowerCase();
-            if (brandName.includes(searchValue)) {
+            const gcNumber = brand.querySelector('.gc-no').textContent.toLowerCase();
+            if (brandName.includes(searchValue) || gcNumber.includes(searchValue)) {
                 brand.style.display = 'block';
             } else {
                 brand.style.display = 'none';

@@ -51,7 +51,7 @@ class BoilerNewBrandController extends Controller
         if($boilerBrand->id && $request->hasFile('logo')):
             $logo = $request->file('logo');
             $imageName = 'Logo_'.$boilerBrand->id.'_'.time() . '.' . $logo->getClientOriginalExtension();
-            $logo->storeAs('boiler-new-brand/'.$boilerBrand->id, $imageName, 'public');
+            $logo->storeAs('boiler-new-brand-logos', $imageName, 'public');
 
             BoilerNewBrand::where('id', $boilerBrand->id)->update([
                 'logo' => $imageName
@@ -151,13 +151,13 @@ class BoilerNewBrandController extends Controller
         $boilerBrand = BoilerNewBrand::find($request->id);
         $logoName = $boilerBrand->logo;
         if($request->hasFile('logo')):
-            if(isset($boilerBrand->logo) && !empty($boilerBrand->logo) && Storage::disk('public')->exists('boiler-new-brand/'.$boilerBrand->id.'/'.$boilerBrand->logo)):
-                Storage::disk('public')->delete('boiler-new-brand/'.$boilerBrand->id.'/'.$boilerBrand->logo);
+            if(isset($boilerBrand->logo) && !empty($boilerBrand->logo) && Storage::disk('public')->exists('boiler-new-brand-logos/'.$boilerBrand->logo)):
+                Storage::disk('public')->delete('boiler-new-brand-logos/'.$boilerBrand->logo);
             endif;
 
             $logo = $request->file('logo');
             $logoName = 'Logo_'.$boilerBrand->id.'_'.time() . '.' . $logo->getClientOriginalExtension();
-            $logo->storeAs('boiler-new-brand/'.$boilerBrand->id, $logoName, 'public');
+            $logo->storeAs('boiler-new-brand-logos', $logoName, 'public');
         endif;
 
         $boilerBrand->name = $request->input('name');

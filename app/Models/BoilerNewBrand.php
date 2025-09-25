@@ -46,8 +46,8 @@ class BoilerNewBrand extends Model
      */
     public function getLogoUrlAttribute()
     {
-        if ($this->logo !== null && Storage::disk('public')->exists('boiler-new-brand/'.$this->id.'/'.$this->logo)) {
-            return Storage::disk('public')->url('boiler-new-brand/'.$this->id.'/'.$this->logo);
+        if ($this->logo !== null && Storage::disk('public')->exists('boiler-new-brand-logos/'.$this->logo)) {
+            return Storage::disk('public')->url('boiler-new-brand-logos/'.$this->logo);
         } else {
             return Vite::asset('resources/images/placeholders/200x200.jpg');
         }
