@@ -52,9 +52,6 @@ class BoilerBrandAndManualPageController extends Controller
         endif;
         $boilerManuals = $query->get();
 
-        $boilerBrands = BoilerNewBrand::with('boilerNewManuals')->find($id);
-        $boilerManuals = (isset($boilerBrands->boilerNewManuals) ? $boilerBrands->boilerNewManuals : FALSE);
-
         if (!$boilerManuals || $boilerManuals->isEmpty()) {
             return response()->json([
                 'success' => false,

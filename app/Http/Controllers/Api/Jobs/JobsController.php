@@ -24,22 +24,15 @@ class JobsController extends Controller
     {
         
         $validStatuses = ['Due', 'Completed', 'Cancelled', 'Trashed'];
-        $status = $request->filled('status') && in_array($request->query('status'), $validStatuses) ? $request->query('status') : 'Due';
+        $status = $request->filled('status') && $request->query('status') > 0 ? $request->query('status') : 1;
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         
-        $query = CustomerJob::with('customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot')
-                ->where('created_by', $request->user()->id);
-
+        $query = CustomerJob::with('customer', 'property', 'priority', 'theStatus', 'calendar', 'calendar.slot')
+                ->where('created_by', $request->user()->id)->where('customer_job_status_id', $status);
         $searchableColumns = Schema::getColumnListing((new CustomerJob())->getTable());
-
-        if ($status !== 'Trashed') {
-            $query->where('status', $status);
-        } else {
-            $query->onlyTrashed();
-        }
 
          if (!empty($searchKey)):
             $query->where(function($q) use ($searchableColumns, $searchKey) {
@@ -78,9 +71,9 @@ class JobsController extends Controller
             'customer_property_id' => $request->customer_property_id,
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
-            'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
-            'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
-            'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : null),
+            //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
+            //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+            'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : 1),
             'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => $request->user()->id,
@@ -155,7 +148,7 @@ class JobsController extends Controller
     }
     public function getJobDetails(Request $request, $id){
        try {
-            $job = CustomerJob::with(['customer', 'property', 'customer.contact'])
+            $job = CustomerJob::with(['customer', 'property', 'customer.contact', 'calendar', 'calendar.slot', 'thestatus'])
             ->withCount("records as number_of_records")
             ->findOrFail($id);
 
@@ -220,9 +213,9 @@ class JobsController extends Controller
                 $updateData['estimated_amount'] = (isset($request->estimated_amount) && !empty($request->estimated_amount) ? $request->estimated_amount : null);
             endif;
 
-            if($request->has('customer_job_priority_id')):
-                $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
-            endif;
+            // if($request->has('customer_job_priority_id')):
+            //     $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
+            // endif;
 
             if($request->has('customer_job_status_id')):
                 $updateData['customer_job_status_id'] = (isset($request->customer_job_status_id) && !empty($request->customer_job_status_id) ? $request->customer_job_status_id : null);
