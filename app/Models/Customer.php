@@ -36,7 +36,7 @@ class Customer extends Model
     protected $dates = ['deleted_at'];
 
     public function getCustomerFullNameAttribute(){
-        return (isset($this->title->name) && !empty($this->title->name) ? $this->title->name.' ' : '').$this->full_name;
+        return $this->full_name;
     }
 
     public function getFullAddressAttribute(){

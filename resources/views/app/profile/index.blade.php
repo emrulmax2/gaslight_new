@@ -61,11 +61,18 @@
                     <span class="font-normal text-slate-400 text-xs block">{{ (!empty($user->oil_registration_number) ? $user->oil_registration_number : 'N/A') }}</span>
                 </div>
             </a>
-            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Installer Ref Number" data-field="installer_ref_no" data-value="{{ $user->installer_ref_no }}" class="fieldValueToggler flex w-full items-start px-5 py-3">
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Installer Ref Number" data-field="installer_ref_no" data-value="{{ $user->installer_ref_no }}" class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="hash" />
                 <div>
                     <span class="font-medium text-slate-500 text-sm block">Installer Ref Number</span>
                     <span class="font-normal text-slate-400 text-xs block">{{ (!empty($user->installer_ref_no) ? $user->installer_ref_no : 'N/A') }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-type="number" data-required="1" data-title="Max Job Per Slot" data-field="max_job_per_slot" data-value="{{ $user->max_job_per_slot }}" class="fieldValueToggler flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="hash" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Max Job Per Slot</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($user->max_job_per_slot) ? $user->max_job_per_slot : 1) }}</span>
                 </div>
             </a>
         </div>

@@ -551,3 +551,98 @@
     appearance: none;
     margin: 0; 
 }
+
+
+#job_inline_calender_date .litepicker{
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+    border: none;
+    width: 100%;
+}
+#job_inline_calender_date .litepicker .container__main,
+#job_inline_calender_date .litepicker .container__months,
+#job_inline_calender_date .litepicker .container__months .month-item{
+    width: 100%;
+}
+#job_inline_calender_date .litepicker .container__months .month-item-weekdays-row{
+    width: 100%;
+}
+#job_inline_calender_date .litepicker .container__days{
+    width: 100%;
+    gap: 4px;
+}
+#job_inline_calender_date .litepicker .container__days > div, 
+#job_inline_calender_date .litepicker .container__days > a {
+    padding: 25px 0;
+    background: #f1f5f966;
+    width: calc((100% / 7) - 4px);
+    cursor: pointer;
+    font-weight: 600;
+    /* color: #644444; */
+    border-radius: 0;
+}
+#job_inline_calender_date .litepicker .container__days .day-item:not(.is-locked):hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+#job_inline_calender_date .litepicker .container__days .day-item.is-locked {
+    cursor: not-allowed;
+    /* background: rgba(252, 227, 230, 0.45);
+    color: #6444447a; */
+}
+#job_inline_calender_date .litepicker .container__days .day-item.is-today{
+    /* background-color: #bb777747; */
+}
+#job_inline_calender_date .litepicker .container__days .day-item.is-start-date, 
+#job_inline_calender_date .litepicker .container__days .day-item.is-start-date:hover, 
+#job_inline_calender_date .litepicker .container__days .day-item.is-end-date, 
+#job_inline_calender_date .litepicker .container__days .day-item.is-end-date:hover {
+    background-color: #334155;
+    color: white;
+}
+#job_inline_calender_date .litepicker .container__months .month-item-weekdays-row>div{
+    color: #334155;
+    font-weight: 700;
+    line-height: 1;
+    padding: 20px 0 20px;
+    text-transform: uppercase;
+}
+.jobCalSlot input:checked + label{
+    background-color: #0d9488;
+    color: #FFF;
+}
+.jobCalSlot input:disabled + label{
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+    cursor: not-allowed;
+    color: #FFF;
+}
+
+@media (max-width: 767px){
+    #job_inline_calender_date .litepicker .container__days > div, #job_inline_calender_date .litepicker .container__days > a{
+        padding: 15px 0;
+    }
+}
+#updateApointDateModal #job_inline_calender_date .litepicker .container__days > div, #job_inline_calender_date .litepicker .container__days > a{
+    padding: 7px 0;
+    font-size: 13px;
+    font-weight: 500;
+    width: calc((100% / 7) - 2px);
+}
+#updateApointDateModal #job_inline_calender_date .litepicker .container__days{
+    gap: 2px;
+}
+#updateApointDateModal #job_inline_calender_date .litepicker .container__months .month-item-weekdays-row>div{
+    font-size: 11px;
+    font-weight: 500;
+    padding: 15px 0 10px;
+}
+#updateApointDateModal  #job_inline_calender_date .litepicker .container__months, 
+#updateApointDateModal  #job_inline_calender_date .litepicker .container__months .month-item, 
+#updateApointDateModal  #job_inline_calender_date .litepicker .container__months .month-item-header{
+    padding: 0;
+}
+#job_calender_date:read-only{
+    background: transparent;
+}

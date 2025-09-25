@@ -1,3 +1,4 @@
+import { error } from "jquery";
 import Litepicker from "litepicker";
 (function(){
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
@@ -111,36 +112,37 @@ import Litepicker from "litepicker";
     /* END: Update Job */
 
 
-    let dateOption = {
-        autoApply: true,
-        singleMode: true,
-        numberOfColumns: 1,
-        numberOfMonths: 1,
-        showWeekNumbers: false,
-        minDate: new Date() - 1,
-        inlineMode: false,
-        format: "DD-MM-YYYY",
-        dropdowns: {
-            minYear: 1900,
-            maxYear: 2050,
-            months: true,
-            years: true,
-        },
-    };
-    const jobCalenderDate = new Litepicker({
-        element: document.getElementById('job_calender_date'),
-        ...dateOption
-    });
+    // let dateOption = {
+    //     autoApply: true,
+    //     singleMode: true,
+    //     numberOfColumns: 1,
+    //     numberOfMonths: 1,
+    //     showWeekNumbers: false,
+    //     minDate: new Date() - 1,
+    //     inlineMode: false,
+    //     format: "DD-MM-YYYY",
+    //     dropdowns: {
+    //         minYear: 1900,
+    //         maxYear: 2050,
+    //         months: true,
+    //         years: true,
+    //     },
+    // };
+    // const jobCalenderDate = new Litepicker({
+    //     element: document.getElementById('job_calender_date'),
+    //     startDate: '2025-09-26',
+    //     ...dateOption
+    // });
 
-    const calenderSlot = document.querySelector('.calenderSlot');
+    // const calenderSlot = document.querySelector('.calenderSlot');
 
-    jobCalenderDate.on('selected', (date) => {
-        if(date){
-            calenderSlot.classList.remove('hidden');
-        }else{
-            calenderSlot.classList.add('hidden');
-        }
-    });
+    // jobCalenderDate.on('selected', (date) => {
+    //     if(date){
+    //         calenderSlot.classList.remove('hidden');
+    //     }else{
+    //         calenderSlot.classList.add('hidden');
+    //     }
+    // });
 
 
     $(document).on('click', '.fieldValueToggler', function(e){
@@ -449,59 +451,132 @@ import Litepicker from "litepicker";
         }
     });
 
+
+    let dateOption = {
+        autoApply: true,
+        singleMode: true,
+        numberOfColumns: 1,
+        numberOfMonths: 1,
+        showWeekNumbers: false,
+        minDate: new Date() - 1,
+        inlineMode: false,
+        format: "DD-MM-YYYY",
+        dropdowns: {
+            minYear: 1900,
+            maxYear: 2050,
+            months: true,
+            years: true,
+        },
+    };
+    const jobCalenderDate = new Litepicker({
+        element: document.getElementById('job_calender_date'),
+        ...dateOption
+    });
+
+    jobCalenderDate.on('selected', (date) => {
+        if(date){
+            let theDate = date.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-");
+            axios({
+                method: "post",
+                url: route('jobs.get.slot.status'),
+                data: {date : theDate},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    let max = response.data.max;
+                    let jobs = response.data.jobs;
+                    $('#updateApointDateModal .jobSlotWrap').fadeIn('fast', function(){
+                        $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                        if (!$.isEmptyObject(jobs)) {
+                            $.each(jobs, function(index, job) {
+                                if(job.totalJob >= max)
+                                $('#calendar_time_slots_'+job.calendar_time_slot_id).attr('disabled', 'disabled')
+                            })
+                        }
+                    
+                    })
+                }
+            }).catch(error => {
+                if (error.response) {
+                   onsole.log('error');
+                    $('#updateApointDateModal .jobSlotWrap').fadeOut('fast', function(){
+                        $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                    })
+                }
+            });
+            
+        }else{
+            $('.timeSloatWrap').fadeOut('fast', function(){
+                $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+            })
+        }
+    });
+
     $('#updateApointDateForm').on('submit', function(e){
         e.preventDefault();
         const form = document.getElementById('updateApointDateForm');
         const $theForm = $(this);
+
+        let theDate = jobInlineCalenderDate.getDate();
+        let theDates = theDate ? theDate.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-") : null;
         
         $('#updateApointDateModal .acc__input-error').html('');
         $('#updateAptBtn', $theForm).attr('disabled', 'disabled');
         $("#updateAptBtn .theLoader").fadeIn();
 
         let errors = 0;
-        if($theForm.find('[name="fieldValue"]:checked').length == 0){
+        if(theDates == ''){
             errors += 1;
-            $theForm.find('.error-fieldValue').html('This field is required.')
+            $theForm.find('.error-job_inline_calender_date').html('This field is required.')
+        }else if($theForm.find('[name="calendar_time_slot_id"]:checked').length == 0){
+            errors += 1;
+            $theForm.find('.error-calendar_time_slot_id').html('This field is required.')
         }
 
-        let form_data = new FormData(form);
-        axios({
-            method: "POST",
-            url: route('jobs.update.appointment.date'),
-            data: form_data,
-            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-        }).then(response => {
+        if(error > 0){
             $('#updateAptBtn', $theForm).removeAttr('disabled');
             $("#updateAptBtn .theLoader").fadeOut();
+        }else{
+            let form_data = new FormData(form);
+            form_data.append('job_calender_date', theDates);
+            axios({
+                method: "POST",
+                url: route('jobs.update.appointment.date'),
+                data: form_data,
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                $('#updateAptBtn', $theForm).removeAttr('disabled');
+                $("#updateAptBtn .theLoader").fadeOut();
 
-            if (response.status == 200) {
-                updateApointDateModal.hide();
-                window.location.reload();
-            }
-        }).catch(error => {
-            $('#updateAptBtn', $theForm).removeAttr('disabled');
-            $("#updateAptBtn .theLoader").fadeOut();
-            if (error.response) {
-                if (error.response.status == 422) {
-                    for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#updateApointDateForm .${key}`).addClass('border-danger');
-                        $(`#updateApointDateForm  .error-${key}`).html(val);
-                    }
-                } else if (error.response.status == 304) {
-                    warningModal.show();
-                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
-                        $("#warningModal .warningModalTitle").html("Error Found!");
-                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
-                    });
-
-                    setTimeout(() => {
-                        warningModal.hide();
-                    }, 1500);
-                } else {
-                    console.log('error');
+                if (response.status == 200) {
+                    updateApointDateModal.hide();
+                    window.location.reload();
                 }
-            }
-        });
+            }).catch(error => {
+                $('#updateAptBtn', $theForm).removeAttr('disabled');
+                $("#updateAptBtn .theLoader").fadeOut();
+                if (error.response) {
+                    if (error.response.status == 422) {
+                        for (const [key, val] of Object.entries(error.response.data.errors)) {
+                            $(`#updateApointDateForm .${key}`).addClass('border-danger');
+                            $(`#updateApointDateForm  .error-${key}`).html(val);
+                        }
+                    } else if (error.response.status == 304) {
+                        warningModal.show();
+                        document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#warningModal .warningModalTitle").html("Error Found!");
+                            $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                        });
+
+                        setTimeout(() => {
+                            warningModal.hide();
+                        }, 1500);
+                    } else {
+                        console.log('error');
+                    }
+                }
+            });
+        }
     });
 
 

@@ -20,23 +20,6 @@
                     Personal Info
                 </h2>
             </div>
-            <div class="px-2 py-3 bg-white">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Title</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.tom-select id="title_id" name="title_id" data-placeholder="Please Select" class="w-full inlineTomSelect" >
-                                <option value="">Please Select</option>
-                                @if($titles->count() > 0)
-                                    @foreach($titles as $title)
-                                        <option value="{{ $title->id }}">{{ $title->name }}</option>
-                                    @endforeach
-                                @endif
-                            </x-base.tom-select>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">

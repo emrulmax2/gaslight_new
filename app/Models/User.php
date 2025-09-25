@@ -40,7 +40,8 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
         'parent_id',
         'role',
         'mobile',
-        'first_login'
+        'first_login',
+        'max_job_per_slot'
     ];
 
     /**

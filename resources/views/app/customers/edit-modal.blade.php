@@ -161,17 +161,6 @@
             </x-base.dialog.title>
             <x-base.dialog.description>
                <div>
-                    <x-base.form-label for="title_id">Title</x-base.form-label>
-                    <x-base.tom-select class="w-full" id="title_id" name="title_id" data-placeholder="Please Select">
-                        <option value="">Please Select</option>
-                        @if($titles->count() > 0)
-                            @foreach($titles as $title)
-                                <option {{ $customer->title_id == $title->id ? 'Selected' : '' }} value="{{ $title->id }}">{{ $title->name }}</option>
-                            @endforeach
-                        @endif
-                    </x-base.tom-select>
-               </div>
-               <div class="mt-3">
                     <x-base.form-label for="full_name">Full Name <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-input value="{{ isset($customer->full_name) ? $customer->full_name : '' }}" name="full_name" id="full_name" class="w-full cap-fullname" type="text" placeholder="Full Name" />
                     <div class="acc__input-error error-full_name text-danger text-xs mt-1"></div>

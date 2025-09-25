@@ -75,7 +75,7 @@
 
                 setTimeout(() => {
                     successModal.hide();
-                    //window.location.reload();
+                    window.location.reload();
                 }, 1500);
             }
         }).catch(error => {

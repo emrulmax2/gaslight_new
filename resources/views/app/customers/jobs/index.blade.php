@@ -23,20 +23,15 @@
         <input type="hidden" name="customer_id" id="customer_id" value="{{ $customer->id }}">
 
         <x-base.menu class="absolute right-0 top-0" id="jobStatusDropdown">
-            <x-base.menu.button as="x-base.button" class="jobStatsuSelected" variant="secondary"><span class="label">Due</span><x-base.lucide class="ml-2 h-4 w-4" icon="chevron-down" /></x-base.menu.button>
+            <x-base.menu.button as="x-base.button" class="jobStatsuSelected" variant="secondary"><span class="label">Ongoing</span><x-base.lucide class="ml-2 h-4 w-4" icon="chevron-down" /></x-base.menu.button>
             <x-base.menu.items class="w-48 jobStatsDropdown">
-                <x-base.menu.item class="jobStatusBtn" data-status="All">
-                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />All Jobs
-                </x-base.menu.item>
-                <x-base.menu.item class="jobStatusBtn active" data-status="Due">
-                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />Due Jobs
-                </x-base.menu.item>
-                <x-base.menu.item class="jobStatusBtn" data-status="Completed">
-                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />Completed Jobs
-                </x-base.menu.item>
-                <x-base.menu.item class="jobStatusBtn" data-status="Cancelled">
-                    <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />Cancelled Jobs
-                </x-base.menu.item>
+                @if($statuses->count() > 0)
+                    @foreach($statuses as $sts)
+                        <x-base.menu.item class="jobStatusBtn {{ $sts->id == 1 ? 'active' : '' }}" data-label="{{ $sts->name }}" data-status="{{ $sts->id }}">
+                            <x-base.lucide class="mr-2 h-4 w-4" icon="circle-check" />{{ $sts->name }}
+                        </x-base.menu.item>
+                    @endforeach
+                @endif
             </x-base.menu.items>
         </x-base.menu>
     </div>
@@ -128,7 +123,8 @@ END: HTML Table Data -->
 @endsection
 
 @pushOnce('styles')
-@vite('resources/css/vendors/tabulator.css')
+    @vite('resources/css/vendors/tabulator.css')
+    @vite('resources/css/vendors/litepicker.css')
 @endPushOnce
 
 @pushOnce('vendors')

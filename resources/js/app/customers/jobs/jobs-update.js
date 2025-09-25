@@ -126,13 +126,42 @@
         ...dateOption
     });
 
-    const calenderSlot = document.querySelector('.calenderSlot');
-
     jobCalenderDate.on('selected', (date) => {
         if(date){
-            calenderSlot.classList.remove('hidden');
+            let theDate = date.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-");
+            axios({
+                method: "post",
+                url: route('jobs.get.slot.status'),
+                data: {date : theDate},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    let max = response.data.max;
+                    let jobs = response.data.jobs;
+                    $('#updateApointDateModal .jobSlotWrap').fadeIn('fast', function(){
+                        $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                        if (!$.isEmptyObject(jobs)) {
+                            $.each(jobs, function(index, job) {
+                                if(job.totalJob >= max)
+                                $('#calendar_time_slots_'+job.calendar_time_slot_id).attr('disabled', 'disabled')
+                            })
+                        }
+                    
+                    })
+                }
+            }).catch(error => {
+                if (error.response) {
+                   onsole.log('error');
+                    $('#updateApointDateModal .jobSlotWrap').fadeOut('fast', function(){
+                        $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                    })
+                }
+            });
+            
         }else{
-            calenderSlot.classList.add('hidden');
+            $('.timeSloatWrap').fadeOut('fast', function(){
+                $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+            })
         }
     });
 

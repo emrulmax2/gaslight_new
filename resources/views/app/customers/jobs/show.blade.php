@@ -71,7 +71,7 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Job Details</h3>
         <div class="box rounded-md p-0 overflow-hidden">
-            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Description" data-field="description" data-value="{{ !empty($job->description) ? $job->description : '' }}"  class="textValueToggler border-b flex w-full items-start px-5 py-3">
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Job Name" data-field="description" data-value="{{ !empty($job->description) ? $job->description : '' }}"  class="textValueToggler border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="notebook-pen" />
                 <div>
                     <span class="font-normal text-slate-400 text-xs block">
@@ -79,34 +79,10 @@
                     </span>
                 </div>
             </a>
-            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Details" data-field="details" data-value="{{ !empty($job->details) ? $job->details : '' }}"  class="textValueToggler border-b flex w-full items-start px-5 py-3">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  icon="notebook" />
-                <div>
-                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->details) && !empty($job->details) ? $job->details : 'N/A' }}</span>
-                </div>
-            </a>
-            <a href="javascript:void(0);" data-type="number" data-required="0" data-title="Estimated Job Value (Excluding VAT)" data-field="estimated_amount" data-value="{{ !empty($job->estimated_amount) ? $job->estimated_amount : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+            <a href="javascript:void(0);" data-type="number" data-required="0" data-title="Amount" data-field="estimated_amount" data-value="{{ !empty($job->estimated_amount) ? $job->estimated_amount : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="badge-pound-sterling" />
                 <div>
                     <span class="font-normal text-slate-400 text-xs block">{{ isset($job->estimated_amount) && !empty($job->estimated_amount) ? $job->estimated_amount : 'N/A' }}</span>
-                </div>
-            </a>
-            <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updatePriorityModal">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="arrow-down-0-1" />
-                <div>
-                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->priority->name) && !empty($job->priority->name) ? $job->priority->name : 'N/A' }}</span>
-                </div>
-            </a>
-            <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updateStatusModal">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="circle-check-big" />
-                <div>
-                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->status->name) && !empty($job->status->name) ? $job->status->name : 'N/A' }}</span>
-                </div>
-            </a>
-            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Job Ref No" data-field="reference_no" data-value="{{ !empty($job->reference_no) ? $job->reference_no : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="hash" />
-                <div>
-                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : 'N/A' }}</span>
                 </div>
             </a>
             <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updateApointDateModal">
@@ -123,16 +99,29 @@
                 </div>
             </a>
             @endif
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Job Refference" data-field="reference_no" data-value="{{ !empty($job->reference_no) ? $job->reference_no : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="hash" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : 'N/A' }}</span>
+                </div>
+            </a>
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Note" data-field="details" data-value="{{ !empty($job->details) ? $job->details : '' }}"  class="textValueToggler border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  icon="notebook" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{{ isset($job->details) && !empty($job->details) ? $job->details : 'N/A' }}</span>
+                </div>
+            </a>
+            
         </div>
     </div>
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Job Status</h3>
         <div class="box rounded-md p-0 overflow-hidden">
-            <a href="javascript:void(0);" data-id="{{ $job->id }}" data-status="{{ $job->status }}" class="jobStatusUpdateModal border-b flex w-full items-start px-5 py-3">
+            <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#updateStatusModal" class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="badge-check" />
                 <div>
                     <span class="font-normal text-slate-400 text-xs block">
-                        {{ isset($job->status) && !empty($job->status) ? $job->status : 'N/A' }}
+                        {{ isset($job->theStatus->name) && !empty($job->theStatus->name) ? $job->theStatus->name : 'N/A' }}
                     </span>
                 </div>
             </a>

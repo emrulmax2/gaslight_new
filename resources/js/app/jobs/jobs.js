@@ -1,3 +1,5 @@
+import Litepicker from 'litepicker';
+
 ("use strict");
 var jobListTable = (function () {
     var _tableGen = function () {
@@ -57,10 +59,11 @@ var jobListTable = (function () {
         $(document).on('click', '.jobStatusBtn', function(e){
             let $theBtn = $(this);
             let theStatus = $theBtn.attr('data-status');
+            let label = $theBtn.attr('data-label');
 
             $(document).find('.jobStatsDropdown .jobStatusBtn').removeClass('active');
             $theBtn.addClass('active');
-            $(document).find('.jobStatsuSelected .label').html(theStatus);
+            $(document).find('.jobStatsuSelected .label').html(label);
             
             jobStatusDropdown.hide();
             jobListTable.init();
@@ -96,6 +99,67 @@ var jobListTable = (function () {
             }
         }else{
             successModal.hide();
+        }
+    });
+
+    let dateOption = {
+        autoApply: true,
+        singleMode: true,
+        numberOfColumns: 1,
+        numberOfMonths: 1,
+        showWeekNumbers: false,
+        minDate: new Date() - 1,
+        inlineMode: false,
+        format: "DD-MM-YYYY",
+        dropdowns: {
+            minYear: 1900,
+            maxYear: 2050,
+            months: true,
+            years: true,
+        },
+    };
+    const jobCalenderDate = new Litepicker({
+        element: document.getElementById('job_calender_date'),
+        ...dateOption
+    });
+
+    jobCalenderDate.on('selected', (date) => {
+        if(date){
+            let theDate = date.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-");
+            axios({
+                method: "post",
+                url: route('jobs.get.slot.status'),
+                data: {date : theDate},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    let max = response.data.max;
+                    let jobs = response.data.jobs;
+                    $('#addJobCalenderModal .jobSlotWrap').fadeIn('fast', function(){
+                        $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                        if (!$.isEmptyObject(jobs)) {
+                            $.each(jobs, function(index, job) {
+                                if(job.totalJob >= max){
+                                    $('#calendar_time_slots_'+job.calendar_time_slot_id).attr('disabled', 'disabled')
+                                }
+                            })
+                        }
+                    
+                    })
+                }
+            }).catch(error => {
+                if (error.response) {
+                   onsole.log('error');
+                    $('#addJobCalenderModal .timeSloatWrap').fadeOut('fast', function(){
+                        $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                    })
+                }
+            });
+            
+        }else{
+            $('.timeSloatWrap').fadeOut('fast', function(){
+                $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+            })
         }
     });
 
@@ -180,29 +244,29 @@ var jobListTable = (function () {
         }
     });
 
-    $('#jobListTable').on('click', '.addCalenderBtn', function(e){
-        e.preventDefault();
-        let $theBtn = $(this);
-        let customer_job_id = $theBtn.attr('data-id');
+    // $('#jobListTable').on('click', '.addCalenderBtn', function(e){
+    //     e.preventDefault();
+    //     let $theBtn = $(this);
+    //     let customer_job_id = $theBtn.attr('data-id');
 
-        axios({
-            method: "post",
-            url: route('jobs.get.calendar.details'),
-            data: {customer_job_id : customer_job_id},
-            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-        }).then(response => {
-            if (response.status == 200) {
-                var row = response.data.row;
-                $('#addJobCalenderModal input[name="customer_job_id"]').val(customer_job_id);
-                $('#addJobCalenderModal input[name="date"]').val(row.date);
-                $('#addJobCalenderModal input#slot-'+row.calendar_time_slot_id).prop('checked', true);
-            }
-        }).catch(error => {
-            if (error.response) {
-                console.log('error');
-            }
-        });
-    });
+    //     axios({
+    //         method: "post",
+    //         url: route('jobs.get.calendar.details'),
+    //         data: {customer_job_id : customer_job_id},
+    //         headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+    //     }).then(response => {
+    //         if (response.status == 200) {
+    //             var row = response.data.row;
+    //             $('#addJobCalenderModal input[name="customer_job_id"]').val(customer_job_id);
+    //             $('#addJobCalenderModal input[name="date"]').val(row.date);
+    //             $('#addJobCalenderModal input#slot-'+row.calendar_time_slot_id).prop('checked', true);
+    //         }
+    //     }).catch(error => {
+    //         if (error.response) {
+    //             console.log('error');
+    //         }
+    //     });
+    // });
 
     $('#addJobCalenderForm').on('submit', function(e){
         e.preventDefault();
@@ -255,19 +319,63 @@ var jobListTable = (function () {
 
     var clickTimeout;
     var isDoubleClick = false;
+    $('#jobListTable').on('click', '.JobListItem', function(event) {
+        let $target = $(event.target);
 
-    $('#jobListTable').on('click', '.JobListItem', function(e) {
+        if ($target.is('.addCalenderBtn') || $target.is('.addCalenderChild')) {
+            let $parents = $target.closest('.JobListItem');
+            let $theBtn = $parents.find('.addCalenderBtn');
+            let customer_job_id = $theBtn.attr('data-id');
+            
+            axios({
+                method: "post",
+                url: route('jobs.get.calendar.details'),
+                data: {customer_job_id : customer_job_id},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    var row = response.data.row;
+                    $('#addJobCalenderModal input[name="customer_job_id"]').val(customer_job_id);
+                    $('#addJobCalenderModal input[name="date"]').val(row.date);
+                    if(row.date != ''){
+                        $('#addJobCalenderModal .jobSlotWrap').fadeIn('fast', function(){
+                            let max = response.data.max;
+                            let jobs = response.data.jobs;
+                            $('#addJobCalenderModal .jobSlotWrap').fadeIn('fast', function(){
+                                $('[type="radio"]', this).prop('checked', false).removeAttr('disabled');
+                                $('#addJobCalenderModal input#calendar_time_slots_'+row.calendar_time_slot_id).prop('checked', true);
+                                if (!$.isEmptyObject(jobs)) {
+                                    $.each(jobs, function(index, job) {
+                                        if(job.totalJob >= max)
+                                        $('#addJobCalenderModal #calendar_time_slots_'+job.calendar_time_slot_id).attr('disabled', 'disabled')
+                                    })
+                                }
+                            
+                            })
+                        })
+                    }else{
+                        $('#addJobCalenderModal .jobSlotWrap').fadeOut('fast', function(){
+                            $('#addJobCalenderModal input[type="radio"]').prop('checked', false).removeAttr('disabled');
+                        })
+                    }
+                }
+            }).catch(error => {
+                if (error.response) {
+                    console.log('error');
+                }
+            });
+        } else {
+            let $theBtn = $(this);
+            let show_url = $theBtn.attr('show_url');
 
-        let $theBtn = $(this);
-        let show_url = $theBtn.attr('show_url');
-
-        clickTimeout = setTimeout(function() {
-            if (!isDoubleClick) {
-                window.location.href = show_url;
-            } else {
-                isDoubleClick = false;
-            }
-        }, 200);
+            clickTimeout = setTimeout(function() {
+                if (!isDoubleClick) {
+                    window.location.href = show_url;
+                } else {
+                    isDoubleClick = false;
+                }
+            }, 200);
+        }
     });
 
 
@@ -278,18 +386,14 @@ var jobListTable = (function () {
 
         let $theBtn = $(this);
         let jobId = $theBtn.attr('data-id');
-        let currentStatus = $theBtn.attr('data-status');
+        let currentStatus = $theBtn.attr('data-statusid');
 
         function updateModalStatus(status) {
-            $('#statusUpdateForm input[name="status"]').prop('checked', false);
+            $('#statusUpdateForm input[name="customer_job_status_id"]').prop('checked', false);
             $('#statusUpdateForm input[name="customer_job_id"]').val(jobId);;
 
-            if (status === 'Due') {
-                $('#status_due').prop('checked', true);
-            } else if (status === 'Completed') {
-                $('#status_completed').prop('checked', true);
-            } else if (status === 'Cancelled') {
-                $('#status_cancelled').prop('checked', true);
+            if (status  > 0) {
+                 $('#statusUpdateForm #customer_job_status_'+status).prop('checked', true);
             } else {
                 console.warn('Unknown status:', status);
             }
