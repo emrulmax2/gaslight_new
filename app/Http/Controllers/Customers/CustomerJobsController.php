@@ -58,7 +58,7 @@ class CustomerJobsController extends Controller
                 $q->where('description','LIKE','%'.$queryStr.'%')->orWhere('details','LIKE','%'.$queryStr.'%')
                     ->orWhere('reference_no','LIKE','%'.$queryStr.'%');
             });
-        endif;
+        endif; 
 
         $Query= $query->get();
 
