@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Option;
 use App\Models\PricingPackage;
 use App\Models\RegistrationOtp;
 use App\Models\User;
@@ -83,11 +84,13 @@ class RegisteredUserController extends Controller
                 'created_by' => $user->id,
             ]);
 
-            $TRAIL_PERIOD = env('DEFAULT_TRAIL', 14);
+            $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'DEFAULT_TRAIL')->pluck('value')->first() ?? 14;
+            //$TRAIL_PERIOD = env('DEFAULT_TRAIL', 14);
             if(!empty($referral_code)):
                 $referral = UserReferralCode::where('code', $referral_code)->where('active', 1)->get()->first();
                 if(isset($referral->id) && $referral->id > 0):
-                    $TRAIL_PERIOD = env('REFEREE_TRAIL', 90);
+                    $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'REFEREE_TRAIL')->pluck('value')->first() ?? $TRAIL_PERIOD;
+                    //$TRAIL_PERIOD = env('REFEREE_TRAIL', 90);
                     $userReferred = UserReferred::create([
                         'user_referral_code_id' => $referral->id,
                         'referrer_id' => $referral->user_id,

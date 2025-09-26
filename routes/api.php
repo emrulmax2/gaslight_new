@@ -177,6 +177,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::put('job/calendar/{customer_job_id}/update','updateCustomerJobCalendar');
             Route::get('job/calendar/{id}', 'getJobCalendarDetails');
             // Route::post('job/calendar/store','addToCalendar');
+            Route::post('jobs/get-slot-status', 'getCalendarSlotStatus');
         });
 
         Route::controller(QuoteController::class)->group(function(){

@@ -40,6 +40,13 @@
                     <span class="font-normal text-slate-400 text-xs block">{{ $user->email }}</span>
                 </div>
             </a>
+            <a href="javascript:void(0);" data-type="email" data-required="1" data-title="Email" data-field="email" data-value="{{ $user->email }}"  class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="smartphone" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Mobile</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($user->mobile) ? $user->mobile : 'N/A') }}</span>
+                </div>
+            </a>
             <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#updatePasswordModal" class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="key" />
                 <div>

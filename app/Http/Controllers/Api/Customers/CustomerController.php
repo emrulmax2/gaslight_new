@@ -20,17 +20,12 @@ class CustomerController extends Controller
 
     public function list(Request $request)
     {
-        $query = Customer::with('title', 'contact')->where('created_by', $request->user()->id);
+        $query = Customer::where('created_by', $request->user()->id);
 
-        $status = ($request->has('status') && ($request->query('status') != '')) ? $request->query('status') : 1;
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'full_name';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? $request->query('order') : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
-        if ($status == 2) {
-            $query->onlyTrashed();
-        }
-        
         $searchableColumns = Schema::getColumnListing((new Customer)->getTable());
         if (!empty($searchKey)) {
             $query->where(function($q) use ($searchableColumns, $searchKey) {
@@ -65,10 +60,10 @@ class CustomerController extends Controller
     public function storeCustomer(CustomerCreateRequest $request){
         try {
         $data = [
-            'title_id' => (!empty($request->title_id) ? $request->title_id : null),
+            // 'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
-            'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
+            // 'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
             'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
             'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
@@ -103,7 +98,7 @@ class CustomerController extends Controller
                 'mobile' => (!empty($request->mobile) ? $request->mobile : null),
                 'phone' => (!empty($request->phone) ? $request->phone : null),
                 'email' => (!empty($request->email) ? $request->email : null),
-                'other_email' => (!empty($request->other_email) ? $request->other_email : null),
+                // 'other_email' => (!empty($request->other_email) ? $request->other_email : null),
                 'created_by' => $request->user()->id
             ]);
 
@@ -196,103 +191,30 @@ class CustomerController extends Controller
         };
     }
 
-    public function updateCustomer(Request $request){
+    public function updateCustomer(Request $request)
+    {
         try {
-            $customer = Customer::with(['title', 'contact'])
-                        ->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
-                        ->findOrFail($request->id);
+            $customer = Customer::with(['contact'])
+                ->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
+                ->findOrFail($request->id);
+
             $customer->makeHidden([
                 'full_address_html',
                 'full_address_with_html'
             ]);
-            $hasAddress = false;
 
-            $updateData = [];
+            $fields = ['full_name','company_name', 'address_line_1', 'address_line_2', 'postal_code', 'state', 'city',  'country', 'latitude', 'longitude', 'note','auto_reminder' ];
 
-            if($request->has('title_id')):
-                $updateData['title_id'] = (isset($request->title_id) && !empty($request->title_id) ? $request->title_id : null);
-            endif;
-
-            if($request->has('full_name')):
-                $updateData['full_name'] = (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null);
-            endif;
-
-            if($request->has('company_name')):
-                $updateData['company_name'] = (isset($request->company_name) && !empty($request->company_name) ? $request->company_name : null);
-            endif;
-
-            if($request->has('vat_no')):
-                $updateData['vat_no'] = (isset($request->vat_no) && !empty($request->vat_no) ? $request->vat_no : null);
-            endif;
-
-            // update address
-            if($request->has('address_line_1')):
-                $updateData['address_line_1'] = (isset($request->address_line_1) && !empty($request->address_line_1) ? $request->address_line_1 : null);
-                $hasAddress = true;
-            endif;
-
-            if($request->has('address_line_2')):
-                $updateData['address_line_2'] = (isset($request->address_line_2) && !empty($request->address_line_2) ? $request->address_line_2 : null);
-                $hasAddress = true;
-            endif;
-
-            if($request->has('postal_code')):
-                $updateData['postal_code'] = (isset($request->postal_code) && !empty($request->postal_code) ? $request->postal_code : null);
-                $hasAddress = true;
-            endif;
-
-            if($request->has('state')):
-                $updateData['state'] = (isset($request->state) && !empty($request->state) ? $request->state : null);
-            endif;
-
-            if($request->has('city')):
-                $updateData['city'] = (isset($request->city) && !empty($request->city) ? $request->city : null);
-                $hasAddress = true;
-            endif;
-
-            if($request->has('country')):
-                $updateData['country'] = (isset($request->country) && !empty($request->country) ? $request->country : null);
-            endif;
-
-            if($request->has('latitude')):
-                $updateData['latitude'] = (isset($request->latitude) && !empty($request->latitude) ? $request->latitude : null);
-            endif;
-
-            if($request->has('longitude')):
-                $updateData['longitude'] = (isset($request->longitude) && !empty($request->longitude) ? $request->longitude : null);
-            endif;
-
-            if($request->has('note')):
-                $updateData['note'] = (isset($request->note) && !empty($request->note) ? $request->note : null);
-            endif;
-
-            if($request->has('auto_reminder')):
-                $updateData['auto_reminder'] = (isset($request->auto_reminder) && !empty($request->auto_reminder) ? $request->auto_reminder : null);
-            endif;
+            $updateData = $request->only($fields);
+            foreach ($updateData as $key => $value) {
+                $updateData[$key] = !empty($value) ? $value : null;
+            }
 
             $updateData['updated_by'] = $request->user()->id;
-
-            if($hasAddress && ($customer->postal_code != $updateData['postal_code'] || $customer->address_line_1 != $updateData['address_line_1'] || $customer->address_line_2 != $updateData['address_line_2'] || $customer->city != $updateData['city'])):
-                CustomerProperty::create([
-                    'customer_id' => $customer->id,
-                    'address_line_1' => $updateData['address_line_1'],
-                    'address_line_2' => $updateData['address_line_2'],
-                    'postal_code' => $updateData['postal_code'],
-                    'state' => (isset($updateData['state']) ? $updateData['state'] : null),
-                    'city' => $updateData['city'],
-                    'country' => (isset($updateData['country']) ? $updateData['country'] : null),
-                    'note' => null,
-                    'latitude' => (isset($updateData['latitude']) ? $updateData['latitude'] : null),
-                    'longitude' => (isset($updateData['longitude']) ? $updateData['longitude'] : null),
-        
-                    'created_by' => $request->user()->id,
-                ]);
-            endif;
-
             $customer->update($updateData);
 
             return response()->json([
-                'message' => 'Customer successfully updated.', 
+                'message' => 'Customer successfully updated.',
                 'data' => $customer
             ], 200);
         } catch (ModelNotFoundException $e) {
@@ -301,11 +223,11 @@ class CustomerController extends Controller
             ], 404);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Something went wrong. Please try again later or contact with the administrator',
-            ], 304);
-        };
-       
+                'message' => 'Something went wrong. Please try again later or contact the administrator',
+            ], 500);
+        }
     }
+
 
 
     public function updateCustomerContact(CustomerContactInfoUpdateRequest $request)
@@ -394,8 +316,7 @@ class CustomerController extends Controller
     public function getDetails($id)
     {
         try {
-            $customer = Customer::with(['title', 'contact'])
-                        ->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
+            $customer = Customer::withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
                         ->findOrFail($id);
             $customer->makeHidden([
                 'full_address_html',

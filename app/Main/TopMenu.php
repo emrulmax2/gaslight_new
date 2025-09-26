@@ -484,6 +484,12 @@ class TopMenu
                     'route_name' => 'superadmin.boiler-brand.index',
                     'title' => 'Boiler Manual'
                 ],
+                
+                'Settings' => [
+                    'icon' => 'settings',
+                    'route_name' => 'superadmin.site.setting',
+                    'title' => 'Settings'
+                ],
 
             ];
         else:

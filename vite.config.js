@@ -248,7 +248,12 @@ export default defineConfig({
                 "resources/js/app/boiler-new-manuals/crud.js",
                 "resources/js/app/boiler-new-manuals/list.js",
                 "resources/js/app/boiler-new-manuals/dropzone.js",
-                "resources/js/app/boiler-new-manuals/upload-excel.js"
+                "resources/js/app/boiler-new-manuals/upload-excel.js",
+
+                "resources/js/app/superadmin/settings/settings.js",
+                "resources/js/app/superadmin/settings/api.js",
+                "resources/js/app/superadmin/settings/registration-settings.js",
+                "resources/js/app/superadmin/settings/pricing-package.js",
             ],
             refresh: true,
         }),
