@@ -41,7 +41,7 @@ class BoilerBrandAndManualPageController extends Controller
 
 
         $queryStr = (isset($request->search) && !empty($request->search) ? $request->search : null);
-        $orderBy = (isset($request->orderBy) && !empty($request->orderBy) ? $request->orderBy : 'name');
+        $orderBy = (isset($request->orderBy) && !empty($request->orderBy) ? $request->orderBy : 'model');
         $order = (isset($request->orderBy) && !empty($request->order) ? $request->order : 'asc');
 
         $query = BoilerNewManual::where('boiler_new_brand_id', $id)->orderBy($orderBy, $order);

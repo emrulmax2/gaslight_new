@@ -20,8 +20,10 @@ class UserOtp extends Model
     public function sendSMS($receiverNumber){
         $message = "Login OTP is ".$this->otp;
         try {
+            $SMSEAGLE_SIM = Option::where('category', 'SITE_API')->where('name', 'SMSEAGLE_SIM')->pluck('value')->first() ?? '';
+            $SMSEAGLE_API = Option::where('category', 'SITE_API')->where('name', 'SMSEAGLE_API')->pluck('value')->first() ?? getenv('SMSEAGLE_API');
             $response = Http::withHeaders([
-                            'access-token' => getenv('SMSEAGLE_API'),
+                            'access-token' => $SMSEAGLE_API,
                             'Content-Type' => 'application/json',
                         ])->withoutVerifying()->withOptions([
                             "verify" => false

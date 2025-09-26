@@ -4,34 +4,36 @@ namespace App\Http\Controllers\Api\Jobs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CustomerJobCalenderStoreRequest;
-use App\Http\Requests\Api\JobStoreRequest;
 use App\Http\Requests\Api\JobUpdateRequest;
-use App\Http\Requests\JobAddToCalendarRequest;
 use App\Models\Customer;
 use App\Models\CustomerJob;
 use App\Models\CustomerJobCalendar;
 use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class JobsController extends Controller
 {
     public function list(Request $request)
     {
-        
-        $validStatuses = ['Due', 'Completed', 'Cancelled', 'Trashed'];
-        $status = $request->filled('status') && $request->query('status') > 0 ? $request->query('status') : 1;
+        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : '';
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         
-        $query = CustomerJob::with('customer', 'property', 'priority', 'theStatus', 'calendar', 'calendar.slot')
-                ->where('created_by', $request->user()->id)->where('customer_job_status_id', $status);
+        $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot')
+                ->where('created_by', $request->user()->id);
+        
+        if($status){
+            $query->where('customer_job_status_id', $status);
+        }
         $searchableColumns = Schema::getColumnListing((new CustomerJob())->getTable());
 
          if (!empty($searchKey)):
@@ -73,7 +75,7 @@ class JobsController extends Controller
             'details' => (!empty($request->details) ? $request->details : null),
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
-            'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : 1),
+            'customer_job_status_id' => 1,
             'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => $request->user()->id,
@@ -148,24 +150,49 @@ class JobsController extends Controller
     }
     public function getJobDetails(Request $request, $id){
        try {
-            $job = CustomerJob::with(['customer', 'property', 'customer.contact', 'calendar', 'calendar.slot', 'thestatus'])
+        $user = User::find($request->user()->id);
+        $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar'])
             ->withCount("records as number_of_records")
             ->findOrFail($id);
 
-            $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
-            $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
+        $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
+        $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
 
-            if ($job->created_by !== $request->user()->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You are not authorized to access this job.'
-                ], 403);
-            }
+        $calendarDate = (isset($job->calendar->date) && !empty($job->calendar->date) ? date('Y-m-d', strtotime($job->calendar->date)) : 0);
+        $jobCalendarTimeSlotId = (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id > 0 ? $job->calendar->calendar_time_slot_id : '');
+        $user = User:: find($job->created_by);
+        $max_job_per_slot = (isset($user->max_job_per_slot) && $user->max_job_per_slot > 0 ? $user->max_job_per_slot : 1);
 
-            return response()->json([
-                'success' => true,
-                'data' => $job
-            ], 200);
+        $blocked = [];
+        if(!empty($calendarDate)):
+            $query = DB::table('customer_job_calendars as cjc')
+                ->select('cjc.calendar_time_slot_id', DB::raw('count(cjc.id) as totalJob'))
+                ->leftJoin('customer_jobs as cj', 'cjc.customer_job_id', 'cj.id')
+                ->where('cjc.date', $calendarDate);
+            if($jobCalendarTimeSlotId > 0):
+                $query->where('cjc.calendar_time_slot_id', '!=', $jobCalendarTimeSlotId);
+            endif;
+            $result = $query->where('cj.created_by', $job->created_by)
+                ->groupBy('cjc.calendar_time_slot_id')
+                ->get();
+            if($result->count() > 0):
+                foreach($result as $res):
+                    if($res->totalJob >= $max_job_per_slot):
+                        $blocked[] = $res->calendar_time_slot_id;
+                    endif;
+                endforeach;
+            endif;
+        endif;
+
+
+         return response()->json([
+            'success' => true,
+            'data' =>  [
+                'job' => $job,
+                'hasVat' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? true : false),
+                'blocked' => $blocked
+            ]
+        ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -185,7 +212,7 @@ class JobsController extends Controller
         try {
             DB::beginTransaction();
 
-            $job = CustomerJob::with(['customer', 'property', 'priority', 'status', 'calendar', 'calendar.slot'])
+            $job = CustomerJob::with(['customer', 'property', 'priority', 'calendar', 'calendar.slot'])
             ->withCount("records as number_of_records")
             ->findOrFail($id);
 
@@ -213,9 +240,9 @@ class JobsController extends Controller
                 $updateData['estimated_amount'] = (isset($request->estimated_amount) && !empty($request->estimated_amount) ? $request->estimated_amount : null);
             endif;
 
-            // if($request->has('customer_job_priority_id')):
-            //     $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
-            // endif;
+            if($request->has('customer_job_priority_id')):
+                $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
+            endif;
 
             if($request->has('customer_job_status_id')):
                 $updateData['customer_job_status_id'] = (isset($request->customer_job_status_id) && !empty($request->customer_job_status_id) ? $request->customer_job_status_id : null);
@@ -573,5 +600,22 @@ class JobsController extends Controller
             endforeach;
         endif;
         return response()->json(['last_page' => $last_page, 'data' => $data]); 
+    }
+
+
+    public function getCalendarSlotStatus(Request $request){
+        $date = date('Y-m-d', strtotime($request->date));
+        $user = User::find($request->user()->id);
+        $max_job_per_slot = (isset($user->max_job_per_slot) && $user->max_job_per_slot > 0 ? $user->max_job_per_slot : 1);
+
+        $customerJobSlots = DB::table('customer_job_calendars as cjc')
+            ->select('cjc.calendar_time_slot_id', DB::raw('count(cjc.id) as totalJob'))
+            ->leftJoin('customer_jobs as cj', 'cjc.customer_job_id', 'cj.id')
+            ->where('date', $date)
+            ->where('cj.created_by', $request->user()->id)
+            ->groupBy('cjc.calendar_time_slot_id')
+            ->get();
+
+        return response()->json(['max' => $max_job_per_slot, 'jobs' => $customerJobSlots], 200);
     }
 }

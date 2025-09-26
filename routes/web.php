@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ThemeController;
@@ -55,6 +56,9 @@ use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
+use App\Http\Controllers\Superadmin\Settings\PricingPackageController;
+use App\Http\Controllers\SuperAdmin\Settings\SettingController;
+use App\Http\Controllers\Superadmin\Settings\UserSettingsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Middleware\CheckSubscription;
@@ -154,6 +158,30 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
             Route::post('boiler-new-manual-restore/{id}', 'restore')->name('boiler-new-manual.restore'); 
         });
 
+    });
+
+    Route::controller(SettingController::class)->group(function(){
+        Route::get('site-settings', 'index')->name('site.setting');
+        Route::post('site-settings/update', 'update')->name('site.setting.update');
+
+        Route::get('site-settings/api', 'apiSettings')->name('site.setting.api');
+        Route::post('site-settings/api-update', 'updateApi')->name('site.setting.api.update');
+    });
+
+    Route::controller(UserSettingsController::class)->group(function(){
+        Route::get('site-settings/user-registration-setting', 'index')->name('site.setting.user.registration');
+        Route::post('site-settings/user-registration-setting-update', 'update')->name('site.setting.user.registration.update');
+    });
+
+    Route::controller(PricingPackageController::class)->group(function(){
+        Route::get('site-settings/pricing-package', 'index')->name('site.setting.pricing.package');
+        Route::get('site-settings/pricing-package/list', 'list')->name('site.setting.pricing.package.list');
+        Route::post('site-settings/pricing-package/store', 'store')->name('site.setting.pricing.package.store');
+        Route::post('site-settings/pricing-package/update', 'update')->name('site.setting.pricing.package.update');
+
+        
+        Route::delete('site-settings/pricing-package/destroy/{pack_id}', 'destroy')->name('site.setting.pricing.package.destroy'); 
+        Route::post('site-settings/pricing-package/restore/{pack_id}', 'restore')->name('site.setting.pricing.package.restore');
     });
        
 });

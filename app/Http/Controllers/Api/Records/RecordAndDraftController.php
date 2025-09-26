@@ -156,7 +156,7 @@ class RecordAndDraftController extends Controller
         $job_form_id = $request->form_id;
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
-        $jobsQuery = CustomerJob::with('customer', 'property', 'status')
+        $jobsQuery = CustomerJob::with('customer', 'property', 'thestatus')
             ->where('created_by', $user_id)
             ->orderBy('id', 'DESC');
 
