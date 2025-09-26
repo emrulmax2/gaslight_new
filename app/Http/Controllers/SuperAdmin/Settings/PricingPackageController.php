@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Superadmin\Settings;
+namespace App\Http\Controllers\SuperAdmin\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PricingPackStoreRequest;
