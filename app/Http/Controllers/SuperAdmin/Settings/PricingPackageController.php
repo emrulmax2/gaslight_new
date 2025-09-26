@@ -12,7 +12,7 @@ use Illuminate\Support\Number;
 class PricingPackageController extends Controller
 {
     public function index(){
-        return view('app.superadmin.settings.package.index', [
+        return view('app.superadmin.settings.package.index', [ 
             'title' => 'Site Settings - Gas Certificate APP',
             'subtitle' => 'User Settings',
             'breadcrumbs' => [
