@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class UserSettingsController extends Controller
 {
     public function index(){ 
-        return view('app.superadmin.settings.user.index', [
+        return view('app.superadmin.settings.user.index', [ 
             'title' => 'Site Settings - Gas Certificate APP',
             'subtitle' => 'User Settings',
             'breadcrumbs' => [
