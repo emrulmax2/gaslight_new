@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Superadmin\Settings;
+namespace App\Http\Controllers\SuperAdmin\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PricingPackStoreRequest;
@@ -12,7 +12,7 @@ use Illuminate\Support\Number;
 class PricingPackageController extends Controller
 {
     public function index(){
-        return view('app.superadmin.settings.package.index', [ 
+        return view('app.superadmin.settings.package.index', [  
             'title' => 'Site Settings - Gas Certificate APP',
             'subtitle' => 'User Settings',
             'breadcrumbs' => [
