@@ -49,7 +49,7 @@
                                     <div class="acc__input-error error-mobile mt-2 text-danger text-xs" style="display: none;"></div>   
                                 </div>
                                 <div class="mt-5">
-                                    <x-base.button id="sendOtp" class="w-full" variant="primary">
+                                    <x-base.button type="button" id="sendOtp" class="w-full" variant="primary">
                                         <span class="signin-text">Send OTP</span>
                                         <x-base.loading-icon class="h-4 w-4 ml-2 hidden login__loading" icon="oval" color="#fff"/>
                                     </x-base.button>
@@ -84,58 +84,6 @@
                             <x-base.lucide class="w-4 h-4 mr-2" icon="mail" />
                             <span class="signin-text">Continue with Email</span>
                         </x-base.button>
-
-                        {{--<form id="login-form">
-                            <x-base.form-label>Email*</x-base.form-label>
-                            <x-base.form-input id="email"
-                                class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5 login__input"
-                                type="text"
-                                placeholder="username@example.com"
-                            />
-                            <div id="error-email" class="login__input-error text-danger mt-2 dark:text-orange-400 "></div>        
-                            <x-base.form-label class="mt-4">Password*</x-base.form-label>
-                            <x-base.form-input id="password"
-                                class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5"
-                                type="password"
-                                placeholder="************"
-                            />
-                            <div id="error-password" class="login__input-error text-danger mt-2 dark:text-orange-400"></div>
-                        </form>
-                        <div class="flex mt-4 text-xs text-slate-500 sm:text-sm">
-                            <div class="flex items-center mr-auto">
-                                <x-base.form-check.input
-                                    class="mr-2.5 border"
-                                    id="remember-me"
-                                    type="checkbox"
-                                />
-                                <label
-                                    class="cursor-pointer select-none"
-                                    for="remember-me"
-                                >
-                                    Remember me
-                                </label>
-                            </div>
-                            <a href="">Forgot Password?</a>
-                        </div>
-                        <div class="mt-5 text-center xl:mt-8 xl:text-left">
-                            <x-base.button id="btn-login" 
-                                class="w-full bg-gradient-to-r from-theme-1/70 to-theme-2/70 py-3.5 xl:mr-3"
-                                variant="primary"
-                                rounded
-                            >
-                                <span class="signin-text">Sign In</span><x-base.loading-icon
-                                class="h-6 w-6 hidden login__loading"
-                                icon="oval" color="#fff"
-                            />
-                            </x-base.button>
-                            <!--<a href="{{ route('register') }}"
-                                class="transition duration-200 border shadow-sm inline-flex items-center justify-center px-3 font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed border-secondary text-slate-500 dark:border-darkmode-100/40 dark:text-slate-300 [&:hover:not(:disabled)]:bg-secondary/20 [&:hover:not(:disabled)]:dark:bg-darkmode-100/10 rounded-full mt-3 w-full bg-white/70 py-3.5"
-                                variant="outline-secondary"
-                                rounded
-                            >
-                                Sign Up
-                            </a>-->
-                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -266,72 +214,72 @@
     <script type="module">
         (function () {
             
-            if($('#success-notification-toggle').length>0) {
+            // if($('#success-notification-toggle').length>0) {
 
-                $("#success-notification-toggle").on("click", function () {
-                    // Init toastify
-                    Toastify({
-                    node: $("#success-notification-content")
-                    .clone()
-                    .removeClass("hidden")[0],
-                    duration: -1,
-                    newWindow: true,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    stopOnFocus: true,
-                    }).showToast();
-                    });
+            //     $("#success-notification-toggle").on("click", function () {
+            //         // Init toastify
+            //         Toastify({
+            //         node: $("#success-notification-content")
+            //         .clone()
+            //         .removeClass("hidden")[0],
+            //         duration: -1,
+            //         newWindow: true,
+            //         close: true,
+            //         gravity: "top",
+            //         position: "right",
+            //         stopOnFocus: true,
+            //         }).showToast();
+            //         });
 
-                $("#success-notification-toggle").trigger('click')            
-            }
+            //     $("#success-notification-toggle").trigger('click')            
+            // }
 
             
-            async function login() {
-                // Reset state
-                $('#login-form').find('.login__input').removeClass('border-danger')
-                $('#login-form').find('.login__input-error').html('')
+            // async function login() {
+            //     // Reset state
+            //     $('#login-form').find('.login__input').removeClass('border-danger')
+            //     $('#login-form').find('.login__input-error').html('')
 
-                // Post form
-                let email = $('#email').val()
-                let password = $('#password').val()
-                $('.signin-text').addClass('hidden');
-                $('#btn-login .login__loading').removeClass('hidden');
-                // Loading state
-                //$('#btn-login').html('<i data-loading-icon="oval" data-color="white" class="w-5 h-5 mx-auto"></i>')
-                //tailwind.svgLoader()
-                await helper.delay(1500)
+            //     // Post form
+            //     let email = $('#email').val()
+            //     let password = $('#password').val()
+            //     $('.signin-text').addClass('hidden');
+            //     $('#btn-login .login__loading').removeClass('hidden');
+            //     // Loading state
+            //     //$('#btn-login').html('<i data-loading-icon="oval" data-color="white" class="w-5 h-5 mx-auto"></i>')
+            //     //tailwind.svgLoader()
+            //     await helper.delay(1500)
 
-                axios.post(route('login.check'), {
-                    email: email,
-                    password: password
-                }).then(res => {
-                    location.href = route('company.dashboard');
-                }).catch(err => {
-                    //$('#btn-login').html('Login')
-                    $('#btn-login .login__loading').addClass('hidden');
-                    $('.signin-text').removeClass('hidden');
-                    if (err.response.data.message != 'Wrong email or password.') {
-                        for (const [key, val] of Object.entries(err.response.data.errors)) {
-                            $(`#${key}`).addClass('border-danger')
-                            $(`#error-${key}`).html(val)
-                        }
-                    } else {
-                        $(`#password`).addClass('border-danger')
-                        $(`#error-password`).html(err.response.data.message)
-                    }
-                })
-            }
+            //     axios.post(route('login.check'), {
+            //         email: email,
+            //         password: password
+            //     }).then(res => {
+            //         location.href = route('company.dashboard');
+            //     }).catch(err => {
+            //         //$('#btn-login').html('Login')
+            //         $('#btn-login .login__loading').addClass('hidden');
+            //         $('.signin-text').removeClass('hidden');
+            //         if (err.response.data.message != 'Wrong email or password.') {
+            //             for (const [key, val] of Object.entries(err.response.data.errors)) {
+            //                 $(`#${key}`).addClass('border-danger')
+            //                 $(`#error-${key}`).html(val)
+            //             }
+            //         } else {
+            //             $(`#password`).addClass('border-danger')
+            //             $(`#error-password`).html(err.response.data.message)
+            //         }
+            //     })
+            // }
 
-            $('#login-form').on('keyup', function(e) {
-                if (e.keyCode === 13) {
-                    login()
-                }
-            })
+            // $('#login-form').on('keyup', function(e) {
+            //     if (e.keyCode === 13) {
+            //         login()
+            //     }
+            // })
 
-            $('#btn-login').on('click', function() {
-                login()
-            })
+            // $('#btn-login').on('click', function() {
+            //     login()
+            // })
         })()
     </script>
 @endPushOnce

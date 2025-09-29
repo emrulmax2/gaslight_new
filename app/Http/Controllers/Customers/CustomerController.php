@@ -173,6 +173,7 @@ class CustomerController extends Controller
 
     public function store(CustomerCreateRequest $request){
         $data = [
+            'company_id' => auth()->user()->companies->pluck('id')->first(),
             //'title_id' => (!empty($request->title_id) ? $request->title_id : null),
             'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),

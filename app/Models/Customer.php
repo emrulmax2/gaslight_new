@@ -13,6 +13,7 @@ class Customer extends Model
     protected $appends = ['customer_full_name','full_address', 'full_address_html', 'pdf_address', 'full_address_with_html'];
     
     protected $fillable = [
+        'company_id',
         'title_id',
         'full_name',
         'company_name',
@@ -77,6 +78,10 @@ class Customer extends Model
         $address .= (!empty($this->state) ? $this->state.',<br/> ' : '');
         $address .= (!empty($this->country) ? $this->country : '');
         return $address;
+    }
+
+    public function company(){
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function title(){
