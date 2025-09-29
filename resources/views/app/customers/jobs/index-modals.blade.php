@@ -52,18 +52,14 @@
             </x-base.dialog.title>
             <x-base.dialog.description class="px-5 py-2 bg-slate-100">
                 <div class="bg-white">
-                    <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                        <x-base.form-check.label class="font-medium ml-0 block w-full" for="status_due">Due</x-base.form-check.label>
-                        <x-base.form-check.input id="status_due" name="status" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Due"/>
-                    </x-base.form-check>
-                    <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                        <x-base.form-check.label class="font-medium ml-0 block w-full" for="status_completed">Completed</x-base.form-check.label>
-                        <x-base.form-check.input id="status_completed" name="status" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Completed"/>
-                    </x-base.form-check>
-                    <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                        <x-base.form-check.label class="font-medium ml-0 block w-full" for="status_cancelled">Cancelled</x-base.form-check.label>
-                        <x-base.form-check.input id="status_cancelled" name="status" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Cancelled"/>
-                    </x-base.form-check>
+                    @if($statuses->count() > 0)
+                        @foreach($statuses as $sts)
+                            <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                <x-base.form-check.label class="font-medium ml-0 block w-full" for="customer_job_status_{{ $sts->id }}">{{ $sts->name }}</x-base.form-check.label>
+                                <x-base.form-check.input id="customer_job_status_{{ $sts->id }}" name="customer_job_status_id" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="{{ $sts->id }}"/>
+                            </x-base.form-check>
+                        @endforeach
+                    @endif
                 </div>
                 <div class="acc__input-error error-fieldValue text-danger text-xs"></div>
             </x-base.dialog.description>
@@ -80,3 +76,46 @@
     </x-base.dialog.panel>
 </x-base.dialog>
 <!-- END: Status update Modal Content -->
+
+<!-- BEGIN: Cancell Reason Modal Content -->
+<x-base.dialog id="cancelReasonModal" staticBackdrop size="sm">
+    <x-base.dialog.panel class="rounded-none">
+        <form method="post" action="#" id="cancelReasonForm">
+            <x-base.dialog.title>
+                <h2 class="mr-auto text-base font-medium modalTitle">Cancel Job</h2>
+                <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+            </x-base.dialog.title>
+            <x-base.dialog.description class="px-5 py-2 bg-slate-100">
+                <div>
+                    <x-base.form-label>Reason <span class="text-danger">*</span></x-base.form-label>
+                    <div class="bg-white">
+                        @if($reasons->count() > 0)
+                            @foreach($reasons as $rsn)
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="cancel_reason_{{ $rsn->id }}">{{ $rsn->name }}</x-base.form-check.label>
+                                    <x-base.form-check.input id="cancel_reason_{{ $rsn->id }}" name="cancel_reason_id" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="{{ $rsn->id }}"/>
+                                </x-base.form-check>
+                            @endforeach
+                        @endif
+                    </div>
+                    <div class="acc__input-error error-cancel_reason_id text-danger text-xs"></div>
+                </div>
+                <div class="mt-3">
+                    <x-base.form-label>Note </x-base.form-label>
+                    <x-base.form-textarea rows="4" name="cancel_reason_note" id="cancel_reason_note" class="w-full"></x-base.form-textarea>
+                </div>
+            </x-base.dialog.description>
+            <x-base.dialog.footer>
+                <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
+                <x-base.button class="w-auto" id="updateRsnBtn" type="submit" variant="primary">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Submit
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+                <input type="hidden" name="customer_job_id" id="customer_job_id" value="" />
+                <input type="hidden" name="customer_job_status_id" id="customer_job_status_id" value="" />
+            </x-base.dialog.footer>
+        </form>
+    </x-base.dialog.panel>
+</x-base.dialog>
+<!-- END:Cancel Reason Modal Content -->

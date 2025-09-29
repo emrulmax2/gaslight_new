@@ -135,6 +135,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::get('job-status', [GlobalApiController::class, 'getJobStatus']);
         Route::get('calendar-time-slots', [GlobalApiController::class, 'getCalendarTimeSlots']);
         Route::get('records-list', [GlobalApiController::class, 'getRecordsList']);
+        Route::get('cancel-reasons', [GlobalApiController::class, 'getCancelReasons']);
 
         Route::controller(CustomerController::class)->group(function() {
             Route::get('customer/{id}', 'getDetails');
@@ -166,6 +167,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('customer-job/{id}', 'getSingleCustomerJob');
             Route::put('customer/jobs/{customer_job_id}/update', 'job_update');
             Route::put('customer/jobs/{customer_job_id}/status-update', 'jobStatusUpdate');
+            Route::put('customer/jobs/{customer_job_id}/cancel-job', 'cancelJob');
         });
 
         Route::controller(JobsController::class)->group(function() {

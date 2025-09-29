@@ -56,6 +56,7 @@ use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
+use App\Http\Controllers\SuperAdmin\Settings\JobCancelReasonController;
 use App\Http\Controllers\SuperAdmin\Settings\PricingPackageController;
 use App\Http\Controllers\SuperAdmin\Settings\SettingController;
 use App\Http\Controllers\SuperAdmin\Settings\UserSettingsController;
@@ -183,6 +184,17 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::delete('site-settings/pricing-package/destroy/{pack_id}', 'destroy')->name('site.setting.pricing.package.destroy'); 
         Route::post('site-settings/pricing-package/restore/{pack_id}', 'restore')->name('site.setting.pricing.package.restore');
     });
+
+    Route::controller(JobCancelReasonController::class)->group(function(){
+        Route::get('site-settings/cancel-reason', 'index')->name('site.setting.job.cancel.reason');
+        Route::get('site-settings/cancel-reason/list', 'list')->name('site.setting.job.cancel.reason.list');
+        Route::post('site-settings/cancel-reason/store', 'store')->name('site.setting.job.cancel.reason.store');
+        Route::post('site-settings/cancel-reason/update', 'update')->name('site.setting.job.cancel.reason.update');
+
+        
+        Route::delete('site-settings/cancel-reason/destroy/{pack_id}', 'destroy')->name('site.setting.job.cancel.reason.destroy'); 
+        Route::post('site-settings/cancel-reason/restore/{pack_id}', 'restore')->name('site.setting.job.cancel.reason.restore');
+    });
        
 });
 
@@ -293,6 +305,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('customer/{customer_id}/jobs/{customer_job_id}/show', 'job_edit')->name('customer.jobs.edit');
         Route::post('customer/{customer_id}/jobs/{customer_job_id}/update', 'job_update')->name('customer.jobs.update');
         Route::post('customer/jobs/{customer_job_id}/update-status', 'job_status_update')->name('customer.jobs.status.update');
+        Route::post('customer/jobs/{customer_job_id}/update-cancel-reason', 'job_cancel_reason_update')->name('customer.jobs.cancel.reason.update');
 
         Route::post('customer/jobs/update-data', 'updateJobsData')->name('customer.jobs.update.data');
         Route::post('customer/jobs/update-appintment-data', 'updateJobsAppointmentData')->name('customer.jobs.update.appointment.date');

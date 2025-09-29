@@ -21,6 +21,8 @@ class CustomerJob extends Model
         'reference_no',
         'estimated_amount',
         'status',
+        'cancel_reason_id',
+        'cancel_reason_note',
         'created_by',
         'updated_by'
     ];
@@ -60,5 +62,9 @@ class CustomerJob extends Model
     
     public function records(){
         return $this->hasMany(ExistingRecordDraft::class, 'customer_job_id', 'id');
+    }
+
+    public function cancelReason(){
+        return $this->belongsTo(CancelReason::class, 'cancel_reason_id');
     }
 }

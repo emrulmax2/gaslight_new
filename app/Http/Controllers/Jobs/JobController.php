@@ -8,6 +8,7 @@ use App\Http\Requests\JobAppointmentDataUpdateRequest;
 use App\Http\Requests\JobStoreRequest;
 use App\Http\Requests\JobUpdateRequest;
 use App\Models\CalendarTimeSlot;
+use App\Models\CancelReason;
 use App\Models\Customer;
 use App\Models\CustomerJob;
 use App\Models\CustomerJobCalendar;
@@ -35,7 +36,8 @@ class JobController extends Controller
             'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
-            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get()
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
+            'reasons' => CancelReason::where('active', 1)->orderBy('id', 'asc')->get()
         ]);
     }
 
