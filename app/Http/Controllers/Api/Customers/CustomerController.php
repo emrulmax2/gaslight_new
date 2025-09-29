@@ -20,8 +20,7 @@ class CustomerController extends Controller
 
     public function list(Request $request)
     {
-        $query = Customer::where('created_by', $request->user()->id);
-
+        $query = Customer::with('contact')->where('created_by', $request->user()->id);
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'full_name';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? $request->query('order') : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
@@ -35,26 +34,31 @@ class CustomerController extends Controller
             });
         }
         
-        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'asc';
         $query->orderBy($sortField, $sortOrder);
-        $limit = $request->query('limit', 10);
-        $page = $request->query('page', 1);
-        $limit = max(1, (int)$limit);
-        $page = max(1, (int)$page);
-        
-        $titles = $query->paginate($limit, ['*'], 'page', $page);
-
+        $customers = $query->get();
         return response()->json([
-            'data' => $titles->items(),
-            'meta' => [
-                'total' => $titles->total(),
-                'per_page' => $titles->perPage(),
-                'current_page' => $titles->currentPage(),
-                'last_page' => $titles->lastPage(),
-                'from' => $titles->firstItem(),
-                'to' => $titles->lastItem(),
-            ]
+            'data' => $customers,
+            'total' => $customers->count()
         ]);
+
+        // $limit = $request->query('limit', 10);
+        // $page = $request->query('page', 1);
+        // $limit = max(1, (int)$limit);
+        // $page = max(1, (int)$page);
+        
+        // $titles = $query->paginate($limit, ['*'], 'page', $page);
+
+        // return response()->json([
+        //     'data' => $titles->items(),
+        //     'meta' => [
+        //         'total' => $titles->total(),
+        //         'per_page' => $titles->perPage(),
+        //         'current_page' => $titles->currentPage(),
+        //         'last_page' => $titles->lastPage(),
+        //         'from' => $titles->firstItem(),
+        //         'to' => $titles->lastItem(),
+        //     ]
+        // ]);
     }
 
     public function storeCustomer(CustomerCreateRequest $request){
@@ -316,7 +320,7 @@ class CustomerController extends Controller
     public function getDetails($id)
     {
         try {
-            $customer = Customer::withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
+            $customer = Customer::with('contact')->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
                         ->findOrFail($id);
             $customer->makeHidden([
                 'full_address_html',
