@@ -224,9 +224,9 @@ class CustomerJobsController extends Controller
     {
         DB::beginTransaction();
         try {
-            $status = ucfirst(strtolower($request->status));
+            $status = isset($request->status) && $request->status > 0 ? $request->status : null;
         
-            if (!in_array($status, ['Completed', 'Cancelled'])) {
+            if (empty($status)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid status. '.$status.' are not allowed.',
@@ -235,14 +235,60 @@ class CustomerJobsController extends Controller
 
             $job = CustomerJob::findOrFail($job_id);
             $job->update([
-                'status' => $status
+                'customer_job_status_id' => $status,
+                'cancel_reason_id' => null,
+                'cancel_reason_note' => null
             ]);
-
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Customer job status successfully updated',
+                'data' => $job
+            ]);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer job not found. . The requested Customer job (ID: '.$job_id.') does not exist or may have been deleted.',
+            ], 404);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 500);
+        }
+    }
+
+
+    public function cancelJob(Request $request, $job_id)
+    {
+        DB::beginTransaction();
+        try {
+            $status = isset($request->status) && $request->status == 3 ? $request->status : null;
+            $cancel_reason_id = isset($request->cancel_reason_id) && $request->cancel_reason_id > 0 ? $request->cancel_reason_id : null;
+            $cancel_reason_note = isset($request->cancel_reason_note) && !empty($request->cancel_reason_note) ? $request->cancel_reason_note : null;
+        
+            if ($status != 3 || empty($cancel_reason_id)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid data. Status should be 3 & reason should not be empty.',
+                ], 422);
+            }
+
+            $job = CustomerJob::findOrFail($job_id);
+            $job->update([
+                'customer_job_status_id' => $status,
+                'cancel_reason_id' => $cancel_reason_id,
+                'cancel_reason_note' => $cancel_reason_note
+            ]);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer job cancell reason successfully updated',
                 'data' => $job
             ]);
         } catch (ModelNotFoundException $e) {

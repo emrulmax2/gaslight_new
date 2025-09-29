@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomerJobStoreRequest;
 use App\Http\Requests\CustomerJobUpdateRequest;
 use App\Http\Requests\JobAppointmentDataUpdateRequest;
+use App\Http\Requests\JobCanceleRequest;
+use App\Http\Requests\JobStatusUpdateRequest;
 use App\Http\Requests\JobStoreRequest;
 use App\Models\CalendarTimeSlot;
+use App\Models\CancelReason;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
@@ -33,7 +36,8 @@ class CustomerJobsController extends Controller
             'customer' => Customer::where('id', $request->customer_id)->first(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
-            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get()
+            'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
+            'reasons' => CancelReason::where('active', 1)->orderBy('id', 'asc')->get()
         ]);
     }
 
@@ -291,5 +295,35 @@ class CustomerJobsController extends Controller
         endif;
 
         return response()->json(['msg' => 'Job Appointment Deta successfully updated.'], 200);
+    }
+
+    public function job_status_update(JobStatusUpdateRequest $request){
+        $customer_job_id = $request->customer_job_id;
+        $customer_job_status_id = (isset($request->customer_job_status_id) && $request->customer_job_status_id > 0 ? $request->customer_job_status_id : 1);
+
+        $job = CustomerJob::where('id', $customer_job_id)->update([
+            'customer_job_status_id' => $customer_job_status_id,
+            'cancel_reason_id' => null,
+            'cancel_reason_note' => null,
+            'updated_by' => auth()->user()->id
+        ]);
+
+        return response()->json(['msg' => 'Customer job status successfully updated.'], 200);
+    }
+
+    public function job_cancel_reason_update(JobCanceleRequest $request){
+        $customer_job_id = $request->customer_job_id;
+        $customer_job_status_id = (isset($request->customer_job_status_id) && $request->customer_job_status_id > 0 ? $request->customer_job_status_id : 3);
+        $cancel_reason_id = (isset($request->cancel_reason_id) && $request->cancel_reason_id > 0 ? $request->cancel_reason_id : null);
+        $cancel_reason_note = (isset($request->cancel_reason_note) && !empty($request->cancel_reason_note) ? $request->cancel_reason_note : null);
+
+        $job = CustomerJob::where('id', $customer_job_id)->update([
+            'customer_job_status_id' => $customer_job_status_id,
+            'cancel_reason_id' => $cancel_reason_id,
+            'cancel_reason_note' => $cancel_reason_note,
+            'updated_by' => auth()->user()->id
+        ]);
+
+        return response()->json(['msg' => 'Customer job successfully cancelled.'], 200);
     }
 }

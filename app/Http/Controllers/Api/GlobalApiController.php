@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CalendarTimeSlot;
+use App\Models\CancelReason;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
 use App\Models\JobForm;
@@ -240,6 +241,42 @@ class GlobalApiController extends Controller
                 'last_page' => $time_slots->lastPage(),
                 'from' => $time_slots->firstItem(),
                 'to' => $time_slots->lastItem(),
+            ]
+        ]);
+    }
+    public function getCancelReasons(Request $request): JsonResponse
+    {
+        $query = CancelReason::query();
+
+        $status = ($request->has('status') && ($request->query('status') != '')) ? $request->query('status') : 1;
+        $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'name';
+        $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? $request->query('order') : 'asc';
+        $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
+        $searchableColumns = ['name'];
+        
+        if ($status == 2):
+            $query->onlyTrashed();
+        else:
+            $query->where('active', $status);
+        endif;
+        
+         if (!empty($searchKey)):
+            $query->where(function($q) use ($searchableColumns, $searchKey) {
+                foreach ($searchableColumns as $field) {
+                    $q->orWhere($field, 'like', '%' . $searchKey . '%');
+                }
+            });
+        endif;
+        
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'asc';
+        $query->orderBy($sortField, $sortOrder);
+        
+        $job_status = $query->get();
+
+        return response()->json([
+            'data' => $job_status,
+            'meta' => [
+                'total' => $job_status->count(),
             ]
         ]);
     }

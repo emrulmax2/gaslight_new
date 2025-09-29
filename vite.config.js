@@ -254,6 +254,7 @@ export default defineConfig({
                 "resources/js/app/superadmin/settings/api.js",
                 "resources/js/app/superadmin/settings/registration-settings.js",
                 "resources/js/app/superadmin/settings/pricing-package.js",
+                "resources/js/app/superadmin/settings/cancel-reason.js",
             ],
             refresh: true,
         }),

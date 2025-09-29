@@ -75,6 +75,7 @@ var customerJobListTable = (function () {
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
     const addJobCalenderModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobCalenderModal"));
     const statusUpdateModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#statusUpdateModal"));
+    const cancelReasonModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#cancelReasonModal"));
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -298,24 +299,21 @@ var customerJobListTable = (function () {
 
 
 
-    $('#customerJobListTable').on('dblclick', '.customerJobItem', function(e) {
+    
+    $('#customerJobListTable').on('dblclick', '.JobListItem', function(e) {
         clearTimeout(clickTimeout);
         isDoubleClick = true;
 
         let $theBtn = $(this);
         let jobId = $theBtn.attr('data-id');
-        let currentStatus = $theBtn.attr('data-status');
+        let currentStatus = $theBtn.attr('data-statusid');
 
         function updateModalStatus(status) {
-            $('#statusUpdateForm input[name="status"]').prop('checked', false);
+            $('#statusUpdateForm input[name="customer_job_status_id"]').prop('checked', false);
             $('#statusUpdateForm input[name="customer_job_id"]').val(jobId);;
 
-            if (status === 'Due') {
-                $('#status_due').prop('checked', true);
-            } else if (status === 'Completed') {
-                $('#status_completed').prop('checked', true);
-            } else if (status === 'Cancelled') {
-                $('#status_cancelled').prop('checked', true);
+            if (status  > 0) {
+                 $('#statusUpdateForm #customer_job_status_'+status).prop('checked', true);
             } else {
                 console.warn('Unknown status:', status);
             }
@@ -328,27 +326,94 @@ var customerJobListTable = (function () {
         setTimeout(function() { isDoubleClick = false; }, 200);
     });
 
+
     $('#statusUpdateForm').on('submit', function(e){
         e.preventDefault();
         const form = document.getElementById('statusUpdateForm');
         const $theForm = $(this);
         
+        let customerJobId = $theForm.find('[name="customer_job_id"]').val();
+        let customer_job_status_id = $theForm.find('[name="customer_job_status_id"]:checked').val();
         $('#updateStatusBtn', $theForm).attr('disabled', 'disabled');
         $("#updateStatusBtn .theLoader").fadeIn();
+
+       if(customer_job_status_id == 3){
+            $('#updateStatusBtn', $theForm).removeAttr('disabled');
+            $("#updateStatusBtn .theLoader").fadeOut();
+            statusUpdateModal.hide();
+
+            cancelReasonModal.show();
+            document.getElementById("cancelReasonModal").addEventListener("shown.tw.modal", function (event) {
+                $("#cancelReasonModal [name='customer_job_id']").val(customerJobId);
+                $("#cancelReasonModal [name='customer_job_status_id']").val(customer_job_status_id);
+                $("#cancelReasonModal").find('[name="cancel_reason_id"]').prop('checked', false);
+                $("#cancelReasonModal").find('[name="cancel_reason_note"]').val('');
+            });
+        }else{
+            let form_data = new FormData(form);
+            axios({
+                method: "post",
+                url: route('customer.jobs.status.update', {customer_job_id: customerJobId,}),
+                data: form_data,
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                $('#updateStatusBtn', $theForm).removeAttr('disabled');
+                $("#updateStatusBtn .theLoader").fadeOut();
+
+                if (response.status == 200) {
+                    statusUpdateModal.hide();
+
+                    successModal.show();
+                    document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#successModal .successModalTitle").html("Congratulations!");
+                        $("#successModal .successModalDesc").html(response.data.msg);
+                        $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', '');
+                    });
+
+                    setTimeout(() => {
+                        successModal.hide();
+                    }, 1500);
+                }
+                customerJobListTable.init();
+            }).catch(error => {
+                $('#updateStatusBtn', $theForm).removeAttr('disabled');
+                $("#updateStatusBtn .theLoader").fadeOut();
+                if (error.response) {
+                    if (error.response.status == 422) {
+                        for (const [key, val] of Object.entries(error.response.data.errors)) {
+                            $(`#statusUpdateForm .${key}`).addClass('border-danger');
+                            $(`#statusUpdateForm  .error-${key}`).html(val);
+                        }
+                    } else {
+                        console.log('error');
+                    }
+                }
+            });
+        }
+    })
+
+
+    $('#cancelReasonForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('cancelReasonForm');
+        const $theForm = $(this);
+        
         let customerJobId = $theForm.find('[name="customer_job_id"]').val();
+        $('#updateRsnBtn', $theForm).attr('disabled', 'disabled');
+        $("#updateRsnBtn .theLoader").fadeIn();
 
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('customer.jobs.status.update', {customer_job_id: customerJobId,}),
+            url: route('customer.jobs.cancel.reason.update', {customer_job_id: customerJobId,}),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
-            $('#updateStatusBtn', $theForm).removeAttr('disabled');
-            $("#updateStatusBtn .theLoader").fadeOut();
+            $('#updateRsnBtn', $theForm).removeAttr('disabled');
+            $("#updateRsnBtn .theLoader").fadeOut();
 
             if (response.status == 200) {
-                statusUpdateModal.hide();
+                cancelReasonModal.hide();
 
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
@@ -363,13 +428,13 @@ var customerJobListTable = (function () {
             }
             customerJobListTable.init();
         }).catch(error => {
-            $('#updateStatusBtn', $theForm).removeAttr('disabled');
-            $("#updateStatusBtn .theLoader").fadeOut();
+            $('#updateRsnBtn', $theForm).removeAttr('disabled');
+            $("#updateRsnBtn .theLoader").fadeOut();
             if (error.response) {
                 if (error.response.status == 422) {
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#statusUpdateForm .${key}`).addClass('border-danger');
-                        $(`#statusUpdateForm  .error-${key}`).html(val);
+                        $(`#cancelReasonForm .${key}`).addClass('border-danger');
+                        $(`#cancelReasonForm  .error-${key}`).html(val);
                     }
                 } else {
                     console.log('error');
