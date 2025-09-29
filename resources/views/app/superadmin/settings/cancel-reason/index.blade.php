@@ -50,7 +50,7 @@
                         <div class="mt-5 flex sm:mt-0 max-sm:hidden">
                             <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#addReasonModal" class="shadow-md add_btn" variant="primary" >
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="circle-plus" />
-                                Add Package
+                                Add Reason
                             </x-base.button>
                         </div>
                     </div>
