@@ -33,7 +33,8 @@ class BoilerBrandAndManualPageController extends Controller
         $manual = BoilerNewManual::find($request->boiler_new_manual_id);
         //$pdfUrl (isset($manual->pdf_url) && !empty($manual->pdf_url) ? $manual->pdf_url : false);
 
-        if (!empty($manual->document) && Storage::disk('s3')->exists('public/boilermanual/'.$manual->boiler_new_brand_id.'/'.$manual->document)):
+        if (!empty($manual->document) ):
+            //&& Storage::disk('s3')->exists('public/boilermanual/'.$manual->boiler_new_brand_id.'/'.$manual->document)
             $manualUrl = Storage::disk('s3')->temporaryUrl('public/boilermanual/'.$manual->boiler_new_brand_id.'/'.$manual->document, now()->addMinutes(30));
             return response()->json(['url' => $manualUrl], 200);
         else:
