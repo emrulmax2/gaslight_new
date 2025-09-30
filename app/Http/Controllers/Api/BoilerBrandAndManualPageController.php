@@ -7,6 +7,7 @@ use App\Models\BoilerNewBrand;
 use App\Models\BoilerNewManual;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class BoilerBrandAndManualPageController extends Controller
 {
@@ -63,5 +64,22 @@ class BoilerBrandAndManualPageController extends Controller
             'success' => true,
             'data' => $boilerManuals,
         ], 200);
+    }
+
+    public function boilerBrandManualDownload($manual_id){
+        $manual = BoilerNewManual::find($manual_id);
+
+        if (!empty($manual->document) && Storage::disk('s3')->exists('public/boilermanual/'.$manual->boiler_new_brand_id.'/'.$manual->document)):
+            $manualUrl = Storage::disk('s3')->temporaryUrl('public/boilermanual/'.$manual->boiler_new_brand_id.'/'.$manual->document, now()->addMinutes(30));
+            return response()->json([
+                'success' => true,
+                'data' => $manualUrl,
+            ], 200);
+        else:
+            return response()->json([
+                'success' => false,
+                'message' => 'File not exist.',
+            ], 404);
+        endif;
     }
 }
