@@ -29,7 +29,7 @@ class BoilerNewManual extends Model
      *
      * @var array
     */
-    protected $appends = ['pdf_url'];
+    //protected $appends = ['pdf_url'];
 
     /**
      * Get the boiler brand that this manual belongs to.
@@ -38,7 +38,7 @@ class BoilerNewManual extends Model
     */
     public function boilerBrand(): BelongsTo
     {
-        return $this->belongsTo(BoilerBrand::class);
+        return $this->belongsTo(BoilerNewBrand::class);
     }
 
     /**
@@ -46,11 +46,11 @@ class BoilerNewManual extends Model
      *
      * @return string|false
     */
-    public function getPdfUrlAttribute(){
-        if (!empty($this->document) && Storage::disk('public')->exists('boiler-new-brand/'.$this->boiler_new_brand_id.'/'.$this->document)):
-            return Storage::disk('public')->url('boiler-new-brand/'.$this->boiler_new_brand_id.'/'.$this->document);
-        else:
-            return false;
-        endif;
-    }
+    // public function getPdfUrlAttribute(){
+    //     if (!empty($this->document) && Storage::disk('s3')->exists('public/boilermanual/'.$this->boiler_new_brand_id.'/'.$this->document)):
+    //         return Storage::disk('s3')->temporaryUrl('public/boilermanual/'.$this->boiler_new_brand_id.'/'.$this->document, now()->addMinutes(30));
+    //     else:
+    //         return false;
+    //     endif;
+    // }
 }

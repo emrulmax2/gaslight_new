@@ -49,6 +49,29 @@
 
 @pushOnce('scripts')
 <script type="module">
+    $(document).on('click', '.containerItems', function(e){
+        e.preventDefault();
+        let $theLink = $(this);
+        let boiler_new_manual_id = $theLink.attr('data-manualid');
+        console.log(boiler_new_manual_id);
+
+        axios({
+            method: "post",
+            url: route('boiler-manuals.download'),
+            data: {boiler_new_manual_id : boiler_new_manual_id},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            let url = response.data.url;
+            console.log(url);
+            if(url != ''){
+                window.open(url, "_blank");
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+        
+    });
+
     const boilerBrandSelect = document.getElementById('boiler-brand-select');
     const brandContainer = document.querySelector('.brandContainer');
     const boilerBrandsContainer = document.querySelector('.boiler-brands-container');
@@ -78,7 +101,8 @@
                     $('#search-box').removeClass('hidden');
                     let innerHtml = '';
                     boilerBrandsManual.forEach(manual => {
-                        innerHtml += '<a target="_blank" href="'+(manual.pdf_url != '' ? manual.pdf_url : 'javascript:void(0);')+'" id="'+manual.model+'" class="containerItems block mb-3">';
+                        //innerHtml += '<a target="_blank" href="'+(manual.pdf_url != '' ? manual.pdf_url : 'javascript:void(0);')+'" id="'+manual.model+'" class="containerItems block mb-3">';
+                        innerHtml += '<a href="javascript:void(0);" data-manualid="'+manual.id+'" id="'+manual.model+'" class="containerItems block mb-3">';
                             innerHtml += '<div class="intro-y box p-5">';
                                 innerHtml += '<div class="grid grid-cols-12 gap-x-4 gap-y-2">';
                                     innerHtml += '<div class="col-span-12 sm:col-span-3">';

@@ -229,6 +229,7 @@ Route::middleware(Authenticate::class)->group(function() {
         
         Route::get('boiler-manuals', 'index')->name('boiler-manuals');
         Route::get('boiler-manuals/{id}', 'boilerBrandManualByBoilerBrandId')->name('boiler-manuals.show');
+        Route::post('boiler-manuals/download', 'boilerBrandManualDownload')->name('boiler-manuals.download');
 
     });
     
