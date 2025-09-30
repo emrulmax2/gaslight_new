@@ -136,6 +136,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::get('calendar-time-slots', [GlobalApiController::class, 'getCalendarTimeSlots']);
         Route::get('records-list', [GlobalApiController::class, 'getRecordsList']);
         Route::get('cancel-reasons', [GlobalApiController::class, 'getCancelReasons']);
+        Route::get('get-option', [GlobalApiController::class, 'getOption']);
 
         Route::controller(CustomerController::class)->group(function() {
             Route::get('customer/{id}', 'getDetails');

@@ -8,6 +8,7 @@ use App\Models\CancelReason;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
 use App\Models\JobForm;
+use App\Models\Option;
 use App\Models\Title;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -279,5 +280,49 @@ class GlobalApiController extends Controller
                 'total' => $job_status->count(),
             ]
         ]);
+    }
+
+    public function getOption(Request $request): JsonResponse 
+    {
+        $availableOptions = [
+            'powerd_by',
+            'company_name',
+            'company_phone',
+            'company_email',
+            'address_line_1',
+            'address_line_2',
+            'city',
+            'state',
+            'postal_code',
+            'country',
+            'latitude',
+            'longitude',
+            'company_right',
+            'site_logo',
+            'site_favicon',
+            'DEFAULT_TRAIL',
+            'REFERRER_TRAIL',
+            'REFEREE_TRAIL'
+        ];
+        $category = ($request->has('category') && ($request->query('category') != '')) ? $request->query('category') : null;
+        $option = ($request->has('option') && ($request->query('option') != '')) ? $request->query('option') : null;
+
+        if(!empty($category) && !empty($option) && in_array($option, $availableOptions)){
+            $theOption = Option::where('category', $category)->where('name', $option)->pluck('value')->first() ?? null;
+            return response()->json([
+                'success' => true,
+                'message' => 'Option found!',
+                'data' => [
+                    'category' => $category,
+                    'option' => $option,
+                    'value' => $theOption
+                ]
+            ], 200);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid category or option.'
+            ], 404);
+        }
     }
 }
