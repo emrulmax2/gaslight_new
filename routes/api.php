@@ -80,6 +80,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
         
             Route::get('boiler-brands', 'index');
             Route::get('boiler-brand/{id}/manual', 'brand_manual');
+            Route::get('boiler-brand/download-manual/{manual_id}', 'boilerBrandManualDownload');
     
         });
 
