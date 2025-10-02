@@ -22,18 +22,15 @@ class JobsController extends Controller
 {
     public function list(Request $request)
     {
-        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : '';
+        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : 1;
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         
         $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot')
-                ->where('created_by', $request->user()->id);
+                ->where('created_by', $request->user()->id)->where('customer_job_status_id', $status);
         
-        if($status){
-            $query->where('customer_job_status_id', $status);
-        }
         $searchableColumns = Schema::getColumnListing((new CustomerJob())->getTable());
 
          if (!empty($searchKey)):
@@ -66,6 +63,32 @@ class JobsController extends Controller
         ]);
     }
 
+    private function generateReferenceNo($customerId)
+    {
+        $customer = Customer::find($customerId);
+        if (!$customer) return null;
+        
+        $nameParts = explode(' ', trim($customer->full_name));
+        $prefix = '';
+        foreach ($nameParts as $part):
+            $prefix .= strtoupper(substr($part, 0, 1));
+        endforeach;
+        $lastJob = CustomerJob::where('customer_id', $customerId)->orderBy('id', 'desc')->first();
+
+        if ($lastJob && preg_match('/\d+$/', $lastJob->reference_no, $matches)):
+            $nextNumber = intval($matches[0]) + 1;
+        else:
+            $nextNumber = 1;
+        endif;
+
+        // $referenceNo = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $referenceNo = $prefix . $nextNumber;
+
+        return $referenceNo;
+    }
+
+
+
     public function storeCustomerJob(Request $request){
 
         $data = [
@@ -76,7 +99,7 @@ class JobsController extends Controller
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => 1,
-            'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
+            'reference_no' => $this->generateReferenceNo($request->customer_id),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => $request->user()->id,
         ];
@@ -248,9 +271,9 @@ class JobsController extends Controller
                 $updateData['customer_job_status_id'] = (isset($request->customer_job_status_id) && !empty($request->customer_job_status_id) ? $request->customer_job_status_id : null);
             endif;
 
-            if($request->has('reference_no')):
-                $updateData['reference_no'] = (isset($request->reference_no) && !empty($request->reference_no) ? $request->reference_no : null);
-            endif;
+            // if($request->has('reference_no')):
+            //     $updateData['reference_no'] = (isset($request->reference_no) && !empty($request->reference_no) ? $request->reference_no : null);
+            // endif;
 
             $job->update($updateData);
 

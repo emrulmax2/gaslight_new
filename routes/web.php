@@ -58,6 +58,7 @@ use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
 use App\Http\Controllers\SuperAdmin\Settings\JobCancelReasonController;
 use App\Http\Controllers\SuperAdmin\Settings\PricingPackageController;
+use App\Http\Controllers\SuperAdmin\Settings\ReferralCodeController;
 use App\Http\Controllers\SuperAdmin\Settings\SettingController;
 use App\Http\Controllers\SuperAdmin\Settings\UserSettingsController;
 use App\Http\Controllers\UserManagementController;
@@ -194,6 +195,15 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         
         Route::delete('site-settings/cancel-reason/destroy/{pack_id}', 'destroy')->name('site.setting.job.cancel.reason.destroy'); 
         Route::post('site-settings/cancel-reason/restore/{pack_id}', 'restore')->name('site.setting.job.cancel.reason.restore');
+    });
+
+    Route::controller(ReferralCodeController::class)->group(function(){
+        Route::get('site-settings/referral-code', 'index')->name('site.setting.referral.code');
+        Route::get('site-settings/referral-code/list', 'list')->name('site.setting.referral.code.list');
+        Route::post('site-settings/referral-code/store', 'store')->name('site.setting.referral.code.store');
+        Route::post('site-settings/referral-code/update', 'update')->name('site.setting.referral.code.update');
+        Route::delete('site-settings/referral-code/destroy/{ref_id}', 'destroy')->name('site.setting.referral.code.destroy'); 
+        Route::post('site-settings/referral-code/restore/{ref_id}', 'restore')->name('site.setting.referral.code.restore');
     });
        
 });

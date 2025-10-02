@@ -28,10 +28,10 @@
                 </ul>
             </li>
             <li class="hasChild mt-5">
-                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' || Route::currentRouteName() == 'superadmin.site.setting.pricing.package' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
+                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' || Route::currentRouteName() == 'superadmin.site.setting.pricing.package' || Route::currentRouteName() == 'superadmin.site.setting.referral.code' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
                     <i data-lucide="user-round-cog" class="w-4 h-4 mr-2"></i> User Settings  <i data-lucide="chevron-down" class="w-4 h-4 ml-auto menuAgnle"></i>
                 </a>
-                <ul class="p-0 m-0 pl-5" style="display: {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' || Route::currentRouteName() == 'superadmin.site.setting.pricing.package' ? 'block' : 'none' }};">
+                <ul class="p-0 m-0 pl-5" style="display: {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' || Route::currentRouteName() == 'superadmin.site.setting.pricing.package' || Route::currentRouteName() == 'superadmin.site.setting.referral.code' ? 'block' : 'none' }};">
                     <li>
                         <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.user.registration') }}">
                             <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Registration Settings
@@ -40,6 +40,11 @@
                     <li>
                         <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.pricing.package' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.pricing.package') }}">
                             <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Pricing Packages
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.referral.code' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.referral.code') }}">
+                            <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Referral Codes
                         </a>
                     </li>
                 </ul>

@@ -13,6 +13,10 @@ class UserReferralCode extends Model
     protected $fillable = [
         'user_id',
         'code',
+        'is_global',
+        'no_of_days',
+        'expiry_date',
+        'max_no_of_use',
         'active',
         
         'created_by',
@@ -21,4 +25,13 @@ class UserReferralCode extends Model
 
 
     protected $dates = ['deleted_at'];
+
+    public function setExpiryDateAttribute($value) {  
+        $this->attributes['expiry_date'] = (!empty($value) ? date('Y-m-d', strtotime($value)) : null);
+    }
+
+
+    public function user(){
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

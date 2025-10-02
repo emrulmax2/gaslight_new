@@ -12,6 +12,7 @@ use App\Models\UserPricingPackage;
 use App\Models\UserReferralCode;
 use App\Models\UserReferred;
 use App\Providers\RouteServiceProvider;
+use App\Rules\ValidReferralCode;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -42,12 +43,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'terms' => 'required',
-            'referral_code' => [
-            'nullable', // Optional field
-                Rule::exists('user_referral_codes', 'code')->where(function ($query) {
-                    $query->where('active', 1); // Ensure the referral code is active
-                }),
-            ],
+            'referral_code' => ['nullable', new ValidReferralCode()],
         ]);
 
         // Create the user
@@ -76,14 +72,14 @@ class RegisteredUserController extends Controller
                 if(isset($referral->id) && $referral->id > 0):
                     $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'REFEREE_TRAIL')->pluck('value')->first() ?? $TRAIL_PERIOD;
                     //$TRAIL_PERIOD = env('REFEREE_TRAIL', 90);
-                    $userReferred = UserReferred::create([
-                        'user_referral_code_id' => $referral->id,
-                        'referrer_id' => $referral->user_id,
-                        'referee_id' => $user->id,
-                        'code' => $referral_code,
+                        $userReferred = UserReferred::create([
+                            'user_referral_code_id' => $referral->id,
+                            'referrer_id' => $referral->user_id,
+                            'referee_id' => $user->id,
+                            'code' => $referral_code,
                         
-                        'created_by' => $user->id,
-                    ]);
+                            'created_by' => $user->id,
+                        ]);
                 endif;
             endif;
 
@@ -135,11 +131,36 @@ class RegisteredUserController extends Controller
         $referral_code = $request->referral_code;
         $referral = UserReferralCode::where('code', $referral_code)->where('active', 1)->get()->first();
 
-        if(isset($referral->id) && $referral->id > 0):
-            return response()->json(['suc' => 1], 200);
-        else:
-            return response()->json(['suc' => 2], 200);
+         if(!$referral):
+            return response()->json([
+                    'success' => false,
+                    'message' => 'Referral code is not valid'
+                ], 200);
         endif;
+
+        if ($referral->is_global == 1):
+            if ($referral->expiry_date && now()->gt($referral->expiry_date)) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Referral code is expired'
+                ], 200);
+            }
+
+            if ($referral->max_no_of_use !== null) {
+                $usedCount = UserReferred::where('user_referral_code_id', $referral->id)->count();
+                if ($usedCount >= $referral->max_no_of_use) {
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Referral code has reached its maximum usage limit'
+                    ], 200);
+                }
+            }
+        endif;
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Referral code is valid'
+        ], 200);
     }
 
 
@@ -238,6 +259,7 @@ class RegisteredUserController extends Controller
             'company_country' => 'required|string|max:255',
             'gas_safe_registration_no' => 'required|string|max:255',
             'gas_safe_id_card' => 'required|string|max:255',
+            'referral_code' => ['nullable', new ValidReferralCode()],
         ]);
 
         $referral_code = isset($request->referral_code) && !empty($request->referral_code) ? $request->referral_code : null;
@@ -292,15 +314,31 @@ class RegisteredUserController extends Controller
             if(!empty($referral_code)):
                 $referral = UserReferralCode::where('code', $referral_code)->where('active', 1)->get()->first();
                 if(isset($referral->id) && $referral->id > 0):
-                    $TRAIL_PERIOD = env('REFEREE_TRAIL', 90);
-                    $userReferred = UserReferred::create([
-                        'user_referral_code_id' => $referral->id,
-                        'referrer_id' => $referral->user_id,
-                        'referee_id' => $user->id,
-                        'code' => $referral_code,
-                        
-                        'created_by' => $user->id,
-                    ]);
+                    if ($referral->is_global == 1) {
+                        $isExpired = $referral->expiry_date && now()->gt($referral->expiry_date);
+                        $usedCount = UserReferred::where('user_referral_code_id', $referral->id)->count();
+                        $usageLimitReached = $referral->max_no_of_use !== null && $usedCount >= $referral->max_no_of_use;
+
+                        if (!$isExpired || !$usageLimitReached) {
+                            $TRAIL_PERIOD = $referral->num_of_days ?? $TRAIL_PERIOD;
+                            $userReferred = UserReferred::create([
+                                'user_referral_code_id' => $referral->id,
+                                'referrer_id' => $referral->user_id,
+                                'referee_id' => $user->id,
+                                'code' => $referral_code,
+                                'created_by' => $user->id,
+                            ]);
+                        }
+                    } else {
+                        $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'REFEREE_TRAIL')->value('value') ?? $TRAIL_PERIOD;
+                        $userReferred = UserReferred::create([
+                            'user_referral_code_id' => $referral->id,
+                            'referrer_id' => $referral->user_id,
+                            'referee_id' => $user->id,
+                            'code' => $referral_code,
+                            'created_by' => $user->id,
+                        ]);
+                    }
                 endif;
             endif;
 
