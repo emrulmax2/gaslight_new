@@ -99,7 +99,7 @@
                 </div>
             </a>
             @endif
-            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Job Refference" data-field="reference_no" data-value="{{ !empty($job->reference_no) ? $job->reference_no : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Job Refference" data-field="reference_no" data-value="{{ !empty($job->reference_no) ? $job->reference_no : '' }}"  class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="hash" />
                 <div>
                     <span class="font-normal text-slate-400 text-xs block">{{ isset($job->reference_no) && !empty($job->reference_no) ? $job->reference_no : 'N/A' }}</span>

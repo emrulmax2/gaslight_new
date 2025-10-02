@@ -95,17 +95,6 @@
             <div class="px-2 py-3 bg-white mt-2">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Refference</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.form-input id="reference_no" name="reference_no" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
-                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="hash" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2 py-3 bg-white mt-2">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Appointment Date</div>
                         <div class="theDesc w-full relative">
                             <x-base.form-input readonly id="job_calender_date" name="job_calender_date" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>

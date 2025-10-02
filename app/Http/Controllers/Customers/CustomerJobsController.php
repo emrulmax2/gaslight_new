@@ -154,6 +154,28 @@ class CustomerJobsController extends Controller
         ]);
     }
 
+    private function generateReferenceNo($customerId)
+    {
+        $customer = Customer::find($customerId);
+        if (!$customer) return null;
+        
+        $nameParts = explode(' ', trim($customer->full_name));
+        $prefix = '';
+        foreach ($nameParts as $part):
+            $prefix .= strtoupper(substr($part, 0, 1));
+        endforeach;
+        $lastJob = CustomerJob::where('customer_id', $customerId)->orderBy('id', 'desc')->first();
+
+        if ($lastJob && preg_match('/\d+$/', $lastJob->reference_no, $matches)):
+            $nextNumber = intval($matches[0]) + 1;
+        else:
+            $nextNumber = 1;
+        endif;
+        $referenceNo = $prefix . $nextNumber;
+
+        return $referenceNo;
+    }
+
     public function job_store(CustomerJobStoreRequest $request) {
         $data = [
             'customer_id' => $request->customer_id,
@@ -163,7 +185,7 @@ class CustomerJobsController extends Controller
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => 1,
-            'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
+            'reference_no' => $this->generateReferenceNo($request->customer_id),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => auth()->user()->id,
         ];
@@ -240,7 +262,7 @@ class CustomerJobsController extends Controller
             'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : null),
-            'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
+            // 'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'updated_by' => auth()->user()->id,
         ];
