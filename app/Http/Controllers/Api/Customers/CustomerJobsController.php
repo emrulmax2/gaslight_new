@@ -135,8 +135,9 @@ class CustomerJobsController extends Controller
 
     public function getSingleCustomerJob(Request $request, $id) {
            try {
-            $job = CustomerJob::with(['customer', 'property', 'customer.contact'])
-            ->where('id', $id)->first();
+            $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot'])
+                    ->withCount("records as number_of_records")
+                    ->where('id', $id)->first();
 
             $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
             $job->property->makeHidden(["full_address_html", "full_address_with_html"]);
