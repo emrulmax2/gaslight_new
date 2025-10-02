@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReferralCodeStoreRequest;
+use App\Http\Requests\ReferralCodeUpdateRequest;
 use App\Models\UserReferralCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class ReferralCodeController extends Controller
         $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
         $status = (isset($request->status) && $request->status > 0 ? $request->status : 1);
 
-        $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'ASC']));
+        $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
         $sorts = [];
         foreach($sorters as $sort):
             $sorts[] = $sort['field'].' '.$sort['dir'];
@@ -80,17 +81,8 @@ class ReferralCodeController extends Controller
 
     public function store(ReferralCodeStoreRequest $request)
     {
-        $letters = '';
-        for ($i = 0; $i < 3; $i++) {
-            $letters .= chr(rand(65, 90)); 
-        }
-
-        $digits = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        $generatedCode = $letters . $digits;
-
         $referral_code = UserReferralCode::create([
-            'code' => $generatedCode,
+            'code' => $request->code,
             'user_id' => 1,
             'is_global' => 1,
             'no_of_days' => $request->no_of_days,
@@ -100,11 +92,11 @@ class ReferralCodeController extends Controller
             'active' => $request->active ?? 0,
         ]);
 
-        return response()->json(['msg' => 'Referral code successfully added.', 'code' => $generatedCode], 200);
+        return response()->json(['msg' => 'Referral code successfully added.'], 200);
     }
 
 
-     public function update(ReferralCodeStoreRequest $request)
+     public function update(ReferralCodeUpdateRequest $request)
     {
         $referral_code = UserReferralCode::find($request->id);
         $referral_code->update([

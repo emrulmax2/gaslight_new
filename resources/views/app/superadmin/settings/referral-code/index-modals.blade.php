@@ -8,13 +8,18 @@
             </x-base.dialog.title>
             <x-base.dialog.description class="grid grid-cols-12 gap-x-6 gap-y-3">
                 <div class="col-span-12 sm:col-span-6">
+                    <x-base.form-label for="code">Code<span class="text-danger ml-2">*</span></x-base.form-label>
+                    <x-base.form-input name="code" id="code" class="w-full" type="text" autocomplete="off" />
+                    <div class="acc__input-error error-code text-danger text-xs mt-1"></div>
+                </div>
+                <div class="col-span-12 sm:col-span-6">
                     <x-base.form-label for="no_of_days">No Of Days <span class="text-danger ml-2">*</span></x-base.form-label>
                     <x-base.form-input name="no_of_days" id="no_of_days" class="w-full" type="number" step="any" />
                     <div class="acc__input-error error-no_of_days text-danger text-xs mt-1"></div>
                 </div>
                 <div class="col-span-12 sm:col-span-6">
                     <x-base.form-label for="expiry_date">Expiry Date</x-base.form-label>
-                    <x-base.form-input type="text" name="expiry_date" id="expiry_date" class="w-full z-10" />
+                    <x-base.form-input type="text" name="expiry_date" id="expiry_date" class="w-full z-10" autocomplete="off" />
                     <div class="acc__input-error error-expiry_date text-danger text-xs mt-1"></div>
                 </div>
                 <div class="col-span-12 sm:col-span-6">
@@ -53,14 +58,14 @@
                 <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
             </x-base.dialog.title>
             <x-base.dialog.description class="grid grid-cols-12 gap-x-6 gap-y-3">
-                   <div class="col-span-12 sm:col-span-6">
+                <div class="col-span-12 sm:col-span-6">
                     <x-base.form-label for="no_of_days">No Of Days <span class="text-danger ml-2">*</span></x-base.form-label>
                     <x-base.form-input name="no_of_days" id="no_of_days" class="w-full" type="number" step="any" />
                     <div class="acc__input-error error-no_of_days text-danger text-xs mt-1"></div>
                 </div>
                 <div class="col-span-12 sm:col-span-6">
                     <x-base.form-label for="expiry_date">Expiry Date</x-base.form-label>
-                    <x-base.form-input type="text" name="expiry_date" id="edit_expiry_date" class="w-full z-10" />
+                    <x-base.form-input type="text" name="expiry_date" id="edit_expiry_date" class="w-full z-10" autocomplete="off" />
                     <div class="acc__input-error error-expiry_date text-danger text-xs mt-1"></div>
                 </div>
                 <div class="col-span-12 sm:col-span-6">

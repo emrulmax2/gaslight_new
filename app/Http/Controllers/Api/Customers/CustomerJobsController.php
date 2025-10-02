@@ -70,7 +70,7 @@ class CustomerJobsController extends Controller
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
-        $nameParts = explode(' ', trim($customer->full_name));
+        $nameParts = explode(' ', trim($customer->company_name));
         $prefix = '';
         foreach ($nameParts as $part):
             $prefix .= strtoupper(substr($part, 0, 1));
@@ -91,7 +91,6 @@ class CustomerJobsController extends Controller
 
     public function job_store(CustomerJobStoreRequest $request) {
 
-        return $this->generateReferenceNo($request->customer_id);
         try {
             $data = [
                     'customer_id' => $request->customer_id,

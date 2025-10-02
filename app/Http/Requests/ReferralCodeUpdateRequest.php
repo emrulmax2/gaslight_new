@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ReferralCodeStoreRequest extends FormRequest
+class ReferralCodeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,6 @@ class ReferralCodeStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => 'required|max:255|unique:user_referral_codes',
             'no_of_days' => 'required|integer',
         ];
     }
