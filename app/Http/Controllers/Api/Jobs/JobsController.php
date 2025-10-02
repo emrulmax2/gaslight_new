@@ -68,7 +68,7 @@ class JobsController extends Controller
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
-        $nameParts = explode(' ', trim($customer->full_name));
+        $nameParts = explode(' ', trim($customer->company_name));
         $prefix = '';
         foreach ($nameParts as $part):
             $prefix .= strtoupper(substr($part, 0, 1));
@@ -174,7 +174,7 @@ class JobsController extends Controller
     public function getJobDetails(Request $request, $id){
        try {
         $user = User::find($request->user()->id);
-        $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar'])
+        $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot'])
             ->withCount("records as number_of_records")
             ->findOrFail($id);
 
