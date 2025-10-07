@@ -203,6 +203,11 @@ class CustomerController extends Controller
                 ->withCount(['properties as number_of_job_address', 'jobs as number_of_jobs'])
                 ->findOrFail($request->id);
 
+            $address_line_1 = (!empty($customer->address_line_1) ? $customer->address_line_1 : null);
+            $address_line_2 = (!empty($customer->address_line_2) ? $customer->address_line_2 : null);
+            $city = (!empty($customer->city) ? $customer->city : null);
+            $postal_code = (!empty($customer->postal_code) ? $customer->postal_code : null);
+
             $customer->makeHidden([
                 'full_address_html',
                 'full_address_with_html'
@@ -218,9 +223,34 @@ class CustomerController extends Controller
             $updateData['updated_by'] = $request->user()->id;
             $customer->update($updateData);
 
+            $propertyId = null;
+            if(
+                (isset($updateData['address_line_1']) && $address_line_1 != $updateData['address_line_1']) || 
+                (isset($updateData['address_line_2']) && $address_line_2 != $updateData['address_line_2']) || 
+                (isset($updateData['city']) && $city != $updateData['city']) || 
+                (isset($updateData['postal_code']) && $postal_code != $updateData['postal_code'])
+            ){
+                $CustomerProperty = CustomerProperty::create([
+                    'customer_id' => $customer->id,
+                    'address_line_1' => (!empty($updateData['address_line_1']) ? $updateData['address_line_1'] : null),
+                    'address_line_2' => (!empty($updateData['address_line_2']) ? $updateData['address_line_2'] : null),
+                    'postal_code' => (!empty($updateData['postal_code']) ? $updateData['postal_code'] : null),
+                    'state' => (!empty($updateData['state']) ? $updateData['state'] : null),
+                    'city' => (!empty($updateData['city']) ? $updateData['city'] : null),
+                    'country' => (!empty($updateData['country']) ? $updateData['country'] : null),
+                    'note' => null,
+                    'latitude' => (!empty($updateData['latitude']) ? $updateData['latitude'] : null),
+                    'longitude' => (!empty($updateData['longitude']) ? $updateData['longitude'] : null),
+        
+                    'created_by' => $request->user()->id,
+                ]);
+                $propertyId = $CustomerProperty->id;
+            }
+
             return response()->json([
                 'message' => 'Customer successfully updated.',
-                'data' => $customer
+                'data' => $customer,
+                'id' => $propertyId
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -228,7 +258,7 @@ class CustomerController extends Controller
             ], 404);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Something went wrong. Please try again later or contact the administrator',
+                'message' => $e.'Something went wrong. Please try again later or contact the administrator',
             ], 500);
         }
     }
