@@ -53,11 +53,7 @@ class RecordAndDraftController extends Controller
         $query = ExistingRecordDraft::with('customer', 'job', 'job.property', 'form', 'user', 'model')->orderByRaw(implode(',', $sorts));
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
-                $q->where(function($sq) use($queryStr){
-                    $sq->where('full_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
-                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
-                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
-                });
+                $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
             })->orWhereHas('job.property', function ($q) use ($queryStr) {
                 $q->where(function($sq) use($queryStr){
                     $sq->where('occupant_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')

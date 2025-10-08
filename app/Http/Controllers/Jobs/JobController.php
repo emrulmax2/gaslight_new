@@ -146,7 +146,7 @@ class JobController extends Controller
             'titles' => Title::where('active', 1)->orderBy('name', 'ASC')->get(),
             'priorities' => CustomerJobPriority::orderBy('id', 'ASC')->get(),
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
-            'customers' => Customer::with('title')->where('created_by', auth()->user()->id)->orderBy('full_name', 'asc')->get(),
+            'customers' => Customer::with('address', 'title')->where('created_by', auth()->user()->id)->orderBy('full_name', 'asc')->get(),
             'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
             'hasVat' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? true : false)
         ]);
@@ -357,10 +357,11 @@ class JobController extends Controller
         else:
             $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id)->where(function($q) use($queryStr){
                         $q->where('full_name','LIKE','%'.$queryStr.'%')
-                            ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
-                            ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
+                            ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%');
+                    })->orWhereHas('address', function($q) use($queryStr){
+                        $q->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                             ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
-                    })->orderBy('full_name')->get();
+                    })->where('created_by', auth()->user()->id)->orderBy('full_name')->get();
         endif;
         if($query->count() > 0):
             $html .= '<div class="py-2 px-5 text-xs font-semibold bg-slate-100 rounded-md rounded-bl-none rounded-br-none">'.($query->count() == 1 ? $query->count().' result' : $query->count().' results').' found</div>';
@@ -380,7 +381,7 @@ class JobController extends Controller
                                         $html .= $customer->customer_full_name;
                                     $html .= '</div>';
                                     $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
-                                        $html .= $customer->address_line_1.' '.$customer->address_line_2.' '.$customer->city.', '.$customer->postal_code;
+                                        $html .= (isset($customer->full_address) && !empty($customer->full_address) ? $customer->full_address : 'N/A');
                                     $html .= '</div>';
                                 $html .= '</div>';
                             $html .= '</div>';
@@ -405,7 +406,7 @@ class JobController extends Controller
         $query = CustomerProperty::with('customer')->where('customer_id', $customer_id)->where(function($q) use($queryStr){
                     $q->where('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                         ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
-                })->orderBy('address_line_1', 'ASC')->get();
+                })->where('created_by', auth()->user()->id)->orderBy('address_line_1', 'ASC')->get();
         if($query->count() > 0):
             $html .= '<div class="py-2 px-5 text-xs font-semibold bg-slate-100 rounded-md rounded-bl-none rounded-br-none">'.($query->count() == 1 ? $query->count().' result' : $query->count().' results').' found</div>';
                 $html .= '<div class="results px-5 py-4" style="max-height: 250px; overflow-y: auto;">';

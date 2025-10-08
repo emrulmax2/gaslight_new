@@ -331,7 +331,7 @@ class NewRecordController extends Controller
         $job_form_id = $request->job_form_id;
 
         $html = '';
-        $query = Customer::with('contact')->where('created_by', $user_id)->get();
+        $query = Customer::with('address', 'contact')->where('created_by', $user_id)->get();
         $groupedCustomer = $query->groupBy(function ($item) {
             $full_names = explode(' ', $item->full_name);
             return strtoupper(substr($full_names[0], 0, 1));
@@ -365,10 +365,7 @@ class NewRecordController extends Controller
                                             $html .= $customer->full_name;
                                         $html .= '</div>';
                                         $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
-                                            $html .= (isset($customer->address_line_1) && !empty($customer->address_line_1) ? $customer->address_line_1.' ' : '');
-                                            $html .= (isset($customer->address_line_2) && !empty($customer->address_line_2) ? $customer->address_line_2.', ' : '');
-                                            $html .= (isset($customer->city) && !empty($customer->city) ? $customer->city.', ' : '');
-                                            $html .= (isset($customer->postal_code) && !empty($customer->postal_code) ? $customer->postal_code : '');
+                                            $html .= (isset($customer->full_address) && !empty($customer->full_address) ? $customer->full_address : 'N/A');
                                         $html .= '</div>';
                                     $html .= '</div>';
                                 $html .= '</div>';

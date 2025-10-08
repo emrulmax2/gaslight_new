@@ -74,31 +74,31 @@
                 </div>
                 <div class="mt-3">
                     <x-base.form-label for="address_line_1">Address Line 1 <span class="text-danger ml-2">*</span></x-base.form-label>
-                    <x-base.form-input value="{{ isset($customer->address_line_1) ? $customer->address_line_1 : '' }}" name="address_line_1" id="address_line_1" class="w-full address_line_1" type="text" placeholder="Address Line 1" />
+                    <x-base.form-input value="{{ isset($customer->address->address_line_1) ? $customer->address->address_line_1 : '' }}" name="address_line_1" id="address_line_1" class="w-full address_line_1" type="text" placeholder="Address Line 1" />
                     <div class="acc__input-error error-address_line_1 text-danger text-xs mt-1"></div>
                 </div>
                 <div class="mt-3">
                     <x-base.form-label for="address_line_2">Address Line 2 <span class="text-danger ml-2">*</span></x-base.form-label>
-                    <x-base.form-input value="{{ isset($customer->address_line_2) ? $customer->address_line_2 : '' }}" name="address_line_2" id="address_line_2" class="w-full address_line_2" type="text" placeholder="Address Line 2" />
+                    <x-base.form-input value="{{ isset($customer->address->address_line_2) ? $customer->address->address_line_2 : '' }}" name="address_line_2" id="address_line_2" class="w-full address_line_2" type="text" placeholder="Address Line 2" />
                     <div class="acc__input-error error-address_line_2 text-danger text-xs mt-1"></div>
                 </div>
                 <div class="mt-3">
                     <x-base.form-label for="city">Town/City <span class="text-danger ml-2">*</span></x-base.form-label>
-                    <x-base.form-input value="{{ isset($customer->city) ? $customer->city : '' }}" name="city" id="city" class="w-full city" type="text" placeholder="Town/City" />
+                    <x-base.form-input value="{{ isset($customer->address->city) ? $customer->address->city : '' }}" name="city" id="city" class="w-full city" type="text" placeholder="Town/City" />
                     <div class="acc__input-error error-city text-danger text-xs mt-1"></div>
                 </div>
                 <div  class="mt-3">
                     <x-base.form-label for="state">Region/County</x-base.form-label>
-                    <x-base.form-input value="{{ isset($customer->state) ? $customer->state : '' }}" name="state" id="state" class="w-full state" type="text" placeholder="Region/County" />
+                    <x-base.form-input value="{{ isset($customer->address->state) ? $customer->address->state : '' }}" name="state" id="state" class="w-full state" type="text" placeholder="Region/County" />
                 </div>
                 <div class="mt-3">
                     <x-base.form-label for="postal_code">Post Code <span class="text-danger ml-2">*</span></x-base.form-label>
-                    <x-base.form-input value="{{ isset($customer->postal_code) ? $customer->postal_code : '' }}" name="postal_code" id="postal_code" class="w-full postal_code" type="text" placeholder="Post Code" />
+                    <x-base.form-input value="{{ isset($customer->address->postal_code) ? $customer->address->postal_code : '' }}" name="postal_code" id="postal_code" class="w-full postal_code" type="text" placeholder="Post Code" />
                     <div class="acc__input-error error-postal_code text-danger text-xs mt-1"></div>
                 </div>
-                <x-base.form-input value="{{ isset($customer->country) ? $customer->country : '' }}" name="country" id="country" class="w-full country" type="hidden" />
-                        <x-base.form-input value="{{ isset($customer->latitude) ? $customer->latitude : '' }}" name="latitude" id="latitude" class="w-full latitude" type="hidden" />
-                        <x-base.form-input value="{{ isset($customer->longitude) ? $customer->longitude : '' }}" name="longitude" id="longitude" class="w-full longitude" type="hidden" />
+                <x-base.form-input value="{{ isset($customer->address->country) ? $customer->address->country : '' }}" name="country" id="country" class="w-full country" type="hidden" />
+                        <x-base.form-input value="{{ isset($customer->address->latitude) ? $customer->address->latitude : '' }}" name="latitude" id="latitude" class="w-full latitude" type="hidden" />
+                        <x-base.form-input value="{{ isset($customer->address->longitude) ? $customer->address->longitude : '' }}" name="longitude" id="longitude" class="w-full longitude" type="hidden" />
             </x-base.dialog.description>
             <x-base.dialog.footer>
                 <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
