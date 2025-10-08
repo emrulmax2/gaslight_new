@@ -53,7 +53,10 @@
                 <div class="border-b flex w-full items-start px-5 py-3">
                     <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
                     <div>
-                        <span class="font-normal text-slate-400 text-xs block">{!! (!empty($property->full_address_with_html) ? $property->full_address_with_html : 'N/A') !!}</span>
+                        <span class="font-normal text-slate-400 text-xs block">
+                            {!! $property->is_primary == 1 ? '<span class="inline-flex bg-success text-xs text-white px-2 py-0.5 rounded-sm mb-1">Default</span><br/>' : '' !!}
+                            {!! (!empty($property->full_address_with_html) ? $property->full_address_with_html : 'N/A') !!}
+                        </span>
                     </div>
                 </div>
             </div>

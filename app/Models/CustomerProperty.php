@@ -14,6 +14,7 @@ class CustomerProperty extends Model
     
     protected $fillable = [
         'customer_id',
+        'is_primary',
         'address_line_1',
         'address_line_2',
         'postal_code',

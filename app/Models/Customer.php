@@ -18,14 +18,6 @@ class Customer extends Model
         'full_name',
         'company_name',
         'vat_no',
-        'address_line_1',
-        'address_line_2',
-        'postal_code',
-        'state',
-        'city',
-        'country',
-        'latitude',
-        'longitude',
         'note',
         'auto_reminder',
 
@@ -40,31 +32,33 @@ class Customer extends Model
         return $this->full_name;
     }
 
+    public function address(){
+        return $this->hasOne(CustomerProperty::class, 'customer_id', 'id')->where('is_primary', 1);
+    }
+
     public function getFullAddressAttribute(){
         $address = '';
-        $address .= $this->address_line_1.' '.$this->address_line_2.', ';
-        $address .= (!empty($this->city) ? $this->city.', ' : '');
-        $address .= (!empty($this->postal_code) ? $this->postal_code : '');
-        //$address .= (!empty($this->state) ? $this->state.', ' : '');
-        //$address .= (!empty($this->country) ? $this->country : '');
+        $address .= isset($this->address->address_line_1) && !empty($this->address->address_line_1) ? $this->address->address_line_1.' ' : '';
+        $address .= isset($this->address->address_line_2) && !empty($this->address->address_line_2) ? $this->address->address_line_2.', ' : '';
+        $address .= (isset($this->address->city) && !empty($this->address->city) ? $this->address->city.', ' : '');
+        $address .= (isset($this->address->postal_code) && !empty($this->address->postal_code) ? $this->address->postal_code : '');
         return $address;
     }
 
     public function getPdfAddressAttribute(){
         $address = '';
-        $address .= $this->address_line_1.' '.$this->address_line_2.', ';
-        $address .= (!empty($this->city) ? $this->city : '');
-        //$address .= (!empty($this->postal_code) ? $this->postal_code.', ' : '');
-        //$address .= (!empty($this->state) ? $this->state.' ' : '');
-        //$address .= (!empty($this->country) ? $this->country : '');
+        $address .= isset($this->address->address_line_1) && !empty($this->address->address_line_1) ? $this->address->address_line_1.' ' : '';
+        $address .= isset($this->address->address_line_2) && !empty($this->address->address_line_2) ? $this->address->address_line_2.', ' : '';
+        $address .= (isset($this->address->city) && !empty($this->address->city) ? $this->address->city : '');
         return $address;
     }
 
     public function getFullAddressHtmlAttribute(){
         $address = '';
-        $address .= $this->address_line_1.' '.$this->address_line_2.',<br/> ';
-        $address .= (!empty($this->city) ? $this->city.', ' : '');
-        $address .= (!empty($this->postal_code) ? $this->postal_code : '');
+        $address .= isset($this->address->address_line_1) && !empty($this->address->address_line_1) ? $this->address->address_line_1.' ' : '';
+        $address .= isset($this->address->address_line_2) && !empty($this->address->address_line_2) ? $this->address->address_line_2.',<br/>' : '';
+        $address .= (isset($this->address->city) && !empty($this->address->city) ? $this->address->city.', ' : '');
+        $address .= (isset($this->address->postal_code) && !empty($this->address->postal_code) ? $this->address->postal_code : '');
         //$address .= (!empty($this->state) ? $this->state.',<br/> ' : '');
         //$address .= (!empty($this->country) ? $this->country : '');
         return $address;
@@ -72,11 +66,12 @@ class Customer extends Model
 
     public function getFullAddressWithHtmlAttribute(){
         $address = '';
-        $address .= $this->address_line_1.' '.$this->address_line_2.',<br/> ';
-        $address .= (!empty($this->city) ? $this->city.', ' : '');
-        $address .= (!empty($this->postal_code) ? $this->postal_code.', ' : '');
-        $address .= (!empty($this->state) ? $this->state.',<br/> ' : '');
-        $address .= (!empty($this->country) ? $this->country : '');
+        $address .= isset($this->address->address_line_1) && !empty($this->address->address_line_1) ? $this->address->address_line_1.' ' : '';
+        $address .= isset($this->address->address_line_2) && !empty($this->address->address_line_2) ? $this->address->address_line_2.',<br/>' : '';
+        $address .= (isset($this->address->city) && !empty($this->address->city) ? $this->address->city.', ' : '');
+        $address .= (isset($this->address->postal_code) && !empty($this->address->postal_code) ? $this->address->postal_code.', ' : '');
+        $address .= (isset($this->address->state) && !empty($this->address->state) ? $this->address->state.',<br/> ' : '');
+        $address .= (isset($this->address->country) && !empty($this->address->country) ? $this->address->country : '');
         return $address;
     }
 

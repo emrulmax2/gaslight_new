@@ -71,9 +71,12 @@ class CustomerJobAddressController extends Controller
                         // $html .= '</div>';
                         // endif;
                         // $html .= '<div class="mt-3 text-slate-500 leading-none flex justify-start items-start">';
-                        $html .= '<div class=" text-slate-500 leading-none flex justify-start items-start">';
+                        $html .= '<div class=" text-slate-500 leading-none flex justify-start items-start sm:items-center">';
                             $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" style="top: -3px;" class="lucide lucide-map-pin stroke-1.5 mr-2 h-4 w-4 relative"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>';
-                            $html .= '<span>'.$list->full_address.'</span>';
+                            $html .= '<span>';
+                                $html .= $list->full_address;
+                                $html .= $list->is_primary == 1 ? '<span class="inline-flex bg-success ml-5 text-xs text-white px-2 py-0.5 rounded-sm">Default</span>' : '';
+                            $html .= '</span>';
                         $html .= '</div>';
                     $html .= '</div>';
                     $html .= '<div class="ml-auto">';

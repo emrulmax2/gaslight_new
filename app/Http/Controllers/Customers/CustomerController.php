@@ -11,6 +11,7 @@ use App\Http\Requests\CustomerCreateRequest;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
 use App\Models\CustomerProperty;
+use Exception;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -31,7 +32,7 @@ class CustomerController extends Controller
 
         $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id);
         if(!empty($queryStr)):
-            $query->where(function($q) use($queryStr){
+            $query->whereHas('address', function($q) use($queryStr){
                 $q->where('full_name','LIKE','%'.$queryStr.'%')
                     ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
                     ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
@@ -73,10 +74,7 @@ class CustomerController extends Controller
                                             $html .= $customer->full_name;
                                         $html .= '</div>';
                                         $html .= '<div class="mt-0.5 whitespace-normal text-xs text-slate-500">';
-                                            $html .= (isset($customer->address_line_1) && !empty($customer->address_line_1) ? $customer->address_line_1.' ' : '');
-                                            $html .= (isset($customer->address_line_2) && !empty($customer->address_line_2) ? $customer->address_line_2.', ' : '');
-                                            $html .= (isset($customer->city) && !empty($customer->city) ? $customer->city.', ' : '');
-                                            $html .= (isset($customer->postal_code) && !empty($customer->postal_code) ? $customer->postal_code : '');
+                                            $html .= (isset($customer->full_address) && !empty($customer->full_address) ? $customer->full_address : 'N/A');
                                         $html .= '</div>';
                                     $html .= '</div>';
                                 $html .= '</div>';
@@ -178,14 +176,6 @@ class CustomerController extends Controller
             'full_name' => (isset($request->full_name) && !empty($request->full_name) ? $request->full_name : null),
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
             //'vat_no' => (!empty($request->vat_no) ? $request->vat_no : null),
-            'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
-            'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
-            'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
-            'state' => (!empty($request->state) ? $request->state : null),
-            'city' => (!empty($request->city) ? $request->city : null),
-            'country' => (!empty($request->country) ? $request->country : null),
-            'latitude' => (!empty($request->latitude) ? $request->latitude : null),
-            'longitude' => (!empty($request->longitude) ? $request->longitude : null),
             'note' => (!empty($request->note) ? $request->note : null),
             'auto_reminder' => (isset($request->auto_reminder) && $request->auto_reminder > 0 ? $request->auto_reminder : 0),
             'created_by' => auth()->user()->id
@@ -194,6 +184,7 @@ class CustomerController extends Controller
         if($customer->id):
             $CustomerProperty = CustomerProperty::create([
                 'customer_id' => $customer->id,
+                'is_primary' => 1,
                 'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
                 'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
                 'postal_code' => (!empty($request->postal_code) ? $request->postal_code : null),
@@ -219,12 +210,12 @@ class CustomerController extends Controller
             $customerData = [
                 'id' => $customer->id,
                 'full_name' => $customer->full_name,
-                'address_line_1' => $customer->address_line_1,
-                'address_line_2' => $customer->address_line_2,
-                'postal_code' => $customer->postal_code,
-                'state' => $customer->state,
-                'city' => $customer->city,
-                'country' => $customer->country,
+                'address_line_1' => $CustomerProperty->address_line_1,
+                'address_line_2' => $CustomerProperty->address_line_2,
+                'postal_code' => $CustomerProperty->postal_code,
+                'state' => $CustomerProperty->state,
+                'city' => $CustomerProperty->city,
+                'country' => $CustomerProperty->country,
                 'mobile' => (!empty($request->mobile) ? $request->mobile : ''),
             ];
             return response()->json([
@@ -241,7 +232,7 @@ class CustomerController extends Controller
     }
 
     public function edit(Customer $customer){
-        $customer->load(['title', 'contact']);
+        $customer->load(['address', 'title', 'contact']);
         return view('app.customers.edit', [
             'title' => 'Customers - Gas Certificate APP',
             'breadcrumbs' => [
@@ -288,10 +279,11 @@ class CustomerController extends Controller
         $queryStr = (isset($request->the_search_query) && !empty($request->the_search_query) ? $request->the_search_query : '');
 
         $html = '';
-        $query = Customer::with('title', 'contact')->where(function($q) use($queryStr){
+        $query = Customer::with('address', 'title', 'contact')->where(function($q) use($queryStr){
                     $q->where('full_name','LIKE','%'.$queryStr.'%')
-                        ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%')
-                        ->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
+                        ->orWhere('company_name','LIKE','%'.$queryStr.'%')->orWhere('vat_no','LIKE','%'.$queryStr.'%');
+                })->orWhereHas('address', function($q) use($queryStr){
+                    $q->orWhere('address_line_1','LIKE','%'.$queryStr.'%')->orWhere('address_line_2','LIKE','%'.$queryStr.'%')
                         ->orWhere('postal_code','LIKE','%'.$queryStr.'%')->orWhere('city','LIKE','%'.$queryStr.'%');
                 })->orderBy('full_name')->get();
         if($query->count() > 0):
@@ -312,7 +304,7 @@ class CustomerController extends Controller
                                         $html .= $customer->customer_full_name;
                                     $html .= '</div>';
                                     $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
-                                        $html .= $customer->address_line_1.' '.$customer->address_line_2.' '.$customer->city.', '.$customer->postal_code;
+                                        $html .= (isset($customer->full_address) && !empty($customer->full_address) ? $customer->full_address : 'N/A');
                                     $html .= '</div>';
                                 $html .= '</div>';
                             $html .= '</div>';
@@ -350,7 +342,7 @@ class CustomerController extends Controller
     }
 
     public function updateAddressInfo(CustomerAddressUpdateRequest $request){
-        $customer = Customer::find($request->customer_id);
+        $customer = Customer::with('address')->find($request->customer_id);
         $postal_code = (!empty($request->postal_code) ? $request->postal_code : null);
         $address_line_1 = (!empty($request->address_line_1) ? $request->address_line_1 : null);
         $address_line_2 = (!empty($request->address_line_2) ? $request->address_line_2 : null);
@@ -358,6 +350,7 @@ class CustomerController extends Controller
 
         
         $addressData = [
+            'customer_id' => $request->customer_id,
             'address_line_1' => $address_line_1,
             'address_line_2' => $address_line_2,
             'postal_code' => $postal_code,
@@ -368,28 +361,28 @@ class CustomerController extends Controller
             'longitude' => (!empty($request->longitude) ? $request->longitude : null),
         ];
 
-        $customerUpdate = Customer::where('id', $customer->id)->update($addressData);
-        if($customer->postal_code != $postal_code || $customer->address_line_1 != $address_line_1 || $customer->address_line_2 != $address_line_2 || $customer->city != $city):
-            $CustomerProperty = CustomerProperty::create([
-                'customer_id' => $customer->id,
-                'address_line_1' => $address_line_1,
-                'address_line_2' => $address_line_2,
-                'postal_code' => $postal_code,
-                'state' => (!empty($request->state) ? $request->state : null),
-                'city' => $city,
-                'country' => (!empty($request->country) ? $request->country : null),
-                'note' => null,
-                'latitude' => (!empty($request->latitude) ? $request->latitude : null),
-                'longitude' => (!empty($request->longitude) ? $request->longitude : null),
-    
-                'created_by' => auth()->user()->id,
-            ]);
-        endif;
+        try{
+            if( (!isset($customer->address->postal_code) || $customer->address->postal_code != $postal_code) || 
+                (!isset($customer->address->address_line_1) || $customer->address->address_line_1 != $address_line_1) || 
+                (!isset($customer->address->address_line_2) || $customer->address->address_line_2 != $address_line_2) || 
+                (!isset($customer->address->city) || $customer->address->city != $city)
+            ):
+                CustomerProperty::where('customer_id', $request->customer_id)->where('is_primary', 1)->update([
+                    'is_primary' => 0, 
+                    'updated_by' => auth()->user()->id
+                ]);
 
-        if($customerUpdate):
+                $addressData['is_primary'] = 1;
+                $addressData['note'] = null;
+                $addressData['created_by'] = auth()->user()->id;
+                $CustomerProperty = CustomerProperty::create($addressData);
+            else:
+                $addressData['updated_by'] = auth()->user()->id;
+                CustomerProperty::where('customer_id', $request->customer_id)->where('is_primary', 1)->update($addressData);
+            endif;
             return response()->json(['msg' => 'Customer Address successfully updated.', 'red' => '', ], 200);
-        else:
-            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
-        endif;
+        }catch(Exception $e){
+            return response()->json(['msg' => 'Something went wrong. Please try again later.', 'red' => '', ], 304);
+        }
     }
 }

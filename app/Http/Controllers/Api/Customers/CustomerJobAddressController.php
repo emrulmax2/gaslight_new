@@ -65,8 +65,17 @@ class CustomerJobAddressController extends Controller
 
     public function job_address_store(JobAddressStoreRequest $request){
         try {
+            $is_primary = $request->has('is_primary') && $request->is_primary > 0 ? $request->is_primary : 0;
+            if($is_primary == 1):
+                CustomerProperty::where('customer_id', $request->customer_id)->update([
+                    'is_primary' => 0,
+                    'updated_by' => $request->user()->id
+                ]);
+            endif;
+
             $address = CustomerProperty::create([
                 'customer_id' => $request->customer_id,
+                'is_primary' => $is_primary,
                 'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
                 'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
                 'postal_code' => $request->postal_code,
@@ -106,6 +115,7 @@ class CustomerJobAddressController extends Controller
             $property = CustomerProperty::with(['customer.title', 'customer.contact'])->findOrFail($address_id);
             $property->makeHidden(['full_address_html', 'full_address_with_html']);
             $property->customer->makeHidden(['full_address_html','full_address_with_html']);
+
 
             $updateData = [];
 
