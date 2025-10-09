@@ -22,14 +22,17 @@ class JobsController extends Controller
 {
     public function list(Request $request)
     {
-        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : 1;
+        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : null;
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         
         $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot')
-                ->where('created_by', $request->user()->id)->where('customer_job_status_id', $status);
+                ->where('created_by', $request->user()->id);
+        if($status > 0):
+            $query->where('customer_job_status_id', $status);
+        endif;
         
         $searchableColumns = Schema::getColumnListing((new CustomerJob())->getTable());
 
@@ -250,6 +253,14 @@ class JobsController extends Controller
             }
 
            $updateData = [];
+
+            if($request->has('customer_id') && $request->customer_id > 0):
+                $updateData['customer_id'] = (isset($request->customer_id) && !empty($request->customer_id) ? $request->customer_id : null);
+            endif;
+
+            if($request->has('customer_property_id') && $request->customer_property_id > 0):
+                $updateData['customer_property_id'] = (isset($request->customer_property_id) && !empty($request->customer_property_id) ? $request->customer_property_id : null);
+            endif;
 
             if($request->has('description')):
                 $updateData['description'] = (isset($request->description) && !empty($request->description) ? $request->description : null);

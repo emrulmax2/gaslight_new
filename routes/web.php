@@ -53,6 +53,7 @@ use App\Http\Controllers\Records\InvoiceController;
 use App\Http\Controllers\Records\LandlordGasSafetyController;
 use App\Http\Controllers\Records\NewRecordController;
 use App\Http\Controllers\Records\QuoteController;
+use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
@@ -367,6 +368,30 @@ Route::middleware(Authenticate::class)->group(function() {
     });
 
     Route::middleware(CheckSubscription::class)->group(function() {
+        Route::controller(RecordController::class)->group(function() {
+            Route::get('records', 'index')->name('records');
+            Route::get('records/create/{form}', 'create')->name('records.create');
+
+            Route::post('records/get-jobs', 'getJobs')->name('records.get.jobs');
+            Route::post('records/linked-job', 'linkedJob')->name('records.linked.job');
+            Route::post('records/get-job-addresses', 'getJobAddressrs')->name('records.get.job.addresses');
+            Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.addresses');
+            Route::post('records/get-job-address-occupant', 'getJobAddressOccupent')->name('records.get.job.address.occupant');
+            Route::post('records/store-job-address-occupant', 'storeJobAddressOccupent')->name('records.store.job.address.occupant');
+
+            Route::post('records/get-customers', 'getCustomers')->name('records.get.customers');
+            Route::post('records/get-linked-customer', 'getLInkedCustomer')->name('records.linked.customer');
+
+            Route::post('records/store', 'store')->name('records.store');
+            Route::get('records/show/{record}', 'show')->name('records.show');
+
+            Route::post('records/action', 'recordAction')->name('records.action');
+            Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
+        });
+
+
+
+
         Route::controller(NewRecordController::class)->group(function() {
             Route::get('new-records', 'index')->name('new.records');
             Route::get('new-records/create/{form}', 'create')->name('new.records.create');
