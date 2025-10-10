@@ -1,8 +1,8 @@
-$PDFHTML .= '<html>';
-    $PDFHTML .= '<head>';
-        $PDFHTML .= '<title>'.$report_title.'</title>';
-        $PDFHTML .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
-        $PDFHTML .= '<style>
+<html>
+    <head>
+        <title>{{ $report_title }}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <style>
                         *{border-width: 0; border-style: solid;border-color: #e5e7eb;}
                         body{font-family: Tahoma, sans-serif; font-size: 0.875rem; line-height: 1.25rem; color: #475569; padding-top: 0;}
                         table{margin-left: 0px; width: 100%; border-collapse: collapse; text-indent: 0;border-color: inherit;}
@@ -146,552 +146,553 @@ $PDFHTML .= '<html>';
                         .rounded-none{border-radius: 0px;}
                         
                         .inline-block {display: inline-block;}
-                    </style>';
-    $PDFHTML .= '</head>';
+                    </style>
+    </head>
 
-    $PDFHTML .= '<body>';
-        $PDFHTML .= '<div class="header bg-primary p-25">';
-            $PDFHTML .= '<table class="grid grid-cols-12 gap-4 items-center">';
-                $PDFHTML .= '<tbody>';
-                    $PDFHTML .= '<tr>';
-                        $PDFHTML .= '<td class="w-col2 align-middle text-center">';
-                            $PDFHTML .= '<label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>';
-                            $PDFHTML .= '<div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">'.$gsr->certificate_number.'</div>';
-                        $PDFHTML .= '</td>';
-                        $PDFHTML .= '<td class="w-col8 text-center align-middle px-5">';
-                            $PDFHTML .= '<h1 class="text-white text-xl leading-none mt-0 mb-05">Service/Maintenance Record</h1>';
-                            $PDFHTML .= '<div class="text-white text-12px leading-1-3">';
-                                $PDFHTML .= 'This record can be used to document the outcomes of the checks and tests required by The Gas Safety (Installation and Use) Regulations. 
+    <body>
+        <div class="header bg-primary p-25">
+            <table class="grid grid-cols-12 gap-4 items-center">
+                <tbody>
+                    <tr>
+                        <td class="w-col2 align-middle text-center">
+                            <label class="text-white uppercase font-medium text-12px leading-none mb-2 inline-block">Certificate Number</label>
+                            <div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">{{ $record->certificate_number }}</div>
+                        </td>
+                        <td class="w-col8 text-center align-middle px-5">
+                            <h1 class="text-white text-xl leading-none mt-0 mb-05">Service/Maintenance Record</h1>
+                            <div class="text-white text-12px leading-1-3">
+                                This record can be used to document the outcomes of the checks and tests required by The Gas Safety (Installation and Use) Regulations. 
                                             Some of the outcomes are as a result of visual inspection only and are recorded where appropriate. Unless specifically recorded no detailed 
                                             inspection of the flue lining construction or integrity has been performed.
-                                            Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500';
-                            $PDFHTML .= '</div>';
-                        $PDFHTML .= '</td>';
-                        $PDFHTML .= '<td class="w-col2 align-middle text-right" style="padding-right: 30px;">';
-                            $PDFHTML .= '<img class="w-auto h-80px" src="'.$logoBase64.'" alt="Gas Safe Register Logo">';
-                        $PDFHTML .= '</td>';
-                    $PDFHTML .= '</tr>';
-                $PDFHTML .= '</tbody>';
-            $PDFHTML .= '</table>';
-        $PDFHTML .= '</div>';
+                                            Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500
+                            </div>
+                        </td>
+                        <td class="w-col2 align-middle text-right" style="padding-right: 30px;">
+                            <img class="w-auto h-80px" src="{{ $logoBase64 }}" alt="Gas Safe Register Logo">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        $PDFHTML .= '<div class="recordInfo mt-1-5">';
-            $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                $PDFHTML .= '<thead>';
-                    $PDFHTML .= '<tr>';
-                        $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-t-0 border-r-sec text-white text-12px uppercase leading-none px-2 py-1 text-left">';
-                            $PDFHTML .= 'COMPANY / INSTALLER';
-                        $PDFHTML .= '</th>';
-                        $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-t-0 border-r-sec text-white text-12px uppercase leading-none px-2 py-1 text-left">';
-                            $PDFHTML .= 'INSPECTION / INSTALLATION ADDRESS';
-                        $PDFHTML .= '</th>';
-                        $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-t-0 text-white text-12px uppercase leading-none px-2 py-1 text-left">';
-                            $PDFHTML .= 'LANDLORD / AGENT / CUSTOMER';
-                        $PDFHTML .= '</th>';
-                    $PDFHTML .= '</tr>';
-                $PDFHTML .= '</thead>';
-                $PDFHTML .= '<tbody>';
-                    $PDFHTML .= '<tr>';
-                        $PDFHTML .= '<td class="w-50-percent p-0 border-primary align-top">';
-                            $PDFHTML .= '<table class="border-none">';
-                                $PDFHTML .= '<tbody>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="w-50-percent p-0 border-l-0 border-t-0 border-r-0 border-b-0 align-top">';
-                                            $PDFHTML .= '<table class="border-none">';
-                                                $PDFHTML .= '<tbody>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Engineer</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->user->name) && !empty($gsr->user->name) ? $gsr->user->name : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">GAS SAFE REG.</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->gas_safe_registration_no) && !empty($gsr->user->company->gas_safe_registration_no) ? $gsr->user->company->gas_safe_registration_no : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">ID CARD NO.</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->gas_safe_id_card) && !empty($gsr->user->gas_safe_id_card) ? $gsr->user->gas_safe_id_card : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">&nbsp;</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                $PDFHTML .= '</tbody>';
-                                            $PDFHTML .= '</table>';
-                                        $PDFHTML .= '</td>';
-                                        $PDFHTML .= '<td class="w-50-percent p-0 border-l-0 border-t-0 border-r-0 border-b-0 align-top">';
-                                            $PDFHTML .= '<table class="border-none">';
-                                                $PDFHTML .= '<tbody>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->company_name) && !empty($gsr->user->company->company_name) ? $gsr->user->company->company_name : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->user->company->pdf_address) && !empty($gsr->user->company->pdf_address) ? $gsr->user->company->pdf_address : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">TEL NO.</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->company_phone) && !empty($gsr->user->company->company_phone) ? $gsr->user->company->company_phone : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                    $PDFHTML .= '<tr>';
-                                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Email</td>';
-                                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->user->company->company_email) && !empty($gsr->user->company->company_email) ? $gsr->user->company->company_email : '').'</td>';
-                                                    $PDFHTML .= '</tr>';
-                                                $PDFHTML .= '</tbody>';
-                                            $PDFHTML .= '</table>';
-                                        $PDFHTML .= '</td>';
-                                    $PDFHTML .= '</tr>';
-                                $PDFHTML .= '</tbody>';
-                            $PDFHTML .= '</table>';
-                        $PDFHTML .= '</td>';
-                        $PDFHTML .= '<td class="w-25-percent p-0 border-primary align-top">';
-                            $PDFHTML .= '<table class="border-none">';
-                                $PDFHTML .= '<tbody>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->job->property->occupant_name) && !empty($gsr->job->property->occupant_name) ? $gsr->job->property->occupant_name : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->job->property->pdf_address) && !empty($gsr->job->property->pdf_address) ? $gsr->job->property->pdf_address : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->job->property->postal_code) && !empty($gsr->job->property->postal_code) ? $gsr->job->property->postal_code : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle"></td>';
-                                    $PDFHTML .= '</tr>';
-                                $PDFHTML .= '</tbody>';
-                            $PDFHTML .= '</table>';
-                        $PDFHTML .= '</td>';
-                        $PDFHTML .= '<td class="w-25-percent p-0 border-primary align-top">';
-                            $PDFHTML .= '<table class="border-none">';
-                                $PDFHTML .= '<tbody>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company Name</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px leading-none align-middle">'.(isset($gsr->customer->company_name) && !empty($gsr->customer->company_name) ? $gsr->customer->company_name : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">'.(isset($gsr->customer->pdf_address) && !empty($gsr->customer->pdf_address) ? $gsr->customer->pdf_address : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                    $PDFHTML .= '<tr>';
-                                        $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>';
-                                        $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">'.(isset($gsr->customer->postal_code) && !empty($gsr->customer->postal_code) ? $gsr->customer->postal_code : '').'</td>';
-                                    $PDFHTML .= '</tr>';
-                                $PDFHTML .= '</tbody>';
-                            $PDFHTML .= '</table>';
-                        $PDFHTML .= '</td>';
-                    $PDFHTML .= '</tr>';
-                $PDFHTML .= '</tbody>';
-            $PDFHTML .= '</table>';
-        $PDFHTML .= '</div>';
+        <div class="recordInfo mt-1-5">
+            <table class="table table-sm bordered border-primary">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-t-0 border-r-sec text-white text-12px uppercase leading-none px-2 py-1 text-left">
+                            COMPANY / INSTALLER
+                        </th>
+                        <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-t-0 border-r-sec text-white text-12px uppercase leading-none px-2 py-1 text-left">
+                            INSPECTION / INSTALLATION ADDRESS
+                        </th>
+                        <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-t-0 text-white text-12px uppercase leading-none px-2 py-1 text-left">
+                            LANDLORD / AGENT / CUSTOMER
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="w-50-percent p-0 border-primary align-top">
+                            <table class="border-none">
+                                <tbody>
+                                    <tr>
+                                        <td class="w-50-percent p-0 border-l-0 border-t-0 border-r-0 border-b-0 align-top">
+                                            <table class="border-none">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Engineer</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">{{ (isset($record->user->name) && !empty($record->user->name) ? $record->user->name : '') }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">GAS SAFE REG.</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->user->company->gas_safe_registration_no) && !empty($record->user->company->gas_safe_registration_no) ? $record->user->company->gas_safe_registration_no : '') }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">ID CARD NO.</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->user->gas_safe_id_card) && !empty($record->user->gas_safe_id_card) ? $record->user->gas_safe_id_card : '') }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">&nbsp;</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                        <td class="w-50-percent p-0 border-l-0 border-t-0 border-r-0 border-b-0 align-top">
+                                            <table class="border-none">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->user->company->company_name) && !empty($record->user->company->company_name) ? $record->user->company->company_name : '') }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">{{ (isset($record->user->company->pdf_address) && !empty($record->user->company->pdf_address) ? $record->user->company->pdf_address : '') }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">TEL NO.</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->user->company->company_phone) && !empty($record->user->company->company_phone) ? $record->user->company->company_phone : '') }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Email</td>
+                                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->user->company->company_email) && !empty($record->user->company->company_email) ? $record->user->company->company_email : '') }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="w-25-percent p-0 border-primary align-top">
+                            <table class="border-none">
+                                <tbody>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : '') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">{{ (isset($record->job->property->pdf_address) && !empty($record->job->property->pdf_address) ? $record->job->property->pdf_address : '') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->job->property->postal_code) && !empty($record->job->property->postal_code) ? $record->job->property->postal_code : '') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">&nbsp;</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="w-25-percent p-0 border-primary align-top">
+                            <table class="border-none">
+                                <tbody>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Name</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Company Name</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->company_name) && !empty($record->customer->company_name) ? $record->customer->company_name : '') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-05 pb-05 text-12px w-110px tracking-normal leading-1-3 align-top">Address</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b border-primary pl-2 pr-2 pt-1 pb-05 text-12px h-45px leading-1-3 align-top">{{ (isset($record->customer->pdf_address) && !empty($record->customer->pdf_address) ? $record->customer->pdf_address : '') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->postal_code) && !empty($record->customer->postal_code) ? $record->customer->postal_code : '') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        $PDFHTML .= '<table class="p-0 border-none mt-1-5">';
-            $PDFHTML .= '<tbody>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">';
-                        $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                            $PDFHTML .= '<thead>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">';
-                                        $PDFHTML .= 'Appliance Details';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Location';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Model';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Make';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Type';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Serial No.';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'GC No.';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</thead>';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->location->name) && !empty($gsra1->location->name) ? $gsra1->location->name : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->model) && !empty($gsra1->model) ? $gsra1->model : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->make->name) && !empty($gsra1->make->name) ? $gsra1->make->name : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->type->name) && !empty($gsra1->type->name) ? $gsra1->type->name : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->serial_no) && !empty($gsra1->serial_no) ? $gsra1->serial_no : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->gc_no) && !empty($gsra1->gc_no) ? $gsra1->gc_no : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                    $PDFHTML .= '<td class="w-half pl-1 pr-0 pb-0 pt-0 align-top">';
-                        $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                            $PDFHTML .= '<thead>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">';
-                                        $PDFHTML .= 'Electronic Combustion Gas Analyser Readings';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th colspan="3" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Initial (low) ECGA reading';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th colspan="3" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">';
-                                        $PDFHTML .= 'Final (high) ECGA reading';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</thead>';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">'.(isset($gsra1->low_analyser_ratio) && !empty($gsra1->low_analyser_ratio) ? $gsra1->low_analyser_ratio.' Ratio' : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">'.(isset($gsra1->low_co) && !empty($gsra1->low_co) ? $gsra1->low_co.' CO (PPM)' : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">'.(isset($gsra1->low_co2) && !empty($gsra1->low_co2) ? $gsra1->low_co2.' CO<sub>2</sub> (%)' : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">'.(isset($gsra1->high_analyser_ratio) && !empty($gsra1->high_analyser_ratio) ? $gsra1->high_analyser_ratio.' Ratio' : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">'.(isset($gsra1->high_co) && !empty($gsra1->high_co) ? $gsra1->high_co.' CO (PPM)' : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">'.(isset($gsra1->high_co2) && !empty($gsra1->high_co2) ? $gsra1->high_co2.' CO<sub>2</sub> (%)' : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                $PDFHTML .= '</tr>';
-            $PDFHTML .= '</tbody>';
-        $PDFHTML .= '</table>';
+        <table class="p-0 border-none mt-1-5">
+            <tbody>
+                <tr>
+                    <td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">
+                        <table class="table table-sm bordered border-primary">
+                            <thead>
+                                <tr>
+                                    <th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                                        Appliance Details
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Location
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Model
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Make
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Type
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Serial No.
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        GC No.
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->appliance_location_id) && !empty($record->available_options->appliances->appliance_location_id) ? locationName($record->available_options->appliances->appliance_location_id) : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->model) && !empty($record->available_options->appliances->model) ? $record->available_options->appliances->model : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->boiler_brand_id) && !empty($record->available_options->appliances->boiler_brand_id) ? boilerBrandName($record->available_options->appliances->boiler_brand_id) : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->appliance_type_id) && !empty($record->available_options->appliances->appliance_type_id) ? typeName($record->available_options->appliances->appliance_type_id) : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->serial_no) && !empty($record->available_options->appliances->serial_no) ? $record->available_options->appliances->serial_no : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->gc_no) && !empty($record->available_options->appliances->gc_no) ? $record->available_options->appliances->gc_no : '') }}</td>
+                                </tr>$record->available_options->appliances
+                            </tbody>
+                        </table>
+                    </td>
+                    <td class="w-half pl-1 pr-0 pb-0 pt-0 align-top">
+                        <table class="table table-sm bordered border-primary">
+                            <thead>
+                                <tr>
+                                    <th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                                        Electronic Combustion Gas Analyser Readings
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Initial (low) ECGA reading
+                                    </th>
+                                    <th colspan="3" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Final (high) ECGA reading
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->low_analyser_ratio) && !empty($record->available_options->appliances->low_analyser_ratio) ? $record->available_options->appliances->low_analyser_ratio.' Ratio' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->low_co) && !empty($record->available_options->appliances->low_co) ? $record->available_options->appliances->low_co.' CO (PPM)' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($record->available_options->appliances->low_co2) && !empty($record->available_options->appliances->low_co2) ? $record->available_options->appliances->low_co2.' CO<sub>2</sub> (%)' : '') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->high_analyser_ratio) && !empty($record->available_options->appliances->high_analyser_ratio) ? $record->available_options->appliances->high_analyser_ratio.' Ratio' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->high_co) && !empty($record->available_options->appliances->high_co) ? $record->available_options->appliances->high_co.' CO (PPM)' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($record->available_options->appliances->high_co2) && !empty($record->available_options->appliances->high_co2) ? $record->available_options->appliances->high_co2.' CO<sub>2</sub> (%)' : '') !!}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         
-        $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
-            $PDFHTML .= '<thead>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<th colspan="5" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">';
-                        $PDFHTML .= 'Installation Details';
-                    $PDFHTML .= '</th>';
-                $PDFHTML .= '</tr>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">';
-                        $PDFHTML .= 'Operating Pressure';
-                    $PDFHTML .= '</th>';
-                    $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">';
-                        $PDFHTML .= 'Rented Accommodation';
-                    $PDFHTML .= '</th>';
-                    $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">';
-                        $PDFHTML .= 'Type of Work Carried Out';
-                    $PDFHTML .= '</th>';
-                    $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">';
-                        $PDFHTML .= 'If a gas test has been carried out, was this a pass or fail';
-                    $PDFHTML .= '</th>';
-                    $PDFHTML .= '<th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">';
-                        $PDFHTML .= 'Is electrical bonding (where required satisfactory)';
-                    $PDFHTML .= '</th>';
-                $PDFHTML .= '</tr>';
-            $PDFHTML .= '</thead>';
-            $PDFHTML .= '<tbody>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->opt_pressure) && !empty($gsra1->opt_pressure) ? $gsra1->opt_pressure : '').'</td>';
-                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->rented_accommodation) && !empty($gsra1->rented_accommodation) ? $gsra1->rented_accommodation : '').'</td>';
-                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->type_of_work_carried_out) && !empty($gsra1->type_of_work_carried_out) ? $gsra1->type_of_work_carried_out : '').'</td>';
-                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->test_carried_out) && !empty($gsra1->test_carried_out) ? $gsra1->test_carried_out : '').'</td>';
-                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">'.(isset($gsra1->is_electricial_bonding) && !empty($gsra1->is_electricial_bonding) ? $gsra1->is_electricial_bonding : '').'</td>';
-                $PDFHTML .= '</tr>';
-            $PDFHTML .= '</tbody>';
-        $PDFHTML .= '</table>';
+        <table class="table table-sm bordered border-primary mt-1-5">
+            <thead>
+                <tr>
+                    <th colspan="5" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                        Installation Details
+                    </th>
+                </tr>
+                <tr>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                        Operating Pressure
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                        Rented Accommodation
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                        Type of Work Carried Out
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                        If a gas test has been carried out, was this a pass or fail
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                        Is electrical bonding (where required satisfactory)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->opt_pressure) && !empty($record->available_options->appliances->opt_pressure) ? $record->available_options->appliances->opt_pressure : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->rented_accommodation) && !empty($record->available_options->appliances->rented_accommodation) ? $record->available_options->appliances->rented_accommodation : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->type_of_work_carried_out) && !empty($record->available_options->appliances->type_of_work_carried_out) ? $record->available_options->appliances->type_of_work_carried_out : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->test_carried_out) && !empty($record->available_options->appliances->test_carried_out) ? $record->available_options->appliances->test_carried_out : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->is_electricial_bonding) && !empty($record->available_options->appliances->is_electricial_bonding) ? $record->available_options->appliances->is_electricial_bonding : '') }}</td>
+                </tr>
+            </tbody>
+        </table>
 
-        $PDFHTML .= '<table class="p-0 border-none mt-1-5">';
-            $PDFHTML .= '<tbody>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">';
-                        $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                            $PDFHTML .= '<thead>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">';
-                                        $PDFHTML .= 'Appliance Checks';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Check';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Status';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Defects found / remedial action taken';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</thead>';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Heat Exchanger</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->heat_exchanger) && !empty($gsra1->heat_exchanger) ? $gsra1->heat_exchanger : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->heat_exchanger_detail) && !empty($gsra1->heat_exchanger_detail) ? $gsra1->heat_exchanger_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Burner / injectors</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->burner_injectors) && !empty($gsra1->burner_injectors) ? $gsra1->burner_injectors : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->burner_injectors_detail) && !empty($gsra1->burner_injectors_detail) ? $gsra1->burner_injectors_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Flame Picture</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->flame_picture) && !empty($gsra1->flame_picture) ? $gsra1->flame_picture : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->flame_picture_detail) && !empty($gsra1->flame_picture_detail) ? $gsra1->flame_picture_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ignition</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->ignition) && !empty($gsra1->ignition) ? $gsra1->ignition : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->ignition_detail) && !empty($gsra1->ignition_detail) ? $gsra1->ignition_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Electrical Connection</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->electrics) && !empty($gsra1->electrics) ? $gsra1->electrics : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->electrics_detail) && !empty($gsra1->electrics_detail) ? $gsra1->electrics_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Appliance / System Controls</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->controls) && !empty($gsra1->controls) ? $gsra1->controls : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->controls_detail) && !empty($gsra1->controls_detail) ? $gsra1->controls_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Leaks gas / water</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->leak_gas_water) && !empty($gsra1->leak_gas_water) ? $gsra1->leak_gas_water : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->leak_gas_water_detail) && !empty($gsra1->leak_gas_water_detail) ? $gsra1->leak_gas_water_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Seals (appliance case etc.)</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->seals) && !empty($gsra1->seals) ? $gsra1->seals : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->seals_detail) && !empty($gsra1->seals_detail) ? $gsra1->seals_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Pipework</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->pipework) && !empty($gsra1->pipework) ? $gsra1->pipework : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->pipework_detail) && !empty($gsra1->pipework_detail) ? $gsra1->pipework_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fans</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->fans) && !empty($gsra1->fans) ? $gsra1->fans : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->fans_detail) && !empty($gsra1->fans_detail) ? $gsra1->fans_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fireplace catchment space</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->fireplace) && !empty($gsra1->fireplace) ? $gsra1->fireplace : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->fireplace_detail) && !empty($gsra1->fireplace_detail) ? $gsra1->fireplace_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Closure Plate & PRS10 Tape</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->closure_plate) && !empty($gsra1->closure_plate) ? $gsra1->closure_plate : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->closure_plate_detail) && !empty($gsra1->closure_plate_detail) ? $gsra1->closure_plate_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Allowable Location</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->allowable_location) && !empty($gsra1->allowable_location) ? $gsra1->allowable_location : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->fireplace_allowable_location_detail) && !empty($gsra1->fireplace_allowable_location_detail) ? $gsra1->fireplace_allowable_location_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Boiler Ratio</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->boiler_ratio) && !empty($gsra1->boiler_ratio) ? $gsra1->boiler_ratio : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->boiler_ratio_detail) && !empty($gsra1->boiler_ratio_detail) ? $gsra1->boiler_ratio_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Stability</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->stability) && !empty($gsra1->stability) ? $gsra1->stability : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->stability_detail) && !empty($gsra1->stability_detail) ? $gsra1->stability_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Return air / Plenum</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->return_air_ple) && !empty($gsra1->return_air_ple) ? $gsra1->return_air_ple : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->return_air_ple_detail) && !empty($gsra1->return_air_ple_detail) ? $gsra1->return_air_ple_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                    $PDFHTML .= '<td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">';
-                        $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                            $PDFHTML .= '<thead>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">';
-                                        $PDFHTML .= 'Safety Checks';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Check';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Status';
-                                    $PDFHTML .= '</th>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Defects found / remedial action taken';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</thead>';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ventilation</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->ventillation) && !empty($gsra1->ventillation) ? $gsra1->ventillation : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->ventillation_detail) && !empty($gsra1->ventillation_detail) ? $gsra1->ventillation_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Flue Termination</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->flue_termination) && !empty($gsra1->flue_termination) ? $gsra1->flue_termination : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->flue_termination_detail) && !empty($gsra1->flue_termination_detail) ? $gsra1->flue_termination_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Smoke Pellet Flue Flow Test</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->smoke_pellet_flue_flow) && !empty($gsra1->smoke_pellet_flue_flow) ? $gsra1->smoke_pellet_flue_flow : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->smoke_pellet_flue_flow_detail) && !empty($gsra1->smoke_pellet_flue_flow_detail) ? $gsra1->smoke_pellet_flue_flow_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Smoke Match Spillage Test</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->smoke_pellet_spillage) && !empty($gsra1->smoke_pellet_spillage) ? $gsra1->smoke_pellet_spillage : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->smoke_pellet_spillage_detail) && !empty($gsra1->smoke_pellet_spillage_detail) ? $gsra1->smoke_pellet_spillage_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Working Pressure</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->working_pressure) && !empty($gsra1->working_pressure) ? $gsra1->working_pressure : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->working_pressure_detail) && !empty($gsra1->working_pressure_detail) ? $gsra1->working_pressure_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Safety Device</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->savety_devices) && !empty($gsra1->savety_devices) ? $gsra1->savety_devices : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->savety_devices_detail) && !empty($gsra1->savety_devices_detail) ? $gsra1->savety_devices_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Gas Tightness Test</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->gas_tightness) && !empty($gsra1->gas_tightness) ? $gsra1->gas_tightness : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->gas_tightness_detail) && !empty($gsra1->gas_tightness_detail) ? $gsra1->gas_tightness_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Expansion vessel checked / rech rged</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->expansion_vassel_checked) && !empty($gsra1->expansion_vassel_checked) ? $gsra1->expansion_vassel_checked : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->expansion_vassel_checked_detail) && !empty($gsra1->expansion_vassel_checked_detail) ? $gsra1->expansion_vassel_checked_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Other (regulations etc.)</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">'.(isset($gsra1->other_regulations) && !empty($gsra1->other_regulations) ? $gsra1->other_regulations : '').'</td>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">'.(isset($gsra1->other_regulations_detail) && !empty($gsra1->other_regulations_detail) ? $gsra1->other_regulations_detail : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                        $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
-                            $PDFHTML .= '<thead>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">';
-                                        $PDFHTML .= 'Necessary remedial work required';
-                                    $PDFHTML .= '</th>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</thead>';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top h-60px">'.(isset($gsra1->work_required_note) && !empty($gsra1->work_required_note) ? $gsra1->work_required_note : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
+        <table class="p-0 border-none mt-1-5">
+            <tbody>
+                <tr>
+                    <td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">
+                        <table class="table table-sm bordered border-primary">
+                            <thead>
+                                <tr>
+                                    <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                                        Appliance Checks
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Check
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Status
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Defects found / remedial action taken
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Heat Exchanger</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->heat_exchanger) && !empty($record->available_options->appliances->heat_exchanger) ? $record->available_options->appliances->heat_exchanger : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->heat_exchanger_detail) && !empty($record->available_options->appliances->heat_exchanger_detail) ? $record->available_options->appliances->heat_exchanger_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Burner / injectors</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->burner_injectors) && !empty($record->available_options->appliances->burner_injectors) ? $record->available_options->appliances->burner_injectors : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->burner_injectors_detail) && !empty($record->available_options->appliances->burner_injectors_detail) ? $record->available_options->appliances->burner_injectors_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Flame Picture</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->flame_picture) && !empty($record->available_options->appliances->flame_picture) ? $record->available_options->appliances->flame_picture : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->flame_picture_detail) && !empty($record->available_options->appliances->flame_picture_detail) ? $record->available_options->appliances->flame_picture_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ignition</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->ignition) && !empty($record->available_options->appliances->ignition) ? $record->available_options->appliances->ignition : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->ignition_detail) && !empty($record->available_options->appliances->ignition_detail) ? $record->available_options->appliances->ignition_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Electrical Connection</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->electrics) && !empty($record->available_options->appliances->electrics) ? $record->available_options->appliances->electrics : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->electrics_detail) && !empty($record->available_options->appliances->electrics_detail) ? $record->available_options->appliances->electrics_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Appliance / System Controls</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->controls) && !empty($record->available_options->appliances->controls) ? $record->available_options->appliances->controls : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->controls_detail) && !empty($record->available_options->appliances->controls_detail) ? $record->available_options->appliances->controls_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Leaks gas / water</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->leak_gas_water) && !empty($record->available_options->appliances->leak_gas_water) ? $record->available_options->appliances->leak_gas_water : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->leak_gas_water_detail) && !empty($record->available_options->appliances->leak_gas_water_detail) ? $record->available_options->appliances->leak_gas_water_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Seals (appliance case etc.)</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->seals) && !empty($record->available_options->appliances->seals) ? $record->available_options->appliances->seals : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->seals_detail) && !empty($record->available_options->appliances->seals_detail) ? $record->available_options->appliances->seals_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Pipework</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->pipework) && !empty($record->available_options->appliances->pipework) ? $record->available_options->appliances->pipework : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->pipework_detail) && !empty($record->available_options->appliances->pipework_detail) ? $record->available_options->appliances->pipework_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fans</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->fans) && !empty($record->available_options->appliances->fans) ? $record->available_options->appliances->fans : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->fans_detail) && !empty($record->available_options->appliances->fans_detail) ? $record->available_options->appliances->fans_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fireplace catchment space</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->fireplace) && !empty($record->available_options->appliances->fireplace) ? $record->available_options->appliances->fireplace : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->fireplace_detail) && !empty($record->available_options->appliances->fireplace_detail) ? $record->available_options->appliances->fireplace_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Closure Plate & PRS10 Tape</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->closure_plate) && !empty($record->available_options->appliances->closure_plate) ? $record->available_options->appliances->closure_plate : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->closure_plate_detail) && !empty($record->available_options->appliances->closure_plate_detail) ? $record->available_options->appliances->closure_plate_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Allowable Location</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->allowable_location) && !empty($record->available_options->appliances->allowable_location) ? $record->available_options->appliances->allowable_location : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->fireplace_allowable_location_detail) && !empty($record->available_options->appliances->fireplace_allowable_location_detail) ? $record->available_options->appliances->fireplace_allowable_location_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Boiler Ratio</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->boiler_ratio) && !empty($record->available_options->appliances->boiler_ratio) ? $record->available_options->appliances->boiler_ratio : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->boiler_ratio_detail) && !empty($record->available_options->appliances->boiler_ratio_detail) ? $record->available_options->appliances->boiler_ratio_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Stability</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->stability) && !empty($record->available_options->appliances->stability) ? $record->available_options->appliances->stability : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->stability_detail) && !empty($record->available_options->appliances->stability_detail) ? $record->available_options->appliances->stability_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Return air / Plenum</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->return_air_ple) && !empty($record->available_options->appliances->return_air_ple) ? $record->available_options->appliances->return_air_ple : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->return_air_ple_detail) && !empty($record->available_options->appliances->return_air_ple_detail) ? $record->available_options->appliances->return_air_ple_detail : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">
+                        <table class="table table-sm bordered border-primary">
+                            <thead>
+                                <tr>
+                                    <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                                        Safety Checks
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Check
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Status
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Defects found / remedial action taken
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ventilation</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->ventillation) && !empty($record->available_options->appliances->ventillation) ? $record->available_options->appliances->ventillation : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->ventillation_detail) && !empty($record->available_options->appliances->ventillation_detail) ? $record->available_options->appliances->ventillation_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Flue Termination</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->flue_termination) && !empty($record->available_options->appliances->flue_termination) ? $record->available_options->appliances->flue_termination : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->flue_termination_detail) && !empty($record->available_options->appliances->flue_termination_detail) ? $record->available_options->appliances->flue_termination_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Smoke Pellet Flue Flow Test</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->smoke_pellet_flue_flow) && !empty($record->available_options->appliances->smoke_pellet_flue_flow) ? $record->available_options->appliances->smoke_pellet_flue_flow : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->smoke_pellet_flue_flow_detail) && !empty($record->available_options->appliances->smoke_pellet_flue_flow_detail) ? $record->available_options->appliances->smoke_pellet_flue_flow_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Smoke Match Spillage Test</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->smoke_pellet_spillage) && !empty($record->available_options->appliances->smoke_pellet_spillage) ? $record->available_options->appliances->smoke_pellet_spillage : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->smoke_pellet_spillage_detail) && !empty($record->available_options->appliances->smoke_pellet_spillage_detail) ? $record->available_options->appliances->smoke_pellet_spillage_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Working Pressure</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->working_pressure) && !empty($record->available_options->appliances->working_pressure) ? $record->available_options->appliances->working_pressure : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->working_pressure_detail) && !empty($record->available_options->appliances->working_pressure_detail) ? $record->available_options->appliances->working_pressure_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Safety Device</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->savety_devices) && !empty($record->available_options->appliances->savety_devices) ? $record->available_options->appliances->savety_devices : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->savety_devices_detail) && !empty($record->available_options->appliances->savety_devices_detail) ? $record->available_options->appliances->savety_devices_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Gas Tightness Test</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->gas_tightness) && !empty($record->available_options->appliances->gas_tightness) ? $record->available_options->appliances->gas_tightness : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->gas_tightness_detail) && !empty($record->available_options->appliances->gas_tightness_detail) ? $record->available_options->appliances->gas_tightness_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Expansion vessel checked / rech rged</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->expansion_vassel_checked) && !empty($record->available_options->appliances->expansion_vassel_checked) ? $record->available_options->appliances->expansion_vassel_checked : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->expansion_vassel_checked_detail) && !empty($record->available_options->appliances->expansion_vassel_checked_detail) ? $record->available_options->appliances->expansion_vassel_checked_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Other (regulations etc.)</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->other_regulations) && !empty($record->available_options->appliances->other_regulations) ? $record->available_options->appliances->other_regulations : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->other_regulations_detail) && !empty($record->available_options->appliances->other_regulations_detail) ? $record->available_options->appliances->other_regulations_detail : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm bordered border-primary mt-1-5">
+                            <thead>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Necessary remedial work required
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top h-60px">{{ (isset($record->available_options->appliances->work_required_note) && !empty($record->available_options->appliances->work_required_note) ? $record->available_options->appliances->work_required_note : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                    $PDFHTML .= '</td>';
-                $PDFHTML .= '<tr>';
-            $PDFHTML .= '</tbody>';
-        $PDFHTML .= '</table>';
+                    </td>
+                <tr>
+            </tbody>
+        </table>
 
-        $PDFHTML .= '<table class="p-0 border-none mt-1-5">';
-            $PDFHTML .= '<tbody>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<td class="w-col5 pr-1 pl-0 pb-0 pt-0 align-top">';
-                    $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                        $PDFHTML .= '<tbody>';
-                            $PDFHTML .= '<tr>';
-                                $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-10px uppercase px-2 py-05 leading-none align-middle">Is the installation and appliance safe to use?</td>';
-                                $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-10px w-130px leading-none align-middle">'.(isset($gsra1->is_safe_to_use) && !empty($gsra1->is_safe_to_use) ? $gsra1->is_safe_to_use : '').'</td>';
-                            $PDFHTML .= '</tr>';
-                        $PDFHTML .= '</tbody>';
-                    $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                    $PDFHTML .= '<td class="w-col7 pl-1 pr-0 pb-0 pt-0 align-top">';
-                        $PDFHTML .= '<table class="table table-sm bordered border-primary">';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-10px uppercase px-2 py-05 leading-none align-middle">Has the installation been carried out to the relevant standard/manufacturer\'s instructions? </td>';
-                                    $PDFHTML .= '<td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-10px w-130px leading-none align-middle">'.(isset($gsra1->instruction_followed) && !empty($gsra1->instruction_followed) ? $gsra1->instruction_followed : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                $PDFHTML .= '<tr>';
-            $PDFHTML .= '</tbody>';
-        $PDFHTML .= '</table>';
+        <table class="p-0 border-none mt-1-5">
+            <tbody>
+                <tr>
+                    <td class="w-col5 pr-1 pl-0 pb-0 pt-0 align-top">
+                    <table class="table table-sm bordered border-primary">
+                        <tbody>
+                            <tr>
+                                <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-10px uppercase px-2 py-05 leading-none align-middle">Is the installation and appliance safe to use?</td>
+                                <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-10px w-130px leading-none align-middle">{{ (isset($record->available_options->appliances->is_safe_to_use) && !empty($record->available_options->appliances->is_safe_to_use) ? $record->available_options->appliances->is_safe_to_use : '') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </td>
+                    <td class="w-col7 pl-1 pr-0 pb-0 pt-0 align-top">
+                        <table class="table table-sm bordered border-primary">
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-10px uppercase px-2 py-05 leading-none align-middle">Has the installation been carried out to the relevant standard/manufacturer\'s instructions? </td>
+                                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-10px w-130px leading-none align-middle">{{ (isset($record->available_options->appliances->instruction_followed) && !empty($record->available_options->appliances->instruction_followed) ? $record->available_options->appliances->instruction_followed : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                <tr>
+            </tbody>
+        </table>
 
-        $inspectionDeate = (isset($gsr->inspection_date) && !empty($gsr->inspection_date) ? date('d-m-Y', strtotime($gsr->inspection_date)) : date('d-m-Y'));
-        $nextInspectionDate = (isset($gsr->next_inspection_date) && !empty($gsr->next_inspection_date) ? date('d-m-Y', strtotime($gsr->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
-        
-        $PDFHTML .= '<table class="table table-sm bordered border-primary mt-1-5">';
-            $PDFHTML .= '<thead>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<th colspan="3" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">';
-                        $PDFHTML .= 'SIGNATURES';
-                    $PDFHTML .= '</th>';
-                $PDFHTML .= '</tr>';
-            $PDFHTML .= '</thead>';
-            $PDFHTML .= '<tbody>';
-                $PDFHTML .= '<tr>';
-                    $PDFHTML .= '<td class="w-41-percent p-0 border-primary align-top border-b-0">';
-                        $PDFHTML .= '<table class="table border-none">';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>';
-                                    $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">';
-                                        if($userSignBase64):
-                                            $PDFHTML .= '<img src="'.$userSignBase64.'" alt="signature" class="h-50px w-auto inline-block"/>';
-                                        endif;
-                                    $PDFHTML .= '</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>';
-                                    $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->user->name) && !empty($gsr->user->name) ? $gsr->user->name : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Date of Issue</td>';
-                                    $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.$inspectionDeate.'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                    $PDFHTML .= '<td class="w-41-percent p-0 border-primary align-top border-b-0">';
-                        $PDFHTML .= '<table class="table border-none">';
-                            $PDFHTML .= '<tbody>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>';
-                                    $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">';
-                                        if($signatureBase64):
-                                            $PDFHTML .= '<img src="'.$signatureBase64.'" alt="signature" class="h-50px w-auto inline-block"/>';
-                                        endif;
-                                    $PDFHTML .= '</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Received By</td>';
-                                    $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->relation->name) && !empty($gsr->relation->name) ? $gsr->relation->name : '').'</td>';
-                                $PDFHTML .= '</tr>';
-                                $PDFHTML .= '<tr>';
-                                    $PDFHTML .= '<td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>';
-                                    $PDFHTML .= '<td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">'.(isset($gsr->received_by) && !empty($gsr->received_by) ? $gsr->received_by : (isset($gsr->customer->full_name) && !empty($gsr->customer->full_name) ? $gsr->customer->full_name : '')).'</td>';
-                                $PDFHTML .= '</tr>';
-                            $PDFHTML .= '</tbody>';
-                        $PDFHTML .= '</table>';
-                    $PDFHTML .= '</td>';
-                    $PDFHTML .= '<td class="w-20-percent p-0 border-primary border-b-0 align-middle bg-light-2 text-primary text-center px-3">';
-                        $PDFHTML .= '<div class="text-primary uppercase font-medium text-12px leading-none mb-1 px-2">Next Inspection Date</div>';
-                        $PDFHTML .= '<div class="inline-block bg-white w-col9 text-center rounded-none h-30px text-12px font-medium">'.$nextInspectionDate.'</div>';
-                    $PDFHTML .= '</td>';
-                $PDFHTML .= '</tr>';
-            $PDFHTML .= '</tbody>';
-        $PDFHTML .= '</table>';
+        @php 
+            $inspectionDeate = (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : date('d-m-Y'));
+            $nextInspectionDate = (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
+        @endphp
+        <table class="table table-sm bordered border-primary mt-1-5">
+            <thead>
+                <tr>
+                    <th colspan="3" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
+                        SIGNATURES
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="w-41-percent p-0 border-primary align-top border-b-0">
+                        <table class="table border-none">
+                            <tbody>
+                                <tr>
+                                    <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">
+                                        @if($userSignBase64)
+                                            <img src="{{ $userSignBase64 }}" alt="signature" class="h-50px w-auto inline-block"/>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->user->name) && !empty($record->user->name) ? $record->user->name : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Date of Issue</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ $inspectionDeate }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td class="w-41-percent p-0 border-primary align-top border-b-0">
+                        <table class="table border-none">
+                            <tbody>
+                                <tr>
+                                    <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">
+                                        @if($signatureBase64)
+                                            <img src="{{ $signatureBase64 }}" alt="signature" class="h-50px w-auto inline-block"/>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Received By</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '')) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td class="w-20-percent p-0 border-primary border-b-0 align-middle bg-light-2 text-primary text-center px-3">
+                        <div class="text-primary uppercase font-medium text-12px leading-none mb-1 px-2">Next Inspection Date</div>
+                        <div class="inline-block bg-white w-col9 text-center rounded-none h-30px text-12px font-medium">{{ $nextInspectionDate }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-    $PDFHTML .= '</body>';
-$PDFHTML .= '</html>';
+    </body>
+</html>

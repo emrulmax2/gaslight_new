@@ -266,6 +266,8 @@ export default defineConfig({
                 "resources/js/app/records/landlord_gas_safety_record.js",
                 "resources/js/app/records/gas_warning_notice.js",
                 "resources/js/app/records/gas_service_record.js",
+                "resources/js/app/records/gas_breakdown_record.js",
+                "resources/js/app/records/gas_boiler_system_commissioning_checklist.js",
             ],
             refresh: true,
         }),

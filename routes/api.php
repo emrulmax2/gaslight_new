@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Records\InvoiceController;
 use App\Http\Controllers\Api\Records\LandlordGasSafetyController;
 use App\Http\Controllers\Api\Records\QuoteController;
 use App\Http\Controllers\Api\Records\RecordAndDraftController;
+use App\Http\Controllers\Api\Records\RecordController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\Users\UserManagementController;
 use App\Http\Controllers\Api\Users\UserProfileController;
@@ -182,6 +183,15 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('job/calendar/{id}', 'getJobCalendarDetails');
             // Route::post('job/calendar/store','addToCalendar');
             Route::post('jobs/get-slot-status', 'getCalendarSlotStatus');
+        });
+
+        Route::controller(RecordController::class)->group(function(){
+            Route::post('records/store', 'store');
+            Route::get('records/edit/{record_id}', 'edit');
+
+            Route::get('records/approve/{record_id}', 'approve');
+            Route::get('records/approve-and-email/{record_id}', 'approveEmail');
+            Route::get('records/download/{record_id}', 'download');
         });
 
         Route::controller(QuoteController::class)->group(function(){

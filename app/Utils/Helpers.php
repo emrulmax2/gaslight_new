@@ -2,6 +2,7 @@
 
 use App\Models\ApplianceFlueType;
 use App\Models\ApplianceLocation;
+use App\Models\ApplianceTimeTemperatureHeating;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
 use App\Models\GasWarningClassification;
@@ -107,5 +108,10 @@ if (!function_exists('flueName')) {
 if (!function_exists('classificationName')) {
     function classificationName($id, $default = ''){
         return GasWarningClassification::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('heatingName')) {
+    function heatingName($id, $default = ''){
+        return ApplianceTimeTemperatureHeating::find($id)?->name ?? $default;
     }
 }
