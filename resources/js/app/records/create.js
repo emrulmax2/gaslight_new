@@ -864,6 +864,22 @@ import INTAddressLookUps from '../../address_lookup.js';
             }else{
                 errors['appliance_error'] = 'Please add at least one appliance.&nbsp;';
             }
+        }else if(jobFormId == 10){
+            if(localStorage.appliances){
+                let appliances = localStorage.getItem('appliances');
+                options['appliances'] = appliances;
+                //formData.append('appliances', appliances);
+            }else{
+                errors['appliance_error'] = 'Please add at least one appliance.&nbsp;';
+            }
+        }else if(jobFormId == 13){
+            if(localStorage.appliances){
+                let appliances = localStorage.getItem('appliances');
+                options['appliances'] = appliances;
+                //formData.append('appliances', appliances);
+            }else{
+                errors['appliance_error'] = 'Please add at least one appliance.&nbsp;';
+            }
         }
         formData.append('options', JSON.stringify(options));
 

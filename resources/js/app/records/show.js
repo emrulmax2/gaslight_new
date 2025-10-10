@@ -122,7 +122,7 @@
                     localStorage.setItem('gsrComments', JSON.stringify(row.gsrComments));
                     localStorage.setItem('applianceCount', row.applianceCount);
                     localStorage.setItem('appliances', JSON.stringify(row.appliances));
-                }else if(form_id == 8){
+                }else if(form_id == 8 || form_id == 9 || form_id == 10 || form_id == 13){
                     localStorage.setItem('appliances', JSON.stringify(row.appliances));
                 }
 

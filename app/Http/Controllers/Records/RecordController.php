@@ -396,6 +396,12 @@ class RecordController extends Controller
             endif;
         elseif($record->job_form_id == 8):
             $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 9):
+            $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 10):
+            $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 13):
+            $data['appliances'] = $record->available_options->appliances;
         endif;
 
         return $data;
@@ -412,22 +418,7 @@ class RecordController extends Controller
         $userSignBase64 = (isset($record->user->signature) && Storage::disk('public')->exists($record->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->user->signature->filename)) : '');
         $signatureBase64 = ($record->signature && Storage::disk('public')->exists($record->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->signature->filename)) : '');
         
-        switch ($record->job_form_id) {
-            case '6':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            case '7':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            case '8':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            default:
-                $VIEW = '';
-                break;
-        }
-
-
+        $VIEW = 'app.records.pdf.'.$record->form->slug;
         $fileName = $record->certificate_number.'.pdf';
         if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)) {
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
