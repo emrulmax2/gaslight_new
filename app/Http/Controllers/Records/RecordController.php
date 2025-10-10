@@ -101,7 +101,7 @@ class RecordController extends Controller
         elseif($form->slug == 'gas_warning_notice'):
             $data['classifications'] = GasWarningClassification::where('active', 1)->orderBy('name', 'ASC')->get();
         elseif($form->slug == 'gas_service_record'):
-            $data['types'] = ApplianceType::where('active', 1)->orderBy('name', 'ASC')->get();
+            //Nothing 
         elseif($form->slug == 'gas_breakdown_record'):
             //Nothing 
         elseif($form->slug == 'gas_boiler_system_commissioning_checklist'):
