@@ -880,6 +880,44 @@ import INTAddressLookUps from '../../address_lookup.js';
             }else{
                 errors['appliance_error'] = 'Please add at least one appliance.&nbsp;';
             }
+        }else if(jobFormId == 15){
+            if(localStorage.radiators){
+                let radiators = localStorage.getItem('radiators');
+                options['radiators'] = radiators;
+                //formData.append('radiators', radiators);
+            }else{
+                errors['radiator_error'] = 'Please add at least one Radiator.&nbsp;';
+            }
+            if(localStorage.powerFlushChecklist){
+                let powerFlushChecklist = localStorage.getItem('powerFlushChecklist');
+                options['powerFlushChecklist'] = powerFlushChecklist;
+                //formData.append('powerFlushChecklist', powerFlushChecklist);
+            }else{
+                errors['checklist_error'] = 'Please fill out powerflush checklist data.&nbsp;';
+            }
+        }else if(jobFormId == 16){
+            if(localStorage.appliances){
+                let appliances = localStorage.getItem('appliances');
+                options['appliances'] = appliances;
+                //formData.append('appliances', appliances);
+            }else{
+                errors['appliance_error'] = 'Please add at least one appliance.&nbsp;';
+            }
+        }else if(jobFormId == 17){
+            if(localStorage.unventedSystems){
+                let unventedSystems = localStorage.getItem('unventedSystems');
+                options['unventedSystems'] = unventedSystems;
+                //formData.append('unventedSystems', unventedSystems);
+            }else{
+                errors['system_error'] = 'Please fill out unvented hot water system details.&nbsp;';
+            }
+            if(localStorage.inspectionRecords){
+                let inspectionRecords = localStorage.getItem('inspectionRecords');
+                options['inspectionRecords'] = inspectionRecords;
+                //formData.append('inspectionRecords', inspectionRecords);
+            }else{
+                errors['inspection_error'] = 'Please fill out inspection record details details.&nbsp;';
+            }
         }
         formData.append('options', JSON.stringify(options));
 

@@ -124,6 +124,19 @@
                     localStorage.setItem('appliances', JSON.stringify(row.appliances));
                 }else if(form_id == 8 || form_id == 9 || form_id == 10 || form_id == 13){
                     localStorage.setItem('appliances', JSON.stringify(row.appliances));
+                }else if(form_id == 15){
+                    localStorage.setItem('powerFlushChecklist', JSON.stringify(row.powerFlushChecklist));
+                    localStorage.setItem('checklistAnswered', row.checklistAnswered);
+                    localStorage.setItem('radiatorCount', row.radiatorCount);
+                    localStorage.setItem('radiators', JSON.stringify(row.radiators));
+                }else if(form_id == 16){
+                    localStorage.setItem('appliances', JSON.stringify(row.appliances));
+                    localStorage.setItem('applianceAnswered', row.applianceAnswered);
+                }else if(form_id == 17){
+                    localStorage.setItem('unventedSystems', JSON.stringify(row.unventedSystems));
+                    localStorage.setItem('inspectionRecords', JSON.stringify(row.inspectionRecords));
+                    localStorage.setItem('systemAnswered', JSON.stringify(row.systemAnswered));
+                    localStorage.setItem('inspectionAnswered', JSON.stringify(row.inspectionAnswered));
                 }
 
                 window.location.href = response.data.red
