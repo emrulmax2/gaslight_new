@@ -5,7 +5,14 @@ use App\Models\ApplianceLocation;
 use App\Models\ApplianceTimeTemperatureHeating;
 use App\Models\ApplianceType;
 use App\Models\BoilerBrand;
+use App\Models\Color;
+use App\Models\CommissionDecommissionWorkType;
 use App\Models\GasWarningClassification;
+use App\Models\PowerflushCirculatorPumpLocation;
+use App\Models\PowerflushCylinderType;
+use App\Models\PowerflushPipeworkType;
+use App\Models\PowerflushSystemType;
+use App\Models\RadiatorType;
 
 if (!function_exists('merge')) {
     function merge($arrays)
@@ -113,5 +120,40 @@ if (!function_exists('classificationName')) {
 if (!function_exists('heatingName')) {
     function heatingName($id, $default = ''){
         return ApplianceTimeTemperatureHeating::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('systemTypeName')) {
+    function systemTypeName($id, $default = ''){
+        return PowerflushSystemType::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('cylinderName')) {
+    function cylinderName($id, $default = ''){
+        return PowerflushCylinderType::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('pipeworkTypeName')) {
+    function pipeworkTypeName($id, $default = ''){
+        return PowerflushPipeworkType::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('pumpLocationName')) {
+    function pumpLocationName($id, $default = ''){
+        return PowerflushCirculatorPumpLocation::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('rediatorTypeName')) {
+    function rediatorTypeName($id, $default = ''){
+        return RadiatorType::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('colorName')) {
+    function colorName($id, $default = ''){
+        return Color::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('workTypeName')) {
+    function workTypeName($id, $default = ''){
+        return CommissionDecommissionWorkType::find($id)?->name ?? $default;
     }
 }
