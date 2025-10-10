@@ -17,8 +17,7 @@ use Illuminate\Support\Facades\Schema;
 class CustomerJobsController extends Controller
 {
     public function list(Request $request) {
-        $validStatuses = ['Due', 'Completed', 'Cancelled', 'Trashed'];
-        $status = $request->filled('status') && in_array($request->query('status'), $validStatuses) ? $request->query('status') : 'Due';
+        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : null;
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
@@ -37,11 +36,9 @@ class CustomerJobsController extends Controller
             });
         endif;
 
-         if ($status !== 'Trashed') {
-            $query->where('status', $status);
-        } else {
-            $query->onlyTrashed();
-        }
+        if($status > 0):
+            $query->where('customer_job_status_id', $status);
+        endif;
 
         $query->orderBy($sortField, $sortOrder);
 

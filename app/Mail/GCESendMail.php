@@ -58,13 +58,14 @@ class GCESendMail extends Mailable
     {
         $attachmentArray = [];
         $i =0 ;
-        
-        foreach ($this->attachmentList as $attachment) {     
-            $disk = (isset($attachment['disk']) && !empty($attachment['disk']) ? $attachment['disk'] : 'local');      
-            $attachmentArray[$i++] = Attachment::fromStorageDisk($disk, $attachment["pathinfo"])
-            ->as($attachment["nameinfo"])
-            ->withMime($attachment["mimeinfo"]);
-        }
+        if(!empty($this->attachmentList)):
+            foreach ($this->attachmentList as $attachment) {     
+                $disk = (isset($attachment['disk']) && !empty($attachment['disk']) ? $attachment['disk'] : 'local');      
+                $attachmentArray[$i++] = Attachment::fromStorageDisk($disk, $attachment["pathinfo"])
+                ->as($attachment["nameinfo"])
+                ->withMime($attachment["mimeinfo"]);
+            }
+        endif;
         
         return $attachmentArray;
     }

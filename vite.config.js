@@ -256,6 +256,16 @@ export default defineConfig({
                 "resources/js/app/superadmin/settings/pricing-package.js",
                 "resources/js/app/superadmin/settings/cancel-reason.js",
                 "resources/js/app/superadmin/settings/referral-code.js",
+
+                /* New Records */
+                "resources/js/app/records/index.js",
+                "resources/js/app/records/create.js",
+                "resources/js/app/records/show.js",
+
+                "resources/js/app/records/homeowner_gas_safety_record.js",
+                "resources/js/app/records/landlord_gas_safety_record.js",
+                "resources/js/app/records/gas_warning_notice.js",
+                "resources/js/app/records/gas_service_record.js",
             ],
             refresh: true,
         }),

@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\ApplianceFlueType;
+use App\Models\ApplianceLocation;
+use App\Models\ApplianceType;
+use App\Models\BoilerBrand;
+use App\Models\GasWarningClassification;
+
 if (!function_exists('merge')) {
     function merge($arrays)
     {
@@ -75,5 +81,31 @@ if (!function_exists('getFileList')) {
         }
 
         return $files;
+    }
+}
+
+if (!function_exists('locationName')) {
+    function locationName($id, $default = ''){
+        return ApplianceLocation::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('boilerBrandName')) {
+    function boilerBrandName($id, $default = ''){
+        return BoilerBrand::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('typeName')) {
+    function typeName($id, $default = ''){
+        return ApplianceType::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('flueName')) {
+    function flueName($id, $default = ''){
+        return ApplianceFlueType::find($id)?->name ?? $default;
+    }
+}
+if (!function_exists('classificationName')) {
+    function classificationName($id, $default = ''){
+        return GasWarningClassification::find($id)?->name ?? $default;
     }
 }
