@@ -3,12 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApplianceFlueType;
+use App\Models\ApplianceLocation;
+use App\Models\ApplianceTimeTemperatureHeating;
+use App\Models\ApplianceType;
+use App\Models\BoilerBrand;
 use App\Models\CalendarTimeSlot;
 use App\Models\CancelReason;
+use App\Models\CommissionDecommissionWorkType;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
+use App\Models\GasWarningClassification;
 use App\Models\JobForm;
 use App\Models\Option;
+use App\Models\PowerflushCylinderType;
+use App\Models\PowerflushSystemType;
+use App\Models\Relation;
 use App\Models\Title;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -324,5 +334,81 @@ class GlobalApiController extends Controller
                 'message' => 'Invalid category or option.'
             ], 404);
         }
+    }
+
+    public function getDropdownsList(Request $request): JsonResponse
+    {
+        $model = 'App\\Models\\'.($request->has('model') && !empty($request->query('model')) ? $request->query('model') : 'ApplianceLocation');
+        $status = ($request->has('status') ? $request->query('status') : 1);
+        $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
+        $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? $request->query('order') : 'asc';
+        $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
+        $searchableColumns = ['name'];
+
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'asc';
+        switch($model):
+            case('Relation'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('BoilerBrand'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('ApplianceType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('ApplianceFlueType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('GasWarningClassification'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('ApplianceTimeTemperatureHeating'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('CommissionDecommissionWorkType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('PowerflushSystemType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('PowerflushCylinderType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('PowerflushPipeworkType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('PowerflushCirculatorPumpLocation'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('RadiatorType'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('Color'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            case('PaymentMethod'):
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+            default:
+                $query = $model::orderBy($sortField, $sortOrder);
+                break;
+        endswitch;
+        $query->where('active', $status);
+        
+        if(!empty($searchKey)):
+            $query->where(function($q) use ($searchableColumns, $searchKey) {
+                foreach ($searchableColumns as $field) {
+                    $q->orWhere($field, 'like', '%' . $searchKey . '%');
+                }
+            });
+        endif;
+        $list = $query->get();
+
+        return response()->json([
+            'data' => $list,
+            'meta' => [
+                'total' => $list->count()
+            ]
+        ]);
     }
 }

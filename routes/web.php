@@ -387,6 +387,8 @@ Route::middleware(Authenticate::class)->group(function() {
 
             Route::post('records/action', 'recordAction')->name('records.action');
             Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
+
+            Route::post('records/destroy-document', 'destroyJobSheetDoc')->name('records.destroy.job.sheet.doc');
         });
 
 
