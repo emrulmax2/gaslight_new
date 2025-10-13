@@ -734,7 +734,12 @@ import INTAddressLookUps from '../../address_lookup.js';
     /* Submit the Form */
     $(document).on('click', '#saveCertificateBtn', function(e){
         e.preventDefault();
-        $('.gsfSignature .sign-pad-button-submit').trigger('click');
+        let job_form_id = $('#certificateForm').find('[name="job_form_id"]').val();
+        if(job_form_id == 3 || job_form_id == 4){
+            $('#certificateForm').trigger('submit');
+        }else{
+            $('.gsfSignature .sign-pad-button-submit').trigger('click');
+        }
     });
 
     $('.gsfSignature .sign-pad-button-submit').on('click', function(){
@@ -917,6 +922,41 @@ import INTAddressLookUps from '../../address_lookup.js';
                 //formData.append('inspectionRecords', inspectionRecords);
             }else{
                 errors['inspection_error'] = 'Please fill out inspection record details details.&nbsp;';
+            }
+        }else if(jobFormId == 18){
+            if(localStorage.jobSheets){
+                let jobSheets = localStorage.getItem('jobSheets');
+                options['jobSheets'] = jobSheets;
+                //formData.append('jobSheets', jobSheets);
+            }else{
+                errors['jobSheets_error'] = 'Please fill out job sheet details.&nbsp;';
+            }
+            let input = document.getElementById('job_sheet_files');
+            if(input.files.length > 0){
+                formData.append('file', $('#certificateForm input#job_sheet_files')[0].files[0]); 
+            }
+        }else if(jobFormId == 3){
+            if(localStorage.quoteItems){
+                let quoteItems = localStorage.getItem('quoteItems');
+                options['quoteItems'] = quoteItems;
+                formData.append('quoteItems', quoteItems);
+            }else{
+                errors['item_error'] = 'Please add at least one item for this quote.&nbsp;';
+            }
+            if(localStorage.quoteDiscounts){
+                let quoteDiscounts = localStorage.getItem('quoteDiscounts');
+                options['quoteDiscounts'] = quoteDiscounts;
+                //formData.append('quoteDiscounts', quoteDiscounts);
+            }
+            if(localStorage.quoteAdvance){
+                let quoteAdvance = localStorage.getItem('quoteAdvance');
+                options['quoteAdvance'] = quoteAdvance;
+                //formData.append('quoteAdvance', quoteAdvance);
+            }
+            if(localStorage.quoteNotes){
+                let quoteNotes = localStorage.getItem('quoteNotes');
+                options['quoteNotes'] = quoteNotes;
+                //formData.append('quoteNotes', JSON.parse(quoteNotes));
             }
         }
         formData.append('options', JSON.stringify(options));

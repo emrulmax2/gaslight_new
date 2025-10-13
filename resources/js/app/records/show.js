@@ -108,6 +108,7 @@
                 let form_id = response.data.form;
                 
                 localStorage.setItem('certificate_id', row.certificate_id);
+                localStorage.setItem('certificate_number', JSON.stringify(row.certificate_number));
                 localStorage.setItem('certificate', JSON.stringify(row.certificate));
                 localStorage.setItem('job', JSON.stringify(row.job));
                 localStorage.setItem('customer', JSON.stringify(row.customer));
@@ -137,6 +138,24 @@
                     localStorage.setItem('inspectionRecords', JSON.stringify(row.inspectionRecords));
                     localStorage.setItem('systemAnswered', JSON.stringify(row.systemAnswered));
                     localStorage.setItem('inspectionAnswered', JSON.stringify(row.inspectionAnswered));
+                }else if(form_id == 18){
+                    localStorage.setItem('jobSheets', JSON.stringify(row.jobSheets));
+                    localStorage.setItem('jobSheetAnswered', JSON.stringify(row.jobSheetAnswered));
+                    localStorage.setItem('jobSheetDocuments', JSON.stringify(row.jobSheetDocuments));
+                }else if(form_id == 3){
+                    if(row.quoteNotes){
+                        localStorage.setItem('quoteNotes', JSON.stringify(row.quoteNotes));
+                    }
+                    if(row.quoteItems){
+                        localStorage.setItem('quoteItemsCount', row.quoteItemsCount);
+                        localStorage.setItem('quoteItems', JSON.stringify(row.quoteItems));
+                    }
+                    if(row.quoteDiscounts){
+                        localStorage.setItem('quoteDiscounts', JSON.stringify(row.quoteDiscounts));
+                    }
+                    if(row.quoteExtra){
+                        localStorage.setItem('quoteExtra', JSON.stringify(row.quoteExtra));
+                    }
                 }
 
                 window.location.href = response.data.red

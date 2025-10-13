@@ -59,6 +59,7 @@ use App\Models\RadiatorType;
 use App\Models\Record;
 use App\Models\RecordOption;
 use App\Models\Relation;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Creagia\LaravelSignPad\Signature;
@@ -133,7 +134,9 @@ class RecordController extends Controller
     }
 
     public function store(Request $request){
-        $user_id = auth()->user()->id;
+        $user_id = $request->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
         $job_form_id = $request->job_form_id;
         $form = JobForm::find($job_form_id);
 
@@ -176,7 +179,7 @@ class RecordController extends Controller
             if($record->id):
                 $certificate_number = $this->generateCertificateNumber($record->id);
                 $options = json_decode($request->options);
-                RecordOption::where('record_id', $record->id)->forceDelete();
+                RecordOption::where('record_id', $record->id)->whereNotIn('name', ['jobSheetDocuments', 'quoteExtra'])->forceDelete();
                 if(!empty($options)):
                     foreach($options as $key => $value):
                         RecordOption::create([
@@ -188,7 +191,49 @@ class RecordController extends Controller
                     endforeach;
                 endif;
 
-                if($request->input('sign') !== null):
+                if($job_form_id == 18):
+                    $recordOption = RecordOption::where('record_id', $record->id)->where('name', 'jobSheetDocuments')->get()->first();
+                    $jobSheetDocuments = (isset($recordOption->value) && !empty($recordOption->value) ? (array) $recordOption->value : []);
+                    
+                    if($request->hasFile('job_sheet_files')):
+                        $documents = $request->file('job_sheet_files');
+                        foreach($documents as $document):
+                            $documentName = $record->id.'_'.time().'.'.$document->getClientOriginalExtension();
+                            $path = $document->storeAs('records/'.$user_id.'/'.$job_form_id.'/job_sheets/', $documentName, 'public');
+                            $jobSheetDocuments[] = $documentName;
+                        endforeach;
+                    endif;
+
+                    RecordOption::create([
+                        'record_id' => $record->id,
+                        'job_form_id' => $job_form_id,
+                        'name' => 'jobSheetDocuments',
+                        'value' => $jobSheetDocuments
+                    ]);
+                elseif($job_form_id == 3):
+                    $existRow = RecordOption::where('record_id', $certificate_id)->where('name', 'quoteExtra')->get()->first();
+                    $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
+
+                    $quoteExtra = [
+                        'non_vat_quote' => (isset($request->non_vat_quote) && $request->non_vat_quote == 1 ? 1 : 0),
+                        'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                        'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d'))
+                    ];
+                    if(!isset($theData->payment_term) || empty($theData->payment_term)):
+                        $quoteExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
+                    else:
+                        $quoteExtra['payment_term'] = $theData->payment_term;
+                    endif;
+                    RecordOption::where('record_id', $record->id)->where('name', 'quoteExtra')->forceDelete();
+                    RecordOption::create([
+                        'record_id' => $record->id,
+                        'job_form_id' => $job_form_id,
+                        'name' => 'quoteExtra',
+                        'value' => $quoteExtra
+                    ]);
+                endif;
+
+                if($request->has('sign') && $request->input('sign') !== null):
                     $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
                     $signatureData = base64_decode($signatureData);
                     if(strlen($signatureData) > 2621):
@@ -343,6 +388,7 @@ class RecordController extends Controller
                     ->find($record_id);
         $data = [
             'certificate_id' => $record->id,
+            'certificate_number' => $record->certificate_number,
             'certificate' => [
                 'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
                 'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
@@ -402,15 +448,101 @@ class RecordController extends Controller
             $data['appliances'] = $record->available_options->appliances;
         elseif($record->job_form_id == 13):
             $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 15):
+            $data['checklistAnswered'] = $data['radiatorCount'] = 0;
+            $data['radiators'] = $data['powerFlushChecklist'] = [];
+            if(isset($record->available_options->radiators) && !empty($record->available_options->radiators)):
+                foreach($record->available_options->radiators as $radiator):
+                    $data['radiators'][$radiator->radiator_serial] = (array) $radiator;
+
+                    $data['radiatorCount'] += 1;
+                endforeach;
+            endif;
+            if(isset($record->available_options->powerFlushChecklist) && !empty($record->available_options->powerFlushChecklist)):
+                $powerFlushChecklist = (array) $record->available_options->powerFlushChecklist;
+                $data['powerFlushChecklist'] = $powerFlushChecklist;
+                $data['checklistAnswered'] = count(array_filter($powerFlushChecklist, function($v) { return !empty($v); }));
+            endif;
+        elseif($record->job_form_id == 16):
+            $data['applianceAnswered'] = 0;
+            $data['appliances'] = [];
+            if(isset($record->available_options->appliances) && !empty($record->available_options->appliances)):
+                $appliances = (array) $record->available_options->appliances;
+                $data['appliances'] = $appliances;
+                $data['applianceAnswered'] = count(array_filter($appliances, function($v) { return !empty($v); }));
+            endif;
+        elseif($record->job_form_id == 17):
+            $data['systemAnswered'] = $data['inspectionAnswered'] = 0;
+            $data['unventedSystems'] = $data['inspectionRecords'] = [];
+            if(isset($record->available_options->unventedSystems) && !empty($record->available_options->unventedSystems)):
+                $unventedSystems = (array) $record->available_options->unventedSystems;
+                $data['unventedSystems'] = $unventedSystems;
+                $data['systemAnswered'] = count(array_filter($unventedSystems, function($v) { return !empty($v); }));
+            endif;
+            if(isset($record->available_options->inspectionRecords) && !empty($record->available_options->inspectionRecords)):
+                $inspectionRecords = (array) $record->available_options->inspectionRecords;
+                $data['inspectionRecords'] = $inspectionRecords;
+                $data['inspectionAnswered'] = count(array_filter($inspectionRecords, function($v) { return !empty($v); }));
+            endif;
+        elseif($record->job_form_id == 18):
+            $data['jobSheetAnswered'] = $data['jobSheetDocumentsCount'] = 0;
+            $data['jobSheets'] = [];
+            $data['jobSheetDocuments'] = '';
+            if(isset($record->available_options->jobSheets) && !empty($record->available_options->jobSheets)):
+                $jobSheets = (array) $record->available_options->jobSheets;
+                $data['jobSheets'] = $jobSheets;
+                $data['jobSheetAnswered'] = count(array_filter($jobSheets, function($v) { return !empty($v); }));
+            endif;
+            if(isset($record->available_options->jobSheetDocuments) && !empty($record->available_options->jobSheetDocuments)):
+                $jobSheetsDocs = (array) $record->available_options->jobSheetDocuments;
+                $i = 1;
+                foreach($jobSheetsDocs as $doc):
+                    if(!empty($doc) && Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc)):
+                        $documentUrl = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc);
+                        $mimeType = Storage::disk('public')->mimeType('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc);
+                        if(in_array($mimeType, ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'])):
+                            $data['jobSheetDocuments'] .= '<a data-name="'.$doc.'" id="gjsr_doc_'.$i.'" href="'.$documentUrl.'" target="_blank" class="jobSheetDocument relative inline-flex items-center justify-center image-fit h-[60px] w-[60px] bg-success bg-opacity-10 rounded-[3px] overflow-hidden mr-1 mb-1"><button data-name="'.$doc.'" data-id="'.$i.'" class="delete-doc absolute z-10 right-0 top-0 w-[15px] h-[15px] bg-danger text-white rounded-none rounded-bl-[3px] inline-flex items-center justify-center" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" class="lucide lucide-x stroke-1.5 h-3 w-3"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button><img class="rounded-[3px]" src="'.$documentUrl.'"></a>';
+                        else:
+                            $data['jobSheetDocuments'] .= '<a data-name="'.$doc.'" id="gjsr_doc_'.$i.'" href="'.$documentUrl.'" target="_blank" class="jobSheetDocument relative inline-flex items-center justify-center h-[60px] w-[60px] bg-success bg-opacity-10 rounded-[3px] overflow-hidden mr-1 mb-1"><button data-name="'.$doc.'" data-id="'.$i.'" class="delete-doc absolute z-10 right-0 top-0 w-[15px] h-[15px] bg-danger text-white rounded-none rounded-bl-[3px] inline-flex items-center justify-center" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" class="lucide lucide-x stroke-1.5 h-3 w-3"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="file-text" class="lucide lucide-file-text stroke-1.5 h-8 w-8 text-success"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></a>';
+                        endif;
+                        $i++;
+                    endif;
+                endforeach;
+            endif;
+        elseif($record->job_form_id == 3):
+            $data['quoteItemsCount'] = 0;
+            $data['quoteItems'] = $data['quoteDiscounts'] = $data['quoteExtra'] = [];
+            $data['quoteNotes'] = (isset($record->available_options->quoteNotes) && !empty($record->available_options->quoteNotes) ? $record->available_options->quoteNotes : '');
+            
+            if(isset($record->available_options->quoteItems) && !empty($record->available_options->quoteItems)):
+                if(isset($record->available_options->quoteItems) && !empty($record->available_options->quoteItems)):
+                    $q = 1;
+                    foreach($record->available_options->quoteItems as $item):
+                        $data['quoteItems'][$q] = (array) $item;
+
+                        $data['quoteItemsCount'] += 1;
+                        $q++;
+                    endforeach;
+                endif;
+            endif;
+            if(isset($record->available_options->quoteDiscounts) && !empty($record->available_options->quoteDiscounts)):
+                $quoteDiscounts = (array) $record->available_options->quoteDiscounts;
+                $data['quoteDiscounts'] = $quoteDiscounts;
+            endif;
+            if(isset($record->available_options->quoteExtra) && !empty($record->available_options->quoteExtra)):
+                $quoteExtra = (array) $record->available_options->quoteExtra;
+                $data['quoteExtra'] = $quoteExtra;
+            endif;
         endif;
 
         return $data;
     }
 
     public function generatePdf($record_id){
+        $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
         $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($record_id);
-        
-        //dd($record->available_options->appliances);
+       
+        //dd($record->available_options->quoteItems);
         $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         $report_title = 'Certificate of '.$record->certificate_number;
@@ -423,9 +555,10 @@ class RecordController extends Controller
         if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)) {
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
         }
-        $pdf = Pdf::loadView($VIEW, compact('record', 'logoBase64', 'report_title', 'userSignBase64', 'signatureBase64'))
+        $paper = ($record->job_form_id == 3 || $record->job_form_id == 4 ? 'portrait' : 'landscape');
+        $pdf = Pdf::loadView($VIEW, compact('record', 'logoBase64', 'report_title', 'userSignBase64', 'signatureBase64', 'worktypes'))
             ->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
-            ->setPaper('a4', 'landscape') //portrait landscape
+            ->setPaper('a4', $paper) //portrait landscape
             ->setWarnings(false);
         $content = $pdf->output();
         Storage::disk('public')->put('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName, $content );
@@ -657,5 +790,29 @@ class RecordController extends Controller
         $customer = Customer::with('address')->find($request->customer_id);
 
         return response()->json(['customer' => $customer], 200);
+    }
+
+    public function destroyJobSheetDoc(Request $request){
+        $record_id = $request->record_id;
+        $document_name = $request->document_name;
+        $record = Record::find($record_id);
+
+        $jobSheetsDocs = (array) $record->available_options->jobSheetDocuments;
+        if(!empty($jobSheetsDocs) && !empty($document_name)):
+            if (($key = array_search($document_name, $jobSheetsDocs)) !== false) :
+                unset($jobSheetsDocs[$key]);
+                if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$document_name)) {
+                    Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$document_name);
+                }
+            endif;
+
+            RecordOption::where('record_id', $record_id)->where('job_form_id', $record->job_form_id)->where('name')->update([
+                'value' => $jobSheetsDocs,
+            ]);
+
+            return response()->json(['msg' => 'Job Sheet document Successfully deleted.', 'red' => ''], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong please try again later.', 'red' => ''], 422);
+        endif;
     }
 }
