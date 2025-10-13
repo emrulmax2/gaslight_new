@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 
 class GlobalApiController extends Controller
 {
+    
     public function getTitles(Request $request)
     {
         $query = Title::query();
