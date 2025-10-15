@@ -20,6 +20,7 @@ use App\Models\Customer;
 use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
+use App\Models\CustomerPropertyOccupant;
 use App\Models\ExistingRecordDraft;
 use App\Models\GasBreakdownRecord;
 use App\Models\GasBreakdownRecordAppliance;
@@ -66,6 +67,7 @@ use Creagia\LaravelSignPad\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 
 class RecordController extends Controller
 {
@@ -167,6 +169,8 @@ class RecordController extends Controller
                 'customer_id' => $customer_id,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
+                'customer_property_id' => $customer_property_id,
+                'customer_property_occupant_id' => (isset($request->customer_property_occupant_id) && $request->customer_property_occupant_id > 0 ? $request->customer_property_occupant_id : null),
 
                 'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
                 'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
@@ -231,6 +235,27 @@ class RecordController extends Controller
                         'name' => 'quoteExtra',
                         'value' => $quoteExtra
                     ]);
+                elseif($job_form_id == 4):
+                    $existRow = RecordOption::where('record_id', $certificate_id)->where('name', 'invoiceExtra')->get()->first();
+                    $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
+
+                    $invoiceExtra = [
+                        'non_vat_invoice' => (isset($request->non_vat_invoice) && $request->non_vat_invoice == 1 ? 1 : 0),
+                        'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                        'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d'))
+                    ];
+                    if(!isset($theData->payment_term) || empty($theData->payment_term)):
+                        $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
+                    else:
+                        $invoiceExtra['payment_term'] = $theData->payment_term;
+                    endif;
+                    RecordOption::where('record_id', $record->id)->where('name', 'invoiceExtra')->forceDelete();
+                    RecordOption::create([
+                        'record_id' => $record->id,
+                        'job_form_id' => $job_form_id,
+                        'name' => 'invoiceExtra',
+                        'value' => $invoiceExtra
+                    ]);
                 endif;
 
                 if($request->has('sign') && $request->input('sign') !== null):
@@ -265,7 +290,7 @@ class RecordController extends Controller
 
     public function show(Record $record){
         $user_id = auth()->user()->id;
-        $record->load(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company']);
+        $record->load(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant']);
         $form = JobForm::find($record->job_form_id);
 
         $thePdf = $this->generatePdf($record->id);
@@ -384,7 +409,7 @@ class RecordController extends Controller
     public function editReady(Request $request){
         $record_id = $request->record_id;
 
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
+        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
                     ->find($record_id);
         $data = [
             'certificate_id' => $record->id,
@@ -401,10 +426,10 @@ class RecordController extends Controller
             'customer' => $record->customer,
             'job_address' => $record->job->property,
             'occupant' => [
-                'customer_property_occupant_id' => $record->job->property->id,
-                'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
-                'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
-                'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
+                'customer_property_occupant_id' => $record->customer_property_occupant_id,
+                'occupant_name' => (isset($record->occupant->occupant_name) && !empty($record->occupant->occupant_name) ? $record->occupant->occupant_name : ''),
+                'occupant_email' => (isset($record->occupant->occupant_email) && !empty($record->occupant->occupant_email) ? $record->occupant->occupant_email : ''),
+                'occupant_phone' => (isset($record->occupant->occupant_phone) && !empty($record->occupant->occupant_phone) ? $record->occupant->occupant_phone : ''),
             ]
         ];
 
@@ -416,7 +441,7 @@ class RecordController extends Controller
     }
 
     public function sortOptionData($record_id){
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
+        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
                     ->find($record_id);
         
         $data = [];
@@ -533,6 +558,34 @@ class RecordController extends Controller
                 $quoteExtra = (array) $record->available_options->quoteExtra;
                 $data['quoteExtra'] = $quoteExtra;
             endif;
+        elseif($record->job_form_id == 4):
+            $data['invoiceItemsCount'] = 0;
+            $data['invoiceItems'] = $data['invoiceDiscounts'] = $data['invoiceAdvance'] = $data['invoiceExtra'] = [];
+            $data['invoiceNotes'] = (isset($record->available_options->invoiceNotes) && !empty($record->available_options->invoiceNotes) ? $record->available_options->invoiceNotes : '');
+            
+            if(isset($record->available_options->invoiceItems) && !empty($record->available_options->invoiceItems)):
+                if(isset($record->available_options->invoiceItems) && !empty($record->available_options->invoiceItems)):
+                    $q = 1;
+                    foreach($record->available_options->invoiceItems as $item):
+                        $data['invoiceItems'][$q] = (array) $item;
+
+                        $data['invoiceItemsCount'] += 1;
+                        $q++;
+                    endforeach;
+                endif;
+            endif;
+            if(isset($record->available_options->invoiceDiscounts) && !empty($record->available_options->invoiceDiscounts)):
+                $invoiceDiscounts = (array) $record->available_options->invoiceDiscounts;
+                $data['invoiceDiscounts'] = $invoiceDiscounts;
+            endif;
+            if(isset($record->available_options->invoiceExtra) && !empty($record->available_options->invoiceExtra)):
+                $invoiceExtra = (array) $record->available_options->invoiceExtra;
+                $data['invoiceExtra'] = $invoiceExtra;
+            endif;
+            if(isset($record->available_options->invoiceAdvance) && !empty($record->available_options->invoiceAdvance)):
+                $invoiceAdvance = (array) $record->available_options->invoiceAdvance;
+                $data['invoiceAdvance'] = $invoiceAdvance;
+            endif;
         endif;
 
         return $data;
@@ -542,7 +595,7 @@ class RecordController extends Controller
         $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
         $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($record_id);
        
-        //dd($record->available_options->quoteItems);
+        //dd($record->available_options->invoiceItems);
         $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         $report_title = 'Certificate of '.$record->certificate_number;
@@ -685,26 +738,28 @@ class RecordController extends Controller
         $property_id = (isset($request->property_id) && $request->property_id > 0 ? $request->property_id : 0);
 
         $html = '';
-        $property = CustomerProperty::find($property_id);
-        if(!empty($property->occupant_name)):
+        $occupants = CustomerPropertyOccupant::where('customer_property_id', $property_id)->where('active', 1)->get();
+        if($occupants->count() > 0):
             $html .= '<div class="results existingOccupant">';
-                $html .= '<div data-id="'.$property->id.'" data-occupant="'.(!empty($property->occupant_name) ? $property->occupant_name : '').'" class="jobAddressOccupantItem flex items-center cursor-pointer bg-white px-3 py-3">';
-                    $html .= '<div>';
-                        $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
-                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 h-4 w-4 text-success"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-                        $html .= '</div>';
-                    $html .= '</div>';
-                    $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                foreach($occupants as $occupant):
+                    $html .= '<div data-id="'.$occupant->id.'" data-occupant="'.(!empty($occupant->occupant_name) ? $occupant->occupant_name : '').'" class="jobAddressOccupantItem flex items-center cursor-pointer bg-white px-3 py-3 mb-2">';
                         $html .= '<div>';
-                            $html .= '<div class="whitespace-nowrap font-medium">';
-                                $html .= $property->occupant_name;
+                            $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 h-4 w-4 text-success"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
                             $html .= '</div>';
-                            $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
-                                $html .= (!empty($property->occupant_email) ? $property->occupant_email : (!empty($property->occupant_phone) ? $property->occupant_phone : ''));
+                        $html .= '</div>';
+                        $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                            $html .= '<div>';
+                                $html .= '<div class="whitespace-nowrap font-medium">';
+                                    $html .= $occupant->occupant_name;
+                                $html .= '</div>';
+                                $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                                    $html .= (!empty($occupant->occupant_email) ? $occupant->occupant_email : (!empty($occupant->occupant_phone) ? $occupant->occupant_phone : ''));
+                                $html .= '</div>';
                             $html .= '</div>';
                         $html .= '</div>';
                     $html .= '</div>';
-                $html .= '</div>';
+                endforeach;
             $html .= '</div>';
 
             return response()->json(['suc' => 1, 'html' => $html], 200);
@@ -715,17 +770,22 @@ class RecordController extends Controller
     }
 
     public function storeJobAddressOccupent(OccupantDetailsStoreRequest $request){
-        $property_id = $request->customer_property_id;
+        try{
+            $property_id = $request->customer_property_id;
 
-        $occupant = (!empty($request->occupant_name) ? $request->occupant_name : null);
-        $data = [
-            'occupant_name' => (!empty($request->occupant_name) ? ucwords($request->occupant_name) : null),
-            'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
-            'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
-        ];
-        $address = CustomerProperty::where('id', $property_id)->update($data);
-        return response()->json(['msg' => 'Customer Job Addresses occupant details successfully created.', 'red' => '', 'occupant' => $occupant, 'id' => $property_id], 200);
-       
+            $occupantName = (!empty($request->occupant_name) ? $request->occupant_name : null);
+            $occupant = CustomerPropertyOccupant::create([
+                'customer_property_id' => $property_id,
+                'occupant_name' => (!empty($request->occupant_name) ? ucwords($request->occupant_name) : null),
+                'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
+                'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
+                'active' => 1,
+                'created_by' => $request->user()->id,
+            ]);
+            return response()->json(['msg' => 'Customer Job Addresses occupant details successfully created.', 'red' => '', 'occupant' => $occupantName, 'id' => $occupant->id], 200);
+        }catch( Exception $d){
+            return response()->json(['msg' => 'Something went wrong. Please try again later.', 'red' => ''], 422);
+        }
     }
 
     public function getCustomers(Request $request){

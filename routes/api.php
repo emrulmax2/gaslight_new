@@ -163,6 +163,11 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy');
             Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore');
             Route::get('customer-job-address/{id}', 'single_job_address');
+
+            Route::post('job-addresses/{property_id}/occoupant-store', 'occupantStore');
+            Route::get('job-address/{property_id}/occupants-list', 'occupantsList');
+            Route::get('job-address/occupants-edit/{occupant_id}', 'occupantEidt');
+            Route::put('job-address/occupants-update/{occupant_id}', 'occupantUpdate');
         });
 
         Route::controller(CustomerJobsController::class)->group(function(){

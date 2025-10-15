@@ -142,3 +142,99 @@
     </x-base.dialog.panel>
 </x-base.dialog>
 <!-- END: Company Address Modal Content -->
+
+
+<!-- BEGIN: Add Occupant Modal Content -->
+<x-base.dialog id="addOccupantModal" staticBackdrop>
+    <x-base.dialog.panel class="rounded-none">
+        <form method="post" action="#" id="addOccupantForm">
+            <x-base.dialog.title>
+                <h2 class="mr-auto text-base font-medium inline-flex items-center">Add Occupant</h2>
+                <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+            </x-base.dialog.title>
+            <x-base.dialog.description class="modal-body">
+                <div class="grid grid-cols-12 gap-3">
+                    <div class="col-span-12">
+                        <x-base.form-label for="occupant_name">Occupant Name <span class="text-danger ml-2">*</span></x-base.form-label>
+                        <x-base.form-input value="" name="occupant_name" id="occupant_name" class="w-full" type="text" placeholder="" />
+                        <div class="acc__input-error error-occupant_name text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="col-span-12">
+                        <x-base.form-label for="occupant_phone">Occupant Phone</x-base.form-label>
+                        <x-base.form-input value="" name="occupant_phone" id="occupant_phone" class="w-full" type="text" placeholder="" />
+                        <div class="acc__input-error error-occupant_phone text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="col-span-12">
+                        <x-base.form-label for="occupant_email">Occupant Email</x-base.form-label>
+                        <x-base.form-input value="" name="occupant_email" id="occupant_email" class="w-full" type="text" placeholder="" />
+                        <div class="acc__input-error error-occupant_email text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="col-span-12">
+                        <x-base.form-label for="due_date">Due Date</x-base.form-label>
+                        <x-base.litepicker name="due_date" id="due_date" class="w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                        <div class="acc__input-error error-due_date text-danger text-xs mt-1"></div>
+                    </div>
+                </div>
+            </x-base.dialog.description>
+            <x-base.dialog.footer>
+                <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
+                <x-base.button class="w-auto" id="addOccupantBtn" type="submit" variant="primary">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Save
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+                <input type="hidden" name="customer_property_id" value="{{ $property->id }}"/>
+                <input type="hidden" name="customer_id" value="{{ $property->customer_id }}"/>
+            </x-base.dialog.footer>
+        </form>
+    </x-base.dialog.panel>
+</x-base.dialog>
+<!-- END: Add Occupant Modal Content -->
+
+<!-- BEGIN: Edit Occupant Modal Content -->
+<x-base.dialog id="editOccupantModal" staticBackdrop>
+    <x-base.dialog.panel class="rounded-none">
+        <form method="post" action="#" id="editOccupantForm">
+            <x-base.dialog.title>
+                <h2 class="mr-auto text-base font-medium inline-flex items-center">Add Occupant</h2>
+                <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+            </x-base.dialog.title>
+            <x-base.dialog.description class="modal-body">
+                <div class="grid grid-cols-12 gap-3">
+                    <div class="col-span-12">
+                        <x-base.form-label for="edit_occupant_name">Occupant Name <span class="text-danger ml-2">*</span></x-base.form-label>
+                        <x-base.form-input value="" name="occupant_name" id="edit_occupant_name" class="w-full" type="text" placeholder="" />
+                        <div class="acc__input-error error-occupant_name text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="col-span-12">
+                        <x-base.form-label for="edit_occupant_phone">Occupant Phone</x-base.form-label>
+                        <x-base.form-input value="" name="occupant_phone" id="edit_occupant_phone" class="w-full" type="text" placeholder="" />
+                        <div class="acc__input-error error-occupant_phone text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="col-span-12">
+                        <x-base.form-label for="edit_occupant_email">Occupant Email</x-base.form-label>
+                        <x-base.form-input value="" name="occupant_email" id="edit_occupant_email" class="w-full" type="text" placeholder="" />
+                        <div class="acc__input-error error-occupant_email text-danger text-xs mt-1"></div>
+                    </div>
+                    <div class="col-span-12">
+                        <x-base.form-label for="edit_due_date">Due Date</x-base.form-label>
+                        <x-base.litepicker name="due_date" id="edit_due_date" class="w-full" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                        <div class="acc__input-error error-due_date text-danger text-xs mt-1"></div>
+                    </div>
+                </div>
+            </x-base.dialog.description>
+            <x-base.dialog.footer>
+                <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
+                <x-base.button class="w-auto" id="editOccupantBtn" type="submit" variant="primary">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Save
+                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                </x-base.button>
+                <input type="hidden" name="customer_property_id" value="{{ $property->id }}"/>
+                <input type="hidden" name="customer_id" value="{{ $property->customer_id }}"/>
+                <input type="hidden" name="id" value="0"/>
+            </x-base.dialog.footer>
+        </form>
+    </x-base.dialog.panel>
+</x-base.dialog>
+<!-- END: Edit Occupant Modal Content -->

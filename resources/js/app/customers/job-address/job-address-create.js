@@ -71,7 +71,20 @@ import INTAddressLookUps from '../../../address_lookup.js';
         $('#addJobAddressForm').submit();
     });
 
-    
+    $('#has_occupants').on('change', function(e){
+        let $theCheckbox = $(this);
+        if($theCheckbox.prop('checked')){
+            $('.occupantSection').addClass('pb-2');
+            $('#occupantWrap').fadeIn('fast', function(){
+                $('input', this).val('');
+            })
+        }else{
+            $('.occupantSection').removeClass('pb-2');
+            $('#occupantWrap').fadeOut('fast', function(){
+                $('input', this).val('');
+            })
+        }
+    })
 
     $('#addJobAddressForm').on('submit', function(e){
         e.preventDefault();

@@ -1,10 +1,66 @@
 import INTAddressLookUps from '../../../address_lookup.js';
 
+("use strict");
+var JobAddressOccupantsListTable = (function () {
+    var _tableGen = function () {
+
+        let property_id = $("#JobAddressOccupantsListTable").attr('data-propery') != "" ? $("#JobAddressOccupantsListTable").attr('data-propery') : "";
+        
+        axios({
+            method: 'post',
+            url: route('job-addresses.occupant.list'),
+            data: {property_id: property_id},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            if (response.status == 200) {
+                $('#JobAddressOccupantsListTable').html(response.data.html);
+
+                createIcons({
+                    icons,
+                    attrs: { "stroke-width": 1.5 },
+                    nameAttr: "data-lucide",
+                });
+            }
+        }).catch(error =>{
+            console.log(error)
+        });
+        
+
+    };
+    return {
+        init: function () {
+            _tableGen();
+        },
+    };
+
+})();
+
 (function(){
     // INIT Address Lookup
     if($('.theAddressWrap').length > 0){
         INTAddressLookUps();
     }
+
+    if($('#has_occupants').prop('checked')){
+        JobAddressOccupantsListTable.init();
+    }
+
+    function filterJobAddressListTable() {
+        JobAddressOccupantsListTable.init();
+    }
+
+    function destroyJobAddressListTable(){
+        $('#JobAddressOccupantsListTable').html('')
+    }
+
+    $("#query").on("keypress", function (e) {
+        var key = e.keyCode || e.which;
+        if(key === 13){
+            e.preventDefault();
+
+            JobAddressOccupantsListTable.init();
+        }
+    });
 
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
@@ -13,6 +69,8 @@ import INTAddressLookUps from '../../../address_lookup.js';
     const updatePropertyDueDateModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#updatePropertyDueDateModal"));
     const jobAddressNoteModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#jobAddressNoteModal"));
     const propertyAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#propertyAddressModal"));
+    const addOccupantModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addOccupantModal"));
+    const editOccupantModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#editOccupantModal"));
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -40,6 +98,17 @@ import INTAddressLookUps from '../../../address_lookup.js';
         $('#updatePropertyDataModal input[name="fieldValue"]').val('');
         $('#updatePropertyDataModal input[name="fieldName"]').val('');
         $('#updatePropertyDataModal input[name="theModel"]').val('customer');
+    });
+
+    document.getElementById('addOccupantModal').addEventListener('hide.tw.modal', function(event) {
+        $('#addOccupantModal .acc__input-error').html('');
+        $('#addOccupantModal .modal-body input').val('');
+    });
+
+    document.getElementById('editOccupantModal').addEventListener('hide.tw.modal', function(event) {
+        $('#editOccupantModal .acc__input-error').html('');
+        $('#editOccupantModal .modal-body input').val('');
+        $('#editOccupantModal [name="id"]').val('0');
     });
 
     
@@ -281,6 +350,207 @@ import INTAddressLookUps from '../../../address_lookup.js';
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
                         $(`#propertyAddressForm .${key}`).addClass('border-danger');
                         $(`#propertyAddressForm  .error-${key}`).html(val);
+                    }
+                } else if (error.response.status == 304) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    });
+
+    $('#has_occupants').on('change', function(e){
+        let $theCheckbox = $(this);
+        if($theCheckbox.prop('checked')){
+            $('.occupantSection').addClass('pb-2');
+            $('.occupantTableWrap').fadeIn('fast', function(){
+                filterJobAddressListTable();
+                $('.addOccupantToggler').fadeIn();
+            })
+        }else{
+            $('.occupantSection').removeClass('pb-2');
+            $('.occupantTableWrap').fadeOut('fast', function(){
+                destroyJobAddressListTable();
+                $('.addOccupantToggler').fadeOut();
+            })
+        }
+    });
+
+    $('#has_occupants').on('change', function (e) {
+        let $theCheckbox = $(this);
+        let isChecked = $theCheckbox.prop('checked');
+        let propertyId = $theCheckbox.attr('data-propertyid');
+        $theCheckbox.prop('disabled', true);
+        
+        axios({
+            method: "POST",
+            url: route('job-addresses.update.occupant.status'),
+            data: {
+                property_id: propertyId,
+                has_occupants: isChecked ? 1 : 0,
+            },
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(function (response) {
+            if (isChecked) {
+                $('.occupantSection').addClass('pb-2');
+                $('.occupantTableWrap').fadeIn('fast', function () {
+                    filterJobAddressListTable();
+                    $('.addOccupantToggler').fadeIn();
+                });
+            } else {
+                $('.occupantSection').removeClass('pb-2');
+                $('.occupantTableWrap').fadeOut('fast', function () {
+                    destroyJobAddressListTable();
+                    $('.addOccupantToggler').fadeOut();
+                });
+            }
+        }).catch(function (error) {
+            console.error('Error:', error);
+        }).finally(function () {
+            $theCheckbox.prop('disabled', false);
+        });
+    });
+
+    $('#addOccupantForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('addOccupantForm');
+        const $theForm = $(this);
+        
+        $('#addOccupantForm .acc__input-error').html('');
+        $('#addOccupantBtn', $theForm).attr('disabled', 'disabled');
+        $("#addOccupantBtn .theLoader").fadeIn();
+
+        let form_data = new FormData(form);
+        axios({
+            method: "POST",
+            url: route('job-addresses.occupant.store'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#addOccupantBtn', $theForm).removeAttr('disabled');
+            $("#addOccupantBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                addOccupantModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                });
+                setTimeout(() => {
+                    successModal.hide();
+                }, 1500);
+            }
+            filterJobAddressListTable();
+        }).catch(error => {
+            $('#addOccupantBtn', $theForm).removeAttr('disabled');
+            $("#addOccupantBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#addOccupantForm .${key}`).addClass('border-danger');
+                        $(`#addOccupantForm  .error-${key}`).html(val);
+                    }
+                } else if (error.response.status == 304) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.occupantWrap', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        let occupant_id = $theBtn.attr('data-id');
+        let customer_id = $theBtn.attr('data-customerid');
+
+        axios({
+            method: "post",
+            url: route('job-addresses.occupant.edit'),
+            data: {occupant_id : occupant_id},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            if (response.status == 200) {
+                let row = response.data.row;
+
+                editOccupantModal.show();
+                document.getElementById("editOccupantModal").addEventListener("shown.tw.modal", function (event) {
+                    $('#editOccupantModal [name="occupant_name"]').val(row.occupant_name ? row.occupant_name : '');
+                    $('#editOccupantModal [name="occupant_phone"]').val(row.occupant_phone ? row.occupant_phone : '');
+                    $('#editOccupantModal [name="occupant_email"]').val(row.occupant_email ? row.occupant_email : '');
+                    $('#editOccupantModal [name="due_date"]').val(row.due_date ? row.due_date : '');
+                    $('#editOccupantModal [name="id"]').val(occupant_id);
+                });
+            }
+        }).catch(error => {
+            if (error.response) {
+                console.log('error');
+            }
+        });
+    })   
+
+    $('#editOccupantForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('editOccupantForm');
+        const $theForm = $(this);
+        
+        $('#editOccupantForm .acc__input-error').html('');
+        $('#editOccupantBtn', $theForm).attr('disabled', 'disabled');
+        $("#editOccupantBtn .theLoader").fadeIn();
+
+        let form_data = new FormData(form);
+        axios({
+            method: "POST",
+            url: route('job-addresses.occupant.update'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#editOccupantBtn', $theForm).removeAttr('disabled');
+            $("#editOccupantBtn .theLoader").fadeOut();
+            console.log(response.data);
+            if (response.status == 200) {
+                editOccupantModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                });
+                setTimeout(() => {
+                    successModal.hide();
+                }, 1500);
+            }
+            filterJobAddressListTable();
+        }).catch(error => {
+            $('#editOccupantBtn', $theForm).removeAttr('disabled');
+            $("#editOccupantBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#editOccupantForm .${key}`).addClass('border-danger');
+                        $(`#editOccupantForm  .error-${key}`).html(val);
                     }
                 } else if (error.response.status == 304) {
                     warningModal.show();

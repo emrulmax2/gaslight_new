@@ -173,12 +173,12 @@ import INTAddressLookUps from '../../address_lookup.js';
                         $('.theId', this).val((job_address.id && job_address.id > 0 ? job_address.id : 0));
                     })
             
-                    if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
+                    //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
                         $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
                             $('.theDesc', this).html((occupant.occupant_name ? occupant.occupant_name : 'Click here to add job address occupant'));
                             $('.theId', this).val((occupant.customer_property_occupant_id ? occupant.customer_property_occupant_id : 0));
                         });
-                    }
+                    //}
 
                     linkedJobModal.hide();
                 },
@@ -249,12 +249,12 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(0);
         })
 
-        if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
-            $('.customerPropertyOccupantWrap').fadeOut('fast', function(){
-                $('.theDesc', this).html('Click here to add job address occupant');
-                $('.theId', this).val(0);
-            })
-        }
+        //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
+        $('.customerPropertyOccupantWrap').fadeOut('fast', function(){
+            $('.theDesc', this).html('Click here to add job address occupant');
+            $('.theId', this).val(0);
+        })
+        //}
     }
     $('.customerBlock').on('click', function(e){
         e.preventDefault();
@@ -336,12 +336,12 @@ import INTAddressLookUps from '../../address_lookup.js';
                         $('.theId', this).val(0);
                     })
 
-                    if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
+                    //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
                         $('.customerPropertyOccupantWrap').fadeOut('fast', function(){
                             $('.theDesc', this).html('Click here to add job address occupant').removeClass('font-medium');
                             $('.theId', this).val(0);
                         })
-                    }
+                    //}
 
                     customerListModal.hide();
                 },
@@ -399,7 +399,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(jobAddressObj.id);
         });
 
-        if(localStorage.occupant && (job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4)){
+        if(localStorage.occupant){
             let occupant = localStorage.getItem('occupant');
             let occupantObj = JSON.parse(occupant);
 
@@ -446,12 +446,12 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(theAddressId);
         });
 
-        if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
+        //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
             $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
                 $('.theDesc', this).html('Click here to add job address occupant');
                 $('.theId', this).val(0);
             });
-        }
+        //}
     });
     /* On Click Add Customer Address End */
 
@@ -503,12 +503,12 @@ import INTAddressLookUps from '../../address_lookup.js';
                     $('.theId', this).val(address_id);
                 })
 
-                if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
+                //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
                     $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
                         $('.theDesc', this).html('Click here to add job address occupant');
                         $('.theId', this).val(0);
                     });
-                }
+                //}
             }
         }).catch(error => {
             $('#addressSaveBtn', $theForm).removeAttr('disabled');
@@ -834,6 +834,9 @@ import INTAddressLookUps from '../../address_lookup.js';
         if($theForm.find('[name="customer_property_id"]').val() == 0 || $theForm.find('[name="customer_property_id"]').val() == ''){
             errors['customer_property_id'] = 'Job address can not be empty.';
         }
+        // if($theForm.find('[name="customer_property_occupant_id"]').val() == 0 || $theForm.find('[name="customer_property_occupant_id"]').val() == ''){
+        //     errors['customer_property_occupant_id'] = 'Occoupant details can not be empty.';
+        // }
 
         if(jobFormId == 6 || jobFormId == 7){
             if(localStorage.appliances){
@@ -939,7 +942,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             if(localStorage.quoteItems){
                 let quoteItems = localStorage.getItem('quoteItems');
                 options['quoteItems'] = quoteItems;
-                formData.append('quoteItems', quoteItems);
+                //formData.append('quoteItems', quoteItems);
             }else{
                 errors['item_error'] = 'Please add at least one item for this quote.&nbsp;';
             }
@@ -956,6 +959,29 @@ import INTAddressLookUps from '../../address_lookup.js';
             if(localStorage.quoteNotes){
                 let quoteNotes = localStorage.getItem('quoteNotes');
                 options['quoteNotes'] = quoteNotes;
+                //formData.append('quoteNotes', JSON.parse(quoteNotes));
+            }
+        }else if(jobFormId == 4){
+            if(localStorage.invoiceItems){
+                let invoiceItems = localStorage.getItem('invoiceItems');
+                options['invoiceItems'] = invoiceItems;
+                //formData.append('quoteItems', quoteItems);
+            }else{
+                errors['item_error'] = 'Please add at least one item for this quote.&nbsp;';
+            }
+            if(localStorage.invoiceDiscounts){
+                let invoiceDiscounts = localStorage.getItem('invoiceDiscounts');
+                options['invoiceDiscounts'] = invoiceDiscounts;
+                //formData.append('quoteDiscounts', quoteDiscounts);
+            }
+            if(localStorage.invoiceAdvance){
+                let invoiceAdvance = localStorage.getItem('invoiceAdvance');
+                options['invoiceAdvance'] = invoiceAdvance;
+                //formData.append('quoteAdvance', quoteAdvance);
+            }
+            if(localStorage.invoiceNotes){
+                let invoiceNotes = localStorage.getItem('invoiceNotes');
+                options['invoiceNotes'] = invoiceNotes;
                 //formData.append('quoteNotes', JSON.parse(quoteNotes));
             }
         }

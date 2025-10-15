@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Customers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Http\Requests\JobAddressStoreRequest;
+use App\Http\Requests\OccupantStoreRequest;
 use App\Http\Requests\PropertyAddressUpdateRequest;
 use App\Models\Customer;
 use App\Models\CustomerContactInformation;
 use App\Models\CustomerProperty;
+use App\Models\CustomerPropertyOccupant;
 use App\Models\Title;
+use Exception;
 use Illuminate\Http\Request;
 use PhpParser\Builder\Property;
 
@@ -115,6 +118,7 @@ class CustomerJobAddressController extends Controller
         $customer_id = $request->customer_id;
         $customer = Customer::find($customer_id);
         $address_lookup = $request->address_lookup;
+        $has_occupants = (isset($request->has_occupants) && !empty($request->has_occupants) ? $request->has_occupants : 0);
         $data = [
             'customer_id' => $request->customer_id,
             'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
@@ -126,15 +130,24 @@ class CustomerJobAddressController extends Controller
             'latitude' => (!empty($request->latitude) ? $request->latitude : null),
             'longitude' => (!empty($request->longitude) ? $request->longitude : null),
             'note' => (!empty($request->note) ? $request->note : null),
-            'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
-            'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
-            'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
-            'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+            'has_occupants' => $has_occupants,
 
             'created_by' => auth()->user()->id,
         ];
         $address = CustomerProperty::create($data);
         if($address->id):
+            if($has_occupants):
+                $occupant = CustomerPropertyOccupant::create([
+                    'customer_property_id' => $address->id,
+                    'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
+                    'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
+                    'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
+                    'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+                    'active' => 1,
+
+                    'created_by' => $request->user()->id,
+                ]);
+            endif;
             return response()->json(['msg' => 'Customer Job Addresses successfully created.', 'red' => route('customer.job-addresses', $customer_id), 'address' => $address_lookup, 'id' => $address->id], 200);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
@@ -232,5 +245,109 @@ class CustomerJobAddressController extends Controller
         else:
             return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
         endif;
+    }
+
+    public function updateOccupantStatus(Request $request){
+        $property_id = $request->property_id;
+        $has_occupants = $request->has_occupants;
+
+        if($has_occupants == 1){
+            $occupant = CustomerPropertyOccupant::onlyTrashed()->where('customer_property_id', $property_id)->restore();
+        }else{
+            $occupant = CustomerPropertyOccupant::where('customer_property_id', $property_id)->delete();
+        }
+        $property = CustomerProperty::where('id', $property_id)->update(['has_occupants' => $has_occupants]);
+    }
+
+    public function occupantlist(Request $request){
+        $property_id = (isset($request->property_id) && !empty($request->property_id) ? $request->property_id : '');
+
+
+        $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
+        $sorts = [];
+        foreach($sorters as $sort):
+            $sorts[] = $sort['field'].' '.$sort['dir'];
+        endforeach;
+
+        $Query = CustomerPropertyOccupant::orderByRaw(implode(',', $sorts))->where('customer_property_id', $property_id)->get();
+
+        $html = '';
+        if($Query->count() > 0):
+            foreach($Query as $list):
+                $html .= '<a data-customerid="'.$list->property->customer_id.'" data-id="'.$list->id.'" href="javascript:void(0);" class="occupantWrap relative userWrap px-0 py-4 border-b border-b-slate-100 flex w-full items-center">';
+                    $html .= '<div class="mr-auto">';
+                        if(!empty($list->due_date)):
+                            $html .= '<div class="text-xs bg-slate-100 inline-flex text-slate-500 leading-none font-medium px-2 py-1 mb-2">'.date('jS F, Y', strtotime($list->due_date)).'</div>';
+                        endif;
+                        $html .= '<div class="font-medium text-dark leading-none mb-2 flex items-center">';
+                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user h-4 w-4 mr-2 stroke-2 text-success"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+                            $html .= $list->occupant_name;
+                        $html .= '</div>';
+                        $html .= '<div class=" text-slate-500 text-xs leading-none flex items-center">';
+                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone h-3 w-3 mr-3 stroke-2 text-slate-500"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>';
+                            $html .= $list->occupant_phone;
+                        $html .='</div>';
+                        if(!empty($list->occupant_email)):
+                            $html .= '<div class=" text-slate-500 text-xs leading-none mt-1 flex items-center">';
+                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="mail" class="lucide lucide-mail h-3 w-3 mr-3 stroke-2 text-slate-500"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>';
+                                $html .= $list->occupant_email;
+                            $html .= '</div>';
+                        endif;
+                    $html .= '</div>';
+                $html .= '</a>';
+            endforeach;
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-pending border-pending bg-opacity-20 border-opacity-5 text-pending dark:border-pending dark:border-opacity-20 mb-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>
+                        Data not found.
+                    </div>';
+        endif;
+        
+        return response()->json(['html' => $html]);
+    }
+
+    public function storeOccupant(OccupantStoreRequest $request){
+        try{
+            $occupant = CustomerPropertyOccupant::create([
+                'customer_property_id' => $request->customer_property_id,
+                'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
+                'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
+                'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
+                'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+                'active' => 1,
+
+                'created_by' => $request->user()->id,
+            ]);
+            return response()->json(['msg' => 'Occupant successfully added.', 'red' => ''], 200);
+        }catch(Exception $e){
+            return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);
+        }
+    }
+
+    public function editOccupant(Request $request){
+        try{
+            $occupant_id = $request->occupant_id;
+            $row = CustomerPropertyOccupant::find($occupant_id);
+
+            return response()->json(['row' => $row], 200);
+        }catch(Exception $e){
+            return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);
+        }
+    }
+
+    public function updateOccupant(OccupantStoreRequest $request){
+        try{
+            $occupant = CustomerPropertyOccupant::where('id', $request->id)->update([
+                'occupant_name' => (!empty($request->occupant_name) ? $request->occupant_name : null),
+                'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
+                'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
+                'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+
+                'updated_by' => $request->user()->id,
+            ]);
+            return response()->json(['msg' => 'Occupant successfully updated.', 'red' => ''], 200);
+        }catch(Exception $e){
+            return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);
+        }
     }
 }

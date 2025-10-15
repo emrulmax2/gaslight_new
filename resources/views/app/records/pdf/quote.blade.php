@@ -63,7 +63,7 @@
         <table class="mb-60">
             <tr>
                 <td class="customerAddressWrap v-top">
-                    <img src="' . $logoBase64 . '" alt="Gas Safe Engineer APP" style="width: 126px; height: auto; margin-bottom: 20px;">
+                    <img src="{{ $logoBase64 }}" alt="Gas Safe Engineer APP" style="width: 126px; height: auto; margin-bottom: 20px;">
                     <div class="titleLabel">Address to</div>
                     <div class="customerDetails">
                         <div class="customerName font-medium">{{ $record->customer->full_name }}</div>

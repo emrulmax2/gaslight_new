@@ -20,7 +20,7 @@
                         </a>
                     </div>--}}
                     <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
-                        <a href="{{ ($user->subscribed ? route('new.records') : 'javascript:void(0);') }}" class="{{ ($user->subscribed ? '': 'overlayBG cursor-not-allowed') }} relative intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
+                        <a href="{{ ($user->subscribed ? route('records') : 'javascript:void(0);') }}" class="{{ ($user->subscribed ? '': 'overlayBG cursor-not-allowed') }} relative intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
                             <div @class([
                                 'relative zoom-in',
                                 "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
