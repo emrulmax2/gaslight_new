@@ -306,6 +306,13 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('customer/job-addresses/update-data', 'updateJobAddressData')->name('customer.job-addresses.update.data');
         Route::post('customer/job-addresses/update-address', 'updateJobAddress')->name('customer.job-addresses.update.address');
+
+        Route::post('job-addresses/update-occupant-status', 'updateOccupantStatus')->name('job-addresses.update.occupant.status');
+
+        Route::post('job-addresses/occupant/list', 'occupantlist')->name('job-addresses.occupant.list');
+        Route::post('job-addresses/occupant/store', 'storeOccupant')->name('job-addresses.occupant.store');
+        Route::post('job-addresses/occupant/edit', 'editOccupant')->name('job-addresses.occupant.edit');
+        Route::post('job-addresses/occupant/update', 'updateOccupant')->name('job-addresses.occupant.update');
     });
 
 

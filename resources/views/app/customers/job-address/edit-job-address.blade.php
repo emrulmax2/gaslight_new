@@ -63,34 +63,15 @@
         </div>
 
         <div class="settingsBox mt-5">
-            <h3 class="font-medium leading-none mb-3 text-dark">Occupant's Details</h3>
-            <div class="box rounded-md p-0 overflow-hidden">
-                <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Name" data-field="occupant_name" data-value="{{ !empty($property->occupant_name) ? $property->occupant_name : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
-                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" />
-                    <div>
-                        <span class="font-normal text-slate-400 text-xs block">
-                            {{ isset($property->occupant_name) && !empty($property->occupant_name) ? $property->occupant_name : 'N/A' }}
-                        </span>
-                    </div>
-                </a>
-                <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Phone" data-field="occupant_phone" data-value="{{ !empty($property->occupant_phone) ? $property->occupant_phone : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
-                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  icon="smartphone" />
-                    <div>
-                        <span class="font-normal text-slate-400 text-xs block">{{ isset($property->occupant_phone) && !empty($property->occupant_phone) ? $property->occupant_phone : 'N/A' }}</span>
-                    </div>
-                </a>
-                <a href="javascript:void(0);" data-type="email" data-required="0" data-title="Email" data-field="occupant_email" data-value="{{ !empty($property->occupant_email) ? $property->occupant_email : '' }}"  class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
-                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="mail" />
-                    <div>
-                        <span class="font-normal text-slate-400 text-xs block">{{ isset($property->occupant_email) && !empty($property->occupant_email) ? $property->occupant_email : 'N/A' }}</span>
-                    </div>
-                </a>
-                <a href="javascript:void(0);"  class="border-b flex w-full items-start px-5 py-3" data-tw-toggle="modal" data-tw-target="#updatePropertyDueDateModal">
-                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="calendar" />
-                    <div>
-                        <span class="font-normal text-slate-400 text-xs block">{{ !empty($property->due_date) ? date('jS F, Y', strtotime($property->due_date)) : 'N/A' }}</span>
-                    </div>
-                </a>
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-medium leading-none text-dark flex items-center">
+                    <x-base.form-switch.input data-propertyid="{{ $property->id }}" checked="{{ isset($property->has_occupants) && $property->has_occupants == 1 ? 1 : 0 }}" class="mr-3 relative -top-[1px]" id="has_occupants" name="has_occupants" value="1" type="checkbox" />
+                    <label data-tw-merge for="has_occupants" class="cursor-pointer font-medium mr-5">Occupants</label>
+                </h3>
+                <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#addOccupantModal" class="addOccupantToggler font-medium ml-auto text-success items-center tracking-normal" style="display: {{ isset($property->has_occupants) && $property->has_occupants != 1 ? 'none' : 'inline-flex' }};"><x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="circle-plus" /> Add Occupant</a>
+            </div>
+            <div class="box rounded-md p-0 overflow-hidden occupantTableWrap" style="display: {{ isset($property->has_occupants) && $property->has_occupants != 1 ? 'none' : 'block' }};">
+                <div id="JobAddressOccupantsListTable" class="px-5" data-customer="{{ $customer->id }}" data-propery="{{ $property->id }}"></div>
             </div>
         </div>
 

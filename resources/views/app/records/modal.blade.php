@@ -140,8 +140,8 @@
 <!-- END: Occupant Modal Content -->
 
 <!-- BEGIN: Modal Content -->
-<x-base.dialog id="addJobAddressOccupantModal" staticBackdrop size="xl">
-    <x-base.dialog.panel>
+<x-base.dialog id="addJobAddressOccupantModal" staticBackdrop>
+    <x-base.dialog.panel class="rounded-none">
         <form method="post" action="#" id="addJobAddressOccupantForm">
             <x-base.dialog.title>
                 <h2 class="mr-auto text-base font-medium">Add Occupant Details</h2>
@@ -149,7 +149,6 @@
             </x-base.dialog.title>
             <x-base.dialog.description>
                 <x-base.form-input name="customer_property_id" class="w-full" type="hidden" value="0" />
-                <h2 class="text-base font-medium mb-2">Occupant's Details</h2>
                 <div class="mb-3">
                     <x-base.form-label for="occupant_name">Name <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-input name="occupant_name" id="occupant_name" class="w-full capitalize" type="text" placeholder="Name" />

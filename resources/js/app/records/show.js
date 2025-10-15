@@ -156,6 +156,23 @@
                     if(row.quoteExtra){
                         localStorage.setItem('quoteExtra', JSON.stringify(row.quoteExtra));
                     }
+                }else if(form_id == 4){
+                    if(row.invoiceNotes){
+                        localStorage.setItem('invoiceNotes', JSON.stringify(row.invoiceNotes));
+                    }
+                    if(row.invoiceItems){
+                        localStorage.setItem('invoiceItemsCount', row.invoiceItemsCount);
+                        localStorage.setItem('invoiceItems', JSON.stringify(row.invoiceItems));
+                    }
+                    if(row.invoiceDiscounts){
+                        localStorage.setItem('invoiceDiscounts', JSON.stringify(row.invoiceDiscounts));
+                    }
+                    if(row.invoiceAdvance){
+                        localStorage.setItem('invoiceAdvance', JSON.stringify(row.invoiceAdvance));
+                    }
+                    if(row.invoiceExtra){
+                        localStorage.setItem('invoiceExtra', JSON.stringify(row.invoiceExtra));
+                    }
                 }
 
                 window.location.href = response.data.red

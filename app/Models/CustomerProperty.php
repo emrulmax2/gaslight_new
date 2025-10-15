@@ -24,10 +24,7 @@ class CustomerProperty extends Model
         'latitude',
         'longitude',
         'note',
-        'occupant_name',
-        'occupant_email',
-        'occupant_phone',
-        'due_date',
+        'has_occupants',
 
         'created_by',
         'updated_by'
@@ -81,11 +78,7 @@ class CustomerProperty extends Model
         return $address;
     }
 
-    public function setOccupantNameAttribute($value) {  
-        $this->attributes['occupant_name'] =  (!empty($value) ? ucwords($value) : null);
-    }
-
-    public function getOccupantNameAttribute($value) {
-        return (!empty($value) ? ucwords($value) : '');
+    public function occupants(){
+        return $this->hasMany(CustomerPropertyOccupant::class, 'customer_property_id', 'id');
     }
 }

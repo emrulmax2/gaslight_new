@@ -145,53 +145,56 @@
             <x-base.form-input name="longitude" id="longitude" class="w-full longitude" type="hidden" value="" />
         </div>
 
-        <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2 pb-2">
+        <div class="intro-y box mt-2 bg-slate-200 rounded-none border-none px-2  occupantSection">
             <div class="flex flex-col items-center border-b border-slate-200/60 px-2 py-3 dark:border-darkmode-400 sm:flex-row">
-                <h2 class="mr-auto text-base font-medium">
-                    Occupant's Details
+                <h2 class="mr-auto text-base font-medium flex items-center">
+                    <x-base.form-switch.input class="mr-3 relative -top-[1px]" id="has_occupants" name="has_occupants" value="1" type="checkbox" />
+                    <label data-tw-merge for="has_occupants" class="cursor-pointer font-medium mr-5">Occupant</label>
                 </h2>
             </div>
-            <div class="px-2 py-3 bg-white">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Name</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.form-input id="occupant_name" name="occupant_name" value="" placeholder="Mr. John Doe" class="cap-fullname w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
-                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="user" />
-                        </div>
-                        <div class="acc__input-error error-occupant_name text-danger text-xs"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="px-2 py-3 bg-white mt-2">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Phone</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.form-input id="occupant_phone" name="occupant_phone" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
-                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="smartphone" />
+            <div id="occupantWrap" style="display: none;">
+                <div class="px-2 py-3 bg-white">
+                    <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                        <div class="w-full">
+                            <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Name</div>
+                            <div class="theDesc w-full relative">
+                                <x-base.form-input id="occupant_name" name="occupant_name" value="" placeholder="Mr. John Doe" class="cap-fullname w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="user" />
+                            </div>
+                            <div class="acc__input-error error-occupant_name text-danger text-xs"></div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="px-2 py-3 bg-white mt-2">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Email</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.form-input id="occupant_email" name="occupant_email" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="email"  autocomplete="off"/>
-                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="mail" />
+                <div class="px-2 py-3 bg-white mt-2">
+                    <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                        <div class="w-full">
+                            <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Phone</div>
+                            <div class="theDesc w-full relative">
+                                <x-base.form-input id="occupant_phone" name="occupant_phone" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text"  autocomplete="off"/>
+                                <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="smartphone" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="px-2 py-3 bg-white mt-2">
-                <div class="flex justify-between items-center cursor-pointer receivedByBlock">
-                    <div class="w-full">
-                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Gas Service Due Date</div>
-                        <div class="theDesc w-full relative">
-                            <x-base.litepicker name="due_date" id="due_date" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
-                            <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
+                <div class="px-2 py-3 bg-white mt-2">
+                    <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                        <div class="w-full">
+                            <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Email</div>
+                            <div class="theDesc w-full relative">
+                                <x-base.form-input id="occupant_email" name="occupant_email" value="" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="email"  autocomplete="off"/>
+                                <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="mail" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-2 py-3 bg-white mt-2">
+                    <div class="flex justify-between items-center cursor-pointer receivedByBlock">
+                        <div class="w-full">
+                            <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Gas Service Due Date</div>
+                            <div class="theDesc w-full relative">
+                                <x-base.litepicker name="due_date" id="due_date" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" data-single-mode="true" data-format="DD-MM-YYYY" autocomplete="off" />
+                                <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
+                            </div>
                         </div>
                     </div>
                 </div>

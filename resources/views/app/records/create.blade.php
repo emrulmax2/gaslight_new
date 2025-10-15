@@ -17,8 +17,11 @@
     <form method="post" action="#" id="certificateForm" enctype="multipart/form-data">
         <input type="hidden" name="job_form_id" value="{{ $form->id }}"/>
         <input type="hidden" name="certificate_id" id="certificate_id" value="0"/>
-        @if($form->id == 3 || $form->id == 4)
+        @if($form->id == 3)
             <input type="hidden" name="non_vat_quote" id="non_vat_quote" value="{{ $non_vat_quote }}"/>
+            <input type="hidden" name="vat_number" id="vat_number" value="{{ $vat_number }}"/>
+        @elseif($form->id == 4)
+            <input type="hidden" name="non_vat_invoice" id="non_vat_invoice" value="{{ $non_vat_invoice }}"/>
             <input type="hidden" name="vat_number" id="vat_number" value="{{ $vat_number }}"/>
         @endif
 
@@ -28,6 +31,18 @@
                     <a href="javascript:void(0);" class="flex justify-between items-center cursor-pointer quoteNoBlock">
                         <div>
                             <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">QUOTE #</div>
+                            <div class="theDesc">N/A</div>
+                        </div>
+                        <span style="flex: 0 0 16px; margin-left: 20px;"></span>
+                    </a>
+                </div>
+            </div>
+        @elseif($form->id == 4)
+            <div class="intro-y box mt-5 bg-slate-200 rounded-none border-none px-2 py-2 invoiceNoBlockWrap" style="display: none;">
+                <div class="px-2 py-3 invoiceNoWrap bg-white">
+                    <a href="javascript:void(0);" class="flex justify-between items-center cursor-pointer invoiceNoBlock">
+                        <div>
+                            <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">INVOICE #</div>
                             <div class="theDesc">N/A</div>
                         </div>
                         <span style="flex: 0 0 16px; margin-left: 20px;"></span>

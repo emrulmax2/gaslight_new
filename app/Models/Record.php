@@ -26,6 +26,8 @@ class Record extends Model implements CanBeSigned
         'customer_id',
         'customer_job_id',
         'job_form_id',
+        'customer_property_id',
+        'customer_property_occupant_id',
         'certificate_number',
         'inspection_date',
         'next_inspection_date',
@@ -53,6 +55,14 @@ class Record extends Model implements CanBeSigned
 
     public function form(){
         return $this->belongsTo(JobForm::class, 'job_form_id');
+    }
+
+    public function property(){
+        return $this->belongsTo(CustomerProperty::class, 'customer_property_id');
+    }
+
+    public function occupant(){
+        return $this->belongsTo(CustomerPropertyOccupant::class, 'customer_property_occupant_id');
     }
 
     public function relation(){
