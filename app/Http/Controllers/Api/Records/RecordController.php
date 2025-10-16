@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Records;
 use App\Http\Controllers\Controller;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
+use App\Models\CommissionDecommissionWorkType;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\JobForm;
@@ -31,6 +32,7 @@ class RecordController extends Controller
         $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
         $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
         $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $customer_property_occupant_id = (isset($request->customer_property_occupant_id) && $request->customer_property_occupant_id > 0 ? $request->customer_property_occupant_id : null);
         $property = CustomerProperty::find($customer_property_id);
 
         /* Create Job If Empty */
@@ -38,6 +40,7 @@ class RecordController extends Controller
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
                 'customer_property_id' => $customer_property_id,
+                'customer_property_occupant_id' => $customer_property_occupant_id,
                 'description' => $form->name,
                 'details' => 'Job created for '.$property->full_address,
 
@@ -76,6 +79,31 @@ class RecordController extends Controller
                             'value' => $value
                         ]);
                     endforeach;
+                endif;
+
+                if($job_form_id == 18):
+                    $recordOption = RecordOption::where('record_id', $record->id)->where('name', 'jobSheetDocuments')->get()->first();
+                    $jobSheetDocuments = (isset($recordOption->value) && !empty($recordOption->value) ? (array) $recordOption->value : []);
+                    
+                    if($request->hasFile('job_sheet_files')):
+                        $documents = $request->file('job_sheet_files');
+                        $d = 1;
+                        foreach($documents as $document):
+                            $documentName = $d.'_'.$record->id.'_'.time().'.'.$document->getClientOriginalExtension();
+                            $path = $document->storeAs('records/'.$user_id.'/'.$job_form_id.'/job_sheets/', $documentName, 'public');
+                            $jobSheetDocuments[] = $documentName;
+
+                            $d++;
+                        endforeach;
+                    endif;
+
+                    RecordOption::where('record_id', $record->id)->where('name', 'jobSheetDocuments')->forceDelete();
+                    RecordOption::create([
+                        'record_id' => $record->id,
+                        'job_form_id' => $job_form_id,
+                        'name' => 'jobSheetDocuments',
+                        'value' => $jobSheetDocuments
+                    ]);
                 endif;
 
                 if($request->input('sign') !== null):
@@ -121,7 +149,7 @@ class RecordController extends Controller
     public function edit($record_id, Request $record){
         try {
             $pdf_url = $this->generatePdf($record_id);
-            $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
+            $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
                         ->find($record_id);
             $data = [
                 'certificate_id' => $record->id,
@@ -136,12 +164,7 @@ class RecordController extends Controller
                 'job' => $record->job,
                 'customer' => $record->customer,
                 'job_address' => $record->job->property,
-                'occupant' => [
-                    'customer_property_occupant_id' => $record->job->property->id,
-                    'occupant_name' => (isset($record->job->property->occupant_name) && !empty($record->job->property->occupant_name) ? $record->job->property->occupant_name : ''),
-                    'occupant_email' => (isset($record->job->property->occupant_email) && !empty($record->job->property->occupant_email) ? $record->job->property->occupant_email : ''),
-                    'occupant_phone' => (isset($record->job->property->occupant_phone) && !empty($record->job->property->occupant_phone) ? $record->job->property->occupant_phone : ''),
-                ],
+                'occupant' => (isset($record->occupant) && $record->occupant->count() > 0 ? $record->occupant : []),
                 'pdf_url' => $pdf_url
             ];
 
@@ -264,7 +287,7 @@ class RecordController extends Controller
     }
 
     public function sortOptionData($record_id){
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
+        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
                     ->find($record_id);
         
         $data = [];
@@ -290,15 +313,78 @@ class RecordController extends Controller
             endif;
         elseif($record->job_form_id == 8):
             $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 9):
+            $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 10):
+            $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 13):
+            $data['appliances'] = $record->available_options->appliances;
+        elseif($record->job_form_id == 15):
+            $data['checklistAnswered'] = $data['radiatorCount'] = 0;
+            $data['radiators'] = $data['powerFlushChecklist'] = [];
+            if(isset($record->available_options->radiators) && !empty($record->available_options->radiators)):
+                foreach($record->available_options->radiators as $radiator):
+                    $data['radiators'][$radiator->radiator_serial] = (array) $radiator;
+
+                    $data['radiatorCount'] += 1;
+                endforeach;
+            endif;
+            if(isset($record->available_options->powerFlushChecklist) && !empty($record->available_options->powerFlushChecklist)):
+                $powerFlushChecklist = (array) $record->available_options->powerFlushChecklist;
+                $data['powerFlushChecklist'] = $powerFlushChecklist;
+                $data['checklistAnswered'] = count(array_filter($powerFlushChecklist, function($v) { return !empty($v); }));
+            endif;
+        elseif($record->job_form_id == 16):
+            $data['applianceAnswered'] = 0;
+            $data['appliances'] = [];
+            if(isset($record->available_options->appliances) && !empty($record->available_options->appliances)):
+                $appliances = (array) $record->available_options->appliances;
+                $data['appliances'] = $appliances;
+                $data['applianceAnswered'] = count(array_filter($appliances, function($v) { return !empty($v); }));
+            endif;
+        elseif($record->job_form_id == 17):
+            $data['systemAnswered'] = $data['inspectionAnswered'] = 0;
+            $data['unventedSystems'] = $data['inspectionRecords'] = [];
+            if(isset($record->available_options->unventedSystems) && !empty($record->available_options->unventedSystems)):
+                $unventedSystems = (array) $record->available_options->unventedSystems;
+                $data['unventedSystems'] = $unventedSystems;
+                $data['systemAnswered'] = count(array_filter($unventedSystems, function($v) { return !empty($v); }));
+            endif;
+            if(isset($record->available_options->inspectionRecords) && !empty($record->available_options->inspectionRecords)):
+                $inspectionRecords = (array) $record->available_options->inspectionRecords;
+                $data['inspectionRecords'] = $inspectionRecords;
+                $data['inspectionAnswered'] = count(array_filter($inspectionRecords, function($v) { return !empty($v); }));
+            endif;
+        elseif($record->job_form_id == 18):
+            $data['jobSheetAnswered'] = $data['jobSheetDocumentsCount'] = 0;
+            $data['jobSheets'] = [];
+            $data['jobSheetDocuments'] = [];
+            if(isset($record->available_options->jobSheets) && !empty($record->available_options->jobSheets)):
+                $jobSheets = (array) $record->available_options->jobSheets;
+                $data['jobSheets'] = $jobSheets;
+                $data['jobSheetAnswered'] = count(array_filter($jobSheets, function($v) { return !empty($v); }));
+            endif;
+            if(isset($record->available_options->jobSheetDocuments) && !empty($record->available_options->jobSheetDocuments)):
+                $jobSheetsDocs = (array) $record->available_options->jobSheetDocuments;
+                $i = 1;
+                foreach($jobSheetsDocs as $doc):
+                    if(!empty($doc) && Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc)):
+                        $documentUrl = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc);
+                        $data['jobSheetDocuments'][$i] = $documentUrl;
+                        $i++;
+                    endif;
+                endforeach;
+            endif;
         endif;
 
         return $data;
     }
 
     public function generatePdf($record_id){
+        $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
         $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($record_id);
-        
-        //dd($record->available_options->appliances);
+       
+        //dd($record->available_options->invoiceItems);
         $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         $report_title = 'Certificate of '.$record->certificate_number;
@@ -306,32 +392,15 @@ class RecordController extends Controller
         $userSignBase64 = (isset($record->user->signature) && Storage::disk('public')->exists($record->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->user->signature->filename)) : '');
         $signatureBase64 = ($record->signature && Storage::disk('public')->exists($record->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->signature->filename)) : '');
         
-        switch ($record->job_form_id) {
-            case '6':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            case '7':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            case '8':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            case '9':
-                $VIEW = 'app.records.pdf.'.$record->form->slug;
-                break;
-            default:
-                $VIEW = '';
-                break;
-        }
-
-
+        $VIEW = 'app.records.pdf.'.$record->form->slug;
         $fileName = $record->certificate_number.'.pdf';
         if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)) {
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
         }
-        $pdf = Pdf::loadView($VIEW, compact('record', 'logoBase64', 'report_title', 'userSignBase64', 'signatureBase64'))
+        $paper = ($record->job_form_id == 3 || $record->job_form_id == 4 ? 'portrait' : 'landscape');
+        $pdf = Pdf::loadView($VIEW, compact('record', 'logoBase64', 'report_title', 'userSignBase64', 'signatureBase64', 'worktypes'))
             ->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
-            ->setPaper('a4', 'landscape') //portrait landscape
+            ->setPaper('a4', $paper) //portrait landscape
             ->setWarnings(false);
         $content = $pdf->output();
         Storage::disk('public')->put('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName, $content );

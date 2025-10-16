@@ -141,7 +141,7 @@
                 }else if(form_id == 18){
                     localStorage.setItem('jobSheets', JSON.stringify(row.jobSheets));
                     localStorage.setItem('jobSheetAnswered', JSON.stringify(row.jobSheetAnswered));
-                    localStorage.setItem('jobSheetDocuments', JSON.stringify(row.jobSheetDocuments));
+                    localStorage.setItem('jobSheetDocuments', row.jobSheetDocuments);
                 }else if(form_id == 3){
                     if(row.quoteNotes){
                         localStorage.setItem('quoteNotes', JSON.stringify(row.quoteNotes));
