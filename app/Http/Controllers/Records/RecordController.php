@@ -201,13 +201,17 @@ class RecordController extends Controller
                     
                     if($request->hasFile('job_sheet_files')):
                         $documents = $request->file('job_sheet_files');
+                        $d = 1;
                         foreach($documents as $document):
-                            $documentName = $record->id.'_'.time().'.'.$document->getClientOriginalExtension();
+                            $documentName = $d.'_'.$record->id.'_'.time().'.'.$document->getClientOriginalExtension();
                             $path = $document->storeAs('records/'.$user_id.'/'.$job_form_id.'/job_sheets/', $documentName, 'public');
                             $jobSheetDocuments[] = $documentName;
+
+                            $d++;
                         endforeach;
                     endif;
 
+                    RecordOption::where('record_id', $record->id)->where('name', 'jobSheetDocuments')->forceDelete();
                     RecordOption::create([
                         'record_id' => $record->id,
                         'job_form_id' => $job_form_id,
@@ -261,7 +265,8 @@ class RecordController extends Controller
                 if($request->has('sign') && $request->input('sign') !== null):
                     $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
                     $signatureData = base64_decode($signatureData);
-                    if(strlen($signatureData) > 2621):
+                    
+                    if(strlen($signatureData) > 3252):
                         $record->deleteSignature();
                         
                         $imageName = 'signatures/' . Str::uuid() . '.png';
@@ -866,7 +871,7 @@ class RecordController extends Controller
                 }
             endif;
 
-            RecordOption::where('record_id', $record_id)->where('job_form_id', $record->job_form_id)->where('name')->update([
+            RecordOption::where('record_id', $record_id)->where('job_form_id', $record->job_form_id)->where('name', 'jobSheetDocuments')->update([
                 'value' => $jobSheetsDocs,
             ]);
 

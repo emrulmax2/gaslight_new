@@ -65,12 +65,11 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('.jobSheetBlock .theDesc').html((questionAnswered != '' ? questionAnswered : '0')+'/9').addClass('font-medium');
     }
 
-    console.log(localStorage.jobSheetDocuments)
     if(localStorage.jobSheetDocuments){
         let jobSheetDocuments = localStorage.getItem('jobSheetDocuments');
         if(jobSheetDocuments != ''){
             $('.customeUploads .customeUploadsContent').fadeOut('fast', function(){
-                $('#uploadedFileWrap').fadeIn().html(JSON.parse(jobSheetDocuments));
+                $('#uploadedFileWrap').fadeIn().html(jobSheetDocuments);
                 $('#job_sheet_files').val('');
             });
         }else{
