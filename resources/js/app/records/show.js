@@ -6,9 +6,13 @@
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+    const addCustomerEmailModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addCustomerEmailModal"));
 
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+    });
+    document.getElementById('addCustomerEmailModal').addEventListener('hide.tw.modal', function(event) {
+        $('#addCustomerEmailModal [name="customer_email"]').val('');
     });
 
     $('#successModal .agreeWith').on('click', function(e){
@@ -182,5 +186,71 @@
                 console.log('error');
             }
         });
-    })
+    });
+
+    $('#addCustomerEmailForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('addCustomerEmailForm');
+        let $theForm = $(this);
+        let customer_email = $theForm.find('#customer_email').val();
+
+        if(customer_email == ''){
+            $('#sendMailBtn', $theForm).removeAttr('disabled');
+            $('#sendMailBtn .theLoader', $theForm).fadeOut();
+
+            $theForm.find('.acc__input-error.error-customer_email').fadeIn().html('This field is required.');
+        }else{
+            $theForm.find('.acc__input-error').fadeOut().html('');
+            $('#sendMailBtn', $theForm).attr('disabled', 'disabled');
+            $('#sendMailBtn .theLoader', $theForm).fadeIn();
+
+            let form_data = new FormData(form);
+            form_data.append('submit_type', 3);
+            axios({
+                method: "post",
+                url: route('records.action'),
+                data: form_data,
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                $('#sendMailBtn', $theForm).removeAttr('disabled');
+                $('#sendMailBtn .theLoader', $theForm).fadeOut();
+
+                if (response.status == 200) {
+                    addCustomerEmailModal.hide();
+
+                    successModal.show();
+                    document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#successModal .successModalTitle").html("Congratulations!");
+                        $("#successModal .successModalDesc").html(response.data.msg);
+                        $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    });
+
+                    setTimeout(() => {
+                        successModal.hide();
+                        if(response.data.red){
+                            window.location.href = response.data.red
+                        }
+                    }, 1500);
+                }
+            }).catch(error => {
+                $('#sendMailBtn', $theForm).removeAttr('disabled');
+                $('#sendMailBtn .theLoader', $theForm).fadeOut();
+                if (error.response) {
+                    if (error.response.status == 422) {
+                        warningModal.show();
+                        document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#warningModal .warningModalTitle").html("Error Found!");
+                            $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                        });
+
+                        setTimeout(() => {
+                            warningModal.hide();
+                        }, 1500);
+                    } else {
+                        console.log('error');
+                    }
+                }
+            });
+        }
+    });
 })()

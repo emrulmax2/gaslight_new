@@ -3,6 +3,11 @@ import laravel from "laravel-vite-plugin";
 import path from "path";
 
 export default defineConfig({
+    server: {
+        headers: {
+            'Access-Control-Allow-Origin': 'https://lcc_gas_certificate.test'
+        }
+    },
     build: {
         commonjsOptions: {
             include: ["tailwind.config.js", "node_modules/**"],
@@ -269,6 +274,7 @@ export default defineConfig({
                 "resources/js/app/records/gas_breakdown_record.js",
                 "resources/js/app/records/gas_boiler_system_commissioning_checklist.js",
                 "resources/js/app/records/power_flush_record.js",
+                "resources/js/app/records/installation_commissioning_decommissioning_record.js",
                 "resources/js/app/records/unvented_hot_water_cylinders.js",
                 "resources/js/app/records/job_sheet.js",
                 "resources/js/app/records/quote.js",

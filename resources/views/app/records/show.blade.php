@@ -26,11 +26,19 @@
                             Approve
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                         </x-base.button>
-                        <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
-                            <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
-                            Approve & Email
-                            <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                        </x-base.button>
+                        @if(isset($record->customer->contact->email) && !empty($record->customer->contact->email))
+                            <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
+                                Approve & Email
+                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                            </x-base.button>
+                        @else 
+                            <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#addCustomerEmailModal" class="justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
+                                Approve & Email
+                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                            </x-base.button>
+                        @endif
                         @if(!empty($thePdf))
                         <x-base.button as="a" href="{{ $thePdf }}" class="action_btns justify-start w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="download" />
@@ -62,6 +70,7 @@
     </form>
 
    
+    @include('app.records.show-modal')
     @include('app.action-modals')
 @endsection
 @pushOnce('styles')
