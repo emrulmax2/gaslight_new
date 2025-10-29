@@ -345,9 +345,12 @@ class RecordController extends Controller
 
         $pdf = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf');
 
-        if($submit_type == 2):
+        if($submit_type == 2 || $submit_type == 3):
+            if($submit_type == 3 && $request->has('customer_email') && !empty($request->customer_email)):
+                CustomerContactInformation::where('customer_id', $record->customer_id)->update(['email' => $request->customer_email]);
+            endif;
             $data = [];
-            $data['status'] = 'Approved & Sent';
+            $data['status'] = 'Approved';
 
             Record::where('id', $request->record_id)->update($data);
             
