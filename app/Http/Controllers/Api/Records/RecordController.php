@@ -154,6 +154,13 @@ class RecordController extends Controller
             $data = [
                 'certificate_id' => $record->id,
                 'certificate' => [
+                    'company_id' => $record->company_id,
+                    'customer_id' => $record->customer_id,
+                    'customer_job_id' => $record->customer_job_id,
+                    'job_form_id' => $record->job_form_id,
+                    'customer_property_id' => $record->customer_property_id,
+                    'certificate_number' => $record->certificate_number,
+                    'status' => $record->status,
                     'inspection_date' => (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : ''),
                     'next_inspection_date' => (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : ''),
                     'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
