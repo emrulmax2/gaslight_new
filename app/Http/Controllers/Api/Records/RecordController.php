@@ -224,13 +224,13 @@ class RecordController extends Controller
        
     }
 
-    public function approve_email(Request $request, $record_id)
+    public function approveEmail(Request $request, $record_id)
     {
         try {
             $record = Record::findOrFail($record_id);
             
             $updateResult = $record->update([
-                'status' => 'Approved & Sent'
+                'status' => 'Approved'
             ]);
 
             if (!$updateResult) {
