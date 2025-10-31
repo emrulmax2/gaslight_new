@@ -163,6 +163,9 @@ class RegisteredUserController extends Controller
                     $signature->save();
                 endif;
             endif;
+
+            
+
         endif;
         event(new Registered($user));
 

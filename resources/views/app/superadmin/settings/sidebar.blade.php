@@ -61,6 +61,18 @@
                     </li>
                 </ul>
             </li>
+            <li class="hasChild mt-5">
+                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.email.template' || Route::currentRouteName() == 'superadmin.site.setting.email.template.create' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
+                    <i data-lucide="Briefcase" class="w-4 h-4 mr-2"></i> Communication Settings <i data-lucide="chevron-down" class="w-4 h-4 ml-auto menuAgnle"></i>
+                </a>
+                <ul class="p-0 m-0 pl-5" style="display: {{ Route::currentRouteName() == 'superadmin.site.setting.email.template.create' || Route::currentRouteName() == 'superadmin.site.setting.email.template' ? 'block' : 'none' }};">
+                    <li>
+                        <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.email.template.create' || Route::currentRouteName() == 'superadmin.site.setting.email.template' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.email.template') }}">
+                            <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Email Templates
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
 </div>

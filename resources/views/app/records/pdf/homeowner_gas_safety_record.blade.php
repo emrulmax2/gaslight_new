@@ -150,7 +150,7 @@
                             <div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">{{ $record->certificate_number }}</div>
                         </td>
                         <td class="w-col8 text-center align-middle px-5">
-                            <h1 class="text-white text-xl leading-none mt-0 mb-05">CP12 Homeowner Gas Safety Record</h1>
+                            <h1 class="text-white text-xl leading-none mt-0 mb-05">CP12 Homeowner / Landlord Gas Safety Record</h1>
                             <div class="text-white text-12px leading-1-3">
                                 This inspection is for gas safety purposes only to comply with the Gas Safety (Installation and Use) Regulations. Flues have been inspected visually and checked for satisfactory evacuation of products of combustion
                                             A detailed internal inspection of the flue integrity, construction and lining has NOT been carried out.
@@ -273,7 +273,7 @@
                                     </tr>
                                     <tr>
                                         <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>
-                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->postal_code) && !empty($record->customer->postal_code) ? $record->customer->postal_code : '') }}</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->address->postal_code) && !empty($record->customer->address->postal_code) ? $record->customer->address->postal_code : '') }}</td>
                                     </tr>
                                 </tbody>
                             </table>

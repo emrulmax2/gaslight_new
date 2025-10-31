@@ -273,7 +273,7 @@
                                     </tr>
                                     <tr>
                                         <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 pt-0 pb-0 text-12px w-110px h-25px tracking-normal leading-1-3 align-middle">Postcode</td>
-                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->postal_code) && !empty($record->customer->postal_code) ? $record->customer->postal_code : '') }}</td>
+                                        <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary pl-2 pr-2 pt-05 pb-05 text-12px leading-none align-middle">{{ (isset($record->customer->address->postal_code) && !empty($record->customer->address->postal_code) ? $record->customer->address->postal_code : '') }}</td>
                                     </tr>
                                 </tbody>
                             </table>

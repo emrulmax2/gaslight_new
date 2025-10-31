@@ -9,12 +9,14 @@
             </x-base.notification>
             <x-base.menu.items class="w-72 sm:w-96 emailTags overflow-y-auto h-60">
                 <x-base.menu.header>Customer Tags</x-base.menu.header>
-                <x-base.menu.item>[DATA=customers]full_name[/DATA]</x-base.menu.item>
-                <x-base.menu.item>[DATA=customers]company_name[/DATA]</x-base.menu.item>
-                <x-base.menu.item>[DATA=customers]full_address[/DATA]</x-base.menu.item>
-                <x-base.menu.item>[DATA=customers]occupant_name[/DATA]</x-base.menu.item>
-                <x-base.menu.item>[DATA=customers]occupant_email[/DATA]</x-base.menu.item>
-                <x-base.menu.item>[DATA=customers]occupant_phone[/DATA]</x-base.menu.item>
+                <x-base.menu.item>:customertitle</x-base.menu.item>
+                <x-base.menu.item>:customername</x-base.menu.item>
+                <x-base.menu.item>:customercompany</x-base.menu.item>
+                <x-base.menu.item>:jobbuilding</x-base.menu.item>
+                <x-base.menu.item>:jobstreet</x-base.menu.item>
+                <x-base.menu.item>:jobref</x-base.menu.item>
+                <x-base.menu.item>:propertyaddress</x-base.menu.item>
+                <x-base.menu.item>:propertyaddress</x-base.menu.item>
 
                 <x-base.menu.header>Customer Job Tags</x-base.menu.header>
                 <x-base.menu.item>[DATA=customer_jobs]due_date[/DATA]</x-base.menu.item>

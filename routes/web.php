@@ -57,6 +57,7 @@ use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
+use App\Http\Controllers\SuperAdmin\Settings\EmailTemplateController;
 use App\Http\Controllers\SuperAdmin\Settings\JobCancelReasonController;
 use App\Http\Controllers\SuperAdmin\Settings\PricingPackageController;
 use App\Http\Controllers\SuperAdmin\Settings\ReferralCodeController;
@@ -205,6 +206,12 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::post('site-settings/referral-code/update', 'update')->name('site.setting.referral.code.update');
         Route::delete('site-settings/referral-code/destroy/{ref_id}', 'destroy')->name('site.setting.referral.code.destroy'); 
         Route::post('site-settings/referral-code/restore/{ref_id}', 'restore')->name('site.setting.referral.code.restore');
+    });
+
+    Route::controller(EmailTemplateController::class)->group(function(){
+        Route::get('site-settings/email-templates', 'index')->name('site.setting.email.template');
+        Route::get('site-settings/email-templates/create/{form}', 'create')->name('site.setting.email.template.create');
+        Route::post('site-settings/email-templates/store', 'store')->name('site.setting.email.template.store');
     });
        
 });

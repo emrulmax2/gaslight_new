@@ -37,7 +37,7 @@
                     </div>
                     <div class="flex justify-between">
                         <label for="editEditor" class="form-label">Description <span class="text-danger">*</span></label>
-                        @include('app.settings.reminders.letter-tags')
+                        @include('app.settings.reminders.tags')
                     </div>
                     <div class="mb-5">
                         <div class="editor" id="theEditor">{!! (isset($template->content) ? $template->content : '') !!}</div>
