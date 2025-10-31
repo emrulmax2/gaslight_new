@@ -32,10 +32,10 @@
                 <div class="intro-y box mt-5 p-5">
                     <div class="mb-5">
                         <x-base.form-label for="subject">Subject</x-base.form-label>
-                        <x-base.form-input value="{{ (isset($template->subject) ? $template->subject : '') }}" name="subject" class="w-full" type="text" placeholder="{{ $form->name }} for job at [jobaddr1] [jobaddr2]" />
+                        <x-base.form-input id="subject" value="{{ (isset($template->subject) ? $template->subject : '') }}" name="subject" class="w-full" type="text" placeholder="{{ $form->name }} for job at [jobaddr1] [jobaddr2]" />
                         <div class="acc__input-error error-subject text-danger text-xs mt-1"></div>
                     </div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between mb-3">
                         <label for="editEditor" class="form-label">Description <span class="text-danger">*</span></label>
                         @include('app.settings.reminders.tags')
                     </div>
