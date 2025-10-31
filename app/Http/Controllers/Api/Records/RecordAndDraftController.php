@@ -15,13 +15,14 @@ class RecordAndDraftController extends Controller
 {
     public function list($job_form_id, Request $request)
     {
+        $user_id = $request->user()->id;
         $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'Draft');
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? strtolower($request->query('order')) : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
         $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
-                 ->where('status', $status);
+                 ->where('status', $status)->where('created_by', $user_id);
         if(isset($job_form_id) && $job_form_id > 0):
             $query->where('job_form_id', $job_form_id);
         endif;
