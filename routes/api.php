@@ -298,7 +298,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
         });
 
         Route::controller(RecordAndDraftController::class)->group(function(){
-            Route::get('records-and-drafts', 'list');
+            Route::get('records-and-drafts/{job_form_id?}', 'list');
             Route::get('invoice-number', 'getInvoiceNumber');
             Route::get('quote-number', 'getQuoteNumber');
             Route::get('records/jobs/{form_id}', 'getJobs');
