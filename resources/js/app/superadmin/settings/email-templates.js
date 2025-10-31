@@ -25,16 +25,62 @@
         }
     });
 
-    let theEditor;
-    if($("#theEditor").length > 0){
-        const el = document.getElementById('theEditor');
-        ClassicEditor.create(el).then((editor) => {
+    let lastActiveField = null; // last active field (input or CKEditor)
+    let theEditor = null;
+
+    // Track input focus and mousedown
+    const input = document.getElementById('subject');
+    input.addEventListener('mousedown', () => lastActiveField = input);
+    input.addEventListener('focus', () => lastActiveField = input);
+
+    // Initialize CKEditor
+    ClassicEditor.create(document.getElementById('theEditor'))
+        .then(editor => {
             theEditor = editor;
-            $(el).closest(".editor").find(".document-editor__toolbar").append(editor.ui.view.toolbar.element);
-        }).catch((error) => {
-            console.error(error);
+
+            // Optional: move toolbar
+            const toolbarContainer = document.querySelector('.document-editor__toolbar');
+            if (toolbarContainer) {
+                toolbarContainer.appendChild(editor.ui.view.toolbar.element);
+            }
+
+            // Track CKEditor focus
+            editor.editing.view.document.on('focus', () => lastActiveField = editor);
+        })
+        .catch(error => console.error(error));
+
+    // Tag buttons
+    const tagButtons = document.querySelectorAll('.theTagItem');
+    tagButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tagText = this.textContent;
+            if (!lastActiveField) return;
+
+            // CKEditor active
+            if (lastActiveField === theEditor) {
+                theEditor.model.change(writer => {
+                    const selection = theEditor.model.document.selection;
+                    if (!selection.isCollapsed) {
+                        writer.remove(selection.getFirstRange());
+                    }
+                    writer.insertText(tagText, selection.getFirstPosition());
+                });
+                theEditor.editing.view.focus();
+                return;
+            }
+
+            // Input field active
+            const start = lastActiveField.selectionStart;
+            const end = lastActiveField.selectionEnd;
+            const val = lastActiveField.value;
+            lastActiveField.value = val.substring(0, start) + tagText + val.substring(end);
+
+            lastActiveField.selectionStart = lastActiveField.selectionEnd = start + tagText.length;
+            lastActiveField.focus();
         });
-    }
+    });
+
 
     $('#reminderTemplateForm').on('submit', function(e){
         e.preventDefault();
