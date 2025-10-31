@@ -230,7 +230,7 @@ class RecordController extends Controller
             $record = Record::findOrFail($record_id);
             
             $updateResult = $record->update([
-                'status' => 'Approved'
+                'status' => 'Email Sent'
             ]);
 
             if (!$updateResult) {
@@ -249,8 +249,8 @@ class RecordController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $emailSent 
-                    ? 'Record Certificate has been approved and emailed to the customer'
-                    : 'Record Certificate has been approved but email failed: ' . 
+                    ? 'Record Certificate status has been updated and emailed to the customer'
+                    : 'Record Certificate status has been updated but email failed: ' . 
                     ($emailError ?: 'Invalid or empty email address'),
                 'record_id' => $record_id
             ], 200);

@@ -117,8 +117,8 @@ class RecordAndDraftController extends Controller
                             $html .= '<label class="sm:hidden font-medium m-0">Status</label>';
                             if($list->status == 'Cancelled'){
                                 $html .= '<button class="ml-auto font-medium bg-danger rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Cancelled</button>';
-                            }else if($list->status == 'Approved & Sent'){
-                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved & Sent</button>';
+                            }else if($list->status == 'Email Sent'){
+                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Email Sent</button>';
                             }else if($list->status == 'Approved'){
                                 $html .= '<button class="ml-auto font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved</button>';
                             }else{
