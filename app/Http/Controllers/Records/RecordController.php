@@ -350,7 +350,7 @@ class RecordController extends Controller
                 CustomerContactInformation::where('customer_id', $record->customer_id)->update(['email' => $request->customer_email]);
             endif;
             $data = [];
-            $data['status'] = 'Approved';
+            $data['status'] = 'Email Sent';
 
             Record::where('id', $request->record_id)->update($data);
             
