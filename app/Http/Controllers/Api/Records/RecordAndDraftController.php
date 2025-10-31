@@ -4,34 +4,35 @@ namespace App\Http\Controllers\Api\Records;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerJob;
-use App\Models\ExistingRecordDraft;
 use App\Models\Invoice;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\Quote;
+use App\Models\Record;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class RecordAndDraftController extends Controller
 {
-    public function list(Request $request)
+    public function list($job_form_id, Request $request)
     {
-        $status = ($request->has('status') && ($request->query('status') != '') ? $request->query('status') : 1);
+        $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'Draft');
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? strtolower($request->query('order')) : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
-        $query = ExistingRecordDraft::with('customer', 'job', 'job.property', 'form', 'user', 'model')
-                    ->where('created_by', $request->user()->id);
-
-        if ($status == 2) {
-            $query->onlyTrashed();
-        }
+        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
+                 ->where('status', $status);
+        if(isset($job_form_id) && $job_form_id > 0):
+            $query->where('job_form_id', $job_form_id);
+        endif;
 
         if (!empty($searchKey)) {
             $query->where(function($q) use ($searchKey) {
-                $q->whereHas('customer', function ($customerQuery) use ($searchKey) {
-                    $customerQuery->where('full_name', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
+                $q->where('certificate_number', 'LIKE', '%' . $searchKey . '%')
+                ->orWhereHas('customer', function ($customerQuery) use ($searchKey) {
+                    $customerQuery->where('full_name', 'LIKE', '%' . $searchKey . '%');
+                })->orWhereHas('customer.address', function($customerAddrQuery) use($searchKey){
+                    $customerAddrQuery->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('address_line_2', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
@@ -45,53 +46,48 @@ class RecordAndDraftController extends Controller
             });
         }
 
-        $validSortFields = ['id', 'created_at', 'updated_at'];
+        $validSortFields = ['id', 'created_at', 'updated_at', 'inspection_date', 'next_inspection_date'];
         $sortField = in_array($sortField, $validSortFields) ? $sortField : 'id';
         $sortOrder = in_array($sortOrder, ['asc', 'desc']) ? $sortOrder : 'asc';
-        
         $query->orderBy($sortField, $sortOrder);
 
         $limit = max(1, (int)$request->query('limit', 10));
         $page = max(1, (int)$request->query('page', 1));
         $records = $query->paginate($limit, ['*'], 'page', $page);
 
-        $responseData = [];
-        foreach ($records->items() as $record) {
-            $certificate_number = '';
-            if (!empty($record->model->certificate_number)) {
-                $certificate_number = $record->model->certificate_number;
-            } elseif (!empty($record->model->invoice_number)) {
-                $certificate_number = $record->model->invoice_number;
-            } elseif (!empty($record->model->quote_number)) {
-                $certificate_number = $record->model->quote_number;
-            }
+        $limit = max(1, (int)$request->query('limit', 10));
+        $page = (int)$request->query('page', 1);
 
-            $responseData[] = [
-                'id' => $record->id,
-                'type' => $record->form->name ?? '',
-                'certificate_number' => $certificate_number,
-                'inspection_name' => $record->job->property->occupant_name ?? ($record->customer->full_name ?? ''),
-                'inspection_address' => $record->job->property->full_address ?? '',
-                'landlord_name' => $record->customer->full_name ?? '',
-                'landlord_address' => $record->customer->full_address ?? '',
-                'assigned_to' => $record->model->user->name ?? '',
-                'created_at' => $record->model->created_at ? $record->model->created_at->format('Y-m-d h:i A') : '',
-                'status' => $record->model->status ?? '',
-            ];
+        if ($page === -1) {
+            $records = $query->get();
+            return response()->json([
+                'success' => true,
+                'data' => $records,
+                'meta' => [
+                    'total' => $records->count(),
+                    'per_page' => -1,
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'from' => 1,
+                    'to' => $records->count(),
+                ]
+            ]);
+        } else {
+            $records = $query->paginate($limit, ['*'], 'page', max(1, $page));
+
+            return response()->json([
+                'success' => true,
+                'data' => $records->items(),
+                'meta' => [
+                    'total' => $records->total(),
+                    'per_page' => $records->perPage(),
+                    'current_page' => $records->currentPage(),
+                    'last_page' => $records->lastPage(),
+                    'from' => $records->firstItem(),
+                    'to' => $records->lastItem(),
+                ]
+            ]);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $responseData,
-            'meta' => [
-                'total' => $records->total(),
-                'per_page' => $records->perPage(),
-                'current_page' => $records->currentPage(),
-                'last_page' => $records->lastPage(),
-                'from' => $records->firstItem(),
-                'to' => $records->lastItem(),
-            ]
-        ]);
     }
 
 
