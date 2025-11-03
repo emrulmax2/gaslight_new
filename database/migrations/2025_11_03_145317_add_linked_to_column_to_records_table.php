@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('gas_warning_notices', function (Blueprint $table) {
-            $table->string('certificate_number', 50)->after('job_form_id')->nullable();
+        Schema::table('records', function (Blueprint $table) {
+            $table->unsignedBigInteger('linked_id')->after('status');
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('gas_warning_notices', function (Blueprint $table) {
+        Schema::table('records', function (Blueprint $table) {
             //
         });
     }

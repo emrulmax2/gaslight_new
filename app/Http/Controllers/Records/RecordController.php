@@ -21,31 +21,7 @@ use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\CustomerPropertyOccupant;
-use App\Models\ExistingRecordDraft;
-use App\Models\GasBreakdownRecord;
-use App\Models\GasBreakdownRecordAppliance;
-use App\Models\GasSafetyRecord;
-use App\Models\GasSafetyRecordAppliance;
-use App\Models\GasServiceRecord;
-use App\Models\GasServiceRecordAppliance;
 use App\Models\GasWarningClassification;
-use App\Models\GasWarningNotice;
-use App\Models\GasWarningNoticeAppliance;
-use App\Models\GasBoilerSystemCommissioningChecklist;
-use App\Models\GasBoilerSystemCommissioningChecklistAppliance;
-use App\Models\GasCommissionDecommissionRecord;
-use App\Models\GasCommissionDecommissionRecordAppliance;
-use App\Models\GasJobSheetRecord;
-use App\Models\GasJobSheetRecordDetail;
-use App\Models\GasJobSheetRecordDocument;
-use App\Models\GasPowerFlushRecord;
-use App\Models\GasPowerFlushRecordChecklist;
-use App\Models\GasPowerFlushRecordRediator;
-use App\Models\GasUnventedHotWaterCylinderRecord;
-use App\Models\GasUnventedHotWaterCylinderRecordInspection;
-use App\Models\GasUnventedHotWaterCylinderRecordSystem;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
@@ -54,8 +30,6 @@ use App\Models\PowerflushCirculatorPumpLocation;
 use App\Models\PowerflushCylinderType;
 use App\Models\PowerflushPipeworkType;
 use App\Models\PowerflushSystemType;
-use App\Models\Quote;
-use App\Models\QuoteItem;
 use App\Models\RadiatorType;
 use App\Models\Record;
 use App\Models\RecordOption;
@@ -150,11 +124,14 @@ class RecordController extends Controller
 
         /* Create Job If Empty */
         if($customer_job_id == 0):
+            $jobRefNo = $this->generateReferenceNo($customer_id);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
                 'customer_property_id' => $customer_property_id,
                 'description' => $form->name,
                 'details' => 'Job created for '.$property->full_address,
+                'reference_no' => $jobRefNo,
+                'customer_job_status_id' => 1,
 
                 'created_by' => auth()->user()->id
             ]);
@@ -368,20 +345,35 @@ class RecordController extends Controller
     }
 
     public function sendEmail($record_id){
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
-                    ->find($record_id);
+        $record = Record::with([
+            'customer', 
+            'property', 
+            'customer.address', 
+            'customer.contact', 
+            'job', 
+            'job.property', 
+            'job.calendar',
+            'job.calendar.slot',
+            'form', 
+            'user', 
+            'user.company'])->find($record_id);
         $user_id = (isset($record->created_by) && $record->created_by > 0 ? $record->created_by : auth()->user()->id);
         $customerName = (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '');
         $customerEmail = (isset($record->customer->contact->email) && !empty($record->customer->contact->email) ? $record->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $template = JobFormEmailTemplate::where('user_id', $user_id)->where('job_form_id', $record->job_form_id)->get()->first();
-            $subject = (isset($template->subject) && !empty($template->subject) ? $template->subject : $record->form->name);
-            $content = (isset($template->content) && !empty($template->content) ? $template->content : '');
+            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $record->job_form_id)->get()->first();
+            $emailData = $this->renderEmailTemplate($record, $template);
+
+            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
+            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
+            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
+            $ccMail[] = $record->user->email;
+
             if($content == ''):
                 $content .= 'Hi '.$customerName.',<br/><br/>';
                 $content .= 'Please check attachment for details.<br/><br/>';
                 $content .= 'Thanks & Regards<br/>';
-                $content .= 'Gas Safety Engineer';
+                $content .= env('APP_NAME', 'Gas Safety Engineer');
             endif;
             
             $sendTo = [$customerEmail];
@@ -397,21 +389,73 @@ class RecordController extends Controller
             ];
 
             $attachmentFiles = [];
-            Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf');
             if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf')):
-                $attachmentFiles[] = [
+                $attachmentFiles[0] = [
                     "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf',
                     "nameinfo" => $record->certificate_number.'.pdf',
                     "mimeinfo" => 'application/pdf',
                     "disk" => 'public'
                 ];
             endif;
+            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
+                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles));
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles), $ccMail);
             return true;
         else:
             return false;
         endif;
+    }
+
+
+    public function renderEmailTemplate(Record $record, JobFormEmailTemplate $template): array {
+        // Build shortcode replacements
+        $companyName = $record->user->companies->pluck('company_name')->first();
+        $shortcodes = [
+            ':customername'         => $record->customer->full_name ?? '',
+            ':customercompany'      => $record->customer->company_name ?? '',
+            ':jobref'               => $record->job->reference_no ?? '',
+            ':jobbuilding'          => isset($record->job->property->address_line_1) && !empty($record->job->property->address_line_1) ? $record->job->property->address_line_1 : '',
+            ':jobstreet'            => isset($record->job->property->address_line_2) && !empty($record->job->property->address_line_1) ? $record->job->property->address_line_2 : '',
+            ':jobregion'            => isset($record->job->property->state) && !empty($record->job->property->state) ? $record->job->property->state : '',
+            ':jobpostcode'          => isset($record->job->property->postal_code) && !empty($record->job->property->postal_code) ? $record->job->property->postal_code : '',
+            ':jobtown'              => isset($record->job->property->city) && !empty($record->job->property->city) ? $record->job->property->city : '',
+            ':propertyaddress'      => isset($record->property->full_address) && !empty($record->property->full_address) ? $record->property->full_address : '',
+            ':contactphone'         => isset($record->user->mobile) && !empty($record->user->mobile) ? $record->user->mobile : '',
+            ':companyname'          => $companyName ?? '',
+            ':engineername'         => $record->user->name ?? '',
+            ':eventdate'            => isset($record->job->calendar->date) && !empty($record->job->calendar->date) ? date('d-m-Y', strtotime($record->job->calendar->date)) : '',
+            ':eventtime'            => (isset($record->job->calendar->slot->start) && !empty($record->job->calendar->slot->start) ? date('H:i', strtotime($record->job->calendar->slot->start)) : '').(isset($record->job->calendar->slot->end) && !empty($record->job->calendar->slot->end) ? ' - '.date('H:i', strtotime($record->job->calendar->slot->end)) : ''),
+            // Add more shortcodes as needed
+        ];
+
+        // Replace shortcodes in subject and content
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+
+        $attachmentFiles = [];
+        if(isset($template->attachment) && $template->attachment->count() > 0):
+            $i = 1;
+            foreach($template->attachment as $attachment):
+                if(isset($attachment->download_url) && !empty($attachment->download_url)):
+                    $attachmentFiles[$i] = [
+                        "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf',
+                        "nameinfo" => $attachment->current_file_name,
+                        "mimeinfo" => $attachment->doc_type,
+                        "disk" => 'public'
+                    ];
+                    $i++;
+                endif;
+            endforeach;
+        endif;
+
+        return [
+            'subject' => $subject,
+            'content' => $content,
+            'attachmentFiles' => $attachmentFiles,
+            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
+        ];
     }
 
     public function editReady(Request $request){
@@ -638,7 +682,7 @@ class RecordController extends Controller
             $html .= '<div class="results existingAddress">';
                 $i = 1;
                 foreach($query as $job):
-                    $recordExist = ExistingRecordDraft::where('customer_job_id', $job->id)->where('job_form_id', $job_form_id)->get();
+                    $recordExist = Record::where('customer_job_id', $job->id)->where('job_form_id', $job_form_id)->where('created_by', $user_id)->get();
                     if($recordExist->count() == 0):
                         $html .= '<div data-id="'.$job->id.'" data-description="'.(!empty($job->description) ? $job->description : '').(isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '').(isset($job->customer->address->postal_code) && !empty($job->customer->address->postal_code) ? ' ('.$job->customer->address->postal_code.')' : '').'" class="customerJobItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
                             $html .= '<div>';
@@ -882,5 +926,26 @@ class RecordController extends Controller
         else:
             return response()->json(['msg' => 'Something went wrong please try again later.', 'red' => ''], 422);
         endif;
+    }
+
+    private function generateReferenceNo($customerId){
+        $customer = Customer::find($customerId);
+        if (!$customer) return null;
+        
+        $nameParts = explode(' ', trim($customer->company_name));
+        $prefix = '';
+        foreach ($nameParts as $part):
+            $prefix .= strtoupper(substr($part, 0, 1));
+        endforeach;
+        $lastJob = CustomerJob::where('customer_id', $customerId)->orderBy('id', 'desc')->first();
+
+        if ($lastJob && preg_match('/\d+$/', $lastJob->reference_no, $matches)):
+            $nextNumber = intval($matches[0]) + 1;
+        else:
+            $nextNumber = 1;
+        endif;
+        $referenceNo = $prefix . $nextNumber;
+
+        return $referenceNo;
     }
 }

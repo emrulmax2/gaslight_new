@@ -210,6 +210,42 @@
             }).catch(error =>{
                 console.log(error)
             });
+        }else if(action == 'RELOADTEMPLATE'){
+            axios({
+                method: 'POST',
+                url: route('user.settings.reminder.templates.reload'),
+                data: {'form_id' : row_id},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    $('#confirmModal button').removeAttr('disabled');
+                    confirmModal.hide();
+
+                    let row = response.data.row;
+                    if(row.subject != ''){
+                        $('#subject').val(row.subject);
+                    }
+                    if(row.content != ''){
+                        theEditor.setData(row.content);
+                    }
+                }
+            }).catch(error =>{
+                if (error.response) {
+                    if (error.response.status == 304) {
+                        warningModal.show();
+                        document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#warningModal .warningModalTitle").html("Error Found!");
+                            $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                        });
+
+                        setTimeout(() => {
+                            warningModal.hide();
+                        }, 1500);
+                    } else {
+                        console.log('error');
+                    }
+                }
+            });
         }
     })
 
@@ -231,5 +267,19 @@
             }).showToast();
         });
     }
+
+    // Reload Data
+    $(document).on('click', '#reloadTemplate', function(){
+        let $statusBTN = $(this);
+        let row_id = $statusBTN.attr('data-id');
+
+        confirmModal.show();
+        document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
+            $('#confirmModal .confirmModalTitle').html('Are you sure?');
+            $('#confirmModal .confirmModalDesc').html('Do you really want to reload this template from base template? If yes then please click on the agree btn.');
+            $('#confirmModal .agreeWith').attr('data-id', row_id);
+            $('#confirmModal .agreeWith').attr('data-action', 'RELOADTEMPLATE');
+        });
+    });
 
 })()

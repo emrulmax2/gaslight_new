@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Listeners\InsertUserJobFormEmailTemplatesListener;
+use App\Listeners\SendSmsOnRegistered;
 use App\Listeners\SendWelcomeEmail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -20,7 +21,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
             SendWelcomeEmail::class,
-            InsertUserJobFormEmailTemplatesListener::class
+            InsertUserJobFormEmailTemplatesListener::class,
+            SendSmsOnRegistered::class
         ],
     ];
 

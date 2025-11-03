@@ -86,6 +86,11 @@
             </div>
             <div class="col-span-12 sm:col-span-3">
                 <div class="intro-y box p-5">
+                    <x-base.button type="button" data-id="{{ $form->id }}" id="reloadTemplate" class="w-full mb-3 text-white" variant="facebook" >
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                        Reload Base Template
+                        <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                    </x-base.button>
                     <x-base.button type="submit" id="saveEmailTemplatesBtn" class="w-full mb-3 text-white" variant="success" >
                         <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
                         Save

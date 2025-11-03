@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UserSettings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReminderTemplateStoreRequest;
 use App\Models\JobForm;
+use App\Models\JobFormBaseEmailTemplate;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormEmailTemplateAttachment;
 use Illuminate\Http\Request;
@@ -62,7 +63,7 @@ class ReminderEmailTemplateController extends Controller
                     $data['job_form_email_template_id'] = $template->id;
                     $data['display_file_name'] = $documentName;
                     $data['current_file_name'] = $documentName;
-                    $data['doc_type'] = $document->getClientOriginalExtension();
+                    $data['doc_type'] = $document->getClientMimeType();
                     $data['disk_type'] = 'local';
                     $data['path'] = Storage::disk('public')->url($path);
                     $data['created_by'] = $user_id;
@@ -81,5 +82,17 @@ class ReminderEmailTemplateController extends Controller
         $attachment->delete();
 
         return response()->json(['msg' => 'Attachment successfully deleted.', 'red' => route('user.settings.reminder.templates.create', $job_form_id)], 200);
+    }
+
+    public function reloadBaseData(Request $request){
+        $form_id = $request->form_id;
+        $user_id = auth()->user()->id;
+
+        $baseTemplate = JobFormBaseEmailTemplate::where('job_form_id', $form_id)->get()->first();
+        if(isset($baseTemplate->id) && $baseTemplate->id > 0):
+            return response()->json(['row' => $baseTemplate, 'red' => ''], 200);
+        else:
+            return response()->json(['msg' => 'Base template not found!', 'red' => ''], 304);
+        endif;
     }
 }

@@ -517,7 +517,7 @@ import Litepicker from "litepicker";
         const form = document.getElementById('updateApointDateForm');
         const $theForm = $(this);
 
-        let theDate = jobInlineCalenderDate.getDate();
+        let theDate = jobCalenderDate.getDate();
         let theDates = theDate ? theDate.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-") : null;
         
         $('#updateApointDateModal .acc__input-error').html('');

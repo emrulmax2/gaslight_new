@@ -3,11 +3,6 @@ import laravel from "laravel-vite-plugin";
 import path from "path";
 
 export default defineConfig({
-    server: {
-        headers: {
-            'Access-Control-Allow-Origin': 'https://lcc_gas_certificate.test'
-        }
-    },
     build: {
         commonjsOptions: {
             include: ["tailwind.config.js", "node_modules/**"],
@@ -205,38 +200,12 @@ export default defineConfig({
                 "resources/js/app/calculator/calculator.js",
                 "resources/js/app/initial-setup.js",
                 
-                "resources/js/app/new-records/homewoner_gass_safety_record_show.js",
-                "resources/js/app/new-records/gas_warning_notice_show.js",
-                "resources/js/app/new-records/gas_service_record_show.js",
-                "resources/js/app/new-records/gas_breakdown_record_show.js",
+                
                 "resources/js/app/users/users.js",
-                "resources/js/app/new-records/power_flush_record_show.js",
-                "resources/js/app/new-records/installation_commissioning_decommissioning_record_show.js",
 
                 "resources/js/app/dashboard.js",
-                "resources/js/app/new-records/unvented_hot_water_cylinders_show.js",
-                "resources/js/app/new-records/job_sheet_record_show.js",
                 "resources/js/app/drafts/certificates.js",
                 "resources/js/app/jobs/record-and-drafts.js",
-
-                "resources/js/app/new-records/index.js",
-                "resources/js/app/new-records/create.js",
-                "resources/js/app/new-records/homeowner-gas-safety-record.js",
-                "resources/js/app/new-records/gas-warning-notice-record.js",
-                "resources/js/app/new-records/gas-service-record.js",
-                "resources/js/app/new-records/gas-breakdown-record.js",
-                "resources/js/app/new-records/gas-boiler-system-commissioning-checklist.js",
-                "resources/js/app/new-records/gas_boiler_system_commissioning_checklist_show.js",
-                "resources/js/app/new-records/installation-commissioning-decommissioning-record.js",
-                "resources/js/app/new-records/unvented-hot-water-cylinders.js",
-                "resources/js/app/new-records/job-sheet.js",
-                "resources/js/app/new-records/power-flush-record.js",
-                "resources/js/app/new-records/invoice.js",
-                "resources/js/app/new-records/invoice_show.js",
-                "resources/js/app/new-records/quote.js",
-                "resources/js/app/new-records/quote_show.js",
-                "resources/js/app/new-records/landlord-gas-safety-record.js",
-                "resources/js/app/new-records/landlord-gass-safety-record-show.js",
 
                 "resources/js/app/user-settings/subscription.js",
                 "resources/js/app/users/profile.js",
@@ -278,6 +247,7 @@ export default defineConfig({
                 "resources/js/app/records/unvented_hot_water_cylinders.js",
                 "resources/js/app/records/job_sheet.js",
                 "resources/js/app/records/quote.js",
+                "resources/js/app/records/invoice.js",
                 "resources/js/app/superadmin/settings/email-templates.js",
             ],
             refresh: true,

@@ -61,7 +61,7 @@ class CustomerJob extends Model
     }
     
     public function records(){
-        return $this->hasMany(ExistingRecordDraft::class, 'customer_job_id', 'id');
+        return $this->hasMany(Record::class, 'customer_job_id', 'id');
     }
 
     public function cancelReason(){

@@ -17,6 +17,7 @@ use App\Models\CustomerJobStatus;
 use App\Models\CustomerProperty;
 use App\Models\ExistingRecordDraft;
 use App\Models\JobForm;
+use App\Models\Record;
 use App\Models\Title;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -152,8 +153,7 @@ class JobController extends Controller
         ]);
     }
 
-   private function generateReferenceNo($customerId)
-    {
+    private function generateReferenceNo($customerId){
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
@@ -510,84 +510,31 @@ class JobController extends Controller
         foreach($sorters as $sort):
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
-    
-        $query = ExistingRecordDraft::with('customer', 'job', 'job.property', 'form', 'user', 'model')->orderByRaw(implode(',', $sorts))
-                 ->where('customer_job_id', $job_id);
+
+        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
+                ->orderByRaw(implode(',', $sorts))->where('customer_job_id', $job_id);
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
-                $q->where(function($sq) use($queryStr){
-                    $sq->where('full_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
-                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
-                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
-                });
+                $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
             })->orWhereHas('job.property', function ($q) use ($queryStr) {
                 $q->where(function($sq) use($queryStr){
-                    $sq->where('occupant_name', 'LIKE', '%' . $queryStr . '%')->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
+                    $sq->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
                     ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
                     ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
                 });
+            })->orWhereHas('occupant', function($q) use ($queryStr){
+                $q->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
             });
         endif;
-        $query->where('created_by', auth()->user()->id);
+        $query->where('created_by', $request->user()->id);
         $Query = $query->get();
 
         $html = '';
-
         if(!empty($Query)):
             foreach($Query as $list):
-                $certificate_number = '';
-                if(isset($list->model->certificate_number) && !empty($list->model->certificate_number)):
-                    $certificate_number = $list->model->certificate_number;
-                elseif(isset($list->model->invoice_number) && !empty($list->model->invoice_number)):
-                    $certificate_number = $list->model->quote_number;
-                elseif(isset($list->model->quote_number) && !empty($list->model->quote_number)):
-                    $certificate_number = $list->model->quote_number;
-                endif;
-                $theModel = $list->model->getMorphClass();
-                switch($list->job_form_id){
-                    case(4):
-                        $url = route('invoice.show', $list->model_id);
-                        break;
-                    case(3):
-                        $url = route('quote.show', $list->model_id);
-                        break;
-                    case(6):
-                        $url = route('new.records.gsr.view', $list->model_id);
-                        break;
-                    case(7):
-                        $url = route('new.records.glsr.view', $list->model_id);
-                        break;
-                    case(8):
-                        $url = route('new.records.gas.warning.notice.show', $list->model_id);
-                        break;
-                    case(9):
-                        $url = route('new.records.gas.service.show', $list->model_id);
-                        break;
-                    case(10):
-                        $url = route('new.records.gas.breakdown.record.show', $list->model_id);
-                        break;
-                    case(13):
-                        $url = route('new.records.gas.bscc.record.show', $list->model_id);
-                        break;
-                    case(15):
-                        $url = route('new.records.gas.power.flush.record.show', $list->model_id);
-                        break;
-                    case(16):
-                        $url = route('new.records.gcdr.show', $list->model_id);
-                        break;
-                    case(17):
-                        $url = route('new.records.guhwcr.show', $list->model_id);
-                        break;
-                    case(18):
-                        $url = route('new.records.gjsr.show', $list->model_id);
-                        break;
-                    default:
-                        $url = '';
-                        break;
-                }
+                $url = route('records.show', $list->id);
 
-                $status = $list->model->status ?? '';
-                $html .= '<tr data-url="'.$url.'" class="recordRow intro-x box border max-sm:px-3 max-sm:pt-2 max-sm:pb-2 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
+                $html .= '<tr data-url="'.$url.'" class="recordRow cursor-pointer intro-x box border max-sm:px-3 max-sm:pt-2 max-sm:pb-2 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2 rounded-tl-none sm:rounded-tl rounded-bl-none sm:rounded-bl">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Type</label>';
@@ -597,7 +544,7 @@ class JobController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Serial No</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto">'.$certificate_number.'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto">'.$list->certificate_number.'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
@@ -627,26 +574,26 @@ class JobController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Assigned To</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.(isset($list->model->user->name) ? $list->model->user->name : '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.(isset($list->user->name) ? $list->user->name : '').'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Created At</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal text-xs leading-[1.3] max-sm:ml-auto">'.($list->model->created_at ? $list->model->created_at->format('Y-m-d h:i A') : '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal text-xs leading-[1.3] max-sm:ml-auto">'.($list->created_at ? $list->created_at->format('Y-m-d h:i A') : '').'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 border-none px-0 sm:px-3 py-3 sm:py-2 rounded-tr-none sm:rounded-tr rounded-br-none sm:rounded-br">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Status</label>';
-                            if($status == 'Cancelled'){
+                            if($list->status == 'Cancelled'){
                                 $html .= '<button class="ml-auto font-medium bg-danger rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Cancelled</button>';
-                            }else if($status == 'Approved & Sent'){
-                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved & Sent</button>';
-                            }else if($status == 'Approved'){
+                            }else if($list->status == 'Email Sent'){
+                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Email Sent</button>';
+                            }else if($list->status == 'Approved'){
                                 $html .= '<button class="ml-auto font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved</button>';
                             }else{
-                                $html .= '<button class="ml-auto font-medium bg-pending rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$status.'</button>';
+                                $html .= '<button class="ml-auto font-medium bg-pending rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Draft</button>';
                             }
                         $html .= '</div>';
                     $html .= '</td>';
