@@ -19,7 +19,7 @@ class Record extends Model implements CanBeSigned
         });
     }
 
-    protected $appends = ['available_options'];
+    protected $appends = ['available_options', 'has_invoice', 'invoice_url'];
 
     protected $fillable = [
         'company_id',
@@ -34,6 +34,7 @@ class Record extends Model implements CanBeSigned
         'received_by',
         'relation_id',
         'status',
+        'linked_id',
         
         'created_by',
         'updated_by'
@@ -86,5 +87,15 @@ class Record extends Model implements CanBeSigned
         endif;
 
         return (object) $options;
+    }
+
+    public function getHasInvoiceAttribute(){
+        $record = Record::where('job_form_id', 4)->where('linked_id', $this->id)->get()->first();
+        return (isset($record->id) && $record->id > 0 ? true : false);
+    }
+
+    public function getInvoiceUrlAttribute(){
+        $record = Record::where('job_form_id', 4)->where('linked_id', $this->id)->get()->first();
+        return (isset($record->id) && $record->id > 0 ? route('records.show', $record->id) : 'javascript:void(0);');
     }
 }

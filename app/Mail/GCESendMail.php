@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Support\Facades\Vite;
 
 class GCESendMail extends Mailable
 {
@@ -44,7 +45,7 @@ class GCESendMail extends Mailable
         return new Content(
             view: 'app.emails.communication',
             with: [
-                'content' => $this->content,
+                'content' => $this->content
             ]
         );
     }

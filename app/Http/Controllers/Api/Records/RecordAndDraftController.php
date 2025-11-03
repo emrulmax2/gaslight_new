@@ -16,13 +16,16 @@ class RecordAndDraftController extends Controller
     public function list($job_form_id, Request $request)
     {
         $user_id = $request->user()->id;
-        $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'Draft');
+        $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'All');
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? strtolower($request->query('order')) : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
         $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
-                 ->where('status', $status)->where('created_by', $user_id);
+                 ->where('created_by', $user_id);
+        if($status != 'All'):
+            $query->where('status', $status);
+        endif;
         if(isset($job_form_id) && $job_form_id > 0):
             $query->where('job_form_id', $job_form_id);
         endif;
@@ -38,11 +41,12 @@ class RecordAndDraftController extends Controller
                     ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
                 })->orWhereHas('job.property', function ($propertyQuery) use ($searchKey) {
-                    $propertyQuery->where('occupant_name', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
+                    $propertyQuery->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('address_line_2', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
+                })->orWhereHas('occupant', function ($propertyQuery) use ($searchKey) {
+                    $propertyQuery->orWhere('occupant_name', 'LIKE', '%' . $searchKey . '%');
                 });
             });
         }
@@ -149,7 +153,7 @@ class RecordAndDraftController extends Controller
 
     public function getJobs(Request $request)
     {
-        $user_id = $request->user_id;
+        $user_id = $request->user()->id;
         $job_form_id = $request->form_id;
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
@@ -157,51 +161,27 @@ class RecordAndDraftController extends Controller
             ->where('created_by', $user_id)
             ->orderBy('id', 'DESC');
 
-        if ($searchKey) {
+        if(!$searchKey) {
             $jobsQuery->where(function($query) use ($searchKey) {
                 $query->where('description', 'like', '%' . $searchKey . '%')
                     ->orWhereHas('customer', function($q) use ($searchKey) {
-                        $q->where('full_name', 'like', '%' . $searchKey . '%')
-                            ->orWhere('postal_code', 'like', '%' . $searchKey . '%');
+                        $q->where('full_name', 'like', '%' . $searchKey . '%');
                     });
             });
         }
 
         $jobs = $jobsQuery->get();
 
-        if ($jobs->count() > 0) {
+        if($jobs->count() > 0) {
             $filteredJobs = [];
             foreach ($jobs as $job) {
-                $recordExist = ExistingRecordDraft::where('customer_job_id', $job->id)
+                $recordExist = Record::where('customer_job_id', $job->id)
                     ->where('job_form_id', $job_form_id)
+                    ->where('created_by', $user_id)
                     ->exists();
                 
                 if (!$recordExist) {
-                    $filteredJobs[] = [
-                        'id' => $job->id,
-                        'customer_id' => $job->customer_id,
-                        'customer_property_id' => $job->customer_property_id,
-                        'description' => $job->description ?? '',
-                        'customer_name' => $job->customer->full_name ?? '',
-                        'postal_code' => $job->customer->postal_code ?? '',
-                        'status' => $job->status ? $job->status : null,
-                        'property' => $job->property ? [
-                            'id' => $job->property->id,
-                            'customer_id' => $job->property->customer_id,
-                            'address_line_1' => $job->property->address_line_1 ?? '',
-                            'address_line_2' => $job->property->address_line_2 ?? '',
-                            'city' => $job->property->city ?? '',
-                            'state' => $job->property->state ?? '',
-                            'postal_code' => $job->property->postal_code ?? '',
-                            'country' => $job->property->country ?? '',
-                            'latitude' => $job->property->latitude ?? '',
-                            'longitude' => $job->property->longitude ?? '',
-                            'note' => $job->property->note ?? '',
-                            'occupant_name' => $job->property->occupant_name ?? '',
-                            'occupant_email' => $job->property->occupant_email ?? '',
-                            'occupant_phone' => $job->property->occupant_phone ?? '',
-                        ] : null,
-                    ];
+                    $filteredJobs[] = $job;
                 }
             }
 
@@ -213,7 +193,7 @@ class RecordAndDraftController extends Controller
 
         return response()->json([
             'success' => false,
-            'message' => 'No jobs found.'
+            'message' => 'No jobs founds.'
         ], 200);
     }
 
