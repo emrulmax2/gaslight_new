@@ -430,6 +430,7 @@ class RecordController extends Controller
         
         $VIEW = 'app.records.pdf.'.$record->form->slug;
         $fileName = $this->generatePdfFileName($record->id);
+        
         if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)) {
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
         }
@@ -462,7 +463,7 @@ class RecordController extends Controller
         $customerEmail = (isset($record->customer->contact->email) && !empty($record->customer->contact->email) ? $record->customer->contact->email : '');
         if(!empty($customerEmail)):
             $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $record->job_form_id)->get()->first();
-            $emailData = $this->renderEmailTemplate($record, $template);
+            $emailData = ($template ? $this->renderEmailTemplate($record, $template) : []);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
