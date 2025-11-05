@@ -28,7 +28,7 @@ class GCEMailerJob implements ShouldQueue
         $this->configuration = $configuration;
         $this->to = $to;
         $this->mailable = $mailable;
-        $this->bcc = (!empty($bcc) ? $bcc : []);
+        $this->bcc = (!empty($bcc) ? $bcc : []); 
     }
 
     /**
