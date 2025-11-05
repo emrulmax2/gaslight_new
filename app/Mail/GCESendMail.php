@@ -15,16 +15,17 @@ class GCESendMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject, $content, $attachmentList;
+    public $subject, $content, $attachmentList, $template;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subject, $content, $attachmentList)
+    public function __construct($subject, $content, $attachmentList, $template = 'communication')
     {
         $this->subject = $subject;
         $this->content = $content;
         $this->attachmentList = $attachmentList;
+        $this->template = $template;
     }
 
     /**
@@ -43,9 +44,10 @@ class GCESendMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'app.emails.communication',
+            view: 'app.emails.'.$this->template,
             with: [
-                'content' => $this->content
+                'content' => $this->content,
+                'title' => $this->subject
             ]
         );
     }
