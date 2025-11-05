@@ -40,7 +40,8 @@ class RecordAndDraftController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
     
-        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])->orderByRaw(implode(',', $sorts));
+        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
+                 ->orderByRaw(implode(',', $sorts));
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
                 $q->where('full_name', 'LIKE', '%' . $queryStr . '%');

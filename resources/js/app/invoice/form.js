@@ -19,6 +19,28 @@ import INTAddressLookUps from '../../address_lookup.js';
     };
     let payment_method_id = new TomSelect(document.getElementById('payment_method_id'), tncTomOptions);
 
+    
+    let dateOption = {
+        autoApply: true,
+        singleMode: true,
+        numberOfColumns: 1,
+        numberOfMonths: 1,
+        showWeekNumbers: false,
+        minDate: new Date() - 1,
+        inlineMode: false,
+        format: "DD-MM-YYYY",
+        dropdowns: {
+            minYear: 1900,
+            maxYear: 2050,
+            months: true,
+            years: true,
+        },
+    };
+    const issuedDate = new Litepicker({
+        element: document.getElementById('issued_date'),
+        ...dateOption
+    });
+
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const invoiceItemModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceItemModal"));
@@ -45,13 +67,13 @@ import INTAddressLookUps from '../../address_lookup.js';
     });
     
     /* Init The Calculation */
-    let isVatInvoice = ($('#certificateForm #non_vat_invoice').val() == 1 ? false : true);
+    let isVatInvoice = ($('#invoiceForm #non_vat_invoice').val() == 1 ? false : true);
     invoiceCalculation();
     /* Init The Calculation */
 
     /* Generate Or Autoload Invoice Number Start */
-    if(localStorage.certificate_number && localStorage.getItem('certificate_number') != ''){
-        let invoiceNumber = JSON.parse(localStorage.getItem('certificate_number'));
+    if(localStorage.invoice_number && localStorage.getItem('invoice_number') != ''){
+        let invoiceNumber = JSON.parse(localStorage.getItem('invoice_number'));
         $('.invoiceNoBlockWrap').fadeIn('fast', function(){
             $('.invoiceNoBlock').find('.theDesc').html(invoiceNumber).addClass('font-medium');
         });
@@ -611,6 +633,26 @@ import INTAddressLookUps from '../../address_lookup.js';
     })
     /* Invoice Advance End */
 
+    /* Issued Date Load Start */
+    if(localStorage.issued_date){
+        let issued_date = localStorage.getItem('issued_date');
+        if(issued_date != ''){
+            $('#issued_date').val(JSON.parse(issued_date));
+            issuedDate.setDate(JSON.parse(issued_date)); 
+        }else{
+            $('#issued_date').val(getTodayDate());
+            issuedDate.setDate(getTodayDate()); 
+        }
+    }
+    issuedDate.on('selected', (date) => {
+        localStorage.removeItem('invoiceNotes');
+        if(date){
+            let theDate = date.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-");
+            localStorage.setItem('issued_date', JSON.stringify(theDate));
+        }
+    });
+    /* Issued Date Load Start */
+
     /* Note Auto Load Start */
     document.getElementById('invoiceNoteModal').addEventListener('hide.tw.modal', function(event) {
         $('#invoiceNoteModal textarea').val('');
@@ -660,11 +702,6 @@ import INTAddressLookUps from '../../address_lookup.js';
     /* Extras Auto Load Start */
     if(localStorage.invoiceExtra && localStorage.invoiceExtra != null){
         let invoiceExtra = JSON.parse(localStorage.getItem('invoiceExtra'));
-        if(invoiceExtra.issued_date != ''){
-            $('#issued_date').val(formatDateToDdMmYyyy(invoiceExtra.issued_date));
-        }else{
-            $('#issued_date').val(getTodayDate());
-        }
         if(invoiceExtra.vat_number != ''){
             $('#vat_number').val(invoiceExtra.vat_number);
         }

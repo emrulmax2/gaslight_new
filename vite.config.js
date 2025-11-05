@@ -247,8 +247,12 @@ export default defineConfig({
                 "resources/js/app/records/unvented_hot_water_cylinders.js",
                 "resources/js/app/records/job_sheet.js",
                 "resources/js/app/records/quote.js",
-                "resources/js/app/records/invoice.js",
                 "resources/js/app/superadmin/settings/email-templates.js",
+
+                "resources/js/app/invoice/index.js",
+                "resources/js/app/invoice/form.js",
+                "resources/js/app/invoice/create.js",
+                "resources/js/app/invoice/show.js",
             ],
             refresh: true,
         }),

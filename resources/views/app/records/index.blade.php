@@ -6,7 +6,7 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium">Create Certificate / Invoice</h2>
+        <h2 class="mr-auto text-lg font-medium">Create Certificate</h2>
         <div class="flex mt-0 w-auto">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />

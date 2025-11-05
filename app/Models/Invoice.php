@@ -3,15 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
-use Creagia\LaravelSignPad\Concerns\RequiresSignature;
-use Creagia\LaravelSignPad\Contracts\CanBeSigned;
 
-class Record extends Model implements CanBeSigned
+class Invoice extends Model
 {
-    use SoftDeletes, HasFactory, RequiresSignature;
+    use SoftDeletes, SoftDeletes;
 
     protected static function booted(){
         static::creating(function ($thisModel) {
@@ -19,7 +15,7 @@ class Record extends Model implements CanBeSigned
         });
     }
 
-    protected $appends = ['available_options', 'email_sent_count'];
+    protected $appends = ['available_options'];
 
     protected $fillable = [
         'company_id',
@@ -28,12 +24,11 @@ class Record extends Model implements CanBeSigned
         'job_form_id',
         'customer_property_id',
         'customer_property_occupant_id',
-        'certificate_number',
-        'inspection_date',
-        'next_inspection_date',
-        'received_by',
-        'relation_id',
+        'invoice_number',
+        'issued_date',
+        'expire_date',
         'status',
+        'pay_status',
         
         'created_by',
         'updated_by'
@@ -65,16 +60,12 @@ class Record extends Model implements CanBeSigned
         return $this->belongsTo(CustomerPropertyOccupant::class, 'customer_property_occupant_id');
     }
 
-    public function relation(){
-        return $this->belongsTo(Relation::class, 'relation_id', 'id');
-    }
-
     public function user(){
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function options(){
-        return $this->hasMany(RecordOption::class, 'record_id', 'id')->orderBy('id', 'asc');
+        return $this->hasMany(InvoiceOption::class, 'invoice_id', 'id')->orderBy('id', 'asc');
     }
 
     public function getAvailableOptionsAttribute(){
@@ -86,9 +77,5 @@ class Record extends Model implements CanBeSigned
         endif;
 
         return (object) $options;
-    }
-
-    public function getEmailSentCountAttribute(){
-        return RecordHistory::where('record_id', $this->id)->where('action', 'Email Sent')->get()->count();
     }
 }

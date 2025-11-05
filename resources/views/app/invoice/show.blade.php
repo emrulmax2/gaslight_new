@@ -6,7 +6,7 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium">{{ $form->name }}</h2>
+        <h2 class="mr-auto text-lg font-medium">Edit {{ $form->name }}</h2>
         <div class="flex mt-0 w-auto">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin"><x-base.lucide class="h-4 w-4" icon="home" /></x-base.button>
         </div>
@@ -16,7 +16,7 @@
             <div class="intro-y col-span-12 max-sm:mt-5 sm:col-span-2 order-2 sm:order-1">
                 <div class="sticky top-0">
                     <div class="flex flex-col justify-center items-center shadow-md rounded-md bg-white p-5">
-                        <x-base.button data-id="{{ $record->id }}" type="button" class="editRecordBtn justify-start w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
+                        <x-base.button data-id="{{ $invoice->id }}" type="button" class="editRecordBtn justify-start w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#164e63] [&.active]:text-white hover:bg-[#164e63] focus:bg-[#164e63] hover:text-white focus:text-white">
                             <x-base.lucide class="mr-2 h-4 w-4" icon="Pencil" />
                             Edit
                             <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
@@ -27,27 +27,18 @@
                             Download
                         </x-base.button>
                         @endif
-                        @if($record->status == 'Draft' || $record->status == 'Cancelled')
-                        <x-base.button value="1" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits justify-start submit_1 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
-                            <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                            Approve
-                            <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                        </x-base.button>
-                        @endif
-                        @if($record->status == 'Approved' || $record->status == 'Email Sent')
-                            @if(isset($record->customer->contact->email) && !empty($record->customer->contact->email))
-                                <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
-                                    {{ $record->email_sent_count > 0 ? 'Resend' : 'Send'}} Email
-                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                                </x-base.button>
-                            @else 
-                                <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#addCustomerEmailModal" class="justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
-                                    Insert & {{ $record->email_sent_count > 0 ? 'Resend' : 'Send'}} Email
-                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                                </x-base.button>
-                            @endif
+                        @if(isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email))
+                            <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
+                                {{ $invoice->status == 'Send' ? 'Resend' : 'Send' }}
+                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                            </x-base.button>
+                        @else 
+                            <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#addCustomerEmailModal" class="justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
+                                Insert & Send
+                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                            </x-base.button>
                         @endif
                     </div>
                     <input type="hidden" value="1" name="submit_type"/>
@@ -69,12 +60,12 @@
                     @endif
                 </div>
             </div>
-            <input id="record_id" name="record_id" type="hidden" value="{{ $record->id }}" />
+            <input id="invoice_id" name="invoice_id" type="hidden" value="{{ $invoice->id }}" />
         </div>
     </form>
 
    
-    @include('app.records.show-modal')
+    @include('app.invoice.show-modal')
     @include('app.action-modals')
 @endsection
 @pushOnce('styles')
@@ -92,5 +83,5 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/records/show.js')
+    @vite('resources/js/app/invoice/show.js')
 @endPushOnce

@@ -62,7 +62,7 @@
             <div class="w-full">
                 <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Invoice Date</div>
                 <div class="theDesc w-full relative">
-                    <x-base.litepicker id="issued_date" name="issued_date" value="{{ date('d-m-Y') }}" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off"/>
+                    <x-base.form-input type="text" id="issued_date" name="issued_date" value="{{ date('d-m-Y') }}" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text" autocomplete="off"/>
                     <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
                 </div>
             </div>

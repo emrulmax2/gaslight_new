@@ -32,6 +32,7 @@ use App\Models\PowerflushPipeworkType;
 use App\Models\PowerflushSystemType;
 use App\Models\RadiatorType;
 use App\Models\Record;
+use App\Models\RecordHistory;
 use App\Models\RecordOption;
 use App\Models\Relation;
 use App\Models\User;
@@ -42,6 +43,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RecordController extends Controller
 {
@@ -51,7 +53,7 @@ class RecordController extends Controller
             'breadcrumbs' => [
                 ['label' => 'Create Records', 'href' => 'javascript:void(0);'],
             ],
-            'forms' => JobForm::with('childs')->where('parent_id', 0)->where('active', 1)->orderBy('id', 'ASC')->get()
+            'forms' => JobForm::with('childs')->where('parent_id', 0)->whereNot('id', 1)->where('active', 1)->orderBy('id', 'ASC')->get()
         ]);
     }
 
@@ -96,11 +98,6 @@ class RecordController extends Controller
             $data['flush_pump_location'] = PowerflushCirculatorPumpLocation::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['radiator_type'] = RadiatorType::where('active', 1)->orderBy('name', 'ASC')->get();
             $data['color'] = Color::where('active', 1)->orderBy('name', 'ASC')->get();
-        elseif($form->slug == 'invoice'):
-            $user = User::find(auth()->user()->id);
-            $data['non_vat_invoice'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
-            $data['vat_number'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
-            $data['methods'] = PaymentMethod::where('active', 1)->orderBy('name', 'asc')->get();
         elseif($form->slug == 'quote'):
             $user = User::find(auth()->user()->id);
             $data['non_vat_quote'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
@@ -158,6 +155,12 @@ class RecordController extends Controller
             ]);
             
             if($record->id):
+                RecordHistory::create([
+                    'record_id' => $record->id,
+                    'action' => $certificate_id > 0 ? 'Updated' : 'Created',
+                    'created_by' => $user_id,
+                ]);
+
                 $certificate_number = $this->generateCertificateNumber($record->id);
                 $options = json_decode($request->options);
                 RecordOption::where('record_id', $record->id)->whereNotIn('name', ['jobSheetDocuments', 'quoteExtra'])->forceDelete();
@@ -215,27 +218,6 @@ class RecordController extends Controller
                         'job_form_id' => $job_form_id,
                         'name' => 'quoteExtra',
                         'value' => $quoteExtra
-                    ]);
-                elseif($job_form_id == 4):
-                    $existRow = RecordOption::where('record_id', $certificate_id)->where('name', 'invoiceExtra')->get()->first();
-                    $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
-
-                    $invoiceExtra = [
-                        'non_vat_invoice' => (isset($request->non_vat_invoice) && $request->non_vat_invoice == 1 ? 1 : 0),
-                        'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
-                        'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d'))
-                    ];
-                    if(!isset($theData->payment_term) || empty($theData->payment_term)):
-                        $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
-                    else:
-                        $invoiceExtra['payment_term'] = $theData->payment_term;
-                    endif;
-                    RecordOption::where('record_id', $record->id)->where('name', 'invoiceExtra')->forceDelete();
-                    RecordOption::create([
-                        'record_id' => $record->id,
-                        'job_form_id' => $job_form_id,
-                        'name' => 'invoiceExtra',
-                        'value' => $invoiceExtra
                     ]);
                 endif;
 
@@ -320,7 +302,8 @@ class RecordController extends Controller
         $form = JobForm::find($record->job_form_id);
         $submit_type = $request->submit_type;
 
-        $pdf = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf');
+        $fileName = $this->generatePdfFileName($record->id);
+        $pdf = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
 
         if($submit_type == 2 || $submit_type == 3):
             if($submit_type == 3 && $request->has('customer_email') && !empty($request->customer_email)):
@@ -330,10 +313,22 @@ class RecordController extends Controller
             $data['status'] = 'Email Sent';
 
             Record::where('id', $request->record_id)->update($data);
-            
+
             $email = $this->sendEmail($request->record_id);
+
+            RecordHistory::create([
+                'record_id' => $request->record_id,
+                'action' => 'Email Sent',
+                'created_by' => $user_id,
+            ]);
             $message = (!$email ? 'Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Certificate has been approved and a copy of the certificate mailed to the customer');
         else:
+            RecordHistory::create([
+                'record_id' => $request->record_id,
+                'action' => 'Approved',
+                'created_by' => $user_id,
+            ]);
+
             $data = [];
             $data['status'] = 'Approved';
 
@@ -341,7 +336,7 @@ class RecordController extends Controller
             $message = 'Certificate successfully approved.';
         endif;
 
-        return response()->json(['msg' => $message, 'red' => route('company.dashboard'), 'pdf' => $pdf]);
+        return response()->json(['msg' => $message, 'red' => route('records.show', $request->record_id), 'pdf' => $pdf]);
     }
 
     public function sendEmail($record_id){
@@ -362,7 +357,7 @@ class RecordController extends Controller
         $customerEmail = (isset($record->customer->contact->email) && !empty($record->customer->contact->email) ? $record->customer->contact->email : '');
         if(!empty($customerEmail)):
             $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $record->job_form_id)->get()->first();
-            $emailData = $this->renderEmailTemplate($record, $template);
+            $emailData = ($template ? $this->renderEmailTemplate($record, $template) : []);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
@@ -387,12 +382,15 @@ class RecordController extends Controller
                 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
                 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
             ];
+            //from_name: Company Name
+            // Replay to: engineer or company email.
 
             $attachmentFiles = [];
-            if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf')):
+            $fileName = $this->generatePdfFileName($record->id); 
+            if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)):
                 $attachmentFiles[0] = [
-                    "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf',
-                    "nameinfo" => $record->certificate_number.'.pdf',
+                    "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName,
+                    "nameinfo" => $fileName,
                     "mimeinfo" => 'application/pdf',
                     "disk" => 'public'
                 ];
@@ -407,7 +405,6 @@ class RecordController extends Controller
             return false;
         endif;
     }
-
 
     public function renderEmailTemplate(Record $record, JobFormEmailTemplate $template): array {
         // Build shortcode replacements
@@ -440,7 +437,7 @@ class RecordController extends Controller
             foreach($template->attachment as $attachment):
                 if(isset($attachment->download_url) && !empty($attachment->download_url)):
                     $attachmentFiles[$i] = [
-                        "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf',
+                        "pathinfo" => 'template_attachments/'.$template->id.'/'.$attachment->current_file_name,
                         "nameinfo" => $attachment->current_file_name,
                         "mimeinfo" => $attachment->doc_type,
                         "disk" => 'public'
@@ -656,7 +653,7 @@ class RecordController extends Controller
         $signatureBase64 = ($record->signature && Storage::disk('public')->exists($record->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->signature->filename)) : '');
         
         $VIEW = 'app.records.pdf.'.$record->form->slug;
-        $fileName = $record->certificate_number.'.pdf';
+        $fileName = $this->generatePdfFileName($record->id); 
         if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)) {
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
         }
@@ -671,6 +668,26 @@ class RecordController extends Controller
         return Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
     }
 
+    function generatePdfFileName($record_id){
+        $record = Record::with('job', 'job.property')->find($record_id);
+        $address_line_1 = $record->job->property->address_line_1;
+        $address_line_2 = $record->job->property->address_line_2;
+        $postal_code = $record->job->property->postal_code;
+        $certificate_no = $record->certificate_number;
+
+        // Concatenate the fields
+        $fileName = "{$address_line_1}_{$address_line_2}_{$postal_code}_{$certificate_no}";
+        // Replace any non-alphanumeric characters with underscores
+        $fileName = preg_replace('/[^A-Za-z0-9\-]/', '_', $fileName);
+        // Replace multiple consecutive underscores with a single underscore
+        $fileName = preg_replace('/_+/', '_', $fileName);
+        // Trim underscores from start and end
+        $fileName = trim($fileName, '_');
+        // Optionally lowercase
+        $fileName = Str::lower($fileName);
+        // Add PDF extension
+        return $fileName . '.pdf';
+    }
 
     public function getJobs(Request $request){
         $user_id = auth()->user()->id;

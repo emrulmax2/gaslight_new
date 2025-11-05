@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CustomerJob extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $appends = ['cancel_reason_name'];
     
     protected $fillable = [
         'customer_id',
@@ -66,5 +67,9 @@ class CustomerJob extends Model
 
     public function cancelReason(){
         return $this->belongsTo(CancelReason::class, 'cancel_reason_id');
+    }
+
+    public function getCancelReasonNameAttribute(){
+        return (isset($this->cancelReason->name) && !empty($this->cancelReason->name) ? $this->cancelReason->name : null);
     }
 }
