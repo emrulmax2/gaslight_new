@@ -13,6 +13,7 @@ use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\Record;
+use App\Models\RecordHistory;
 use App\Models\RecordOption;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Creagia\LaravelSignPad\Signature;
@@ -61,6 +62,8 @@ class RecordController extends Controller
                 'customer_id' => $customer_id,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
+                'customer_property_id' => $customer_property_id,
+                'customer_property_occupant_id' => $customer_property_occupant_id,
 
                 'inspection_date' => (isset($request->inspection_date) && !empty($request->inspection_date) ? date('Y-m-d', strtotime($request->inspection_date)) : null),
                 'next_inspection_date' => (isset($request->next_inspection_date) && !empty($request->next_inspection_date) ? date('Y-m-d', strtotime($request->next_inspection_date)) : null),
@@ -71,6 +74,12 @@ class RecordController extends Controller
             ]);
             
             if($record->id):
+                RecordHistory::create([
+                    'record_id' => $record->id,
+                    'action' => $certificate_id > 0 ? 'Updated' : 'Created',
+                    'created_by' => $user_id,
+                ]);
+
                 $certificate_number = $this->generateCertificateNumber($record->id);
                 $options = $request->options;
                 RecordOption::where('record_id', $record->id)->forceDelete();
@@ -150,14 +159,15 @@ class RecordController extends Controller
         /* Store or Update Record */
     }
 
-    public function edit($record_id, Request $record){
+    public function edit($record_id, Request $request){
         try {
-            //$pdf_url = $this->generatePdf($record_id);
-            $fileName = $record->certificate_number.'.pdf';
-            $pdf_url = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
-
             $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
                         ->find($record_id);
+
+            //$pdf_url = $this->generatePdf($record_id);
+            $fileName = $this->generatePdfFileName($record->id);
+            $pdf_url = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
+
             $data = [
                 'certificate_id' => $record->id,
                 'certificate' => [
@@ -173,7 +183,8 @@ class RecordController extends Controller
                     'received_by' => (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : ''),
                     'relation_id' => (isset($record->relation_id) && !empty($record->relation_id) ? $record->relation_id : ''),
                     'relation_name' => (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : ''),
-                    'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : ''
+                    'signature' => $record->signature && !empty($record->signature->filename) ? Storage::disk('public')->url($record->signature->filename) : '',
+                    'email_sent_count' => $record->email_sent_count
                 ],
                 'job' => $record->job,
                 'customer' => $record->customer,
@@ -203,12 +214,17 @@ class RecordController extends Controller
         }
     }
 
-    public function approve($record_id)
+    public function approve($record_id, Request $request)
     {
         try {
             $record = Record::findOrFail($record_id);
             $record->update([
                 'status' => 'Approved'
+            ]);
+            RecordHistory::create([
+                'record_id' => $record_id,
+                'action' => 'Approved',
+                'created_by' => $request->user()->id,
             ]);
 
             return response()->json([
@@ -249,6 +265,12 @@ class RecordController extends Controller
             
             try {
                 $emailSent = $this->sendEmail($record->id, $request->user_id);
+
+                RecordHistory::create([
+                    'record_id' => $record_id,
+                    'action' => 'Email Sent',
+                    'created_by' => $request->user()->id,
+                ]);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }
@@ -407,7 +429,7 @@ class RecordController extends Controller
         $signatureBase64 = ($record->signature && Storage::disk('public')->exists($record->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->signature->filename)) : '');
         
         $VIEW = 'app.records.pdf.'.$record->form->slug;
-        $fileName = $record->certificate_number.'.pdf';
+        $fileName = $this->generatePdfFileName($record->id);
         if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)) {
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
         }
@@ -467,10 +489,11 @@ class RecordController extends Controller
             ];
 
             $attachmentFiles = [];
-            if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf')):
+            $fileName = $this->generatePdfFileName($record->id);
+            if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)):
                 $attachmentFiles[0] = [
-                    "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf',
-                    "nameinfo" => $record->certificate_number.'.pdf',
+                    "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName,
+                    "nameinfo" => $fileName,
                     "mimeinfo" => 'application/pdf',
                     "disk" => 'public'
                 ];
@@ -517,7 +540,7 @@ class RecordController extends Controller
             foreach($template->attachment as $attachment):
                 if(isset($attachment->download_url) && !empty($attachment->download_url)):
                     $attachmentFiles[$i] = [
-                        "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$record->certificate_number.'.pdf',
+                        "pathinfo" => 'template_attachments/'.$template->id.'/'.$attachment->current_file_name,
                         "nameinfo" => $attachment->current_file_name,
                         "mimeinfo" => $attachment->doc_type,
                         "disk" => 'public'
@@ -579,5 +602,26 @@ class RecordController extends Controller
         $referenceNo = $prefix . $nextNumber;
 
         return $referenceNo;
+    }
+
+    function generatePdfFileName($record_id){
+        $record = Record::with('job', 'job.property')->find($record_id);
+        $address_line_1 = $record->job->property->address_line_1;
+        $address_line_2 = $record->job->property->address_line_2;
+        $postal_code = $record->job->property->postal_code;
+        $certificate_no = $record->certificate_number;
+
+        // Concatenate the fields
+        $fileName = "{$address_line_1}_{$address_line_2}_{$postal_code}_{$certificate_no}";
+        // Replace any non-alphanumeric characters with underscores
+        $fileName = preg_replace('/[^A-Za-z0-9\-]/', '_', $fileName);
+        // Replace multiple consecutive underscores with a single underscore
+        $fileName = preg_replace('/_+/', '_', $fileName);
+        // Trim underscores from start and end
+        $fileName = trim($fileName, '_');
+        // Optionally lowercase
+        $fileName = Str::lower($fileName);
+        // Add PDF extension
+        return $fileName . '.pdf';
     }
 }

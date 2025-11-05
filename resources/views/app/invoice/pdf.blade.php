@@ -58,11 +58,11 @@
         </style>
     </head>
     @php 
-        $invoiceItems = isset($record->available_options->invoiceItems) && !empty($record->available_options->invoiceItems) ? $record->available_options->invoiceItems : [];
-        $invoiceDiscounts = isset($record->available_options->invoiceDiscounts) && !empty($record->available_options->invoiceDiscounts) ? $record->available_options->invoiceDiscounts : [];
-        $invoiceAdvance = isset($record->available_options->invoiceAdvance) && !empty($record->available_options->invoiceAdvance) ? $record->available_options->invoiceAdvance : [];
-        $invoiceNotes = isset($record->available_options->invoiceNotes) && !empty($record->available_options->invoiceNotes) ? $record->available_options->invoiceNotes : '';
-        $invoiceExtra = isset($record->available_options->invoiceExtra) && !empty($record->available_options->invoiceExtra) ? $record->available_options->invoiceExtra : [];
+        $invoiceItems = isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems) ? $invoice->available_options->invoiceItems : [];
+        $invoiceDiscounts = isset($invoice->available_options->invoiceDiscounts) && !empty($invoice->available_options->invoiceDiscounts) ? $invoice->available_options->invoiceDiscounts : [];
+        $invoiceAdvance = isset($invoice->available_options->invoiceAdvance) && !empty($invoice->available_options->invoiceAdvance) ? $invoice->available_options->invoiceAdvance : [];
+        $invoiceNotes = isset($invoice->available_options->invoiceNotes) && !empty($invoice->available_options->invoiceNotes) ? $invoice->available_options->invoiceNotes : '';
+        $invoiceExtra = isset($invoice->available_options->invoiceExtra) && !empty($invoice->available_options->invoiceExtra) ? $invoice->available_options->invoiceExtra : [];
     @endphp
     <body>
         <table class="mb-60">
@@ -71,20 +71,20 @@
                     <img src="{{ $logoBase64 }}" alt="Gas Safe Engineer APP" style="width: 126px; height: auto; margin-bottom: 20px;">
                     <div class="titleLabel">Address to</div>
                     <div class="customerDetails">
-                        <div class="customerName font-medium">{{ $record->customer->full_name }}</div>
-                        <div class="customerAddress">{!! (isset($record->customer->full_address_html) ? $record->customer->full_address_html : '') !!}</div>
+                        <div class="customerName font-medium">{{ $invoice->customer->full_name }}</div>
+                        <div class="customerAddress">{!! (isset($invoice->customer->full_address_html) ? $invoice->customer->full_address_html : '') !!}</div>
                     </div>
                 </td>
                 <td class="invoiceDetails text-right v-top">
                     <div class="invoiceTitle font-bold">Invoice</div>
-                    <div class="invoiceRef font-bold text-primary">{{ $record->certificate_number }}</div>
-                    <div class="titleLabel mb-8">{{ $record->user->company->company_name }}</div>
-                    <div class="companyAddress">{!! (isset($record->user->company->full_address_html) ? $record->user->company->full_address_html : '') !!}</div>
-                    @if(isset($record->user->company->company_email) && !empty($record->user->company->company_email))
-                        <div>{{ $record->user->company->company_email }}</div>
+                    <div class="invoiceRef font-bold text-primary">{{ $invoice->invoice_number }}</div>
+                    <div class="titleLabel mb-8">{{ $invoice->user->company->company_name }}</div>
+                    <div class="companyAddress">{!! (isset($invoice->user->company->full_address_html) ? $invoice->user->company->full_address_html : '') !!}</div>
+                    @if(isset($invoice->user->company->company_email) && !empty($invoice->user->company->company_email))
+                        <div>{{ $invoice->user->company->company_email }}</div>
                     @endif
-                    @if(isset($record->user->company->company_phone) && !empty($record->user->company->company_phone))
-                        <div>{{ $record->user->company->company_phone }}</div>
+                    @if(isset($invoice->user->company->company_phone) && !empty($invoice->user->company->company_phone))
+                        <div>{{ $invoice->user->company->company_phone }}</div>
                     @endif
                     @if($invoiceExtra->non_vat_invoice != 1)
                         <div class="vatNumberField pt-10 mb-1">
@@ -98,14 +98,14 @@
                             <span>{{ date('jS F, Y', strtotime($invoiceExtra->issued_date)) }}</span>
                         </div>
                     @endif
-                    @if(!empty($record->job->reference_no) && !empty($record->job->reference_no))
+                    @if(!empty($invoice->job->reference_no) && !empty($invoice->job->reference_no))
                         <div class="mb-1">
                             <span class="font-bold mr-3">Job Ref No:</span>
-                            <span>{{ (isset($record->job->reference_no) ? $record->job->reference_no : '') }}</span>
+                            <span>{{ (isset($invoice->job->reference_no) ? $invoice->job->reference_no : '') }}</span>
                         </div>
                     @endif
                     <div class="titleLabel pt-10">Job Address</div>
-                    <div class="companyAddress">{!! (isset($record->job->property->full_address_html) ? $record->job->property->full_address_html : '') !!}</div>
+                    <div class="companyAddress">{!! (isset($invoice->job->property->full_address_html) ? $invoice->job->property->full_address_html : '') !!}</div>
                 </td>
             </tr>
         </table>
@@ -246,33 +246,33 @@
                     <table class="invoiceInfoTable">
                         <tr>
                             <td class="v-top" style="width: 250px;">
-                                @if(isset($record->user->company->bank->bank_name) && !empty($record->user->company->bank->bank_name))
+                                @if(isset($invoice->user->company->bank->bank_name) && !empty($invoice->user->company->bank->bank_name))
                                     <div class="mb-1">
                                         <span class="font-medium text-slate-400 inline-block w-140">Bank Name:</span>
-                                        <span class="inline-block">{{ $record->user->company->bank->bank_name }}</span>
+                                        <span class="inline-block">{{ $invoice->user->company->bank->bank_name }}</span>
                                     </div>
                                 @endif
-                                @if(isset($record->user->company->bank->name_on_account) && !empty($record->user->company->bank->name_on_account))
+                                @if(isset($invoice->user->company->bank->name_on_account) && !empty($invoice->user->company->bank->name_on_account))
                                     <div class="mb-1">
                                         <span class="font-medium text-slate-400 inline-block w-140">Account Name:</span>
-                                        <span class="inline-block">{{ $record->user->company->bank->name_on_account }}</span>
+                                        <span class="inline-block">{{ $invoice->user->company->bank->name_on_account }}</span>
                                     </div>
                                 @endif
-                                @if(isset($record->user->company->bank->sort_code) && !empty($record->user->company->bank->sort_code))
+                                @if(isset($invoice->user->company->bank->sort_code) && !empty($invoice->user->company->bank->sort_code))
                                     <div class="mb-1">
                                         <span class="font-medium text-slate-400 inline-block w-140">Sort Code:</span>
-                                        <span class="inline-block">{{ $record->user->company->bank->sort_code }}</span>
+                                        <span class="inline-block">{{ $invoice->user->company->bank->sort_code }}</span>
                                     </div>
                                 @endif
-                                @if(isset($record->user->company->bank->account_number) && !empty($record->user->company->bank->account_number))
+                                @if(isset($invoice->user->company->bank->account_number) && !empty($invoice->user->company->bank->account_number))
                                     <div class="mb-1">
                                         <span class="font-medium text-slate-400 inline-block w-140">Account Number:</span>
-                                        <span class="inline-block">{{ $record->user->company->bank->account_number }}</span>
+                                        <span class="inline-block">{{ $invoice->user->company->bank->account_number }}</span>
                                     </div>
                                 @endif
                                 <div class="mb-1">
                                     <span class="font-medium text-slate-400 inline-block w-140">Payment Ref:</span>
-                                    <span class="inline-block">{{ $record->invoice_number }}</span>
+                                    <span class="inline-block">{{ $invoice->invoice_number }}</span>
                                 </div>
 
                                 <div class="font-medium mb-4 pt-9">Payment Terms</div>

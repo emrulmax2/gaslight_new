@@ -1,0 +1,798 @@
+<?php
+
+namespace App\Http\Controllers\Records;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\JobAddressStoreRequest;
+use App\Http\Requests\OccupantDetailsStoreRequest;
+use App\Jobs\GCEMailerJob;
+use App\Mail\GCESendMail;
+use App\Models\Customer;
+use App\Models\CustomerContactInformation;
+use App\Models\CustomerJob;
+use App\Models\CustomerProperty;
+use App\Models\CustomerPropertyOccupant;
+use App\Models\Invoice;
+use App\Models\InvoiceOption;
+use App\Models\JobForm;
+use App\Models\JobFormEmailTemplate;
+use App\Models\JobFormPrefixMumbering;
+use App\Models\PaymentMethod;
+use App\Models\Record;
+use App\Models\User;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+class InvoiceController extends Controller
+{
+    public function index(){
+       $engineers = User::whereHas('companies', function($query) {
+                                $query->where('companies.user_id', Auth::id());
+                            })->select('id', 'name')->get();
+
+        $certificate_types = JobForm::where('parent_id', '!=',  0)->where('active', 1)->orderBy('id', 'ASC')->get();
+        return view('app.invoice.index', [
+            'title' => 'Invoices - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Invoice', 'href' => 'javascript:void(0);'],
+            ],
+            'engineers' => $engineers,
+            'certificate_types' => $certificate_types
+        ]);
+    }
+
+    public function list(Request $request){
+        $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
+
+        
+        $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
+        $sorts = [];
+        foreach($sorters as $sort):
+            $sorts[] = $sort['field'].' '.$sort['dir'];
+        endforeach;
+    
+        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])->orderByRaw(implode(',', $sorts));
+        if (!empty($queryStr)):
+            $query->whereHas('customer', function ($q) use ($queryStr) {
+                $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
+            })->orWhereHas('job.property', function ($q) use ($queryStr) {
+                $q->where(function($sq) use($queryStr){
+                    $sq->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
+                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
+                });
+            })->orWhereHas('occupant', function($q) use ($queryStr){
+                $q->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
+            });
+        endif;
+        $query->where('created_by', $request->user()->id);
+        $Query = $query->get();
+
+        $html = '';
+
+        if(!empty($Query) && $Query->count() > 0):
+            foreach($Query as $list):
+                $url = route('invoices.show', $list->id);
+
+                $html .= '<tr data-url="'.$url.'" class="invoiceRow cursor-pointer intro-x box border max-sm:px-3 max-sm:pt-2 max-sm:pb-2 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
+                    
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Serial No</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto">'.$list->invoice_number.'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Inspection Name</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->job->property->occupant_name ?? ($list->customer->full_name ?? '')).'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start flex-wrap">';
+                            $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Inspection Address</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->job->property->full_address ?? '').'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Landlord Name</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->customer->full_name ?? '').'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start flex-wrap">';
+                            $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Landlord Address</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->customer->full_address ?? '').'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Assigned To</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.(isset($list->user->name) ? $list->user->name : '').'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Created At</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal text-xs leading-[1.3] max-sm:ml-auto">'.($list->created_at ? $list->created_at->format('Y-m-d h:i A') : '').'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 border-none px-0 sm:px-3 py-3 sm:py-2 rounded-tr-none sm:rounded-tr rounded-br-none sm:rounded-br">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Status</label>';
+                            if($list->status == 'Cancelled'){
+                                $html .= '<button class="ml-auto font-medium bg-danger rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Cancelled</button>';
+                            }else if($list->status == 'Email Sent'){
+                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Email Sent</button>';
+                            }else if($list->status == 'Approved'){
+                                $html .= '<button class="ml-auto font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved</button>';
+                            }else{
+                                $html .= '<button class="ml-auto font-medium bg-pending rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Draft</button>';
+                            }
+                        $html .= '</div>';
+                    $html .= '</td>';
+                $html .= '</tr>';
+            endforeach;
+        else:
+            $html .= '<tr data-url="" class="intro-x box bg-pending bg-opacity-10 border border-pending border-opacity-5 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
+                $html .= '<td colspan="9" class="border-b dark:border-darkmode-300 border-none px-3 py-3 rounded">';
+                    $html .= '<div class="flex justify-center items-center text-pending">';
+                        $html .= 'No matching records found!';
+                    $html .= '</div>';
+                $html .= '</td>';
+            $html .= '</tr>';
+        endif;
+
+        return response()->json(['html' => $html], 200); 
+    }
+
+    public function create(JobForm $form){
+        $data = [
+            'title' => 'Create New Invoice - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Create Invoice', 'href' => 'javascript:void(0);'],
+                ['label' => $form->name, 'href' => 'javascript:void(0);'],
+            ],
+            'form' => JobForm::find(4),
+        ];
+        $user = User::find(auth()->user()->id);
+        $data['non_vat_invoice'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
+        $data['vat_number'] = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
+        $data['methods'] = PaymentMethod::where('active', 1)->orderBy('name', 'asc')->get();
+
+        return view('app.invoice.create', $data);
+    }
+
+
+    public function store(Request $request){
+        $user_id = $request->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+        $job_form_id = $request->job_form_id;
+        $form = JobForm::find($job_form_id);
+
+        $invoice_id = (isset($request->invoice_id) && $request->invoice_id > 0 ? $request->invoice_id : 0);
+        $customer_job_id = (isset($request->job_id) && $request->job_id > 0 ? $request->job_id : 0);
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+        $customer_property_id = (isset($request->customer_property_id) && $request->customer_property_id > 0 ? $request->customer_property_id : 0);
+        $property = CustomerProperty::find($customer_property_id);
+
+        /* Create Job If Empty */
+        if($customer_job_id == 0):
+            $jobRefNo = $this->generateReferenceNo($customer_id);
+            $customerJob = CustomerJob::create([
+                'customer_id' => $customer_id,
+                'customer_property_id' => $customer_property_id,
+                'description' => $form->name,
+                'details' => 'Job created for '.$property->full_address,
+                'reference_no' => $jobRefNo,
+                'customer_job_status_id' => 1,
+
+                'created_by' => auth()->user()->id
+            ]);
+            $customer_job_id = ($customerJob->id ? $customerJob->id : $customer_job_id);
+        endif;
+        /* Create Job If Empty */
+
+        /* Store or Update Record */
+        if($customer_job_id > 0):
+            $invoice = Invoice::updateOrCreate(['id' => $invoice_id, 'job_form_id' => $job_form_id ], [
+                'company_id' => auth()->user()->companies->pluck('id')->first(),
+                'customer_id' => $customer_id,
+                'customer_job_id' => $customer_job_id,
+                'job_form_id' => $job_form_id,
+                'customer_property_id' => $customer_property_id,
+                'customer_property_occupant_id' => (isset($request->customer_property_occupant_id) && $request->customer_property_occupant_id > 0 ? $request->customer_property_occupant_id : null),
+
+                'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d')),
+                'expire_date' => date('Y-m-d', strtotime("+30 days")),
+                
+                'updated_by' => $user_id,
+            ]);
+            
+            if($invoice->id):
+                $invoice_number = $this->generateInvoiceNumber($invoice->id);
+                $options = json_decode($request->options);
+                InvoiceOption::where('invoice_id', $invoice->id)->forceDelete();
+                if(!empty($options)):
+                    foreach($options as $key => $value):
+                        InvoiceOption::create([
+                            'invoice_id' => $invoice->id,
+                            'name' => $key,
+                            'value' => json_decode($value)
+                        ]);
+                    endforeach;
+                endif;
+
+                
+                $existRow = InvoiceOption::where('invoice_id', $invoice->id)->where('name', 'invoiceExtra')->get()->first();
+                $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
+                $invoiceExtra = [
+                    'non_vat_invoice' => (isset($request->non_vat_invoice) && $request->non_vat_invoice == 1 ? 1 : 0),
+                    'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                ];
+                if(!isset($theData->payment_term) || empty($theData->payment_term)):
+                    $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
+                else:
+                    $invoiceExtra['payment_term'] = $theData->payment_term;
+                endif;
+                InvoiceOption::where('invoice_id', $invoice->id)->where('name', 'invoiceExtra')->forceDelete();
+                InvoiceOption::create([
+                    'invoice_id' => $invoice->id,
+                    'name' => 'invoiceExtra',
+                    'value' => $invoiceExtra
+                ]);
+
+                return response()->json(['msg' => 'Invoice successfully created.', 'red' => route('invoices.show', $invoice->id)], 200);
+            else:
+                return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
+            endif;
+        else:
+            return response()->json(['msg' => 'Jobs not found. Please select a job.'], 304);
+        endif;
+        /* Store or Update Record */
+    }
+
+    public function show(Invoice $invoice){
+        $user_id = auth()->user()->id;
+        $invoice->load(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant']);
+        $form = JobForm::find($invoice->job_form_id);
+
+        $thePdf = $this->generatePdf($invoice->id);
+        return view('app.invoice.show', [
+            'title' => 'Records - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Invoice', 'href' => 'javascript:void(0);'],
+                ['label' => 'Show', 'href' => 'javascript:void(0);'],
+            ],
+            'form' => $form,
+            'invoice' => $invoice,
+            'thePdf' => $thePdf
+        ]);
+    }
+
+    public function editReady(Request $request){
+        $invoice_id = $request->invoice_id;
+
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
+                    ->find($invoice_id);
+        $data = [
+            'invoice_id' => $invoice->id,
+            'invoice_number' => $invoice->invoice_number,
+            'invoice' => [
+                'status' => $invoice->status,
+                'pay_status' => $invoice->pay_status,
+                'expire_date' => $invoice->expire_date,
+            ],
+            'issued_date' => (isset($invoice->issued_date) && !empty($invoice->issued_date) ? date('d-m-Y', strtotime($invoice->issued_date)) : ''),
+            'job' => $invoice->job,
+            'customer' => $invoice->customer,
+            'job_address' => $invoice->job->property,
+            'occupant' => [
+                'customer_property_occupant_id' => $invoice->customer_property_occupant_id,
+                'occupant_name' => (isset($invoice->occupant->occupant_name) && !empty($invoice->occupant->occupant_name) ? $invoice->occupant->occupant_name : ''),
+                'occupant_email' => (isset($invoice->occupant->occupant_email) && !empty($invoice->occupant->occupant_email) ? $invoice->occupant->occupant_email : ''),
+                'occupant_phone' => (isset($invoice->occupant->occupant_phone) && !empty($invoice->occupant->occupant_phone) ? $invoice->occupant->occupant_phone : ''),
+            ]
+        ];
+
+        $data['invoiceItemsCount'] = 0;
+        $data['invoiceItems'] = $data['invoiceDiscounts'] = $data['invoiceAdvance'] = $data['invoiceExtra'] = [];
+        $data['invoiceNotes'] = (isset($invoice->available_options->invoiceNotes) && !empty($invoice->available_options->invoiceNotes) ? $invoice->available_options->invoiceNotes : '');
+        
+        if(isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems)):
+            if(isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems)):
+                $q = 1;
+                foreach($invoice->available_options->invoiceItems as $item):
+                    $data['invoiceItems'][$q] = (array) $item;
+
+                    $data['invoiceItemsCount'] += 1;
+                    $q++;
+                endforeach;
+            endif;
+        endif;
+        if(isset($invoice->available_options->invoiceDiscounts) && !empty($invoice->available_options->invoiceDiscounts)):
+            $invoiceDiscounts = (array) $invoice->available_options->invoiceDiscounts;
+            $data['invoiceDiscounts'] = $invoiceDiscounts;
+        endif;
+        if(isset($invoice->available_options->invoiceExtra) && !empty($invoice->available_options->invoiceExtra)):
+            $invoiceExtra = (array) $invoice->available_options->invoiceExtra;
+            $data['invoiceExtra'] = $invoiceExtra;
+        endif;
+        if(isset($invoice->available_options->invoiceAdvance) && !empty($invoice->available_options->invoiceAdvance)):
+            $invoiceAdvance = (array) $invoice->available_options->invoiceAdvance;
+            $data['invoiceAdvance'] = $invoiceAdvance;
+        endif;
+        //$data = array_merge($data, $optionData);
+        //dd($optionData);
+
+        return response()->json(['row' => $data, 'form' => $invoice->job_form_id, 'red' => route('invoices.create')], 200);
+    }
+
+    public function invoiceAction(Request $request){
+        $user_id = auth()->user()->id;
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
+                    ->find($request->invoice_id);
+        $form = JobForm::find($invoice->job_form_id);
+        $submit_type = $request->submit_type;
+
+        $fileName = $this->generatePdfFileName($invoice->id);
+        $pdf = Storage::disk('public')->url('invoices/'.$invoice->created_by.'/'.$fileName);
+
+        if($submit_type == 2 || $submit_type == 3):
+            if($submit_type == 3 && $request->has('customer_email') && !empty($request->customer_email)):
+                CustomerContactInformation::where('customer_id', $invoice->customer_id)->update(['email' => $request->customer_email]);
+            endif;
+            $data = [];
+            $data['status'] = 'Send';
+
+            Invoice::where('id', $request->invoice_id)->update($data);
+
+            $email = $this->sendEmail($request->invoice_id);
+            $message = (!$email ? 'Invoice status has been updated to Send. Email cannot be sent due to an invalid or empty email address.' : 'Invoice has been approved and a copy of the invoice mailed to the customer');
+        endif;
+
+        return response()->json(['msg' => $message, 'red' => route('invoices.show', $request->invoice_id), 'pdf' => $pdf]);
+    }
+
+    public function sendEmail($invoice_id){
+        $invoice = Invoice::with([
+            'customer', 
+            'property', 
+            'customer.address', 
+            'customer.contact', 
+            'job', 
+            'job.property', 
+            'job.calendar',
+            'job.calendar.slot',
+            'form', 
+            'user', 
+            'user.company'])->find($invoice_id);
+        $user_id = (isset($invoice->created_by) && $invoice->created_by > 0 ? $invoice->created_by : auth()->user()->id);
+        $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
+        $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
+        if(!empty($customerEmail)):
+            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $invoice->job_form_id)->get()->first();
+            $emailData = ($template ? $this->renderEmailTemplate($invoice, $template) : []);
+
+            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $invoice->form->name);
+            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
+            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
+            $ccMail[] = $invoice->user->email;
+
+            if($content == ''):
+                $content .= 'Hi '.$customerName.',<br/><br/>';
+                $content .= 'Please check attachment for details.<br/><br/>';
+                $content .= 'Thanks & Regards<br/>';
+                $content .= env('APP_NAME', 'Gas Safety Engineer');
+            endif;
+            
+            $sendTo = [$customerEmail];
+            $configuration = [
+                'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
+                'smtp_port' => env('MAIL_PORT', '587'),
+                'smtp_username' => env('MAIL_USERNAME', 'info@gascertificate.co.uk'),
+                'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
+                'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+                
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
+                'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+            ];
+            //from_name: Company Name
+            // Replay to: engineer or company email.
+
+            $attachmentFiles = [];
+            $fileName = $this->generatePdfFileName($invoice->id); 
+            if (Storage::disk('public')->exists('invoices/'.$invoice->created_by.'/'.$fileName)):
+                $attachmentFiles[0] = [
+                    "pathinfo" => 'invoices/'.$invoice->created_by.'/'.$fileName,
+                    "nameinfo" => $fileName,
+                    "mimeinfo" => 'application/pdf',
+                    "disk" => 'public'
+                ];
+            endif;
+            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
+                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            endif;
+
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles), $ccMail);
+            return true;
+        else:
+            return false;
+        endif;
+    }
+
+    public function renderEmailTemplate(Invoice $invoice, JobFormEmailTemplate $template): array {
+        // Build shortcode replacements
+        $companyName = $invoice->user->companies->pluck('company_name')->first();
+        $shortcodes = [
+            ':customername'         => $invoice->customer->full_name ?? '',
+            ':customercompany'      => $invoice->customer->company_name ?? '',
+            ':jobref'               => $invoice->job->reference_no ?? '',
+            ':jobbuilding'          => isset($invoice->job->property->address_line_1) && !empty($invoice->job->property->address_line_1) ? $invoice->job->property->address_line_1 : '',
+            ':jobstreet'            => isset($invoice->job->property->address_line_2) && !empty($invoice->job->property->address_line_1) ? $invoice->job->property->address_line_2 : '',
+            ':jobregion'            => isset($invoice->job->property->state) && !empty($invoice->job->property->state) ? $invoice->job->property->state : '',
+            ':jobpostcode'          => isset($invoice->job->property->postal_code) && !empty($invoice->job->property->postal_code) ? $invoice->job->property->postal_code : '',
+            ':jobtown'              => isset($invoice->job->property->city) && !empty($invoice->job->property->city) ? $invoice->job->property->city : '',
+            ':propertyaddress'      => isset($invoice->property->full_address) && !empty($invoice->property->full_address) ? $invoice->property->full_address : '',
+            ':contactphone'         => isset($invoice->user->mobile) && !empty($invoice->user->mobile) ? $invoice->user->mobile : '',
+            ':companyname'          => $companyName ?? '',
+            ':engineername'         => $invoice->user->name ?? '',
+            ':eventdate'            => isset($invoice->job->calendar->date) && !empty($invoice->job->calendar->date) ? date('d-m-Y', strtotime($invoice->job->calendar->date)) : '',
+            ':eventtime'            => (isset($invoice->job->calendar->slot->start) && !empty($invoice->job->calendar->slot->start) ? date('H:i', strtotime($invoice->job->calendar->slot->start)) : '').(isset($invoice->job->calendar->slot->end) && !empty($invoice->job->calendar->slot->end) ? ' - '.date('H:i', strtotime($invoice->job->calendar->slot->end)) : ''),
+            // Add more shortcodes as needed
+        ];
+
+        // Replace shortcodes in subject and content
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+
+        $attachmentFiles = [];
+        if(isset($template->attachment) && $template->attachment->count() > 0):
+            $i = 1;
+            foreach($template->attachment as $attachment):
+                if(isset($attachment->download_url) && !empty($attachment->download_url)):
+                    $attachmentFiles[$i] = [
+                        "pathinfo" => 'template_attachments/'.$template->id.'/'.$attachment->current_file_name,
+                        "nameinfo" => $attachment->current_file_name,
+                        "mimeinfo" => $attachment->doc_type,
+                        "disk" => 'public'
+                    ];
+                    $i++;
+                endif;
+            endforeach;
+        endif;
+
+        return [
+            'subject' => $subject,
+            'content' => $content,
+            'attachmentFiles' => $attachmentFiles,
+            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
+        ];
+    }
+
+    public function generatePdf($invoice_id){
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($invoice_id);
+       
+        //dd($record->available_options->invoiceItems);
+        $logoPath = resource_path('images/gas_safe_register_yellow.png');
+        $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        $report_title = 'Invoice of '.$invoice->invoice_number;
+
+        $userSignBase64 = (isset($record->user->signature) && Storage::disk('public')->exists($record->user->signature->filename) ? 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get($record->user->signature->filename)) : '');
+        
+        $VIEW = 'app.invoice.pdf';
+        $fileName = $this->generatePdfFileName($invoice->id); 
+        if (Storage::disk('public')->exists('invoices/'.$invoice->created_by.'/'.$fileName)) {
+            Storage::disk('public')->delete('invoices/'.$invoice->created_by.'/'.$fileName);
+        }
+        $pdf = Pdf::loadView($VIEW, compact('invoice', 'logoBase64', 'report_title', 'userSignBase64'))
+            ->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
+            ->setPaper('a4', 'portrait') //portrait landscape
+            ->setWarnings(false);
+        $content = $pdf->output();
+        Storage::disk('public')->put('invoices/'.$invoice->created_by.'/'.$fileName, $content );
+
+        return Storage::disk('public')->url('invoices/'.$invoice->created_by.'/'.$fileName);
+    }
+
+    function generatePdfFileName($invoice_id){
+        $invoice = Invoice::with('job', 'job.property')->find($invoice_id);
+        $address_line_1 = $invoice->job->property->address_line_1;
+        $address_line_2 = $invoice->job->property->address_line_2;
+        $postal_code = $invoice->job->property->postal_code;
+        $invoice_number = $invoice->invoice_number;
+
+        // Concatenate the fields
+        $fileName = "{$address_line_1}_{$address_line_2}_{$postal_code}_{$invoice_number}";
+        // Replace any non-alphanumeric characters with underscores
+        $fileName = preg_replace('/[^A-Za-z0-9\-]/', '_', $fileName);
+        // Replace multiple consecutive underscores with a single underscore
+        $fileName = preg_replace('/_+/', '_', $fileName);
+        // Trim underscores from start and end
+        $fileName = trim($fileName, '_');
+        // Optionally lowercase
+        $fileName = Str::lower($fileName);
+        // Add PDF extension
+        return $fileName . '.pdf';
+    }
+
+    public function generateInvoiceNumber($invoice_id){
+        $invoice = Invoice::find($invoice_id);
+        $user_id = $invoice->created_by;
+        if(empty($invoice->invoice_number)):
+            $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $invoice->job_form_id)->orderBy('id', 'DESC')->get()->first();
+            $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+            $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+            $userLastInvoice = Invoice::where('created_by', $user_id)->where('id', '!=', $invoice_id)->orderBy('id', 'DESC')->get()->first();
+            $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
+
+             $cerSerial = $starting_form;
+            if(!empty($lastInvoiceNo)):
+                preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+                $cerSerial = isset($invoiceNumbers[1]) ? ((int) $invoiceNumbers[1]) + 1 : $starting_form;
+            endif;
+            $invoiceNumber = $prifix . $cerSerial;
+            Invoice::where('id', $invoice_id)->update(['invoice_number' => $invoiceNumber]);
+
+            return $invoiceNumber;
+        else:
+            return false;
+        endif;
+    }
+
+    private function generateReferenceNo($customerId){
+        $customer = Customer::find($customerId);
+        if (!$customer) return null;
+        
+        $nameParts = explode(' ', trim($customer->company_name));
+        $prefix = '';
+        foreach ($nameParts as $part):
+            $prefix .= strtoupper(substr($part, 0, 1));
+        endforeach;
+        $lastJob = CustomerJob::where('customer_id', $customerId)->orderBy('id', 'desc')->first();
+
+        if ($lastJob && preg_match('/\d+$/', $lastJob->reference_no, $matches)):
+            $nextNumber = intval($matches[0]) + 1;
+        else:
+            $nextNumber = 1;
+        endif;
+        $referenceNo = $prefix . $nextNumber;
+
+        return $referenceNo;
+    }
+
+    public function getJobs(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+
+        $html = '';
+        $query = CustomerJob::with('customer', 'customer.address', 'property', 'priority', 'thestatus')->where('created_by', $user_id)->orderBy('id', 'DESC')->get();
+        if($query->count() > 0):
+            $html .= '<div class="results existingAddress">';
+                $i = 1;
+                foreach($query as $job):
+                    $html .= '<div data-id="'.$job->id.'" data-description="'.(!empty($job->description) ? $job->description : '').(isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '').(isset($job->customer->address->postal_code) && !empty($job->customer->address->postal_code) ? ' ('.$job->customer->address->postal_code.')' : '').'" class="customerJobItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
+                        $html .= '<div>';
+                            $html .= '<div class="group relative flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="briefcase" class="theIcon lucide lucide-briefcase stroke-1.5 h-4 w-4 text-primary"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>';
+                                $html .= '<span style="display: none;" class="h-4 w-4 theLoader absolute left-0 top-0 bottom-0 right-0 m-auto"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#0d9488"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span>';
+                            $html .= '</div>';
+                        $html .= '</div>';
+                        $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                            $html .= '<div>';
+                                $html .= '<div class="whitespace-normal font-medium">';
+                                    $html .= $job->description;
+                                $html .= '</div>';
+                                $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                                    $html .= (isset($job->customer->full_name) && !empty($job->customer->full_name) ? $job->customer->full_name : '');
+                                    $html .= (isset($job->customer->address->postal_code) && !empty($job->customer->address->postal_code) ? ' ('.$job->customer->address->postal_code.')' : '');
+                                $html .= '</div>';
+                            $html .= '</div>';
+                        $html .= '</div>';
+                    $html .= '</div>';
+
+                    $i++;
+                endforeach;
+            $html .= '</div>';
+
+            return response()->json(['suc' => 1, 'html' => $html], 200);
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-warning border-warning bg-opacity-20 border-opacity-5 text-warning dark:border-warning dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-circle" class="lucide lucide-alert-circle stroke-1.5 mr-2 h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><span><strong>Oops!</strong> No jobs found.</span></div>';
+            return response()->json(['suc' => 2, 'html' => $html], 200);
+        endif;
+    }
+
+    public function linkedJob(Request $request){
+        $job_id = $request->job_id;
+        $job = CustomerJob::with('customer', 'customer.address', 'property')->find($job_id);
+
+        return response()->json(['row' => $job], 200);
+    }
+
+    public function getCustomers(Request $request){
+        $user_id = auth()->user()->id;
+        $job_form_id = $request->job_form_id;
+
+        $html = '';
+        $query = Customer::with('address', 'contact')->where('created_by', $user_id)->get();
+        $groupedCustomer = $query->groupBy(function ($item) {
+            $full_names = explode(' ', $item->full_name);
+            return strtoupper(substr($full_names[0], 0, 1));
+        })->sortKeys();
+        
+        if($query->count() > 0):
+            foreach($groupedCustomer as $letter => $customers):
+                $html .= '<div class="box mb-0 shadow-none rounded-none border-none customersContainer">';
+                    $html .= '<div class="flex flex-col items-center bg-slate-100 px-3 py-3 dark:border-darkmode-400 sm:flex-row">';
+                        $html .= '<h2 class="mr-auto font-medium uppercase text-dark">';
+                            $html .= $letter;
+                        $html .= '</h2>';
+                    $html .= '</div>';
+                    $html .= '<div class="results existingAddress">';
+                        $i = 1;
+                        foreach($customers as $customer):
+                            $allWords = explode(' ', $customer->full_name);
+                            $label = (isset($allWords[0]) && !empty($allWords[0]) ? mb_substr($allWords[0], 0, 1) : '').(count($allWords) > 1 ? mb_substr(end($allWords), 0, 1) : '');
+                            
+                            $html .= '<div data-id="'.$customer->id.'" data-description="'.$customer->full_name.' '.$customer->postal_code.'" class="customerItem flex items-center cursor-pointer '.($i != $customers->count() ? ' border-b border-slate-100 ' : '').' bg-white px-3 py-3">';
+                                $html .= '<div>';
+                                    $html .= '<div class="group relative flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                        $html .= '<span class="text-primary text-xs uppercase font-medium">'.$label.'</span>';
+                                        //$html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" class="lucide lucide-users stroke-1.5 h-4 w-4 text-primary"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+                                        $html .= '<span style="display: none;" class="h-4 w-4 theLoader absolute left-0 top-0 bottom-0 right-0 m-auto"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#0d9488"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span>';
+                                    $html .= '</div>';
+                                $html .= '</div>';
+                                $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                                    $html .= '<div>';
+                                        $html .= '<div class="whitespace-normal font-medium">';
+                                            $html .= $customer->full_name;
+                                        $html .= '</div>';
+                                        $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                                            $html .= (isset($customer->full_address) && !empty($customer->full_address) ? $customer->full_address : 'N/A');
+                                        $html .= '</div>';
+                                    $html .= '</div>';
+                                $html .= '</div>';
+                            $html .= '</div>';
+    
+                            $i++;
+                        endforeach;
+                    $html .= '</div>';
+                $html .= '</div>';
+            endforeach;
+
+            return response()->json(['suc' => 1, 'html' => $html], 200);
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-warning border-warning bg-opacity-20 border-opacity-5 text-warning dark:border-warning dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-circle" class="lucide lucide-alert-circle stroke-1.5 mr-2 h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><span><strong>Oops!</strong> No jobs found.</span></div>';
+            return response()->json(['suc' => 2, 'html' => $html], 200);
+        endif;
+    }
+
+    public function getLInkedCustomer(Request $request){
+        $customer = Customer::with('address')->find($request->customer_id);
+
+        return response()->json(['customer' => $customer], 200);
+    }
+
+    public function getJobAddressrs(Request $request){
+        $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
+
+        $html = '';
+        $query = CustomerProperty::with('customer')->where('customer_id', $customer_id)->orderBy('address_line_1', 'ASC')->get();
+        if($query->count() > 0):
+            $html .= '<div class="results existingAddress">';
+                $i = 1;
+                foreach($query as $property):
+                    $html .= '<div data-id="'.$property->id.'" data-occupant="'.(!empty($property->occupant_name) ? $property->occupant_name : $property->customer->full_name).'" data-address="'.$property->full_address.'" class="customerJobAddressItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
+                        $html .= '<div>';
+                            $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin h-4 w-4 stroke-[1.3] text-primary"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
+                            $html .= '</div>';
+                        $html .= '</div>';
+                        $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                            $html .= '<div>';
+                                $html .= '<div class="whitespace-nowrap font-medium">';
+                                    $html .= $property->address_line_1.' '.$property->address_line_2;
+                                $html .= '</div>';
+                                $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                                    $html .= $property->city.', '.$property->postal_code.', '.$property->country;
+                                $html .= '</div>';
+                            $html .= '</div>';
+                        $html .= '</div>';
+                    $html .= '</div>';
+
+                    $i++;
+                endforeach;
+            $html .= '</div>';
+
+            return response()->json(['suc' => 1, 'html' => $html], 200);
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-warning border-warning bg-opacity-20 border-opacity-5 text-warning dark:border-warning dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-circle" class="lucide lucide-alert-circle stroke-1.5 mr-2 h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><span><strong>Oops!</strong> The customer does not have any job addresses.</span></div>';
+            return response()->json(['suc' => 2, 'html' => $html], 200);
+        endif;
+    }
+
+    public function storeJobAddress(JobAddressStoreRequest $request){
+        $customer_id = $request->customer_id;
+        $customer = Customer::find($customer_id);
+
+        $data = [
+            'customer_id' => $request->customer_id,
+            'address_line_1' => (!empty($request->address_line_1) ? $request->address_line_1 : null),
+            'address_line_2' => (!empty($request->address_line_2) ? $request->address_line_2 : null),
+            'postal_code' => $request->postal_code,
+            'state' => (!empty($request->state) ? $request->state : null),
+            'city' => $request->city,
+            'country' => (!empty($request->country) ? $request->country : null),
+            'latitude' => (!empty($request->latitude) ? $request->latitude : null),
+            'longitude' => (!empty($request->longitude) ? $request->longitude : null),
+            'created_by' => $request->user()->id,
+        ];
+        $address = CustomerProperty::create($data);
+
+        if($address->id):
+            return response()->json(['msg' => 'Customer Job Addresses successfully created.', 'red' => '', 'address' => $address, 'id' => $address->id], 200);
+        else:
+            return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
+        endif;
+    }
+
+    public function getJobAddressOccupent(Request $request){
+        $property_id = (isset($request->property_id) && $request->property_id > 0 ? $request->property_id : 0);
+
+        $html = '';
+        $occupants = CustomerPropertyOccupant::where('customer_property_id', $property_id)->where('active', 1)->get();
+        if($occupants->count() > 0):
+            $html .= '<div class="results existingOccupant">';
+                foreach($occupants as $occupant):
+                    $html .= '<div data-id="'.$occupant->id.'" data-occupant="'.(!empty($occupant->occupant_name) ? $occupant->occupant_name : '').'" class="jobAddressOccupantItem flex items-center cursor-pointer bg-white px-3 py-3 mb-2">';
+                        $html .= '<div>';
+                            $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
+                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 h-4 w-4 text-success"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+                            $html .= '</div>';
+                        $html .= '</div>';
+                        $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
+                            $html .= '<div>';
+                                $html .= '<div class="whitespace-nowrap font-medium">';
+                                    $html .= $occupant->occupant_name;
+                                $html .= '</div>';
+                                $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
+                                    $html .= (!empty($occupant->occupant_email) ? $occupant->occupant_email : (!empty($occupant->occupant_phone) ? $occupant->occupant_phone : ''));
+                                $html .= '</div>';
+                            $html .= '</div>';
+                        $html .= '</div>';
+                    $html .= '</div>';
+                endforeach;
+            $html .= '</div>';
+
+            return response()->json(['suc' => 1, 'html' => $html], 200);
+        else:
+            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-warning border-warning bg-opacity-20 border-opacity-5 text-warning dark:border-warning dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-circle" class="lucide lucide-alert-circle stroke-1.5 mr-2 h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><span><strong>Opps!</strong> The address does not have any occupant details.</span></div>';
+            return response()->json(['suc' => 2, 'html' => $html], 200);
+        endif;
+    }
+
+    public function storeJobAddressOccupent(OccupantDetailsStoreRequest $request){
+        try{
+            $property_id = $request->customer_property_id;
+
+            $occupantName = (!empty($request->occupant_name) ? $request->occupant_name : null);
+            $occupant = CustomerPropertyOccupant::create([
+                'customer_property_id' => $property_id,
+                'occupant_name' => (!empty($request->occupant_name) ? ucwords($request->occupant_name) : null),
+                'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
+                'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
+                'active' => 1,
+                'created_by' => $request->user()->id,
+            ]);
+            return response()->json(['msg' => 'Customer Job Addresses occupant details successfully created.', 'red' => '', 'occupant' => $occupantName, 'id' => $occupant->id], 200);
+        }catch( Exception $d){
+            return response()->json(['msg' => 'Something went wrong. Please try again later.', 'red' => ''], 422);
+        }
+    }
+}

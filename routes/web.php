@@ -35,6 +35,7 @@ use App\Http\Middleware\SuperAdminLoggedIn;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\InvoiceController;
 use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
@@ -385,6 +386,27 @@ Route::middleware(Authenticate::class)->group(function() {
             Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
 
             Route::post('records/destroy-document', 'destroyJobSheetDoc')->name('records.destroy.job.sheet.doc');
+        });
+        Route::controller(InvoiceController::class)->group(function() {
+            Route::get('invoices', 'index')->name('invoices');
+            Route::get('invoices/list', 'list')->name('invoices.list');
+            Route::get('invoices/create', 'create')->name('invoices.create');
+            Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
+
+            Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
+            Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
+            Route::post('invoices/get-customers', 'getCustomers')->name('invoices.get.customers');
+            Route::post('invoices/get-linked-customer', 'getLInkedCustomer')->name('invoices.linked.customer');
+            Route::post('invoices/get-job-addresses', 'getJobAddressrs')->name('invoices.get.job.addresses');
+            Route::post('invoices/store-job-address', 'storeJobAddress')->name('invoices.store.job.addresses');
+            Route::post('invoices/get-job-address-occupant', 'getJobAddressOccupent')->name('invoices.get.job.address.occupant');
+            Route::post('invoices/store-job-address-occupant', 'storeJobAddressOccupent')->name('invoices.store.job.address.occupant');
+
+            Route::post('invoices/store', 'store')->name('invoices.store');
+            Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
+
+            Route::post('invoices/edit-ready', 'editReady')->name('invoices.edit.ready');
+            Route::post('invoices/action', 'invoiceAction')->name('invoices.action');
         });
     });
     

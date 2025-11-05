@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\GlobalApiController;
 use App\Http\Controllers\Api\Jobs\JobsController;
 use App\Http\Controllers\Api\Pricing\PricingPackageController;
+use App\Http\Controllers\Api\Records\InvoiceController;
 use App\Http\Controllers\Api\Records\RecordAndDraftController;
 use App\Http\Controllers\Api\Records\RecordController;
 use App\Http\Controllers\Api\UserController;
@@ -195,6 +196,14 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('quote-number', 'getQuoteNumber');    
             Route::get('records/jobs/{form_id}', 'getJobs');
             Route::get('vat-status/{user_id}', 'vatStatusNumber');
+        });
+
+        Route::controller(InvoiceController::class)->group(function() {
+            Route::get('invoices/list', 'list');
+            Route::post('invoices/store', 'store');
+            Route::get('invoices/edit/{invoice_id}', 'edit');
+            Route::get('invoices/send/{invoice_id}', 'send');
+            Route::get('invoices/download/{invoice_id}', 'download');
         });
 
     });

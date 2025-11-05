@@ -92,7 +92,7 @@
     $('.editRecordBtn').on('click', function(e){
         e.preventDefault();
         var $theBtn = $(this);
-        var record_id = $theBtn.attr('data-id');
+        var invoice_id = $theBtn.attr('data-id');
 
         $theBtn.addClass('active').attr('disabled', 'disabled');
         $theBtn.find('.theLoader').fadeIn();
@@ -100,8 +100,8 @@
 
         axios({
             method: "post",
-            url: route('records.edit.ready'),
-            data: {record_id : record_id},
+            url: route('invoices.edit.ready'),
+            data: {invoice_id : invoice_id},
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             if (response.status == 200) {
@@ -111,73 +111,35 @@
                 let row = response.data.row;
                 let form_id = response.data.form;
                 
-                localStorage.setItem('certificate_id', row.certificate_id);
-                localStorage.setItem('certificate_number', JSON.stringify(row.certificate_number));
-                localStorage.setItem('certificate', JSON.stringify(row.certificate));
+                localStorage.setItem('invoice_id', row.invoice_id);
+                localStorage.setItem('invoice_number', JSON.stringify(row.invoice_number));
+                localStorage.setItem('invoice', JSON.stringify(row.invoice));
                 localStorage.setItem('job', JSON.stringify(row.job));
                 localStorage.setItem('customer', JSON.stringify(row.customer));
                 localStorage.setItem('job_address', JSON.stringify(row.job_address));
                 localStorage.setItem('occupant', JSON.stringify(row.occupant));
 
-
-                if(form_id == 6 || form_id == 7){
-                    localStorage.setItem('safetyChecksAnswered', row.safetyChecksAnswered);
-                    localStorage.setItem('safetyChecks', JSON.stringify(row.safetyChecks));
-                    localStorage.setItem('commentssAnswered', row.commentssAnswered);
-                    localStorage.setItem('gsrComments', JSON.stringify(row.gsrComments));
-                    localStorage.setItem('applianceCount', row.applianceCount);
-                    localStorage.setItem('appliances', JSON.stringify(row.appliances));
-                }else if(form_id == 8 || form_id == 9 || form_id == 10 || form_id == 13){
-                    localStorage.setItem('appliances', JSON.stringify(row.appliances));
-                }else if(form_id == 15){
-                    localStorage.setItem('powerFlushChecklist', JSON.stringify(row.powerFlushChecklist));
-                    localStorage.setItem('checklistAnswered', row.checklistAnswered);
-                    localStorage.setItem('radiatorCount', row.radiatorCount);
-                    localStorage.setItem('radiators', JSON.stringify(row.radiators));
-                }else if(form_id == 16){
-                    localStorage.setItem('appliances', JSON.stringify(row.appliances));
-                    localStorage.setItem('applianceAnswered', row.applianceAnswered);
-                }else if(form_id == 17){
-                    localStorage.setItem('unventedSystems', JSON.stringify(row.unventedSystems));
-                    localStorage.setItem('inspectionRecords', JSON.stringify(row.inspectionRecords));
-                    localStorage.setItem('systemAnswered', JSON.stringify(row.systemAnswered));
-                    localStorage.setItem('inspectionAnswered', JSON.stringify(row.inspectionAnswered));
-                }else if(form_id == 18){
-                    localStorage.setItem('jobSheets', JSON.stringify(row.jobSheets));
-                    localStorage.setItem('jobSheetAnswered', JSON.stringify(row.jobSheetAnswered));
-                    localStorage.setItem('jobSheetDocuments', row.jobSheetDocuments);
-                }else if(form_id == 3){
-                    if(row.quoteNotes){
-                        localStorage.setItem('quoteNotes', JSON.stringify(row.quoteNotes));
-                    }
-                    if(row.quoteItems){
-                        localStorage.setItem('quoteItemsCount', row.quoteItemsCount);
-                        localStorage.setItem('quoteItems', JSON.stringify(row.quoteItems));
-                    }
-                    if(row.quoteDiscounts){
-                        localStorage.setItem('quoteDiscounts', JSON.stringify(row.quoteDiscounts));
-                    }
-                    if(row.quoteExtra){
-                        localStorage.setItem('quoteExtra', JSON.stringify(row.quoteExtra));
-                    }
-                }else if(form_id == 4){
-                    if(row.invoiceNotes){
-                        localStorage.setItem('invoiceNotes', JSON.stringify(row.invoiceNotes));
-                    }
-                    if(row.invoiceItems){
-                        localStorage.setItem('invoiceItemsCount', row.invoiceItemsCount);
-                        localStorage.setItem('invoiceItems', JSON.stringify(row.invoiceItems));
-                    }
-                    if(row.invoiceDiscounts){
-                        localStorage.setItem('invoiceDiscounts', JSON.stringify(row.invoiceDiscounts));
-                    }
-                    if(row.invoiceAdvance){
-                        localStorage.setItem('invoiceAdvance', JSON.stringify(row.invoiceAdvance));
-                    }
-                    if(row.invoiceExtra){
-                        localStorage.setItem('invoiceExtra', JSON.stringify(row.invoiceExtra));
-                    }
+                
+                if(row.invoiceNotes){
+                    localStorage.setItem('invoiceNotes', JSON.stringify(row.invoiceNotes));
                 }
+                if(row.issued_date){
+                    localStorage.setItem('issued_date', JSON.stringify(row.issued_date));
+                }
+                if(row.invoiceItems){
+                    localStorage.setItem('invoiceItemsCount', row.invoiceItemsCount);
+                    localStorage.setItem('invoiceItems', JSON.stringify(row.invoiceItems));
+                }
+                if(row.invoiceDiscounts){
+                    localStorage.setItem('invoiceDiscounts', JSON.stringify(row.invoiceDiscounts));
+                }
+                if(row.invoiceAdvance){
+                    localStorage.setItem('invoiceAdvance', JSON.stringify(row.invoiceAdvance));
+                }
+                if(row.invoiceExtra){
+                    localStorage.setItem('invoiceExtra', JSON.stringify(row.invoiceExtra));
+                }
+                
 
                 window.location.href = response.data.red
             }
@@ -208,7 +170,7 @@
             form_data.append('submit_type', 3);
             axios({
                 method: "post",
-                url: route('records.action'),
+                url: route('invoices.action'),
                 data: form_data,
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
@@ -254,4 +216,55 @@
         }
     });
 
+    $(document).on('click', '#createInvoiceBtn', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        let record_id = $theBtn.attr('data-id');
+
+        confirmModal.show();
+        document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
+            $('#confirmModal .confirmModalTitle').html('Are you sure?');
+            $('#confirmModal .confirmModalDesc').html('Do you really want to create an invoice for this certificate? Click on agree to continue.');
+            $('#confirmModal .agreeWith').attr('data-id', record_id);
+            $('#confirmModal .agreeWith').attr('data-action', 'CREATEINVOICE');
+        });
+    });
+
+    // Confirm Modal Action
+    $('#confirmModal .agreeWith').on('click', function(){
+        let $agreeBTN = $(this);
+        let row_id = $agreeBTN.attr('data-id');
+        let action = $agreeBTN.attr('data-action');
+
+        $('#confirmModal button').attr('disabled', 'disabled');
+        if(action == 'CREATEINVOICE'){
+            axios({
+                method: 'post',
+                url: route('records.create.invoice'),
+                data: {record_id : row_id},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    $('#confirmModal button').removeAttr('disabled');
+                    confirmModal.hide();
+
+                    successModal.show();
+                    document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#successModal .successModalTitle").html("Congratulations!");
+                        $("#successModal .successModalDesc").html(response.data.msg);
+                        $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                    });
+
+                    setTimeout(() => {
+                        successModal.hide();
+                        if(response.data.red){
+                            window.location.href = response.data.red
+                        }
+                    }, 1500);
+                }
+            }).catch(error =>{
+                console.log(error)
+            });
+        }
+    })
 })()
