@@ -459,6 +459,8 @@ class RecordController extends Controller
             'user', 
             'user.company'])->find($record_id);
         $user_id = (isset($record->created_by) && $record->created_by > 0 ? $record->created_by : auth()->user()->id);
+        $companyName = $record->user->companies->pluck('company_name')->first(); 
+        $companyEmail = $record->user->companies->pluck('company_email')->first(); 
         $customerName = (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '');
         $customerEmail = (isset($record->customer->contact->email) && !empty($record->customer->contact->email) ? $record->customer->contact->email : '');
         if(!empty($customerEmail)):
@@ -474,7 +476,7 @@ class RecordController extends Controller
                 $content .= 'Hi '.$customerName.',<br/><br/>';
                 $content .= 'Please check attachment for details.<br/><br/>';
                 $content .= 'Thanks & Regards<br/>';
-                $content .= env('APP_NAME', 'Gas Safety Engineer');
+                $content .= !empty($companyName) ? $companyName : $record->user->name;
             endif;
             
             $sendTo = [$customerEmail]; 
@@ -485,13 +487,11 @@ class RecordController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
-                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
+                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'), 
             ];
-            $companyName = $record->user->companies->pluck('company_name')->first();
-            $companyEmail = $record->user->companies->pluck('company_email')->first();
-            $configuration['from_name'] = !empty($companyName) ? $companyName : $record->user->name;
-            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $record->user->email;
+            $configuration['from_name'] = !empty($companyName) ? $companyName : $record->user->name; 
+            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $record->user->email; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($record->id);
@@ -507,7 +507,7 @@ class RecordController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, 'certificate'), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, 'certificate'), $ccMail); 
             return true;
         else:
             return false;

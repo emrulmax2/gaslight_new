@@ -20,12 +20,12 @@ class GCESendMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($subject, $content, $attachmentList, $template = 'communication')
+    public function __construct($subject, $content, $attachmentList, $template = 'communication') 
     {
         $this->subject = $subject;
         $this->content = $content;
         $this->attachmentList = $attachmentList;
-        $this->template = $template;
+        $this->template = $template; 
     }
 
     /**
@@ -34,7 +34,7 @@ class GCESendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->subject,
+            subject: $this->subject, 
         );
     }
 
@@ -44,10 +44,10 @@ class GCESendMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'app.emails.'.$this->template,
+            view: 'app.emails.'.$this->template, 
             with: [
-                'content' => $this->content,
-                'title' => $this->subject 
+                'content' => $this->content, 
+                'title' => $this->subject  
             ]
         );
     }
