@@ -47,7 +47,7 @@
          <!-- Footer -->
          <div class="footer">
             <div class="contact">
-               <span class="company">Powered by Engineer App Ltd</span><br>
+               <span class="company">Powered by Engineer App Ltd</span><br> 
             </div>
          </div>
       </div>

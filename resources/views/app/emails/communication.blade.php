@@ -20,7 +20,7 @@
          .footer .contact { margin-bottom:8px; }
          .footer .company { font-weight:600; }
          @media only screen and (max-width:600px) {
-         .body, .footer, .header { padding:20px; }
+         .body, .footer, .header { padding:20px; } 
          .header h1 { font-size:20px; }
          }
       </style>

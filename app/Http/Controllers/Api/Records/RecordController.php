@@ -477,7 +477,7 @@ class RecordController extends Controller
                 $content .= env('APP_NAME', 'Gas Safety Engineer');
             endif;
             
-            $sendTo = [$customerEmail];
+            $sendTo = [$customerEmail]; 
             $configuration = [
                 'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
                 'smtp_port' => env('MAIL_PORT', '587'),

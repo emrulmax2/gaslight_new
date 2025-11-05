@@ -47,7 +47,7 @@ class GCESendMail extends Mailable
             view: 'app.emails.'.$this->template,
             with: [
                 'content' => $this->content,
-                'title' => $this->subject
+                'title' => $this->subject 
             ]
         );
     }

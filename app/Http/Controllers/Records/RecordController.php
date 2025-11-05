@@ -393,7 +393,7 @@ class RecordController extends Controller
                 $attachmentFiles[0] = [
                     "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName,
                     "nameinfo" => $fileName,
-                    "mimeinfo" => 'application/pdf',
+                    "mimeinfo" => 'application/pdf', 
                     "disk" => 'public'
                 ];
             endif;
