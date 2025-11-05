@@ -26,7 +26,7 @@
             <form method="post" action="#" id="reminderTemplateForm" enctype="multipart/form-data">
                 <input type="hidden" name="job_form_id" value="{{ $form->id }}"/>
                 <div class="mt-5 grid grid-cols-12 gap-5">
-                    <div class="col-span-12 sm:col-span-9">
+                    <div class="col-span-12">
                         <div class="intro-y box">
                             <div class="flex flex-col items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400 sm:flex-row">
                                 <h2 class="mr-auto text-base font-medium">

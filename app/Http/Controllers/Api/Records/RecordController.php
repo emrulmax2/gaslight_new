@@ -485,9 +485,13 @@ class RecordController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
-                'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
+                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
             ];
+            $companyName = $record->user->companies->pluck('company_name')->first();
+            $companyEmail = $record->user->companies->pluck('company_email')->first();
+            $configuration['from_name'] = !empty($companyName) ? $companyName : $record->user->name;
+            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $record->user->email;
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($record->id);
@@ -503,7 +507,7 @@ class RecordController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, 'certificate'), $ccMail);
             return true;
         else:
             return false;
