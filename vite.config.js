@@ -253,6 +253,8 @@ export default defineConfig({
                 "resources/js/app/invoice/form.js",
                 "resources/js/app/invoice/create.js",
                 "resources/js/app/invoice/show.js",
+
+                "resources/js/app/user-settings/reminder-create.js",
             ],
             refresh: true,
         }),
