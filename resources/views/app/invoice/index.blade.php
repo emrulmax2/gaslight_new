@@ -11,11 +11,14 @@
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
+            <x-base.button as="a" href="{{ route('invoices.create') }}" class="shadow-md w-auto" variant="primary">
+                <x-base.lucide class="h-4 w-4 mr-1" icon="plus-circle" /> Create Invoice
+        </x-base.button>
         </div>
     </div>
     
     <!-- BEGIN: HTML Table Data -->
-    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative">
+    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative w-full">
         <x-base.form-input class="m-0 w-full" id="query" type="text" autocomplete="off" placeholder="Search..."/>
         <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
     </div>
