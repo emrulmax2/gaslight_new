@@ -309,15 +309,7 @@ class UserManagementController extends Controller
     public function getSingleUser(Request $request, $id)
     {
         try {
-            $userCompanyId = $request->user()->company->first()->id ?? 0;
-        
-            $user = User::with(['companies' => function($query) use ($userCompanyId) {
-                    $query->where('company_id', $userCompanyId);
-                }])
-                ->whereHas('companies', function($query) use ($userCompanyId) {
-                    $query->where('company_id', $userCompanyId);
-                })
-                ->findOrFail($id);
+            $user = User::with('companies')->findOrFail($id);
 
             return response()->json([
                 'success' => true,
