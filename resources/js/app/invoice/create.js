@@ -13,9 +13,6 @@ import INTAddressLookUps from '../../address_lookup.js';
     const addJobAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobAddressModal"));
     const customerListModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerListModal"));
 
-    const jobAddressOccupantModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#jobAddressOccupantModal"));
-    const addJobAddressOccupantModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobAddressOccupantModal"));
-
     const linkedJobModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#linkedJobModal"));
     
     
@@ -58,10 +55,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('#addJobAddressModal input[name="customer_id"]').val('0');
     });
 
-    document.getElementById("addJobAddressOccupantModal").addEventListener("hide.tw.modal", function (event) {
-        $('#addJobAddressOccupantModal input[type="text"]').val('');
-        $('#addJobAddressOccupantModal input[name="customer_property_id"]').val('0');
-    });
 
 
     /* Init Variables Start */
@@ -129,16 +122,10 @@ import INTAddressLookUps from '../../address_lookup.js';
                     let customer = job.customer;
                         customer_id = customer.id;
                     let job_address = job.property;
-                    let occupant = {
-                        'customer_property_occupant_id' : job_address.id,
-                        'occupant_email' : job_address.occupant_email,
-                        'occupant_name' : job_address.occupant_name,
-                        'occupant_phone' : job_address.occupant_phone
-                    }
+                    
                     localStorage.setItem('job', JSON.stringify(job));
                     localStorage.setItem('customer', JSON.stringify(customer));
                     localStorage.setItem('job_address', JSON.stringify(job_address));
-                    localStorage.setItem('occupant', JSON.stringify(occupant));
 
                     $('.jobWrap').find('.theDesc').html(job.description).addClass('font-medium');
                     $('.jobWrap').find('.theId').val(job.id);
@@ -168,13 +155,6 @@ import INTAddressLookUps from '../../address_lookup.js';
                         $('.theDesc', this).html((theJobAddress != '' ? theJobAddress : 'Click here to add job address')).addClass((theJobAddress != '' ? 'font-medium' : ''));
                         $('.theId', this).val((job_address.id && job_address.id > 0 ? job_address.id : 0));
                     })
-            
-                    //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
-                        $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
-                            $('.theDesc', this).html((occupant.occupant_name ? occupant.occupant_name : 'Click here to add job address occupant'));
-                            $('.theId', this).val((occupant.customer_property_occupant_id ? occupant.customer_property_occupant_id : 0));
-                        });
-                    //}
 
                     linkedJobModal.hide();
                 },
@@ -238,12 +218,6 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(0);
         })
 
-        //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
-        $('.customerPropertyOccupantWrap').fadeOut('fast', function(){
-            $('.theDesc', this).html('Click here to add job address occupant');
-            $('.theId', this).val(0);
-        })
-        //}
     }
     $('.customerBlock').on('click', function(e){
         e.preventDefault();
@@ -300,7 +274,6 @@ import INTAddressLookUps from '../../address_lookup.js';
                     localStorage.setItem('customer', JSON.stringify(customerObj));
                     localStorage.removeItem('job');
                     localStorage.removeItem('job_address');
-                    localStorage.removeItem('occupant');
 
                     let customerAddressObj = customerObj.address;
                     let customerAddress = '';
@@ -325,12 +298,6 @@ import INTAddressLookUps from '../../address_lookup.js';
                         $('.theId', this).val(0);
                     })
 
-                    //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
-                        $('.customerPropertyOccupantWrap').fadeOut('fast', function(){
-                            $('.theDesc', this).html('Click here to add job address occupant').removeClass('font-medium');
-                            $('.theId', this).val(0);
-                        })
-                    //}
 
                     customerListModal.hide();
                 },
@@ -388,15 +355,6 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(jobAddressObj.id);
         });
 
-        if(localStorage.occupant){
-            let occupant = localStorage.getItem('occupant');
-            let occupantObj = JSON.parse(occupant);
-
-            $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
-                $('.theDesc', this).html((occupantObj.occupant_name ? occupantObj.occupant_name : 'Click here to add job address occupant')).addClass('font-medium');
-                $('.theId', this).val((occupantObj.customer_property_occupant_id ? occupantObj.customer_property_occupant_id : 0));
-            })        
-        }
     }
     $(document).on('click', '.customerPropertyBlock', function(e){
         e.preventDefault();
@@ -426,7 +384,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         e.preventDefault();
         let $theAddress = $(this);
         let theAddressId = $theAddress.attr('data-id');
-        let theOccupantName = $theAddress.attr('data-occupant');
         let theAddress = $theAddress.attr('data-address');
 
         customerJobAddressModal.hide();
@@ -435,12 +392,6 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('.theId', this).val(theAddressId);
         });
 
-        //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
-            $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
-                $('.theDesc', this).html('Click here to add job address occupant');
-                $('.theId', this).val(0);
-            });
-        //}
     });
     /* On Click Add Customer Address End */
 
@@ -492,12 +443,7 @@ import INTAddressLookUps from '../../address_lookup.js';
                     $('.theId', this).val(address_id);
                 })
 
-                //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
-                    $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
-                        $('.theDesc', this).html('Click here to add job address occupant');
-                        $('.theId', this).val(0);
-                    });
-                //}
+                
             }
         }).catch(error => {
             $('#addressSaveBtn', $theForm).removeAttr('disabled');
@@ -515,107 +461,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         });
     })
     /* On Click Add Job Address End */
-
-    /* On Click Add Customer Address Start */
-    $(document).on('click', '.customerPropertyOccupantBlock', function(e){
-        e.preventDefault();
-        let $customerPropertyOccupantBlock = $(this);
-        let property_id = ($('.customerPropertyWrap .theId').val() > 0 ? $('.customerPropertyWrap .theId').val() : 0)
-        console.log(property_id)
-        if(property_id > 0){
-            $.ajax({
-                type: 'POST',
-                data: {property_id : property_id},
-                url: route('invoices.get.job.address.occupant'),
-                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                async: false,
-                success: function(data) {
-                    jobAddressOccupantModal.show();
-                    document.getElementById("jobAddressOccupantModal").addEventListener("shown.tw.modal", function (event) {
-                        $('#jobAddressOccupantModal .customerJobAddressOccupantWrap').html(data.html);
-                        $('#jobAddressOccupantModal .addJobAddressOccupantBtn').attr('data-customer-property-id', property_id);
-                    });
-                },
-                error:function(e){
-                    console.log('Error');
-                }
-            });
-        }
-    });
-    $('#jobAddressOccupantModal').on('click', '.jobAddressOccupantItem', function(e){
-        e.preventDefault();
-        let $theAddress = $(this);
-        let thePropertyId = $theAddress.attr('data-id');
-        let theOccupantName = $theAddress.attr('data-occupant');
-
-        jobAddressOccupantModal.hide();
-        $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
-            $('.theDesc', this).html(theOccupantName).addClass('font-medium');
-            $('.theId', this).val(thePropertyId);
-        })
-    });
-    /* On Click Add Customer Address End */
-
-    /* On Click Add Address Occupant Start */
-    $('.addJobAddressOccupantBtn').on('click', function(e){
-        e.preventDefault();
-        let $theBtn = $(this);
-        let the_property_id = $theBtn.attr('data-customer-property-id');
-
-        jobAddressOccupantModal.hide();
-
-        addJobAddressOccupantModal.show();
-        document.getElementById('addJobAddressOccupantModal').addEventListener('shown.tw.modal', function(event){
-            $('#addJobAddressOccupantModal input[name="customer_property_id"]').val(the_property_id);
-        });
-    });
-
-    $('#addJobAddressOccupantForm').on('submit', function(e){
-        e.preventDefault();
-        const form = document.getElementById('addJobAddressOccupantForm');
-        const $theForm = $(this);
-        
-        $('#occupantSaveBtn', $theForm).attr('disabled', 'disabled');
-        $("#occupantSaveBtn .theLoader").fadeIn();
-
-        let form_data = new FormData(form);
-        axios({
-            method: "post",
-            url: route('invoices.store.job.address.occupant'),
-            data: form_data,
-            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-        }).then(response => {
-            $('#occupantSaveBtn', $theForm).removeAttr('disabled');
-            $("#occupantSaveBtn .theLoader").fadeOut();
-
-            if (response.status == 200) {
-                let occupant = response.data.occupant;
-                let occupant_id = response.data.id;
-
-                addJobAddressOccupantModal.hide();
-                $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
-                    $('.theDesc', this).html(occupant).addClass('font-medium');
-                    $('.theId', this).val(occupant_id);
-                })
-            }
-        }).catch(error => {
-            $('#occupantSaveBtn', $theForm).removeAttr('disabled');
-            $("#occupantSaveBtn .theLoader").fadeOut();
-            if (error.response) {
-                if (error.response.status == 422) {
-                    for (const [key, val] of Object.entries(error.response.data.errors)) {
-                        $(`#addJobAddressOccupantForm .${key}`).addClass('border-danger');
-                        $(`#addJobAddressOccupantForm  .error-${key}`).html(val);
-                    }
-                } else {
-                    console.log('error');
-                }
-            }
-        });
-    })
-    /* On Click Add Address Occupant End */
-
-    
 
 
     /* Auto Load Certificate Edit Data Start */

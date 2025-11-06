@@ -55,5 +55,5 @@ var invoiceListTable = (function () {
     }
 
     
-
+    localStorage.clear();
 })();

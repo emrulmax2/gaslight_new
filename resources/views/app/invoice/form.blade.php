@@ -18,7 +18,7 @@
                 <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Payment To Date</div>
                 <div class="theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
-            <span style="flex: 0 0 16px; margin-left: 20px;"><x-base.lucide class="h-4 w-4 text-success" icon="pencil" /></span>
+            <span style="flex: 0 0 16px; margin-left: 20px;"><x-base.lucide class="h-4 w-4 text-success" icon="plus-circle" /></span>
         </a>
     </div>
 </div>

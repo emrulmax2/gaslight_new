@@ -287,6 +287,10 @@
             </x-base.dialog.title>
             <x-base.dialog.description class="modal-body grid grid-cols-12 gap-4 gap-y-3">
                 <div class="col-span-12">
+                    <x-base.form-label>Payment Date</x-base.form-label>
+                    <x-base.litepicker name="advance_pay_date" value="{{ date('d-m-Y') }}" class="block" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off" />
+                </div>
+                <div class="col-span-12">
                     <x-base.form-label>Payment Amount</x-base.form-label>
                     <x-base.form-input step="any" name="advance_amount" class="w-full" type="number" placeholder="0.0" />
                     <div class="acc__input-error error-advance_amount text-danger text-xs mt-1"></div>
@@ -301,10 +305,6 @@
                             @endforeach
                         @endif
                     </x-base.form-select>
-                </div>
-                <div class="col-span-12">
-                    <x-base.form-label>Payment Date</x-base.form-label>
-                    <x-base.litepicker name="advance_pay_date" value="{{ date('d-m-Y') }}" class="block" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off" />
                 </div>
             </x-base.dialog.description>
             <x-base.dialog.footer class="flex">

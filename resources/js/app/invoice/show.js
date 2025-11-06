@@ -117,7 +117,6 @@
                 localStorage.setItem('job', JSON.stringify(row.job));
                 localStorage.setItem('customer', JSON.stringify(row.customer));
                 localStorage.setItem('job_address', JSON.stringify(row.job_address));
-                localStorage.setItem('occupant', JSON.stringify(row.occupant));
 
                 
                 if(row.invoiceNotes){

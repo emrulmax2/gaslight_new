@@ -33,7 +33,7 @@ class InvoiceController extends Controller
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
     
-        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])->orderByRaw(implode(',', $sorts));
+        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])->orderByRaw(implode(',', $sorts));
         if(!empty($status) && $status !== 'All'): $query->where('status', $status); endif;
         if(!empty($payStatus) && $payStatus !== 'All'): $query->where('pay_status', $payStatus); endif;
         if (!empty($queryStr)):
@@ -45,8 +45,6 @@ class InvoiceController extends Controller
                     ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
                     ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
                 });
-            })->orWhereHas('occupant', function($q) use ($queryStr){
-                $q->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
             });
         endif;
         $query->where('created_by', $user_id);
@@ -133,8 +131,7 @@ class InvoiceController extends Controller
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
-                'customer_property_occupant_id' => (isset($request->customer_property_occupant_id) && $request->customer_property_occupant_id > 0 ? $request->customer_property_occupant_id : null),
-
+                
                 'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d')),
                 'expire_date' => date('Y-m-d', strtotime("+30 days")),
                 
@@ -197,7 +194,7 @@ class InvoiceController extends Controller
 
     public function edit($invoice_id, Request $request){
         try {
-            $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
+            $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])
                         ->find($invoice_id);
 
             $fileName = $this->generatePdfFileName($invoice->id);
@@ -215,12 +212,6 @@ class InvoiceController extends Controller
                 'job' => $invoice->job,
                 'customer' => $invoice->customer,
                 'job_address' => $invoice->job->property,
-                'occupant' => [
-                    'customer_property_occupant_id' => $invoice->customer_property_occupant_id,
-                    'occupant_name' => (isset($invoice->occupant->occupant_name) && !empty($invoice->occupant->occupant_name) ? $invoice->occupant->occupant_name : ''),
-                    'occupant_email' => (isset($invoice->occupant->occupant_email) && !empty($invoice->occupant->occupant_email) ? $invoice->occupant->occupant_email : ''),
-                    'occupant_phone' => (isset($invoice->occupant->occupant_phone) && !empty($invoice->occupant->occupant_phone) ? $invoice->occupant->occupant_phone : ''),
-                ],
                 'url' => $pdf_url
             ];
 
