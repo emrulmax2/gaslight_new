@@ -399,8 +399,6 @@ Route::middleware(Authenticate::class)->group(function() {
             Route::post('invoices/get-linked-customer', 'getLInkedCustomer')->name('invoices.linked.customer');
             Route::post('invoices/get-job-addresses', 'getJobAddressrs')->name('invoices.get.job.addresses');
             Route::post('invoices/store-job-address', 'storeJobAddress')->name('invoices.store.job.addresses');
-            Route::post('invoices/get-job-address-occupant', 'getJobAddressOccupent')->name('invoices.get.job.address.occupant');
-            Route::post('invoices/store-job-address-occupant', 'storeJobAddressOccupent')->name('invoices.store.job.address.occupant');
 
             Route::post('invoices/store', 'store')->name('invoices.store');
             Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');

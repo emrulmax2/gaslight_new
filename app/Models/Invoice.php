@@ -23,7 +23,6 @@ class Invoice extends Model
         'customer_job_id',
         'job_form_id',
         'customer_property_id',
-        'customer_property_occupant_id',
         'invoice_number',
         'issued_date',
         'expire_date',
@@ -54,10 +53,6 @@ class Invoice extends Model
 
     public function property(){
         return $this->belongsTo(CustomerProperty::class, 'customer_property_id');
-    }
-
-    public function occupant(){
-        return $this->belongsTo(CustomerPropertyOccupant::class, 'customer_property_occupant_id');
     }
 
     public function user(){

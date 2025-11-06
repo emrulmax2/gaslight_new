@@ -562,6 +562,8 @@ import INTAddressLookUps from '../../address_lookup.js';
                                 }
                             }
                         }
+                    }else{
+                        $('#invoiceAdvanceModal [name="advance_pay_date"]').val(getTodayDate())
                     }
                     $('#invoiceAdvanceModal #removeAdvanceBtn').fadeIn();
                 }else{
@@ -847,7 +849,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         let hasAdvance = invoiceAdvances.hasAdvance;
         let advanceTotal = invoiceAdvances.advanceTotal;
 
-        let due = invoiteItemTotal + (isVatInvoice ? invoiceItemVatTotal : 0);
+        let due = invoiteItemTotal; //+ (isVatInvoice ? invoiceItemVatTotal : 0);
             totalDue = due - (hasAdvance ? advanceTotal : 0);
 
         return totalDue;
@@ -871,7 +873,7 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         let vatAmount = invoiceItemVatTotal - (hasDiscount ? discountVatTotal : 0);
 
-            totalDue = invoiteItemTotal - (hasDiscount ? discountTotal : 0) + (isVatInvoice ? vatAmount : 0);
+            totalDue = invoiteItemTotal - (hasDiscount ? discountTotal : 0); // + (isVatInvoice ? vatAmount : 0);
 
         return totalDue;
     }

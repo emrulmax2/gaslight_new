@@ -55,7 +55,7 @@ class InvoiceController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
     
-        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])->orderByRaw(implode(',', $sorts));
+        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])->orderByRaw(implode(',', $sorts));
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
                 $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
@@ -65,8 +65,6 @@ class InvoiceController extends Controller
                     ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
                     ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
                 });
-            })->orWhereHas('occupant', function($q) use ($queryStr){
-                $q->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
             });
         endif;
         $query->where('created_by', $request->user()->id);
@@ -207,8 +205,7 @@ class InvoiceController extends Controller
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
-                'customer_property_occupant_id' => (isset($request->customer_property_occupant_id) && $request->customer_property_occupant_id > 0 ? $request->customer_property_occupant_id : null),
-
+                
                 'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d')),
                 'expire_date' => date('Y-m-d', strtotime("+30 days")),
                 
@@ -260,7 +257,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice){
         $user_id = auth()->user()->id;
-        $invoice->load(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant']);
+        $invoice->load(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property']);
         $form = JobForm::find($invoice->job_form_id);
 
         $thePdf = $this->generatePdf($invoice->id);
@@ -279,7 +276,7 @@ class InvoiceController extends Controller
     public function editReady(Request $request){
         $invoice_id = $request->invoice_id;
 
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])
                     ->find($invoice_id);
         $data = [
             'invoice_id' => $invoice->id,
@@ -292,13 +289,7 @@ class InvoiceController extends Controller
             'issued_date' => (isset($invoice->issued_date) && !empty($invoice->issued_date) ? date('d-m-Y', strtotime($invoice->issued_date)) : ''),
             'job' => $invoice->job,
             'customer' => $invoice->customer,
-            'job_address' => $invoice->job->property,
-            'occupant' => [
-                'customer_property_occupant_id' => $invoice->customer_property_occupant_id,
-                'occupant_name' => (isset($invoice->occupant->occupant_name) && !empty($invoice->occupant->occupant_name) ? $invoice->occupant->occupant_name : ''),
-                'occupant_email' => (isset($invoice->occupant->occupant_email) && !empty($invoice->occupant->occupant_email) ? $invoice->occupant->occupant_email : ''),
-                'occupant_phone' => (isset($invoice->occupant->occupant_phone) && !empty($invoice->occupant->occupant_phone) ? $invoice->occupant->occupant_phone : ''),
-            ]
+            'job_address' => $invoice->job->property
         ];
 
         $data['invoiceItemsCount'] = 0;
@@ -740,59 +731,5 @@ class InvoiceController extends Controller
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
-    }
-
-    public function getJobAddressOccupent(Request $request){
-        $property_id = (isset($request->property_id) && $request->property_id > 0 ? $request->property_id : 0);
-
-        $html = '';
-        $occupants = CustomerPropertyOccupant::where('customer_property_id', $property_id)->where('active', 1)->get();
-        if($occupants->count() > 0):
-            $html .= '<div class="results existingOccupant">';
-                foreach($occupants as $occupant):
-                    $html .= '<div data-id="'.$occupant->id.'" data-occupant="'.(!empty($occupant->occupant_name) ? $occupant->occupant_name : '').'" class="jobAddressOccupantItem flex items-center cursor-pointer bg-white px-3 py-3 mb-2">';
-                        $html .= '<div>';
-                            $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
-                                $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user stroke-1.5 h-4 w-4 text-success"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-                            $html .= '</div>';
-                        $html .= '</div>';
-                        $html .= '<div class="ml-3.5 flex w-full flex-col gap-y-2 sm:flex-row sm:items-center">';
-                            $html .= '<div>';
-                                $html .= '<div class="whitespace-nowrap font-medium">';
-                                    $html .= $occupant->occupant_name;
-                                $html .= '</div>';
-                                $html .= '<div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">';
-                                    $html .= (!empty($occupant->occupant_email) ? $occupant->occupant_email : (!empty($occupant->occupant_phone) ? $occupant->occupant_phone : ''));
-                                $html .= '</div>';
-                            $html .= '</div>';
-                        $html .= '</div>';
-                    $html .= '</div>';
-                endforeach;
-            $html .= '</div>';
-
-            return response()->json(['suc' => 1, 'html' => $html], 200);
-        else:
-            $html .= '<div role="alert" class="alert relative border rounded-md px-5 py-4 bg-warning border-warning bg-opacity-20 border-opacity-5 text-warning dark:border-warning dark:border-opacity-20 mb-2 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-circle" class="lucide lucide-alert-circle stroke-1.5 mr-2 h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><span><strong>Opps!</strong> The address does not have any occupant details.</span></div>';
-            return response()->json(['suc' => 2, 'html' => $html], 200);
-        endif;
-    }
-
-    public function storeJobAddressOccupent(OccupantDetailsStoreRequest $request){
-        try{
-            $property_id = $request->customer_property_id;
-
-            $occupantName = (!empty($request->occupant_name) ? $request->occupant_name : null);
-            $occupant = CustomerPropertyOccupant::create([
-                'customer_property_id' => $property_id,
-                'occupant_name' => (!empty($request->occupant_name) ? ucwords($request->occupant_name) : null),
-                'occupant_email' => (!empty($request->occupant_email) ? $request->occupant_email : null),
-                'occupant_phone' => (!empty($request->occupant_phone) ? $request->occupant_phone : null),
-                'active' => 1,
-                'created_by' => $request->user()->id,
-            ]);
-            return response()->json(['msg' => 'Customer Job Addresses occupant details successfully created.', 'red' => '', 'occupant' => $occupantName, 'id' => $occupant->id], 200);
-        }catch( Exception $d){
-            return response()->json(['msg' => 'Something went wrong. Please try again later.', 'red' => ''], 422);
-        }
     }
 }
