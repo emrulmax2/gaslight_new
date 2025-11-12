@@ -89,6 +89,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::put('company/{company}/update', 'update');
             Route::delete('company/{company}/destroy', 'destroy');
             Route::get('bank-details', 'getCompanyBankDetails');
+            Route::get('vat-status', 'vatStatusNumber');
         });
 
         Route::controller(UserProfileController::class)->group(function() {
@@ -195,7 +196,6 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('invoice-number', 'getInvoiceNumber');
             Route::get('quote-number', 'getQuoteNumber');    
             Route::get('records/jobs/{form_id}', 'getJobs');
-            Route::get('vat-status/{user_id}', 'vatStatusNumber');
         });
 
         Route::controller(InvoiceController::class)->group(function() {

@@ -140,14 +140,14 @@ class InvoiceController extends Controller
             
             if($invoice->id):
                 $invoice_number = $this->generateInvoiceNumber($invoice->id);
-                $options = json_decode($request->options);
+                $options = $request->options;
                 InvoiceOption::where('invoice_id', $invoice->id)->forceDelete();
                 if(!empty($options)):
                     foreach($options as $key => $value):
                         InvoiceOption::create([
                             'invoice_id' => $invoice->id,
                             'name' => $key,
-                            'value' => json_decode($value)
+                            'value' => $value
                         ]);
                     endforeach;
                 endif;

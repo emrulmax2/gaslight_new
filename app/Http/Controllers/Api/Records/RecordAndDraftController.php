@@ -196,21 +196,4 @@ class RecordAndDraftController extends Controller
             'message' => 'No jobs founds.'
         ], 200);
     }
-
-    public function vatStatusNumber(Request $request){
-        $user_id = $request->user_id;
-        $user = User::find($user_id);
-
-        $data = [
-            'non_vat_status' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1),
-            'vat_number' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : ''),
-        ];
-
-
-         return response()->json([
-            'success' => true,
-            'data' => $data
-        ], 200);
-    }
-
 }
