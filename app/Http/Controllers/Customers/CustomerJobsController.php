@@ -18,10 +18,14 @@ use App\Models\CustomerJob;
 use App\Models\CustomerJobCalendar;
 use App\Models\CustomerJobPriority;
 use App\Models\CustomerJobStatus;
+use App\Models\Invoice;
+use App\Models\InvoiceOption;
+use App\Models\JobFormPrefixMumbering;
 use App\Models\Title;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Number;
+use Throwable;
 
 class CustomerJobsController extends Controller
 {
@@ -154,12 +158,12 @@ class CustomerJobsController extends Controller
         ]);
     }
 
-    private function generateReferenceNo($customerId)
-    {
+    private function generateReferenceNo($customerId, $company){
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
-        $nameParts = explode(' ', trim($customer->company_name));
+        $nameParts = (isset($company->company_name) && !empty($company->company_name) ? explode(' ', $company->company_name) : []);
+        //$nameParts = explode(' ', trim($customer->company_name));
         $prefix = '';
         foreach ($nameParts as $part):
             $prefix .= strtoupper(substr($part, 0, 1));
@@ -177,6 +181,10 @@ class CustomerJobsController extends Controller
     }
 
     public function job_store(CustomerJobStoreRequest $request) {
+        $user_id = $request->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+
         $data = [
             'customer_id' => $request->customer_id,
             'customer_property_id' => $request->customer_property_id,
@@ -185,7 +193,7 @@ class CustomerJobsController extends Controller
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => 1,
-            'reference_no' => $this->generateReferenceNo($request->customer_id),
+            'reference_no' => $this->generateReferenceNo($request->customer_id, $company),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => auth()->user()->id,
         ];
@@ -250,7 +258,8 @@ class CustomerJobsController extends Controller
             'statuses' => CustomerJobStatus::orderBy('id', 'ASC')->get(),
             'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
             'job' => $job,
-            'blocked' => $blocked
+            'blocked' => $blocked,
+            'reasons' => CancelReason::where('active', 1)->orderBy('id', 'asc')->get()
         ]);
     }
 
@@ -347,5 +356,124 @@ class CustomerJobsController extends Controller
         ]);
 
         return response()->json(['msg' => 'Customer job successfully cancelled.'], 200);
+    }
+
+    public function markAsComplete(Request $request){
+        try {
+            $customer_job_id = $request->customer_job_id;
+            $customer_job_status_id = $request->customer_job_status_id;
+            $submit_type = $request->submit_type;
+            $user_id = $request->user()->id;
+
+            $invoice = null;
+            if($submit_type == 1):
+                $invoice = DB::transaction(function () use ($customer_job_id, $customer_job_status_id, $submit_type, $user_id) {
+                    $user = User::find($user_id);
+                    $job = CustomerJob::find($customer_job_id);
+                    $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+
+                    $non_vat_status = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
+                    $vat_number = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
+                    
+                    $vat_rate = 20;
+                    $unit_price = (isset($job->estimated_amount) && $job->estimated_amount > 0 ? $job->estimated_amount : 0);
+                    $unit = 1; 
+                    $subTotal = $unit_price * $unit;
+                    $vatAmount = ($non_vat_status ? 0 : ($subTotal / $vat_rate) * 100);
+                    $lineTotal = $subTotal + $vatAmount; 
+
+                    $invoice = Invoice::create([
+                        'company_id' => $company->id,
+                        'customer_id' => $job->customer_id,
+                        'customer_job_id' => $job->id,
+                        'job_form_id' => 4,
+                        'customer_property_id' => (isset($job->customer_property_id) && $job->customer_property_id > 0 ? $job->customer_property_id : null),
+                        
+                        'issued_date' => date('Y-m-d'),
+                        'expire_date' => date('Y-m-d', strtotime("+30 days")),
+                        
+                        'updated_by' => $user_id,
+                    ]);
+                    $invoice_number = $this->generateInvoiceNumber($invoice->id);
+
+                    $invoiceItems[1] = [
+                        'vat' => $vat_rate,
+                        'edit' => 0,
+                        'price' => $unit_price,
+                        'units' => $unit,
+                        'line_total' => $lineTotal,
+                        'description' => (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item 01'),
+                        'inv_item_title' => (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item 01'),
+                        'inv_item_serial' => 1
+                    ];
+                    InvoiceOption::create([
+                        'invoice_id' => $invoice->id,
+                        'name' => 'invoiceItems',
+                        'value' => $invoiceItems
+                    ]);
+
+                    $invoiceExtra = [
+                        'non_vat_invoice' => $non_vat_status,
+                        'vat_number' => $vat_number,
+                    ];
+                    if(isset($company->bank->payment_term) && !empty($company->bank->payment_term)):
+                        $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : '');
+                    else:
+                        $invoiceExtra['payment_term'] = '';
+                    endif;
+                    InvoiceOption::create([
+                        'invoice_id' => $invoice->id,
+                        'name' => 'invoiceExtra',
+                        'value' => $invoiceExtra
+                    ]);
+
+                    return $invoice;
+                });
+            endif;
+            $job = CustomerJob::where('id', $customer_job_id)->update([
+                'customer_job_status_id' => $customer_job_status_id,
+                'cancel_reason_id' => null,
+                'cancel_reason_note' => null,
+                'updated_by' => $request->user()->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => (isset($invoice->id) && $invoice->id > 0) ? 'Invoice created and Customer job successfully mark as completed.' :'Customer job successfully mark as completed.',
+                'job' => $job,
+                'invoice' => $invoice
+            ], 200);
+        }catch(Throwable $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+
+    public function generateInvoiceNumber($invoice_id){
+        $invoice = Invoice::find($invoice_id);
+        $user_id = $invoice->created_by;
+        if(empty($invoice->invoice_number)):
+            $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $invoice->job_form_id)->orderBy('id', 'DESC')->get()->first();
+            $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+            $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+            $userLastInvoice = Invoice::where('created_by', $user_id)->where('id', '!=', $invoice_id)->orderBy('id', 'DESC')->get()->first();
+            $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
+
+             $cerSerial = $starting_form;
+            if(!empty($lastInvoiceNo)):
+                preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+                $cerSerial = isset($invoiceNumbers[1]) ? ((int) $invoiceNumbers[1]) + 1 : $starting_form;
+            endif;
+            $invoiceNumber = $prifix . $cerSerial;
+            Invoice::where('id', $invoice_id)->update(['invoice_number' => $invoiceNumber]);
+
+            return $invoiceNumber;
+        else:
+            return false;
+        endif;
     }
 }

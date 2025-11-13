@@ -28,7 +28,7 @@ class JobsController extends Controller
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         
-        $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot')
+        $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot', 'invoice')
                 ->where('created_by', $request->user()->id);
         if($status > 0):
             $query->where('customer_job_status_id', $status);
@@ -66,12 +66,12 @@ class JobsController extends Controller
         ]);
     }
 
-    private function generateReferenceNo($customerId)
-    {
+    private function generateReferenceNo($customerId, $company){
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
-        $nameParts = explode(' ', trim($customer->company_name));
+        $nameParts = (isset($company->company_name) && !empty($company->company_name) ? explode(' ', $company->company_name) : []);
+        //$nameParts = explode(' ', trim($customer->company_name));
         $prefix = '';
         foreach ($nameParts as $part):
             $prefix .= strtoupper(substr($part, 0, 1));
@@ -83,8 +83,6 @@ class JobsController extends Controller
         else:
             $nextNumber = 1;
         endif;
-
-        // $referenceNo = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         $referenceNo = $prefix . $nextNumber;
 
         return $referenceNo;
@@ -93,6 +91,9 @@ class JobsController extends Controller
 
 
     public function storeCustomerJob(Request $request){
+        $user_id = $request->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
 
         $data = [
             'customer_id' => $request->customer_id,
@@ -102,7 +103,7 @@ class JobsController extends Controller
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => 1,
-            'reference_no' => $this->generateReferenceNo($request->customer_id),
+            'reference_no' => $this->generateReferenceNo($request->customer_id, $company),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => $request->user()->id,
         ];

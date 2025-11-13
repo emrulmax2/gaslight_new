@@ -167,6 +167,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::put('customer/jobs/{customer_job_id}/update', 'job_update');
             Route::put('customer/jobs/{customer_job_id}/status-update', 'jobStatusUpdate');
             Route::put('customer/jobs/{customer_job_id}/cancel-job', 'cancelJob');
+            Route::post('customer/jobs/mark-as-complete', 'markAsComplete');
         });
 
         Route::controller(JobsController::class)->group(function() {

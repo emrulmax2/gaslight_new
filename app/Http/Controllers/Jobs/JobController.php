@@ -78,7 +78,7 @@ class JobController extends Controller
                             break;
                     endswitch;
                 endif;
-                $html .= '<a data-id="'.$list->id.'"  data-statusid="'.$list->customer_job_status_id.'"  show_url="'.route('jobs.show', $list->id).'" class="JobListItem '.$itemBG.' box relative jobItemWrap px-3 py-3 rounded-md block sm:flex w-full items-center mb-1 cursor-pointer">';
+                $html .= '<a data-hasinvoice="'.(isset($list->invoice->id) && $list->invoice->id > 0 ? 1 : 0).'" data-id="'.$list->id.'"  data-statusid="'.$list->customer_job_status_id.'"  show_url="'.route('jobs.show', $list->id).'" class="JobListItem '.$itemBG.' box relative jobItemWrap px-3 py-3 rounded-md block sm:flex w-full items-center mb-1 cursor-pointer">';
                     $html .= '<div class="w-full sm:w-3/6">';
                         $html .= '<div class="font-medium text-dark leading-none mb-1 flex justify-start items-start">';
                             $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="notebook-pen" style="top: -2px;" class="lucide lucide-notebook-pen stroke-1.5 mr-2 h-4 w-4 relative text-slate-500"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"></path><path d="M2 6h4"></path><path d="M2 10h4"></path><path d="M2 14h4"></path><path d="M2 18h4"></path><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"></path></svg>';
@@ -153,11 +153,12 @@ class JobController extends Controller
         ]);
     }
 
-    private function generateReferenceNo($customerId){
+    private function generateReferenceNo($customerId, $company){
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
-        $nameParts = explode(' ', trim($customer->company_name));
+        $nameParts = (isset($company->company_name) && !empty($company->company_name) ? explode(' ', $company->company_name) : []);
+        //$nameParts = explode(' ', trim($customer->company_name));
         $prefix = '';
         foreach ($nameParts as $part):
             $prefix .= strtoupper(substr($part, 0, 1));
@@ -176,6 +177,9 @@ class JobController extends Controller
 
 
     public function store(JobStoreRequest $request){
+        $user_id = $request->user()->id;
+        $user = User::find($user_id);
+        $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
         $data = [
             'customer_id' => $request->customer_id,
             'customer_property_id' => $request->customer_property_id,
@@ -184,7 +188,7 @@ class JobController extends Controller
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => 1,
-            'reference_no' => $this->generateReferenceNo($request->customer_id),
+            'reference_no' => $this->generateReferenceNo($request->customer_id, $company),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => auth()->user()->id,
         ];
@@ -257,7 +261,8 @@ class JobController extends Controller
             'slots' => CalendarTimeSlot::where('active', 1)->orderBy('start', 'asc')->get(),
             'job' => $job,
             'hasVat' => (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? true : false),
-            'blocked' => $blocked
+            'blocked' => $blocked,
+            'reasons' => CancelReason::where('active', 1)->orderBy('id', 'asc')->get()
         ]);
     }
 

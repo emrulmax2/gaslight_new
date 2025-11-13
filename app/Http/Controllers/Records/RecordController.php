@@ -125,7 +125,7 @@ class RecordController extends Controller
 
         /* Create Job If Empty */
         if($customer_job_id == 0):
-            $jobRefNo = $this->generateReferenceNo($customer_id);
+            $jobRefNo = $this->generateReferenceNo($customer_id, $company);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
                 'customer_property_id' => $customer_property_id,
@@ -951,11 +951,12 @@ class RecordController extends Controller
         endif;
     }
 
-    private function generateReferenceNo($customerId){
+    private function generateReferenceNo($customerId, $company){
         $customer = Customer::find($customerId);
         if (!$customer) return null;
         
-        $nameParts = explode(' ', trim($customer->company_name));
+        $nameParts = (isset($company->company_name) && !empty($company->company_name) ? explode(' ', $company->company_name) : []);
+        //$nameParts = explode(' ', trim($customer->company_name));
         $prefix = '';
         foreach ($nameParts as $part):
             $prefix .= strtoupper(substr($part, 0, 1));
