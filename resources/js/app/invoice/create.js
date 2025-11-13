@@ -556,8 +556,8 @@ import INTAddressLookUps from '../../address_lookup.js';
                 data: formData,
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
-                // console.lor(response.data);
-                // return false;
+                console.lor(response.data);
+                return false;
                 
                 if (response.status == 200) {
                     localStorage.clear();

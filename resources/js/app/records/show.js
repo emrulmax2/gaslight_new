@@ -254,4 +254,44 @@
         }
     });
 
+    $('#createRecordInvoice').on('click', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        let record_id = $theBtn.attr('data-id');
+
+        $theBtn.addClass('active').attr('disabled', 'disabled');
+        $theBtn.find('.theLoader').fadeIn();
+        $theBtn.siblings('.action_btns').removeClass('active').attr('disabled', 'disabled');
+
+        axios({
+            method: "post",
+            url: route('records.convert.to.invoice'),
+            data: {record_id : record_id},
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            if (response.status == 200) {
+                window.location.href = response.data.red
+            }
+        }).catch(error => {
+            $theBtn.removeClass('active').removeAttr('disabled');
+            $theBtn.find('.theLoader').fadeOut();
+            $theBtn.siblings('.action_btns').removeClass('active').removeAttr('disabled');
+            if (error.response) {
+                if (error.response.status == 422) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.message);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    })
+
 })()

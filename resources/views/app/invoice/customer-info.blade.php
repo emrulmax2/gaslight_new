@@ -7,7 +7,7 @@
     <div class="px-2 py-3 jobWrap bg-white">
         <a href="javascript:void(0);" class="flex justify-between items-center cursor-pointer jobBlock">
             <div>
-                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job</div>
+                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Select Job</div>
                 <div class="theDesc">Click here to select a job</div>
             </div>
             <span style="flex: 0 0 16px; margin-left: 20px;"><x-base.lucide class="h-4 w-4 text-success" icon="chevron-right" /></span>

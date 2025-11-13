@@ -386,6 +386,7 @@ Route::middleware(Authenticate::class)->group(function() {
             Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
 
             Route::post('records/destroy-document', 'destroyJobSheetDoc')->name('records.destroy.job.sheet.doc');
+            Route::post('records/convert-to-invoice', 'convertToInvoice')->name('records.convert.to.invoice');
         });
         Route::controller(InvoiceController::class)->group(function() {
             Route::get('invoices', 'index')->name('invoices');

@@ -72,4 +72,8 @@ class CustomerJob extends Model
     public function getCancelReasonNameAttribute(){
         return (isset($this->cancelReason->name) && !empty($this->cancelReason->name) ? $this->cancelReason->name : null);
     }
+
+    public function invoice(){
+        return $this->hasOne(Invoice::class, 'customer_job_id', 'id');
+    }
 }

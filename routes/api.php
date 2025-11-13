@@ -188,6 +188,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('records/approve/{record_id}', 'approve');
             Route::get('records/approve-and-email/{record_id}', 'approveEmail');
             Route::get('records/download/{record_id}', 'download');
+            Route::post('records/convert-to-invoice/{record_id}', 'convertToInvoice');
         });
 
 
