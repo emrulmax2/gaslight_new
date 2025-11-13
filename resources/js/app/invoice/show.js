@@ -111,6 +111,8 @@
                 let row = response.data.row;
                 let form_id = response.data.form;
                 
+                localStorage.clear();
+
                 localStorage.setItem('invoice_id', row.invoice_id);
                 localStorage.setItem('invoice_number', JSON.stringify(row.invoice_number));
                 localStorage.setItem('invoice', JSON.stringify(row.invoice));

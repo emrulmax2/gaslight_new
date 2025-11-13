@@ -9,19 +9,24 @@ use App\Models\CommissionDecommissionWorkType;
 use App\Models\Customer;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
+use App\Models\Invoice;
+use App\Models\InvoiceOption;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\Record;
 use App\Models\RecordHistory;
 use App\Models\RecordOption;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Creagia\LaravelSignPad\Signature;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class RecordController extends Controller
 {
@@ -628,5 +633,109 @@ class RecordController extends Controller
         $fileName = Str::lower($fileName);
         // Add PDF extension
         return $fileName . '.pdf';
+    }
+
+    public function convertToInvoice(Request $request, $record_id){
+        try {
+            $invoice = DB::transaction(function () use ($request, $record_id) {
+                $user_id = $request->user()->id;
+                $user = User::find($user_id);
+                $record = Record::with('job')->find($record_id);
+                $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+
+                $non_vat_status = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
+                $vat_number = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
+                
+                $vat_rate = 20;
+                $unit_price = (isset($record->job->estimated_amount) && $record->job->estimated_amount > 0 ? $record->job->estimated_amount : 0);
+                $unit = 1; 
+                $subTotal = $unit_price * $unit;
+                $vatAmount = ($non_vat_status ? 0 : ($subTotal / $vat_rate) * 100);
+                $lineTotal = $subTotal + $vatAmount; 
+
+                $invoice = Invoice::create([
+                    'company_id' => auth()->user()->companies->pluck('id')->first(),
+                    'customer_id' => $record->customer_id,
+                    'customer_job_id' => $record->customer_job_id,
+                    'job_form_id' => 4,
+                    'customer_property_id' => ($record->customer_property_id > 0 ? $record->customer_property_id : (isset($record->job->customer_property_id) && $record->job->customer_property_id > 0 ? $record->job->customer_property_id : null)),
+                    
+                    'issued_date' => date('Y-m-d'),
+                    'expire_date' => date('Y-m-d', strtotime("+30 days")),
+                    
+                    'updated_by' => $user_id,
+                ]);
+                $invoice_number = $this->generateInvoiceNumber($invoice->id);
+
+                $invoiceItems[1] = [
+                    'vat' => $vat_rate,
+                    'edit' => 0,
+                    'price' => $unit_price,
+                    'units' => $unit,
+                    'line_total' => $lineTotal,
+                    'description' => (isset($record->job->description) && !empty($record->job->description) ? $record->job->description : 'Invoice Item 01'),
+                    'inv_item_title' => (isset($record->job->description) && !empty($record->job->description) ? $record->job->description : 'Invoice Item 01'),
+                    'inv_item_serial' => 1
+                ];
+                InvoiceOption::create([
+                    'invoice_id' => $invoice->id,
+                    'name' => 'invoiceItems',
+                    'value' => $invoiceItems
+                ]);
+
+                $invoiceExtra = [
+                    'non_vat_invoice' => $non_vat_status,
+                    'vat_number' => $vat_number,
+                ];
+                if(isset($company->bank->payment_term) && !empty($company->bank->payment_term)):
+                    $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : '');
+                else:
+                    $invoiceExtra['payment_term'] = '';
+                endif;
+                InvoiceOption::create([
+                    'invoice_id' => $invoice->id,
+                    'name' => 'invoiceExtra',
+                    'value' => $invoiceExtra
+                ]);
+
+                return $invoice;
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Records successfully converted to invoice.',
+                'data' => $invoice
+            ], 200);
+        }catch(Throwable $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function generateInvoiceNumber($invoice_id){
+        $invoice = Invoice::find($invoice_id);
+        $user_id = $invoice->created_by;
+        if(empty($invoice->invoice_number)):
+            $prifixs = JobFormPrefixMumbering::where('user_id', $user_id)->where('job_form_id', $invoice->job_form_id)->orderBy('id', 'DESC')->get()->first();
+            $prifix = (isset($prifixs->prefix) && !empty($prifixs->prefix) ? $prifixs->prefix : '');
+            $starting_form = (isset($prifixs->starting_from) && !empty($prifixs->starting_from) ? $prifixs->starting_from : 1);
+            $userLastInvoice = Invoice::where('created_by', $user_id)->where('id', '!=', $invoice_id)->orderBy('id', 'DESC')->get()->first();
+            $lastInvoiceNo = (isset($userLastInvoice->invoice_number) && !empty($userLastInvoice->invoice_number) ? $userLastInvoice->invoice_number : '');
+
+             $cerSerial = $starting_form;
+            if(!empty($lastInvoiceNo)):
+                preg_match("/(\d+)/", $lastInvoiceNo, $invoiceNumbers);
+                $cerSerial = isset($invoiceNumbers[1]) ? ((int) $invoiceNumbers[1]) + 1 : $starting_form;
+            endif;
+            $invoiceNumber = $prifix . $cerSerial;
+            Invoice::where('id', $invoice_id)->update(['invoice_number' => $invoiceNumber]);
+
+            return $invoiceNumber;
+        else:
+            return false;
+        endif;
     }
 }

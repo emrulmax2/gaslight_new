@@ -48,6 +48,14 @@ class Company extends Model
         endif;
     }
 
+    public function getLogoPathAttribute(){
+        if(!empty($this->company_logo) && Storage::disk('public')->exists('companies/'.$this->id.'/'.$this->company_logo)):
+            return Storage::disk('public')->path('companies/'.$this->id.'/'.$this->company_logo);
+        else:
+            return false;
+        endif;
+    }
+
     // public function staffs()
     // {
     //     return $this->belongsToMany(Staff::class, 'company_staff', 'company_id', 'staff_id');

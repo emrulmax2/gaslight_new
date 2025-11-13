@@ -182,12 +182,13 @@ class InvoiceController extends Controller
 
         /* Create Job If Empty */
         if($customer_job_id == 0):
+            $jobName = $this->createJobName($request->options);
             $jobRefNo = $this->generateReferenceNo($customer_id);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
                 'customer_property_id' => $customer_property_id,
-                'description' => $form->name,
-                'details' => 'Job created for '.$property->full_address,
+                'description' => $jobName,
+                'details' => null,
                 'reference_no' => $jobRefNo,
                 'customer_job_status_id' => 1,
 
@@ -245,6 +246,9 @@ class InvoiceController extends Controller
                     'value' => $invoiceExtra
                 ]);
 
+                // Update Customer Job Amount
+                CustomerJob::where('id', $customer_job_id)->update(['estimated_amount' => $request->invoiceTotal]);
+
                 return response()->json(['msg' => 'Invoice successfully created.', 'red' => route('invoices.show', $invoice->id)], 200);
             else:
                 return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);
@@ -253,6 +257,19 @@ class InvoiceController extends Controller
             return response()->json(['msg' => 'Jobs not found. Please select a job.'], 304);
         endif;
         /* Store or Update Record */
+    }
+
+    public function createJobName($options){
+        $options = json_decode($options);
+        $invoiceItems = json_decode($options->invoiceItems);
+        $jobName = [];
+        if(!empty($invoiceItems)):
+            foreach($invoiceItems as $items):
+                $jobName[] = $items->description;
+            endforeach;
+        endif;
+
+        return (!empty($jobName) ? implode(' ', $jobName) : 'New Job');
     }
 
     public function show(Invoice $invoice){
@@ -293,7 +310,7 @@ class InvoiceController extends Controller
         ];
 
         $data['invoiceItemsCount'] = 0;
-        $data['invoiceItems'] = $data['invoiceDiscounts'] = $data['invoiceAdvance'] = $data['invoiceExtra'] = [];
+        $data['invoiceItems'] = [];
         $data['invoiceNotes'] = (isset($invoice->available_options->invoiceNotes) && !empty($invoice->available_options->invoiceNotes) ? $invoice->available_options->invoiceNotes : '');
         
         if(isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems)):
@@ -471,7 +488,10 @@ class InvoiceController extends Controller
         $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($invoice_id);
        
         //dd($record->available_options->invoiceItems);
-        $logoPath = resource_path('images/gas_safe_register_yellow.png');
+        $companyLogoPath = (isset($invoice->user->company->logo_path) && $invoice->user->company->logo_path ? $invoice->user->company->logo_path : '');
+        $companyLogoBase64 = (!empty($companyLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($companyLogoPath)) : '');
+
+        $logoPath = resource_path('images/gas_safe_register.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         $report_title = 'Invoice of '.$invoice->invoice_number;
 
@@ -482,8 +502,8 @@ class InvoiceController extends Controller
         if (Storage::disk('public')->exists('invoices/'.$invoice->created_by.'/'.$fileName)) {
             Storage::disk('public')->delete('invoices/'.$invoice->created_by.'/'.$fileName);
         }
-        $pdf = Pdf::loadView($VIEW, compact('invoice', 'logoBase64', 'report_title', 'userSignBase64'))
-            ->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
+        $pdf = Pdf::loadView($VIEW, compact('invoice', 'logoBase64', 'companyLogoBase64', 'report_title', 'userSignBase64'))
+            ->setOption(['isRemoteEnabled' => true])
             ->setPaper('a4', 'portrait') //portrait landscape
             ->setWarnings(false);
         $content = $pdf->output();

@@ -56,43 +56,17 @@ class RecordAndDraftController extends Controller
         $sortOrder = in_array($sortOrder, ['asc', 'desc']) ? $sortOrder : 'asc';
         $query->orderBy($sortField, $sortOrder);
 
-        $limit = max(1, (int)$request->query('limit', 10));
-        $page = max(1, (int)$request->query('page', 1));
-        $records = $query->paginate($limit, ['*'], 'page', $page);
-
-        $limit = max(1, (int)$request->query('limit', 10));
-        $page = (int)$request->query('page', 1);
-
-        if ($page === -1) {
-            $records = $query->get();
-            return response()->json([
-                'success' => true,
-                'data' => $records,
-                'meta' => [
-                    'total' => $records->count(),
-                    'per_page' => -1,
-                    'current_page' => 1,
-                    'last_page' => 1,
-                    'from' => 1,
-                    'to' => $records->count(),
-                ]
-            ]);
-        } else {
-            $records = $query->paginate($limit, ['*'], 'page', max(1, $page));
-
-            return response()->json([
-                'success' => true,
-                'data' => $records->items(),
-                'meta' => [
-                    'total' => $records->total(),
-                    'per_page' => $records->perPage(),
-                    'current_page' => $records->currentPage(),
-                    'last_page' => $records->lastPage(),
-                    'from' => $records->firstItem(),
-                    'to' => $records->lastItem(),
-                ]
-            ]);
-        }
+        $records = $query->get();
+        return response()->json([
+            'success' => true,
+            'data' => $records,
+            'meta' => [
+                'total' => $records->count(),
+                'per_page' => -1,
+                'current_page' => 1,
+                'last_page' => 1
+            ]
+        ]);
     }
 
 

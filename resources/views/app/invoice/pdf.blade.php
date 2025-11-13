@@ -3,21 +3,37 @@
         <title>{{ $report_title }}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <style>
-            body{font-family: Tahoma, sans-serif; font-size: 14px; line-height: 20px; color: #475569; padding-top: 0;}
+            body{
+                /* font-family: Tahoma, sans-serif; font-size: 14px; line-height: 20px; color: #475569; padding-top: 0; */
+                font-family: 'DejaVu Sans', Helvetica, Arial, sans-serif;
+                color: #333;
+                font-size: 14px;
+                line-height: 1.5;
+                margin: 0;
+                padding: 0;
+                background-color: #fff;
+            }
+            @page{margin: 20px 0 20px;}
+            header{position: fixed;left: 0px;right: 0px;top: -20px;height: 20px; background: #4A4A4A;}
+            footer{position: fixed;left: 0px;right: 0px;bottom: -2px;height: 20px;}
+            footer p{margin: 0 0 5px; font-size: 10px; line-height: 1; text-align: center;}
+
             table{margin-left: 0px; width: 100%; border-collapse: collapse;}
             figure{margin: 0;}
-
             .text-center{text-align: center;}
             .text-left{text-align: left;}
             .text-right{text-align: right;}
             @media print{ .pageBreak{page-break-after: always;} }
+            
             .pageBreak{page-break-after: always;}
             .font-medium{font-weight: bold; }
             .font-bold{font-weight: bold;}
+            .font-normal{font-weight: normal;}
             .v-top{vertical-align: top;}
             .text-primary{color: #164e63;}
             .font-sm{font-size: 12px;}
             .text-slate-400{color: #94a3b8;}
+            .uppercase{text-transform: uppercase;}
             
             .mr-3{margin-right: 3px;}
             .mr-1{margin-right: 4px;}
@@ -35,26 +51,37 @@
             .mb-60{margin-bottom: 60px;}
             .table-bordered th, .table-bordered td {border: 1px solid #e5e7eb;}
             .table-sm th, .table-sm td{padding: 5px 10px;}
-            .w-1/6{width: 16.666666%;}
-            .w-2/6{width: 33.333333%;}
+            .w-50{width: 50%;}
             .w-80{width: 80px;}
             .w-100{width: 100px;}
             .w-120{width: 120px;}
             .w-130{width: 130px;}
             .w-140{width: 140px;}
+            .h-15{height: 15px;}
+            .h-20{height: 20px;}
             .inline-block{display: inline-block;}
+            .block{display: block;}
 
-            .titleLabel{font-size: 20px; font-weight: bold; line-height: 28px; margin-bottom: 5px;}
-            .customerDetails{ position: relative;}
-            .customerName{font-size: 14px; line-height: 20px; margin-bottom: 4px; color: #64748b;}
-            .invoiceTitle{font-size: 28px; line-height: 34px; margin-bottom: 0px;}
-            .invoiceRef{font-size: 20px; line-height: 26px; margin-bottom: 8px;}
-            .calculationTable{width: 210px; float: right;}
-            .calculationTable tr th:first-child{text-align: right;}
-            .calculationTable tr th:last-child{width: 100px; text-align: right;}
-            .calculationTable tr th{padding-bottom: 8px;}
-            .calculationTable tr.totalRow th{border-bottom: 1px solid #e5e7eb;}
-            .calculationTable tr.advanceRow th{padding-top: 6px; border-bottom: 1px solid #e5e7eb;}
+
+            .color-white{ color: #FFF;}
+            .bg-darkish{background-color: #4A4A4A;}
+            .color-darkish{color: #4A4A4A;}
+            .bg-gryish{background-color: #d9d9d9;}
+            .color-gryish{color: #d9d9d9;}
+            .bg-darkish2{ background-color: #545454;}
+            .color-darkish2{ color: #545454;}
+
+            .invoiceTitle{font-size: 48px;line-height: 1;letter-spacing: 5px;}
+            .invoiceDetails{line-height: 1.3; }
+
+            .invoiceItemsTable{border: none; line-height: 1.2;}
+            .invoiceItemsTable tr td, .invoiceItemsTable tr th{padding: 17px 0 17px 30px; border: none;}
+            .invoiceItemsTable tr td:last-child, .invoiceItemsTable tr th:last-child{padding-right: 30px; text-align: right;}
+            .invoiceItemsTable tr:nth-child(odd){background: #ede9e9;}
+
+            .calculationTable tr td{ padding: 3px 0; }
+            .wrapper{ position: relative; height: 100%; }
+            .wrapper::after{position: absolute; right: 0; top: 0; width: 50%; height: 100%; content: ''; background: #d9d9d9; z-index: -1;}
         </style>
     </head>
     @php 
@@ -65,227 +92,173 @@
         $invoiceExtra = isset($invoice->available_options->invoiceExtra) && !empty($invoice->available_options->invoiceExtra) ? $invoice->available_options->invoiceExtra : [];
     @endphp
     <body>
-        <table class="mb-60">
-            <tr>
-                <td class="customerAddressWrap v-top">
-                    <img src="{{ $logoBase64 }}" alt="Gas Safe Engineer APP" style="width: 126px; height: auto; margin-bottom: 20px;">
-                    <div class="titleLabel">Address to</div>
-                    <div class="customerDetails">
-                        <div class="customerName font-medium">{{ $invoice->customer->full_name }}</div>
-                        <div class="customerAddress">{!! (isset($invoice->customer->full_address_html) ? $invoice->customer->full_address_html : '') !!}</div>
-                    </div>
-                </td>
-                <td class="invoiceDetails text-right v-top">
-                    <div class="invoiceTitle font-bold">Invoice</div>
-                    <div class="invoiceRef font-bold text-primary">{{ $invoice->invoice_number }}</div>
-                    <div class="titleLabel mb-8">{{ $invoice->user->company->company_name }}</div>
-                    <div class="companyAddress">{!! (isset($invoice->user->company->full_address_html) ? $invoice->user->company->full_address_html : '') !!}</div>
-                    @if(isset($invoice->user->company->company_email) && !empty($invoice->user->company->company_email))
-                        <div>{{ $invoice->user->company->company_email }}</div>
-                    @endif
-                    @if(isset($invoice->user->company->company_phone) && !empty($invoice->user->company->company_phone))
-                        <div>{{ $invoice->user->company->company_phone }}</div>
-                    @endif
-                    @if($invoiceExtra->non_vat_invoice != 1)
-                        <div class="vatNumberField pt-10 mb-1">
-                            <span class="font-bold mr-3">VAT:</span>
-                            <span>{{ $invoiceExtra->vat_number }}</span>
-                        </div>
-                    @endif
-                    @if(!empty($invoiceExtra->issued_date) && !empty($invoiceExtra->issued_date))
-                        <div class="mb-1">
-                            <span class="font-bold mr-3">Date:</span>
-                            <span>{{ date('jS F, Y', strtotime($invoiceExtra->issued_date)) }}</span>
-                        </div>
-                    @endif
-                    @if(!empty($invoice->job->reference_no) && !empty($invoice->job->reference_no))
-                        <div class="mb-1">
-                            <span class="font-bold mr-3">Job Ref No:</span>
-                            <span>{{ (isset($invoice->job->reference_no) ? $invoice->job->reference_no : '') }}</span>
-                        </div>
-                    @endif
-                    <div class="titleLabel pt-10">Job Address</div>
-                    <div class="companyAddress">{!! (isset($invoice->job->property->full_address_html) ? $invoice->job->property->full_address_html : '') !!}</div>
-                </td>
-            </tr>
-        </table>
-
-        <table class="table table-sm table-bordered invoiceItemsTable mb-50">
-            <thead>
+        <div class="wrapper">
+            <header></header>
+            <table style="position: relative;">
                 <tr>
-                    <th class="text-left">DESCRIPTION</th>
-                    <th class="text-right">UNITS</th>
-                    <th class="text-right">PRICE</th>
-                    if($invoiceExtra->non_vat_invoice != 1):
-                        <th class="text-right">VAT %</th>
-                    endif;
-                    <th class="text-right">TOTAL</th>
-                </tr>
-            </thead>
-
-            @php 
-                $SUBTOTAL = 0;
-                $VATTOTAL = 0;
-                $TOTAL = 0;
-                $DUE = 0;
-                $DISCOUNTTOTAL = 0;
-                $DISCOUNTVATTOTAL = 0;
-                $ADVANCEAMOUNT = (isset($invoiceAdvance->advance_amount) && $invoiceAdvance->advance_amount > 0 ? $invoiceAdvance->advance_amount : 0);
-            @endphp
-            @if(!empty($invoiceItems))
-                @foreach($invoiceItems as $item)
-                    @php 
-                        $units = (!empty($item->units) && $item->units > 0 ? $item->units : 1);
-                        $unitPrice = (!empty($item->price) && $item->price > 0 ? $item->price : 0);
-                        $vatRate = (!empty($item->vat) && $item->vat > 0 ? $item->vat : 0);
-                        $vatAmount = ($unitPrice * $vatRate) / 100;
-                        $lineTotal = ($invoiceExtra->non_vat_invoice != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
-                        
-                        $SUBTOTAL += ($unitPrice * $units);
-                        $VATTOTAL += $vatAmount;
-                    @endphp
-
-                    <tr>
-                        <td>
-                            {!! (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item') !!}
-                        </td>
-                        <td class="w-80 text-right">
-                            {{ $units }}
-                        </td>
-                        <td class="w-80 text-right font-medium">
-                            {{ Number::currency($unitPrice, 'GBP') }}
-                        </td>
-                        @if($invoiceExtra->non_vat_invoice != 1)
-                            <td class="w-80 text-right font-medium">
-                                {{ $vatRate }}%
-                            </td>
+                    <td class="w-50 v-top" style="padding: 60px 0 0 30px;">
+                        @if(!empty($companyLogoBase64))
+                            <img src="{{ $companyLogoBase64 }}" alt="Gas Safe Engineer APP" style="height: 50px; width: auto;">
                         @endif
-                        <td class="w-80 text-right font-medium">
-                            {{ Number::currency($lineTotal, 'GBP') }}
-                        </td>
-                    </tr>
-                @endforeach
-            @endif
-            @if(!empty($invoiceDiscounts))
-                @php    
-                    $description = isset($invoiceDiscounts->inv_item_title) ? $invoiceDiscounts->inv_item_title : 'Discount';
-                    $discountVatRate = (isset($invoiceDiscounts->vat) ? $invoiceDiscounts->vat : 0);
-                    $discountUnitPrice = (isset($invoiceDiscounts->amount) ? $invoiceDiscounts->amount : 0);
-                    $discountVatAmount = ($discountUnitPrice * $discountVatRate) / 100;
-
-                    $DISCOUNTTOTAL += $discountUnitPrice;
-                    $DISCOUNTVATTOTAL += $discountVatAmount;
+                        <div class="customerDetails mb-8" style="margin-top: 110px;">
+                            BILLED TO :<br/>
+                            <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $invoice->customer->full_name }}</span>
+                            <span class="block" style="line-height: 1.1;">{!! (isset($invoice->customer->full_address) ? $invoice->customer->full_address : '') !!}</span>
+                        </div>
+                        <div class="jobDetails">
+                            JOB ADDRESS: 
+                            <span class="block" style="line-height: 1.1;">{!! (isset($invoice->job->property->full_address) ? $invoice->job->property->full_address : '') !!}</span>
+                        </div>
+                    </td>
+                    <td class="w-50 text-right v-top" style="padding: 30px 30px 0 0;">
+                        <img src="{{ $logoBase64 }}" alt="Gas Safe Engineer APP" style="width: 80px; height: auto;">
+                        <div class="invoiceTitle font-normal uppercase" style="margin-top: 45px;">Invoice</div>
+                        <div class="invoiceDetails" style="margin: 70px 0 40px;">
+                            <span class="block">Invoice No. {{ $invoice->invoice_number }}</span>
+                            @if(!empty($invoice->issued_date) && !empty($invoice->issued_date))
+                                <span class="block">{{ date('F d, Y', strtotime($invoice->issued_date)) }}</span>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table class="invoiceItemsTable" style="position: relative;">
+                <tr>
+                    <th class="uppercase font-normal w-50 text-left">Item description</th>
+                    <th class="uppercase text-center">QTY</th>
+                    <th class="uppercase text-center">price</th>
+                    @if($invoiceExtra->non_vat_invoice != 1):
+                    <th class="uppercase text-center">vat</th>
+                    @endif
+                    <th class="uppercase font-normal text-right">Total</th>
+                </tr>
+                @php 
+                    $SUBTOTAL = 0;
+                    $VATTOTAL = 0;
+                    $TOTAL = 0;
+                    $DUE = 0;
+                    $DISCOUNTTOTAL = 0;
+                    $DISCOUNTVATTOTAL = 0;
+                    $ADVANCEAMOUNT = (isset($invoiceAdvance->advance_amount) && $invoiceAdvance->advance_amount > 0 ? $invoiceAdvance->advance_amount : 0);
                 @endphp
-                <tr>
-                    <td>
-                        {{ (!empty($description) ? $description : 'Quote Item') }}
-                    </td>
-                    <td class="w-80 text-right">
-                        {{ 1 }}
-                    </td>
-                    <td class="w-80 text-right font-medium">
-                        {{ Number::currency($discountUnitPrice, 'GBP') }}
-                    </td>
-                    @if($invoiceExtra->non_vat_invoice != 1)
-                        <td class="w-80 text-right font-medium">
-                            {{ $discountVatRate.'%' }}
-                        </td>
-                    @endif
-                    <td class="w-80 text-right font-medium">
-                        {{ '-'.Number::currency($discountUnitPrice, 'GBP') }}
-                    </td>
-                </tr>
-            @endif
-            @php 
-                $SUBTOTAL = $SUBTOTAL - $DISCOUNTTOTAL;
-                $VATTOTAL = $VATTOTAL - $DISCOUNTVATTOTAL;
-                $TOTAL = ($invoiceExtra->non_vat_invoice != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL);
-                $DUE = $TOTAL - $ADVANCEAMOUNT;
-            @endphp
-        </table>
+                @if(!empty($invoiceItems))
+                    @foreach($invoiceItems as $item)
+                        @php 
+                            $units = (!empty($item->units) && $item->units > 0 ? $item->units : 1);
+                            $unitPrice = (!empty($item->price) && $item->price > 0 ? $item->price : 0);
+                            $vatRate = (!empty($item->vat) && $item->vat > 0 ? $item->vat : 0);
+                            $vatAmount = ($unitPrice * $vatRate) / 100;
+                            $lineTotal = ($invoiceExtra->non_vat_invoice != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
+                            
+                            $SUBTOTAL += ($unitPrice * $units);
+                            $VATTOTAL += $vatAmount;
+                        @endphp
 
-        <table class="pdfSummaryTable">
-            <tr>
-                <td>&nbsp;</td>
-                <td class="calculationColumns">
-                    <table class="calculationTable">
                         <tr>
-                            <th>Subtotal:</th>
-                            <th>{{ Number::currency($SUBTOTAL, 'GBP') }}</th>
-                        </tr>
-                        @if($invoiceExtra->non_vat_invoice != 1)
-                            <tr>
-                                <th>VAT Total:</th>
-                                <th>{{ Number::currency($VATTOTAL, 'GBP') }}</th>
-                            </tr>
-                        @endif
-                        <tr class="totalRow">
-                            <th>Total:</th>
-                            <th>{{ Number::currency($TOTAL, 'GBP') }}</th>
-                        </tr>
-                        @if($ADVANCEAMOUNT > 0)
-                            <tr class="advanceRow">
-                                <th>Paid to Date:</th>
-                                <th>{{ Number::currency($ADVANCEAMOUNT, 'GBP') }}</th>
-                            </tr>
-                        @endif
-                        <tr>
-                            <th>Due:</th>
-                            <th>{{ Number::currency($DUE, 'GBP') }}</th>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <div style="clear: both; width: 100%; height: 1px; margin-bottom: 40px;"></div>
-
-        <table class="pdfSummaryTable">
-            <tr>
-                <td>
-                    <div class="font-medium mb-5">Please make the payment using the following bank details</div>
-                    <table class="invoiceInfoTable">
-                        <tr>
-                            <td class="v-top" style="width: 250px;">
-                                @if(isset($invoice->user->company->bank->bank_name) && !empty($invoice->user->company->bank->bank_name))
-                                    <div class="mb-1">
-                                        <span class="font-medium text-slate-400 inline-block w-140">Bank Name:</span>
-                                        <span class="inline-block">{{ $invoice->user->company->bank->bank_name }}</span>
-                                    </div>
-                                @endif
-                                @if(isset($invoice->user->company->bank->name_on_account) && !empty($invoice->user->company->bank->name_on_account))
-                                    <div class="mb-1">
-                                        <span class="font-medium text-slate-400 inline-block w-140">Account Name:</span>
-                                        <span class="inline-block">{{ $invoice->user->company->bank->name_on_account }}</span>
-                                    </div>
-                                @endif
-                                @if(isset($invoice->user->company->bank->sort_code) && !empty($invoice->user->company->bank->sort_code))
-                                    <div class="mb-1">
-                                        <span class="font-medium text-slate-400 inline-block w-140">Sort Code:</span>
-                                        <span class="inline-block">{{ $invoice->user->company->bank->sort_code }}</span>
-                                    </div>
-                                @endif
-                                @if(isset($invoice->user->company->bank->account_number) && !empty($invoice->user->company->bank->account_number))
-                                    <div class="mb-1">
-                                        <span class="font-medium text-slate-400 inline-block w-140">Account Number:</span>
-                                        <span class="inline-block">{{ $invoice->user->company->bank->account_number }}</span>
-                                    </div>
-                                @endif
-                                <div class="mb-1">
-                                    <span class="font-medium text-slate-400 inline-block w-140">Payment Ref:</span>
-                                    <span class="inline-block">{{ $invoice->invoice_number }}</span>
-                                </div>
-
-                                <div class="font-medium mb-4 pt-9">Payment Terms</div>
-                                <div class="mb-10">{{ (isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term) ? $invoiceExtra->payment_term : '') }}</div>
-                                <div class="font-medium mb-4">Notes</div>
-                                <div>{{ (isset($invoiceNotes) && !empty($invoiceNotes) ? $invoiceNotes : '') }}</div>
+                            <td class="font-normal w-50 text-left">
+                                {!! (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item') !!}
+                            </td>
+                            <td class="text-center">
+                                {{ ($units < 10 ? '0' : '').$units }}
+                            </td>
+                            <td class="text-center">
+                                {{ Number::currency($unitPrice, 'GBP') }}
+                            </td>
+                            @if($invoiceExtra->non_vat_invoice != 1)
+                                <td class="text-center">
+                                    {{ $vatRate }}%
+                                </td>
+                            @endif
+                            <td class="text-right">
+                                {{ Number::currency($lineTotal, 'GBP') }}
                             </td>
                         </tr>
-                    </table>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-        </table>
+                    @endforeach
+                @endif
+            </table>
+            <table style="position: relative;">
+                <tr>
+                    <td class="w-50 v-top" style="padding: 0 0 0 30px;">
+                        <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 35px;">
+                            <span class="block font-bold" style="margin-bottom: 6px;">Please make payments to:</span>
+                            @if(isset($invoice->user->companies[0]->bank->name_on_account) && !empty($invoice->user->companies[0]->bank->name_on_account))
+                                <span class="block">{{ $invoice->user->companies[0]->bank->name_on_account }}</span>
+                            @endif
+                            @if(isset($invoice->user->companies[0]->bank->bank_name) && !empty($invoice->user->companies[0]->bank->bank_name))
+                                <span class="block">Bank Name: {{ $invoice->user->companies[0]->bank->bank_name }}</span>
+                            @endif
+                            @if(isset($invoice->user->companies[0]->bank->account_number) && !empty($invoice->user->companies[0]->bank->account_number))
+                                <span class="block">Account no: {{ $invoice->user->companies[0]->bank->account_number }}</span>
+                            @endif
+                        </div>
+                        @if(isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term))
+                        <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
+                            <span class="block font-bold" style="margin-bottom: 6px;">Terms:</span>
+                            <span class="block">{{ (isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term) ? $invoiceExtra->payment_term : '') }}</span>
+                        </div>
+                        @endif
+                        @if(isset($invoiceNotes) && !empty($invoiceNotes))
+                        <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
+                            <span class="block font-bold" style="margin-bottom: 6px;">Note:</span>
+                            <span class="block">{{ (isset($invoiceNotes) && !empty($invoiceNotes) ? $invoiceNotes : '') }}</span>
+                        </div>
+                        @endif
+                    </td>
+                    <td class="w-50 bg-gryish v-top" style="padding-top: 15px;">
+                        @php 
+                            $DISCOUNTTITLE = isset($invoiceDiscounts->inv_item_title) ? $invoiceDiscounts->inv_item_title : 'Discount';
+                            $DISCOUNTUNITPRICE = (isset($invoiceDiscounts->amount) ? $invoiceDiscounts->amount : 0);
 
+                            $DISCOUNTTOTAL += $DISCOUNTUNITPRICE;
+
+                            $TOTAL = ($invoiceExtra->non_vat_invoice != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
+                            $DUE = $TOTAL - $ADVANCEAMOUNT;
+                        @endphp
+                        <table class="bg-darkish2 uppercase color-white calculationTable" style="padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
+                            <tr>
+                                <td class="text-left">Subtotal (excl. VAT)</td>
+                                <td class="text-right">{{ Number::currency($SUBTOTAL, 'GBP') }}</td>
+                            </tr>
+                            @if($invoiceExtra->non_vat_invoice != 1)
+                            <tr>
+                                <td class="text-left">Vat</td>
+                                <td class="text-right">{{ Number::currency($VATTOTAL, 'GBP') }}</td>
+                            </tr>
+                            @endif
+                            @if(!empty($invoiceDiscounts))
+                                <tr>
+                                    <td class="text-left">{{ $DISCOUNTTITLE }}</td>
+                                    <td class="text-right">-{{ Number::currency($DISCOUNTTOTAL, 'GBP') }}</td>
+                                </tr>
+                            @endif
+                            <tr>
+                                <td class="text-left">Total</td>
+                                <td class="text-right">{{ Number::currency($TOTAL, 'GBP') }}</td>
+                            </tr>
+                        </table>
+                        <table class="bg-darkish2 uppercase color-white calculationTable" style="margin-top: 25px; padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
+                            <tr>
+                                <td class="text-left">Paid</td>
+                                <td class="text-right">{{ Number::currency($ADVANCEAMOUNT, 'GBP') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">Due</td>
+                                <td class="text-right">{{ Number::currency($DUE, 'GBP') }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <footer>
+                <p>
+                    {{ isset($invoice->user->companies[0]->company_name) && !empty($invoice->user->companies[0]->company_name) ? $invoice->user->companies[0]->company_name : '' }}
+                     | 
+                    {!! (isset($invoice->user->companies[0]->full_address) ? $invoice->user->companies[0]->full_address : '') !!}
+                    {{ (isset($invoice->user->companies[0]->company_phone) && !empty($invoice->user->companies[0]->company_phone) ? ' | '.$invoice->user->companies[0]->company_phone : '') }}
+                </p>
+                <div class="h-20 bg-darkish"></div>
+            </footer>
+        </div>
     </body>
 </html>

@@ -30,13 +30,13 @@
                 <div class="text-slate-500 heLabel">Sub Total</div>
                 <div class="ml-auto w-[80px] text-slate-700 text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
-            <div class="flex justify-between font-medium text-xs leading-none mb-2 uppercase discountBlock" style="display: none;">
-                <div class="text-slate-500 heLabel">Discount</div>
-                <div class="ml-auto w-[80px] text-danger text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
-            </div>
             <div class="flex justify-between font-medium text-xs leading-none mb-2 uppercase vatTotalBlock" style="display: none;">
                 <div class="text-slate-500 heLabel">Vat Total</div>
                 <div class="ml-auto w-[80px] text-slate-700 text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
+            </div>
+            <div class="flex justify-between font-medium text-xs leading-none mb-2 uppercase discountBlock" style="display: none;">
+                <div class="text-slate-500 heLabel">Discount</div>
+                <div class="ml-auto w-[80px] text-danger text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
         </div>
         <div class="calculationBlock">
@@ -53,6 +53,8 @@
                 <div class="ml-auto w-[80px] text-[#000000] text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
         </div>
+        <input type="hidden" name="invoiceSubTotal" id="invoiceSubTotal" value="0"/>
+        <input type="hidden" name="invoiceTotal" id="invoiceTotal" value="0"/>
     </div>
 </div>
 

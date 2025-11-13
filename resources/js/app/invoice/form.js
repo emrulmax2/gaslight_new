@@ -360,15 +360,15 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('#invoiceDiscountModal input:not([type="radio"]):not([type="checkbox"])').val('');
         $('#invoiceDiscountModal #removeDiscountBtn').fadeOut();
 
-        if(isVatInvoice){
-            $('#invoiceDiscountModal .vatWrap').fadeIn('fast', function(){
-                $('input', this).val(20);
-            })
-        }else{
-            $('#invoiceDiscountModal .vatWrap').fadeOut('fast', function(){
-                $('input', this).val(0);
-            })
-        }
+        // if(isVatInvoice){
+        //     $('#invoiceDiscountModal .vatWrap').fadeIn('fast', function(){
+        //         $('input', this).val(20);
+        //     })
+        // }else{
+        //     $('#invoiceDiscountModal .vatWrap').fadeOut('fast', function(){
+        //         $('input', this).val(0);
+        //     })
+        // }
     });
 
     $(document).on('click', '.discountItemBlock', function(e){
@@ -381,15 +381,15 @@ import INTAddressLookUps from '../../address_lookup.js';
         document.getElementById("invoiceDiscountModal").addEventListener("shown.tw.modal", function (event) {
             $('#invoiceDiscountModal .dueLeft').html(theLabel);
             $('#invoiceDiscountModal input[name="max_discount"]').val(totalDue);
-            if(isVatInvoice){
-                $('#invoiceDiscountModal .vatWrap').fadeIn('fast', function(){
-                    $('input', this).val(20);
-                })
-            }else{
-                $('#invoiceDiscountModal .vatWrap').fadeOut('fast', function(){
-                    $('input', this).val(0);
-                })
-            }
+            // if(isVatInvoice){
+            //     $('#invoiceDiscountModal .vatWrap').fadeIn('fast', function(){
+            //         $('input', this).val(20);
+            //     })
+            // }else{
+            //     $('#invoiceDiscountModal .vatWrap').fadeOut('fast', function(){
+            //         $('input', this).val(0);
+            //     })
+            // }
             if(localStorage.invoiceDiscounts){
                 $('#invoiceDiscountModal #removeDiscountBtn').fadeIn();
                 let invoiceDiscountsObj = JSON.parse(invoiceDiscounts);
@@ -427,15 +427,15 @@ import INTAddressLookUps from '../../address_lookup.js';
                 $('#invoiceDiscountModal .dueLeft').html(theLabel);
                 $('#invoiceDiscountModal input[name="amount"]').val(totalDue);
                 $('#invoiceDiscountModal input[name="max_discount"]').val(totalDue);
-                if(isVatInvoice){
-                    $('#invoiceDiscountModal .vatWrap').fadeIn('fast', function(){
-                        $('input', this).val(20);
-                    })
-                }else{
-                    $('#invoiceDiscountModal .vatWrap').fadeOut('fast', function(){
-                        $('input', this).val(0);
-                    })
-                }
+                // if(isVatInvoice){
+                //     $('#invoiceDiscountModal .vatWrap').fadeIn('fast', function(){
+                //         $('input', this).val(20);
+                //     })
+                // }else{
+                //     $('#invoiceDiscountModal .vatWrap').fadeOut('fast', function(){
+                //         $('input', this).val(0);
+                //     })
+                // }
             });
         }else{
             warningModal.show();
@@ -477,9 +477,9 @@ import INTAddressLookUps from '../../address_lookup.js';
             let formated_data = getFormatedData(form_data);
 
             let amount = $theForm.find('[name="amount"]').val() * 1;
-            let vat = ($theForm.find('[name="vat"]').val() != '' && $theForm.find('[name="vat"]').val() > 0 ? $theForm.find('[name="vat"]').val() * 1 : 0);
+            //let vat = ($theForm.find('[name="vat"]').val() != '' && $theForm.find('[name="vat"]').val() > 0 ? $theForm.find('[name="vat"]').val() * 1 : 0);
             formated_data['inv_item_title'] = 'Discount';
-            formated_data['vat'] = vat;
+            //formated_data['vat'] = vat;
 
             let discountItemBlock = '';
                 discountItemBlock += '<div class="px-2 py-4 discountItemWrap bg-white">';
@@ -723,12 +723,11 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         let hasDiscount = invoiceDiscounts.hasDiscount;
         let discountTotal = invoiceDiscounts.discountTotal;
-        let discountVatTotal = invoiceDiscounts.discountVatTotal;
 
         let hasAdvance = invoiceAdvances.hasAdvance;
         let advanceTotal = invoiceAdvances.advanceTotal;
 
-        let vatAmount = invoiceItemVatTotal - (hasDiscount ? discountVatTotal : 0);
+        let vatAmount = invoiceItemVatTotal;
 
         let total = invoiteItemTotal - (hasDiscount ? discountTotal : 0) + (isVatInvoice ? vatAmount : 0);
         let totalBalance = total - (hasAdvance ? advanceTotal : 0);
@@ -768,6 +767,8 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('.invoiceTotalBlock .theDesc').html('£'+total.toFixed(2));
         $('.invoiceBalanceBlock .theDesc').html('£'+totalBalance.toFixed(2));
 
+        $('#invoiceSubTotal').val(invoiteItemTotal);
+        $('#invoiceTotal').val(total);
         return {
             'totalBalance' : totalBalance
         };
@@ -801,7 +802,6 @@ import INTAddressLookUps from '../../address_lookup.js';
 
     function getInvoiceDiscountTotal(){
         let discountTotal = 0;
-        let discountVatTotal = 0;
         let hasDiscount = 0;
 
         if(localStorage.invoiceDiscounts){
@@ -809,13 +809,11 @@ import INTAddressLookUps from '../../address_lookup.js';
             let invoiceDiscounts = localStorage.getItem('invoiceDiscounts');
             let invoiceDiscountsObj = JSON.parse(invoiceDiscounts);
             let discountAmount = invoiceDiscountsObj.amount * 1;
-            let vat_rate = invoiceDiscountsObj.vat * 1;
             
             discountTotal = discountAmount;
-            discountVatTotal = (discountTotal * vat_rate) / 100;
         }
 
-        return {'hasDiscount' : hasDiscount, 'discountTotal' : discountTotal, 'discountVatTotal' : discountVatTotal};
+        return {'hasDiscount' : hasDiscount, 'discountTotal' : discountTotal};
     }
 
     function getInvoiceAdvanceTotal(){
@@ -844,12 +842,11 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         let hasDiscount = invoiceDiscounts.hasDiscount;
         let discountTotal = invoiceDiscounts.discountTotal;
-        let discountVatTotal = invoiceDiscounts.discountVatTotal;
 
         let hasAdvance = invoiceAdvances.hasAdvance;
         let advanceTotal = invoiceAdvances.advanceTotal;
 
-        let due = invoiteItemTotal; //+ (isVatInvoice ? invoiceItemVatTotal : 0);
+        let due = invoiteItemTotal;
             totalDue = due - (hasAdvance ? advanceTotal : 0);
 
         return totalDue;
@@ -866,14 +863,13 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         let hasDiscount = invoiceDiscounts.hasDiscount;
         let discountTotal = invoiceDiscounts.discountTotal;
-        let discountVatTotal = invoiceDiscounts.discountVatTotal;
 
         let hasAdvance = invoiceAdvances.hasAdvance;
         let advanceTotal = invoiceAdvances.advanceTotal;
 
-        let vatAmount = invoiceItemVatTotal - (hasDiscount ? discountVatTotal : 0);
+        let vatAmount = invoiceItemVatTotal;
 
-            totalDue = invoiteItemTotal - (hasDiscount ? discountTotal : 0); // + (isVatInvoice ? vatAmount : 0);
+            totalDue = invoiteItemTotal - (hasDiscount ? discountTotal : 0);
 
         return totalDue;
     }

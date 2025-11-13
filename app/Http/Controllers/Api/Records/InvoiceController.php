@@ -108,12 +108,13 @@ class InvoiceController extends Controller
 
         /* Create Job If Empty */
         if($customer_job_id == 0):
+            $jobName = $this->createJobName($request->options);
             $jobRefNo = $this->generateReferenceNo($customer_id);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
                 'customer_property_id' => $customer_property_id,
-                'description' => $form->name,
-                'details' => 'Job created for '.$property->full_address,
+                'description' => $jobName,
+                'details' => null,
                 'reference_no' => $jobRefNo,
                 'customer_job_status_id' => 1,
 
@@ -171,6 +172,9 @@ class InvoiceController extends Controller
                     'value' => $invoiceExtra
                 ]);
 
+                // Update Customer Job Amount
+                CustomerJob::where('id', $customer_job_id)->update(['estimated_amount' => $request->estimated_amount]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Invoice successfully created.',
@@ -189,6 +193,19 @@ class InvoiceController extends Controller
             ], 400);
         endif;
         /* Store or Update Record */
+    }
+
+    public function createJobName($options){
+        $options = json_decode($options);
+        $invoiceItems = json_decode($options->invoiceItems);
+        $jobName = [];
+        if(!empty($invoiceItems)):
+            foreach($invoiceItems as $items):
+                $jobName[] = $items->description;
+            endforeach;
+        endif;
+
+        return (!empty($jobName) ? implode(' ', $jobName) : 'New Job');
     }
 
 

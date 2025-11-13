@@ -233,7 +233,7 @@
 
 
 <!-- BEGIN: Discount Modal Content -->
-<x-base.dialog id="invoiceDiscountModal" size="md" class="max-w-full">
+<x-base.dialog id="invoiceDiscountModal" size="sm" class="max-w-full">
     <x-base.dialog.panel class="rounded-none">
         <form method="post" action="#" id="invoiceDiscountForm">
             <x-base.dialog.title class="justify-between">
@@ -249,10 +249,10 @@
                     <x-base.form-input step="any" min="1" name="amount" class="w-full" type="number" placeholder="0.0" />
                     <div class="acc__input-error error-amount text-danger text-xs mt-1"></div>
                 </div>
-                <div class="col-span-12 vatWrap">
+                <!-- <div class="col-span-12 vatWrap">
                     <x-base.form-label>VAT %</x-base.form-label>
                     <x-base.form-input step="any" name="vat" class="w-full" type="number" placeholder="20%" />
-                </div>
+                </div> -->
             </x-base.dialog.description>
             <x-base.dialog.footer class="flex">
                 <div>
