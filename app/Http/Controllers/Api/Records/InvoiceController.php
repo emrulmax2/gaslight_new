@@ -196,12 +196,11 @@ class InvoiceController extends Controller
     }
 
     public function createJobName($options){
-        $options = json_decode($options);
-        $invoiceItems = json_decode($options->invoiceItems);
+        $invoiceItems = $options['invoiceItems'];
         $jobName = [];
         if(!empty($invoiceItems)):
             foreach($invoiceItems as $items):
-                $jobName[] = $items->description;
+                $jobName[] = $items['description'];
             endforeach;
         endif;
 
