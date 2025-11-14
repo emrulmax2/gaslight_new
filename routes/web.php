@@ -316,6 +316,7 @@ Route::middleware(Authenticate::class)->group(function() {
 
         Route::post('customer/jobs/update-data', 'updateJobsData')->name('customer.jobs.update.data');
         Route::post('customer/jobs/update-appintment-data', 'updateJobsAppointmentData')->name('customer.jobs.update.appointment.date');
+        Route::post('customer/jobs/{customer_job_id}/mark-as-complete', 'markAsComplete')->name('customer.jobs.mark.as.complete');
     });
 
     Route::controller(JobsJobController::class)->group(function() {
