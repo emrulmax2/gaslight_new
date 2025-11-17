@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CustomerJob extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $appends = ['cancel_reason_name'];
+    protected $appends = ['cancel_reason_name', 'has_invoice'];
     
     protected $fillable = [
         'customer_id',
@@ -75,5 +75,9 @@ class CustomerJob extends Model
 
     public function invoice(){
         return $this->hasOne(Invoice::class, 'customer_job_id', 'id');
+    }
+
+    public function getHasInvoiceAttribute(){
+        return $this->invoice()->exists();
     }
 }
