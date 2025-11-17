@@ -504,10 +504,12 @@ class RecordController extends Controller
             $data['applianceCount'] = $data['commentssAnswered'] = $data['safetyChecksAnswered'] = 0;
             $data['appliances'] = $data['safetyChecks'] = $data['gsrComments'] = [];
             if(isset($record->available_options->appliances) && !empty($record->available_options->appliances)):
+                $appserial = 1;
                 foreach($record->available_options->appliances as $appliance):
-                    $data['appliances'][$appliance->appliance_serial] = (array) $appliance;
+                    $data['appliances'][$appserial] = (array) $appliance;
 
                     $data['applianceCount'] += 1;
+                    $appserial += 1;
                 endforeach;
             endif;
             if(isset($record->available_options->safetyChecks) && !empty($record->available_options->safetyChecks)):
