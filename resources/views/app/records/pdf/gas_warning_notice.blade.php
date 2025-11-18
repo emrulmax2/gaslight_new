@@ -449,9 +449,9 @@
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>
                                     <td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">
-                                        if($userSignBase64):
+                                        @if($userSignBase64)
                                             <img src="{{ $userSignBase64 }}" alt="signature" class="h-50px w-auto inline-block"/>
-                                        endif;
+                                        @endif
                                     </td>
                                 </tr>
                                 <tr>
@@ -471,9 +471,9 @@
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-top">Signature</td>
                                     <td class="border-t-0 border-l-0 border-r-0 border-b border-primary h-50px align-top">
-                                        if($signatureBase64):
+                                        @if($signatureBase64)
                                             <img src="{{ $signatureBase64 }}" alt="signature" class="h-50px w-auto inline-block"/>
-                                        endif;
+                                        @endif
                                     </td>
                                 </tr>
                                 <tr>
