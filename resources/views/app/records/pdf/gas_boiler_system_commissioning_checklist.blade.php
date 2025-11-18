@@ -599,12 +599,12 @@
                             </tbody>
                         </table>
                     </td>
-                    if($record->available_options->appliances->is_next_inspection == 'Applicable'):
+                    @if($record->available_options->appliances->is_next_inspection == 'Applicable')
                         <td class="w-20-percent p-0 border-primary border-b-0 align-middle bg-light-2 text-primary text-center px-3">
                             <div class="text-primary uppercase font-medium text-12px leading-none mb-1 px-2">Next Inspection Date</div>
                             <div class="inline-block bg-white w-col9 text-center rounded-none h-30px text-12px font-medium">{{ $nextInspectionDate }}</div>
                         </td>
-                    endif;
+                    @endif
                 </tr>
             </tbody>
         </table>
