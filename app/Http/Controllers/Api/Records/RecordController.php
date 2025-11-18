@@ -171,6 +171,9 @@ class RecordController extends Controller
         try {
             $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
                         ->find($record_id);
+            if(isset($record->job->has_invoice) && $record->job->has_invoice):
+                $record->job->invoice_id = (isset($record->job->invoice->id) && $record->job->invoice->id > 0 ? $record->job->invoice->id : null);
+            endif;
 
             //$pdf_url = $this->generatePdf($record_id);
             $fileName = $this->generatePdfFileName($record->id);
