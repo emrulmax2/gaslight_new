@@ -9,6 +9,9 @@
             <x-base.dialog.description class="">
                 <input type="hidden" name="appliance_serial" value="1"/>
                 <div class="grid grid-cols-12 gap-x-3 gap-y-2">
+                    <div class="col-span-12">
+                        <h2 class="mb-4 font-medium text-base leading-none tracking-normal">Appliance Details</h2>
+                    </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Location</x-base.form-label>
                         <x-base.form-select class="w-full tom-select py-0" id="appliance_location_id" name="appliance_location_id" data-placeholder="Please Select">
@@ -55,10 +58,14 @@
                         <x-base.form-input value="" name="gc_no" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="GC Number" />
                     </div>
                     
-
+                    
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Operating Pressure (mbar) or Heat Input (KW/h) or (BTU/h)</x-base.form-label>
                         <x-base.form-input value="" name="opt_pressure" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Operating Pressure" />
+                    </div>
+
+                    <div class="col-span-12">
+                        <h2 class="mb-4 mt-5 font-medium text-base leading-none tracking-normal">Installation Details</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
@@ -131,6 +138,10 @@
                                 </x-base.form-check>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="col-span-12">
+                        <h2 class="mb-4 mt-5 font-medium text-base leading-none tracking-normal">Analyser Readings</h2>
                     </div>
                     <div class="col-span-12 pt-2">
                         <x-base.form-label>Inital (low) Combustion Analyser Reading</x-base.form-label>
@@ -207,6 +218,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="col-span-12">
+                        <h2 class="mb-4 mt-5 font-medium text-base leading-none tracking-normal">Appliance / Safety Checks</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
