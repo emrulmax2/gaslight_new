@@ -370,10 +370,12 @@ class RecordController extends Controller
             $data['checklistAnswered'] = $data['radiatorCount'] = 0;
             $data['radiators'] = $data['powerFlushChecklist'] = [];
             if(isset($record->available_options->radiators) && !empty($record->available_options->radiators)):
+                $red = 1;
                 foreach($record->available_options->radiators as $radiator):
-                    $data['radiators'][$radiator->radiator_serial] = (array) $radiator;
+                    $data['radiators'][$red] = (array) $radiator;
 
                     $data['radiatorCount'] += 1;
+                    $red++;
                 endforeach;
             endif;
             if(isset($record->available_options->powerFlushChecklist) && !empty($record->available_options->powerFlushChecklist)):
