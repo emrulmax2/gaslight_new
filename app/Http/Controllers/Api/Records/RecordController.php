@@ -106,15 +106,27 @@ class RecordController extends Controller
                     $recordOption = RecordOption::where('record_id', $record->id)->where('name', 'jobSheetDocuments')->get()->first();
                     $jobSheetDocuments = (isset($recordOption->value) && !empty($recordOption->value) ? (array) $recordOption->value : []);
                     
-                    if($request->hasFile('job_sheet_files')):
-                        $documents = $request->file('job_sheet_files');
-                        $d = 1;
-                        foreach($documents as $document):
-                            $documentName = $d.'_'.$record->id.'_'.time().'.'.$document->getClientOriginalExtension();
-                            $path = $document->storeAs('records/'.$user_id.'/'.$job_form_id.'/job_sheets/', $documentName, 'public');
-                            $jobSheetDocuments[] = $documentName;
+                    if ($request->filled('job_sheet_files')):
+                        $documents = $request->job_sheet_files;
+                        foreach ($documents as $base64Image):
+                            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)):
+                                $fileType = strtolower($type[1]); // jpg, png, jpeg
+                                $base64Image = substr($base64Image, strpos($base64Image, ',') + 1);
+                            else:
+                                continue;
+                            endif;
 
-                            $d++;
+                            if (!in_array($fileType, ['jpg', 'jpeg', 'png'])):
+                                continue;
+                            endif;
+
+                            $imageData = base64_decode($base64Image);
+                            if ($imageData === false) continue;
+
+                            $fileName = Str::uuid() . '.' . $fileType;
+                            $filePath = 'records/' . $user_id . '/' . $job_form_id . '/job_sheets/' . $fileName;
+                            Storage::disk('public')->put($filePath, $imageData);
+                            $jobSheetDocuments[] = $fileName;
                         endforeach;
                     endif;
 
