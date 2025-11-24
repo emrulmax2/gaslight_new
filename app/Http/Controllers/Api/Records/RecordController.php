@@ -431,7 +431,8 @@ class RecordController extends Controller
                 foreach($jobSheetsDocs as $doc):
                     if(!empty($doc) && Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc)):
                         $documentUrl = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$doc);
-                        $data['jobSheetDocuments'][$i] = $documentUrl;
+                        $data['jobSheetDocuments'][$i]['name'] = $doc;
+                        $data['jobSheetDocuments'][$i]['url'] = $documentUrl;
                         $i++;
                     endif;
                 endforeach;
@@ -757,6 +758,37 @@ class RecordController extends Controller
             return $invoiceNumber;
         else:
             return false;
+        endif;
+    }
+
+    public function destroyJobSheetDoc(Request $request){
+        $record_id = $request->record_id;
+        $document_name = $request->document_name;
+        $record = Record::find($record_id);
+
+        $jobSheetsDocs = (array) $record->available_options->jobSheetDocuments;
+        if(!empty($jobSheetsDocs) && !empty($document_name)):
+            if (($key = array_search($document_name, $jobSheetsDocs)) !== false) :
+                unset($jobSheetsDocs[$key]);
+                if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$document_name)) {
+                    Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/job_sheets/'.$document_name);
+                }
+            endif;
+
+            RecordOption::where('record_id', $record_id)->where('job_form_id', $record->job_form_id)->where('name', 'jobSheetDocuments')->update([
+                'value' => $jobSheetsDocs,
+            ]);
+
+            return response()->json(['msg' => 'Job Sheet document Successfully deleted.', 'red' => ''], 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Job Sheet Succesfully deleted',
+            ], 200);
+        else:
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later.',
+            ], 422);
         endif;
     }
 }
