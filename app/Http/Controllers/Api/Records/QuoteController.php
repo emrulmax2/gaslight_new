@@ -118,14 +118,14 @@ class QuoteController extends Controller
 
         if($quote->id):
             $quote_number = $this->generateQuoteNumber($quote->id);
-            $options = json_decode($request->options);
+            $options = $request->options;
             QuoteOption::where('quote_id', $quote->id)->forceDelete();
             if(!empty($options)):
                 foreach($options as $key => $value):
                     QuoteOption::create([
                         'quote_id' => $quote->id,
                         'name' => $key,
-                        'value' => json_decode($value)
+                        'value' => $value
                     ]);
                 endforeach;
             endif;
@@ -150,7 +150,7 @@ class QuoteController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Invoice successfully created.',
+                'message' => 'Quote successfully created.',
                 'data' =>  Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'options'])->findOrFail($quote->id),
             ], 200);
         else:
