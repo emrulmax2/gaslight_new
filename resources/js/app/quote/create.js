@@ -12,8 +12,6 @@ import INTAddressLookUps from '../../address_lookup.js';
     const customerJobAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerJobAddressModal"));
     const addJobAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addJobAddressModal"));
     const customerListModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#customerListModal"));
-
-    const linkedJobModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#linkedJobModal"));
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -32,10 +30,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         }else{
             successModal.hide();
         }
-    });
-
-    document.getElementById("linkedJobModal").addEventListener("hide.tw.modal", function (event) {
-        $('#linkedJobModal .linkedJobListWrap').html('');
     });
 
     document.getElementById("customerListModal").addEventListener("hide.tw.modal", function (event) {
@@ -69,115 +63,18 @@ import INTAddressLookUps from '../../address_lookup.js';
         let jobObj = JSON.parse(job);
         job_id = (jobObj.id ? jobObj.id : 0);
 
-        $('.jobWrap').find('.theDesc').html((jobObj.description ? jobObj.description : 'Click here to select a job')).addClass('font-medium');
-        $('.jobWrap').find('.theId').val(job_id);
-    }
-    $(document).on('click', '.jobBlock', function(e){
-        e.preventDefault();
-        let $thejobBlock = $(this);
-        let job_form_id = $('#invoiceForm [name="job_form_id"]').val();
-        
-        $.ajax({
-            type: 'POST',
-            data: {job_form_id : job_form_id},
-            url: route('invoices.get.jobs'),
-            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            async: false,
-            success: function(data) {
-                linkedJobModal.show();
-                document.getElementById("linkedJobModal").addEventListener("shown.tw.modal", function (event) {
-                    $('#linkedJobModal .linkedJobListWrap').html(data.html);
-                });
-            },
-            error:function(e){
-                console.log('Error');
-            }
-        });
-    });
-    $('#linkedJobModal').on('click', '.customerJobItem', function(e){
-        e.preventDefault();
-        let $theJob = $(this);
-
-        if(!$theJob.hasClass('disabled')){
-            $('#linkedJobModal .customerJobItem').addClass('disabled')
-
-            $theJob.find('.theIcon').fadeOut();
-            $theJob.find('.theLoader').fadeIn();
-
-            let theJobId = $theJob.attr('data-id');
-            let theJobDescription = $theJob.attr('data-description');
-
-            
-            $.ajax({
-                type: 'POST',
-                data: {job_id : theJobId},
-                url: route('invoices.linked.job'),
-                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                async: false,
-                success: function(data) {
-                    $theJob.find('.theLoader').fadeOut();
-                    $theJob.find('.theIcon').fadeIn();
-
-                    let job = data.row;
-                    let customer = job.customer;
-                        customer_id = customer.id;
-                    let job_address = job.property;
-                    
-                    localStorage.setItem('job', JSON.stringify(job));
-                    localStorage.setItem('customer', JSON.stringify(customer));
-                    localStorage.setItem('job_address', JSON.stringify(job_address));
-
-                    $('.jobWrap').find('.theDesc').html(job.description).addClass('font-medium');
-                    $('.jobWrap').find('.theId').val(job.id);
-
-                    $('.customerWrap').find('.theDesc').html(customer.full_name).addClass('font-medium');
-                    $('.customerWrap').find('.theId').val(customer_id);
-
-                    let customerAddressObj = customer.address;
-                    let customerAddress = '';
-                    customerAddress += (customerAddressObj.address_line_1 != null ? customerAddressObj.address_line_1+' ' : '');
-                    customerAddress += (customerAddressObj.address_line_2 != null ? customerAddressObj.address_line_2+', ' : '');
-                    customerAddress += (customerAddressObj.city != null ? customerAddressObj.city+', ' : '');
-                    customerAddress += (customerAddressObj.state != null ? customerAddressObj.state+', ' : '');
-                    customerAddress += (customerAddressObj.postal_code != null ? customerAddressObj.postal_code : '');
-                    $('.customerAddressWrap').fadeIn('fast', function(){
-                        $('.theDesc', this).html(customerAddress).addClass('font-medium');
-                        $('.theId', this).val(0);
-                    })
-
-                    let theJobAddress = '';
-                    theJobAddress += (job_address.address_line_1 != null ? job_address.address_line_1+' ' : '');
-                    theJobAddress += (job_address.address_line_2 != null ? job_address.address_line_2+', ' : '');
-                    theJobAddress += (job_address.city != null ? job_address.city+', ' : '');
-                    theJobAddress += (job_address.state != null ? job_address.state+', ' : '');
-                    theJobAddress += (job_address.postal_code != null ? job_address.postal_code : '');
-                    $('.customerPropertyWrap').fadeIn('fast', function(){
-                        $('.theDesc', this).html((theJobAddress != '' ? theJobAddress : 'Click here to add job address')).addClass((theJobAddress != '' ? 'font-medium' : ''));
-                        $('.theId', this).val((job_address.id && job_address.id > 0 ? job_address.id : 0));
-                    })
-
-                    linkedJobModal.hide();
-                },
-                error:function(e){
-                    console.log('Error');
-                }
-            });
+        if(job_id > 0){
+            $('.linkedJobWrap').fadeIn('fast', function(){
+                $('.jobWrap').find('.theDesc').html((jobObj.description ? jobObj.description : 'Click here to select a job')).addClass('font-medium');
+                $('.jobWrap').find('.theId').val(job_id);
+            })
+        }else{
+            $('.linkedJobWrap').fadeOut('fast', function(){
+                $('.jobWrap').find('.theDesc').html('').removeClass('font-medium');
+                $('.jobWrap').find('.theId').val('');
+            })
         }
-    });
-
-    const textSearchJob = document.getElementById('search_job');
-    textSearchJob.addEventListener('input', function() {
-        const searchValue = this.value.toLowerCase();
-        const jobItems = document.querySelectorAll('#linkedJobModal .customerJobItem');
-        jobItems.forEach(theJob => {
-            const jobName = theJob.getAttribute('data-description').toLowerCase();
-            if (jobName.includes(searchValue)) {
-                theJob.style.display = 'flex';
-            } else {
-                theJob.style.display = 'none';
-            }
-        });
-    });
+    }
     /*On Click Linked Job End */
 
     /* Storage Trigger Start */
@@ -222,12 +119,12 @@ import INTAddressLookUps from '../../address_lookup.js';
     $('.customerBlock').on('click', function(e){
         e.preventDefault();
         let $theCustomerBlock = $(this);
-        let job_form_id = $('#invoiceForm [name="job_form_id"]').val();
+        let job_form_id = $('#quoteForm [name="job_form_id"]').val();
         
         $.ajax({
             type: 'POST',
             data: {job_form_id : job_form_id},
-            url: route('invoices.get.customers'),
+            url: route('quotes.get.customers'),
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             async: false,
             success: function(data) {
@@ -261,7 +158,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             $.ajax({
                 type: 'POST',
                 data: {customer_id : theCustomerId},
-                url: route('invoices.linked.customer'),
+                url: route('quotes.linked.customer'),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                 async: false,
                 success: function(data) {
@@ -364,7 +261,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             $.ajax({
                 type: 'POST',
                 data: {customer_id : customer_id},
-                url: route('invoices.get.job.addresses'),
+                url: route('quotes.get.job.addresses'),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                 async: false,
                 success: function(data) {
@@ -420,7 +317,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('invoices.store.job.addresses'),
+            url: route('quotes.store.job.addresses'),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
@@ -464,32 +361,32 @@ import INTAddressLookUps from '../../address_lookup.js';
 
 
     /* Auto Load Certificate Edit Data Start */
-    if(localStorage.invoice_id && localStorage.getItem('invoice_id') > 0){
-        $('#invoice_id').val(localStorage.getItem('invoice_id'));
-        if(localStorage.invoice){
-            // populate invoice data
+    if(localStorage.quote_id && localStorage.getItem('quote_id') > 0){
+        $('#quote_id').val(localStorage.getItem('quote_id'));
+        if(localStorage.quote){
+            // populate quote data
         }
     }else{
-        $('#invoice_id').val(0);
+        $('#quote_id').val(0);
     }
     /* Auto Load Certificate Edit Data End */
 
-    /* Auto Load Invoice Edit Data Start */
-    if(localStorage.invoice_id && localStorage.getItem('invoice_id') > 0){
-        $('#invoice_id').val(localStorage.getItem('invoice_id'));
-        if(localStorage.invoiceDetails){
-            let invoiceDetails = localStorage.getItem('invoiceDetails');
-            let invoiceObj = JSON.parse(invoiceDetails);
+    /* Auto Load Quote Edit Data Start */
+    if(localStorage.quote_id && localStorage.getItem('quote_id') > 0){
+        $('#quote_id').val(localStorage.getItem('quote_id'));
+        if(localStorage.quoteDetails){
+            let quoteDetails = localStorage.getItem('quoteDetails');
+            let quoteObj = JSON.parse(quoteDetails);
 
-            $('#non_vat_invoice').val((invoiceObj.non_vat_invoice ? invoiceObj.non_vat_invoice : '0'))
-            $('#vat_number').val((invoiceObj.vat_number ? invoiceObj.vat_number : ''))
-            //$('#issued_date').val((invoiceObj.issued_date ? invoiceObj.issued_date : getTodayDate()))
+            $('#non_vat_quote').val((quoteObj.non_vat_quote ? quoteObj.non_vat_quote : '0'))
+            $('#vat_number').val((quoteObj.vat_number ? quoteObj.vat_number : ''))
+            //$('#issued_date').val((quoteObj.issued_date ? quoteObj.issued_date : getTodayDate()))
             
         }
     }else{
-        $('#invoice_id').val(0);
+        $('#quote_id').val(0);
     }
-    /* Auto Load Invoice Edit Data End */
+    /* Auto Load Quote Edit Data End */
 
 
     
@@ -521,11 +418,11 @@ import INTAddressLookUps from '../../address_lookup.js';
     }
 
     /* Submit the Form */
-    $(document).on('click', '#saveInvoiceBtn', function(e){
+    $(document).on('click', '#saveQuoteBtn', function(e){
         e.preventDefault();
-        let job_form_id = $('#invoiceForm').find('[name="job_form_id"]').val();
+        let job_form_id = $('#quoteForm').find('[name="job_form_id"]').val();
         if(job_form_id == 3 || job_form_id == 4){
-            $('#invoiceForm').trigger('submit');
+            $('#quoteForm').trigger('submit');
         }else{
             $('.gsfSignature .sign-pad-button-submit').trigger('click');
         }
@@ -535,14 +432,14 @@ import INTAddressLookUps from '../../address_lookup.js';
         console.log('clicked');
     })
 
-    $('#invoiceForm').on('submit', function(e){
+    $('#quoteForm').on('submit', function(e){
         e.preventDefault();
-        const form = document.getElementById('invoiceForm');
+        const form = document.getElementById('quoteForm');
         const $theForm = $(this);
         let jobFormId = $theForm.find('input[name="job_form_id"]').val();
         
-        $('#saveInvoiceBtn', $theForm).attr('disabled', 'disabled');
-        $("#saveInvoiceBtn .theLoader").fadeIn();
+        $('#saveQuoteBtn', $theForm).attr('disabled', 'disabled');
+        $("#saveQuoteBtn .theLoader").fadeIn();
 
         let formValidation = validateCurrentForm(jobFormId);
         let errors = formValidation.errors;
@@ -552,7 +449,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         if($.isEmptyObject(errors)){
             axios({
                 method: "post",
-                url: route('invoices.store'),
+                url: route('quotes.store'),
                 data: formData,
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
@@ -564,13 +461,13 @@ import INTAddressLookUps from '../../address_lookup.js';
                     window.location.href = response.data.red;
                 }
             }).catch(error => {
-                $('#saveInvoiceBtn', $theForm).removeAttr('disabled');
-                $("#saveInvoiceBtn .theLoader").fadeOut();
+                $('#saveQuoteBtn', $theForm).removeAttr('disabled');
+                $("#saveQuoteBtn .theLoader").fadeOut();
                 if (error.response) {
                     if (error.response.status == 422) {
                         for (const [key, val] of Object.entries(error.response.data.errors)) {
-                            $(`#invoiceForm .${key}`).addClass('border-danger');
-                            $(`#invoiceForm  .error-${key}`).html(val);
+                            $(`#quoteForm .${key}`).addClass('border-danger');
+                            $(`#quoteForm  .error-${key}`).html(val);
                         }
                     } else if (error.response.status == 304) {
                         warningModal.show();
@@ -595,8 +492,8 @@ import INTAddressLookUps from '../../address_lookup.js';
                 }
             }
 
-            $('#saveInvoiceBtn', $theForm).removeAttr('disabled');
-            $("#saveInvoiceBtn .theLoader").fadeOut();
+            $('#saveQuoteBtn', $theForm).removeAttr('disabled');
+            $("#saveQuoteBtn .theLoader").fadeOut();
 
             warningModal.show();
             document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
@@ -604,15 +501,15 @@ import INTAddressLookUps from '../../address_lookup.js';
                 $("#warningModal .warningModalDesc").html((messages != '' ? messages : 'Form falidation issue found! Please fill out all required data.'));
             });
 
-            // setTimeout(() => {
-            //     warningModal.hide();
-            // }, 1500);
+            setTimeout(() => {
+                warningModal.hide();
+            }, 1500);
         }
     })
 
     function validateCurrentForm(jobFormId){
-        const form = document.getElementById('invoiceForm');
-        const $theForm = $('#invoiceForm');
+        const form = document.getElementById('quoteForm');
+        const $theForm = $('#quoteForm');
         let formData = new FormData(form);
 
         let errors = {};
@@ -620,38 +517,30 @@ import INTAddressLookUps from '../../address_lookup.js';
         if($theForm.find('[name="customer_id"]').val() == 0 || $theForm.find('[name="customer_id"]').val() == ''){
             errors['customer_id'] = 'Please select a customer.';
         }
-        if($theForm.find('[name="customer_property_id"]').val() == 0 || $theForm.find('[name="customer_property_id"]').val() == ''){
-            errors['customer_property_id'] = 'Job address can not be empty.';
-        }
+        // if($theForm.find('[name="customer_property_id"]').val() == 0 || $theForm.find('[name="customer_property_id"]').val() == ''){
+        //     errors['customer_property_id'] = 'Job address can not be empty.';
+        // }
 
-        // Invoice related Validation
-        if(localStorage.invoiceItems){
-            let invoiceItems = localStorage.getItem('invoiceItems');
-            options['invoiceItems'] = invoiceItems;
+        // Quote related Validation
+        if(localStorage.quoteItems){
+            let quoteItems = localStorage.getItem('quoteItems');
+            options['quoteItems'] = quoteItems;
             //formData.append('quoteItems', quoteItems);
         }else{
             errors['item_error'] = 'Please add at least one item for this quote.&nbsp;';
         }
-        if(localStorage.invoiceDiscounts){
-            let invoiceDiscounts = localStorage.getItem('invoiceDiscounts');
-            options['invoiceDiscounts'] = invoiceDiscounts;
+        if(localStorage.quoteDiscounts){
+            let quoteDiscounts = localStorage.getItem('quoteDiscounts');
+            options['quoteDiscounts'] = quoteDiscounts;
             //formData.append('quoteDiscounts', quoteDiscounts);
         }
-        if(localStorage.invoiceAdvance){
-            let invoiceAdvance = localStorage.getItem('invoiceAdvance');
-            options['invoiceAdvance'] = invoiceAdvance;
-            //formData.append('quoteAdvance', quoteAdvance);
-        }
-        if(localStorage.invoiceNotes){
-            let invoiceNotes = localStorage.getItem('invoiceNotes');
-            options['invoiceNotes'] = invoiceNotes;
+        if(localStorage.quoteNotes){
+            let quoteNotes = localStorage.getItem('quoteNotes');
+            options['quoteNotes'] = quoteNotes;
             //formData.append('quoteNotes', JSON.parse(quoteNotes));
         }
 
         formData.append('options', JSON.stringify(options));
-        if(localStorage.from_job && localStorage.getItem('from_job') == 1){
-            formData.append('from_job', 1);
-        }
         return { errors : errors, formData : formData};
     }
 })()

@@ -381,4 +381,26 @@ class CompanyController extends Controller
 
         return redirect('company');
     }
+
+    public function updateQuoteSettings(Request $request){
+        $request->validate([
+            'quote_expired_in' => 'required|integer'
+        ]);
+
+        $updated = Company::where('id', $request->company_id)->update([
+            'quote_expired_in' => $request->quote_expired_in,
+        ]);
+
+        if ($updated) {
+            return response()->json([
+                'msg' => 'Company quote settings successfully updated.',
+                'red' => ''
+            ], 200);
+        } else {
+            return response()->json([
+                'msg' => 'No change found.',
+                'red' => ''
+            ], 304);
+        }
+    }
 }

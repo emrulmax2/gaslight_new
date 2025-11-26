@@ -6,17 +6,27 @@ import INTAddressLookUps from '../../address_lookup.js';
         INTAddressLookUps();
     }
 
-    let tncTomOptions = {
-        plugins: {
-            dropdown_input: {}
-        },
-        placeholder: 'Search Here...',
-        create: false,
-        allowEmptyOption: true,
-        onDelete: function (values) {
-            return confirm( values.length > 1 ? "Are you sure you want to remove these " + values.length + " items?" : 'Are you sure you want to remove "' +values[0] +'"?' );
+    
+    let dateOption = {
+        autoApply: true,
+        singleMode: true,
+        numberOfColumns: 1,
+        numberOfMonths: 1,
+        showWeekNumbers: false,
+        minDate: new Date() - 1,
+        inlineMode: false,
+        format: "DD-MM-YYYY",
+        dropdowns: {
+            minYear: 1900,
+            maxYear: 2050,
+            months: true,
+            years: true,
         },
     };
+    const issuedDate = new Litepicker({
+        element: document.getElementById('issued_date'),
+        ...dateOption
+    });
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
@@ -43,20 +53,20 @@ import INTAddressLookUps from '../../address_lookup.js';
     });
     
     /* Init The Calculation */
-    let isVatQuote = ($('#certificateForm #non_vat_quote').val() == 1 ? false : true);
+    let isVatQuote = ($('#quoteForm #non_vat_quote').val() == 1 ? false : true);
     quoteCalculation();
     /* Init The Calculation */
 
     /* Generate Or Autoload Quote Number Start */
-    if(localStorage.certificate_number && localStorage.getItem('certificate_number') != ''){
-        let quoteNumber = JSON.parse(localStorage.getItem('certificate_number'));
+    if(localStorage.quote_number && localStorage.getItem('quote_number') != ''){
+        let quoteNumber = JSON.parse(localStorage.getItem('quote_number'));
         $('.quoteNoBlockWrap').fadeIn('fast', function(){
             $('.quoteNoBlock').find('.theDesc').html(quoteNumber).addClass('font-medium');
-        })
+        });
     }else{
-        $('.quoteNoBlockWrap').fadeIn('fast', function(){
+        $('.quoteNoBlockWrap').fadeOut('fast', function(){
             $('.quoteNoBlock').find('.theDesc').html('').removeClass('font-medium');
-        })
+        });
     }
     /* Generate Or Autoload Quote Number End */
 
@@ -64,7 +74,7 @@ import INTAddressLookUps from '../../address_lookup.js';
     document.getElementById('quoteItemModal').addEventListener('hide.tw.modal', function(event) {
         $('#quoteItemModal input:not([type="radio"]):not([type="checkbox"])').val('');
         $('#quoteItemModal textarea').val('');
-        $('#quoteItemModal input[name="inv_item_serial"]').val('1');
+        $('#quoteItemModal input[name="qut_item_serial"]').val('1');
         $('#quoteItemModal input[name="edit"]').val('0');
         $('#quoteItemModal #removeItemBtn').fadeOut();
 
@@ -85,16 +95,16 @@ import INTAddressLookUps from '../../address_lookup.js';
         let quoteItemsObj = JSON.parse(quoteItems);
 
         if(Object.keys(quoteItemsObj).length > 0){
-            for (const [inv_item_serial, invItem] of Object.entries(quoteItemsObj)) {
+            for (const [qut_item_serial, invItem] of Object.entries(quoteItemsObj)) {
                 
                 let units = invItem.units * 1;
                 let unit_price = invItem.price * 1;
                 let vat_rate = invItem.vat * 1;
                 let line_total = invItem.line_total * 1;
                 let quoteItemBlock = '';
-                quoteItemBlock += '<div class="px-2 py-4 quoteItemWrap_'+inv_item_serial+' bg-white" style="margin-top: 2px">';
-                    quoteItemBlock += '<a data-key="'+inv_item_serial+'" href="javascript:void(0);" class="editQuoteItemBtn flex justify-between items-center cursor-pointer quoteItemBlock_'+inv_item_serial+'">';
-                        quoteItemBlock += '<div class="theDesc font-medium">'+invItem.inv_item_title+'</div>';
+                quoteItemBlock += '<div class="px-2 py-4 quoteItemWrap_'+qut_item_serial+' bg-white" style="margin-top: 2px">';
+                    quoteItemBlock += '<a data-key="'+qut_item_serial+'" href="javascript:void(0);" class="editQuoteItemBtn flex justify-between items-center cursor-pointer quoteItemBlock_'+qut_item_serial+'">';
+                        quoteItemBlock += '<div class="theDesc font-medium">'+invItem.qut_item_title+'</div>';
                         quoteItemBlock += '<div style="flex: 0 0 150px; margin-left: auto;" class="font-medium inline-flex justify-end items-center">';
                             quoteItemBlock += '<span>'+units+' x £'+unit_price.toFixed(2)+'</span>';
                             quoteItemBlock += '<span class="ml-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pencil" class="lucide lucide-pencil stroke-1.5 h-3 w-3 text-success"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg></span>';
@@ -130,7 +140,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         
         quoteItemModal.show();
         document.getElementById("quoteItemModal").addEventListener("shown.tw.modal", function (event) {
-            $('#quoteItemModal input[name="inv_item_serial"]').val(serial);
+            $('#quoteItemModal input[name="qut_item_serial"]').val(serial);
             $('#quoteItemModal input[name="edit"]').val(0);
             $('#quoteItemModal #removeItemBtn').fadeOut();
 
@@ -157,7 +167,7 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         quoteItemModal.show();
         document.getElementById("quoteItemModal").addEventListener("shown.tw.modal", function (event) {
-            $('#quoteItemModal input[name="inv_item_serial"]').val(theSerial);
+            $('#quoteItemModal input[name="qut_item_serial"]').val(theSerial);
             $('#quoteItemModal input[name="edit"]').val(theSerial);
             $('#quoteItemModal #removeItemBtn').fadeIn();
 
@@ -179,7 +189,7 @@ import INTAddressLookUps from '../../address_lookup.js';
                     if($theInput.attr('type') == 'radio'){
                         $('#quoteItemModal [name="'+key+'"][value="'+value+'"]').prop('checked', true);
                     }else{
-                        if(key != 'inv_item_serial' && key != 'edit'){
+                        if(key != 'qut_item_serial' && key != 'edit'){
                             $theInput.val(value ? value : '');
                         }
                     }
@@ -215,7 +225,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             $('#saveItemBtn', $theForm).removeAttr('disabled');
             $("#saveItemBtn .theLoader").fadeOut();
         }else{
-            let inv_item_serial = $theForm.find('[name="inv_item_serial"]').val() * 1;
+            let qut_item_serial = $theForm.find('[name="qut_item_serial"]').val() * 1;
             let edit = $theForm.find('[name="edit"]').val();
 
             let form_data = $theForm.serializeArray();
@@ -228,46 +238,46 @@ import INTAddressLookUps from '../../address_lookup.js';
             let vat_total = (unit_total * vat) / 100;
             let line_total = unit_total + vat_total;
 
-            let inv_item_title = ($theForm.find('[name="description"]').val() != '' ? $theForm.find('[name="description"]').val() : inv_item_serial+' Line Item');
-            formated_data['inv_item_title'] = inv_item_title;
+            let qut_item_title = ($theForm.find('[name="description"]').val() != '' ? $theForm.find('[name="description"]').val() : qut_item_serial+' Line Item');
+            formated_data['qut_item_title'] = qut_item_title;
             formated_data['vat'] = vat;
             formated_data['line_total'] = line_total;
             
             if(edit > 0){
                 let quoteItems = localStorage.getItem('quoteItems');
                 let quoteItemsObj = JSON.parse(quoteItems);
-                quoteItemsObj[inv_item_serial] = formated_data;
+                quoteItemsObj[qut_item_serial] = formated_data;
 
                 localStorage.setItem('quoteItems', JSON.stringify(quoteItemsObj));
 
                 let quoteItemBlock = ''
-                    quoteItemBlock += '<a data-key="'+inv_item_serial+'" href="javascript:void(0);" class="editQuoteItemBtn flex justify-between items-center cursor-pointer quoteItemBlock_'+inv_item_serial+'">';
-                        quoteItemBlock += '<div class="theDesc font-medium">'+inv_item_title+'</div>';
+                    quoteItemBlock += '<a data-key="'+qut_item_serial+'" href="javascript:void(0);" class="editQuoteItemBtn flex justify-between items-center cursor-pointer quoteItemBlock_'+qut_item_serial+'">';
+                        quoteItemBlock += '<div class="theDesc font-medium">'+qut_item_title+'</div>';
                         quoteItemBlock += '<div style="flex: 0 0 150px; margin-left: auto;" class="font-medium inline-flex justify-end items-center">';
                             quoteItemBlock += '<span>'+unit+' x £'+price.toFixed(2)+'</span>';
                             quoteItemBlock += '<span class="ml-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pencil" class="lucide lucide-pencil stroke-1.5 h-3 w-3 text-success"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg></span>';
                         quoteItemBlock += '</div>';
                     quoteItemBlock += '</a>';
-                $('.allItemsWrap').find('.quoteItemWrap_'+inv_item_serial).html(quoteItemBlock);
+                $('.allItemsWrap').find('.quoteItemWrap_'+qut_item_serial).html(quoteItemBlock);
             }else{
                 if(localStorage.quoteItems){
                     let quoteItems = localStorage.getItem('quoteItems');
                     let quoteItemsObj = JSON.parse(quoteItems);
-                    quoteItemsObj[inv_item_serial] = formated_data
+                    quoteItemsObj[qut_item_serial] = formated_data
 
                     localStorage.setItem('quoteItems', JSON.stringify(quoteItemsObj));
-                    localStorage.setItem('quoteItemsCount', inv_item_serial);
+                    localStorage.setItem('quoteItemsCount', qut_item_serial);
                 }else{
                     let quoteItemsObj = {};
-                    quoteItemsObj[inv_item_serial] = formated_data;
+                    quoteItemsObj[qut_item_serial] = formated_data;
 
                     localStorage.setItem('quoteItems', JSON.stringify(quoteItemsObj));
-                    localStorage.setItem('quoteItemsCount', inv_item_serial);
+                    localStorage.setItem('quoteItemsCount', qut_item_serial);
                 }
                 let quoteItemBlock = '';
-                    quoteItemBlock += '<div class="px-2 py-4 quoteItemWrap_'+inv_item_serial+' bg-white" style="margin-top: 2px">';
-                        quoteItemBlock += '<a data-key="'+inv_item_serial+'" href="javascript:void(0);" class="editQuoteItemBtn flex justify-between items-center cursor-pointer quoteItemBlock_'+inv_item_serial+'">';
-                            quoteItemBlock += '<div class="theDesc font-medium">'+inv_item_title+'</div>';
+                    quoteItemBlock += '<div class="px-2 py-4 quoteItemWrap_'+qut_item_serial+' bg-white" style="margin-top: 2px">';
+                        quoteItemBlock += '<a data-key="'+qut_item_serial+'" href="javascript:void(0);" class="editQuoteItemBtn flex justify-between items-center cursor-pointer quoteItemBlock_'+qut_item_serial+'">';
+                            quoteItemBlock += '<div class="theDesc font-medium">'+qut_item_title+'</div>';
                             quoteItemBlock += '<div style="flex: 0 0 150px; margin-left: auto;" class="font-medium inline-flex justify-end items-center">';
                                 quoteItemBlock += '<span>'+unit+' x £'+price.toFixed(2)+'</span>';
                                 quoteItemBlock += '<span class="ml-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pencil" class="lucide lucide-pencil stroke-1.5 h-3 w-3 text-success"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg></span>';
@@ -291,7 +301,7 @@ import INTAddressLookUps from '../../address_lookup.js';
 
     $('#removeItemBtn').on('click', function(e){
         e.preventDefault();
-        let theSerial = $('#quoteItemModal input[name="inv_item_serial"]').val();
+        let theSerial = $('#quoteItemModal input[name="qut_item_serial"]').val();
 
         if(theSerial > 0){
             let quoteItemsCount = localStorage.getItem('quoteItemsCount') * 1;
@@ -336,15 +346,15 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('#quoteDiscountModal input:not([type="radio"]):not([type="checkbox"])').val('');
         $('#quoteDiscountModal #removeDiscountBtn').fadeOut();
 
-        if(isVatQuote){
-            $('#quoteDiscountModal .vatWrap').fadeIn('fast', function(){
-                $('input', this).val(20);
-            })
-        }else{
-            $('#quoteDiscountModal .vatWrap').fadeOut('fast', function(){
-                $('input', this).val(0);
-            })
-        }
+        // if(isVatQuote){
+        //     $('#quoteDiscountModal .vatWrap').fadeIn('fast', function(){
+        //         $('input', this).val(20);
+        //     })
+        // }else{
+        //     $('#quoteDiscountModal .vatWrap').fadeOut('fast', function(){
+        //         $('input', this).val(0);
+        //     })
+        // }
     });
 
     $(document).on('click', '.discountItemBlock', function(e){
@@ -357,15 +367,15 @@ import INTAddressLookUps from '../../address_lookup.js';
         document.getElementById("quoteDiscountModal").addEventListener("shown.tw.modal", function (event) {
             $('#quoteDiscountModal .dueLeft').html(theLabel);
             $('#quoteDiscountModal input[name="max_discount"]').val(totalDue);
-            if(isVatQuote){
-                $('#quoteDiscountModal .vatWrap').fadeIn('fast', function(){
-                    $('input', this).val(20);
-                })
-            }else{
-                $('#quoteDiscountModal .vatWrap').fadeOut('fast', function(){
-                    $('input', this).val(0);
-                })
-            }
+            // if(isVatQuote){
+            //     $('#quoteDiscountModal .vatWrap').fadeIn('fast', function(){
+            //         $('input', this).val(20);
+            //     })
+            // }else{
+            //     $('#quoteDiscountModal .vatWrap').fadeOut('fast', function(){
+            //         $('input', this).val(0);
+            //     })
+            // }
             if(localStorage.quoteDiscounts){
                 $('#quoteDiscountModal #removeDiscountBtn').fadeIn();
                 let quoteDiscountsObj = JSON.parse(quoteDiscounts);
@@ -403,15 +413,15 @@ import INTAddressLookUps from '../../address_lookup.js';
                 $('#quoteDiscountModal .dueLeft').html(theLabel);
                 $('#quoteDiscountModal input[name="amount"]').val(totalDue);
                 $('#quoteDiscountModal input[name="max_discount"]').val(totalDue);
-                if(isVatQuote){
-                    $('#quoteDiscountModal .vatWrap').fadeIn('fast', function(){
-                        $('input', this).val(20);
-                    })
-                }else{
-                    $('#quoteDiscountModal .vatWrap').fadeOut('fast', function(){
-                        $('input', this).val(0);
-                    })
-                }
+                // if(isVatQuote){
+                //     $('#quoteDiscountModal .vatWrap').fadeIn('fast', function(){
+                //         $('input', this).val(20);
+                //     })
+                // }else{
+                //     $('#quoteDiscountModal .vatWrap').fadeOut('fast', function(){
+                //         $('input', this).val(0);
+                //     })
+                // }
             });
         }else{
             warningModal.show();
@@ -453,9 +463,9 @@ import INTAddressLookUps from '../../address_lookup.js';
             let formated_data = getFormatedData(form_data);
 
             let amount = $theForm.find('[name="amount"]').val() * 1;
-            let vat = ($theForm.find('[name="vat"]').val() != '' && $theForm.find('[name="vat"]').val() > 0 ? $theForm.find('[name="vat"]').val() * 1 : 0);
-            formated_data['inv_item_title'] = 'Discount';
-            formated_data['vat'] = vat;
+            //let vat = ($theForm.find('[name="vat"]').val() != '' && $theForm.find('[name="vat"]').val() > 0 ? $theForm.find('[name="vat"]').val() * 1 : 0);
+            formated_data['qut_item_title'] = 'Discount';
+            //formated_data['vat'] = vat;
 
             let discountItemBlock = '';
                 discountItemBlock += '<div class="px-2 py-4 discountItemWrap bg-white">';
@@ -494,6 +504,25 @@ import INTAddressLookUps from '../../address_lookup.js';
     })
     /* Quote Discount END */
 
+    /* Issued Date Load Start */
+    if(localStorage.issued_date){
+        let issued_date = localStorage.getItem('issued_date');
+        if(issued_date != ''){
+            $('#issued_date').val(JSON.parse(issued_date));
+            issuedDate.setDate(JSON.parse(issued_date)); 
+        }else{
+            $('#issued_date').val(getTodayDate());
+            issuedDate.setDate(getTodayDate()); 
+        }
+    }
+    issuedDate.on('selected', (date) => {
+        localStorage.removeItem('quoteNotes');
+        if(date){
+            let theDate = date.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-");
+            localStorage.setItem('issued_date', JSON.stringify(theDate));
+        }
+    });
+    /* Issued Date Load Start */
 
     /* Note Auto Load Start */
     document.getElementById('quoteNoteModal').addEventListener('hide.tw.modal', function(event) {
@@ -544,11 +573,6 @@ import INTAddressLookUps from '../../address_lookup.js';
     /* Extras Auto Load Start */
     if(localStorage.quoteExtra && localStorage.quoteExtra != null){
         let quoteExtra = JSON.parse(localStorage.getItem('quoteExtra'));
-        if(quoteExtra.issued_date != ''){
-            $('#issued_date').val(formatDateToDdMmYyyy(quoteExtra.issued_date));
-        }else{
-            $('#issued_date').val(getTodayDate());
-        }
         if(quoteExtra.vat_number != ''){
             $('#vat_number').val(quoteExtra.vat_number);
         }
@@ -561,22 +585,17 @@ import INTAddressLookUps from '../../address_lookup.js';
     function quoteCalculation(){
         let quoteItems = getQuoteItemTotal();
         let quoteDiscounts = getQuoteDiscountTotal();
-        let quoteAdvances = getQuoteAdvanceTotal();
 
         let invoiteItemTotal = quoteItems.invoiteItemTotal;
         let quoteItemVatTotal = quoteItems.quoteItemVatTotal;
 
         let hasDiscount = quoteDiscounts.hasDiscount;
         let discountTotal = quoteDiscounts.discountTotal;
-        let discountVatTotal = quoteDiscounts.discountVatTotal;
 
-        let hasAdvance = quoteAdvances.hasAdvance;
-        let advanceTotal = quoteAdvances.advanceTotal;
-
-        let vatAmount = quoteItemVatTotal - (hasDiscount ? discountVatTotal : 0);
+        let vatAmount = quoteItemVatTotal;
 
         let total = invoiteItemTotal - (hasDiscount ? discountTotal : 0) + (isVatQuote ? vatAmount : 0);
-        let totalBalance = total - (hasAdvance ? advanceTotal : 0);
+        let totalBalance = total;
         
         $('.lineTotalBlock').fadeIn('fast', function(){
             $('.subTotalBlock .theDesc').html('£'+invoiteItemTotal.toFixed(2));
@@ -600,19 +619,11 @@ import INTAddressLookUps from '../../address_lookup.js';
             }
         });
 
-        if(hasAdvance){
-            $('.quoteAdvanceBlock').fadeIn('fast', function(){
-                $('.theDesc', this).html('-£'+advanceTotal.toFixed(2))
-            });
-        }else{
-            $('.quoteAdvanceBlock').fadeOut('fast', function(){
-                $('.theDesc', this).html('£0.00');
-            });
-        }
-
         $('.quoteTotalBlock .theDesc').html('£'+total.toFixed(2));
         $('.quoteBalanceBlock .theDesc').html('£'+totalBalance.toFixed(2));
 
+        $('#quoteSubTotal').val(invoiteItemTotal);
+        $('#quoteTotal').val(total);
         return {
             'totalBalance' : totalBalance
         };
@@ -626,7 +637,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             let quoteItemsObj = JSON.parse(quoteItems);
     
             if(Object.keys(quoteItemsObj).length > 0){
-                for (const [inv_item_serial, invItem] of Object.entries(quoteItemsObj)) {
+                for (const [qut_item_serial, invItem] of Object.entries(quoteItemsObj)) {
                     
                     let units = invItem.units * 1;
                     let unit_price = invItem.price * 1;
@@ -646,7 +657,6 @@ import INTAddressLookUps from '../../address_lookup.js';
 
     function getQuoteDiscountTotal(){
         let discountTotal = 0;
-        let discountVatTotal = 0;
         let hasDiscount = 0;
 
         if(localStorage.quoteDiscounts){
@@ -654,71 +664,26 @@ import INTAddressLookUps from '../../address_lookup.js';
             let quoteDiscounts = localStorage.getItem('quoteDiscounts');
             let quoteDiscountsObj = JSON.parse(quoteDiscounts);
             let discountAmount = quoteDiscountsObj.amount * 1;
-            let vat_rate = quoteDiscountsObj.vat * 1;
             
             discountTotal = discountAmount;
-            discountVatTotal = (discountTotal * vat_rate) / 100;
         }
 
-        return {'hasDiscount' : hasDiscount, 'discountTotal' : discountTotal, 'discountVatTotal' : discountVatTotal};
-    }
-
-    function getQuoteAdvanceTotal(){
-        let hasAdvance = 0;
-        let advanceTotal = 0;
-
-        if(localStorage.quoteAdvance){
-            let quoteAdvance = localStorage.getItem('quoteAdvance');
-            let quoteAdvanceObj = JSON.parse(quoteAdvance);
-
-            hasAdvance = 1;
-            advanceTotal = (quoteAdvanceObj.advance_amount ? quoteAdvanceObj.advance_amount * 1 : 0);
-        }
-
-        return {'hasAdvance' : hasAdvance, 'advanceTotal' : advanceTotal};
+        return {'hasDiscount' : hasDiscount, 'discountTotal' : discountTotal};
     }
 
     function getDueAmountForDiscount(){
         let totalDue = 0;
         let quoteItems = getQuoteItemTotal();
         let quoteDiscounts = getQuoteDiscountTotal();
-        let quoteAdvances = getQuoteAdvanceTotal();
 
         let invoiteItemTotal = quoteItems.invoiteItemTotal;
         let quoteItemVatTotal = quoteItems.quoteItemVatTotal;
 
         let hasDiscount = quoteDiscounts.hasDiscount;
         let discountTotal = quoteDiscounts.discountTotal;
-        let discountVatTotal = quoteDiscounts.discountVatTotal;
 
-        let hasAdvance = quoteAdvances.hasAdvance;
-        let advanceTotal = quoteAdvances.advanceTotal;
-
-        let due = invoiteItemTotal + (isVatQuote ? quoteItemVatTotal : 0);
-            totalDue = due - (hasAdvance ? advanceTotal : 0);
-
-        return totalDue;
-    }
-
-    function getDueAmountForAdvance(){
-        let totalDue = 0;
-        let quoteItems = getQuoteItemTotal();
-        let quoteDiscounts = getQuoteDiscountTotal();
-        let quoteAdvances = getQuoteAdvanceTotal();
-
-        let invoiteItemTotal = quoteItems.invoiteItemTotal;
-        let quoteItemVatTotal = quoteItems.quoteItemVatTotal;
-
-        let hasDiscount = quoteDiscounts.hasDiscount;
-        let discountTotal = quoteDiscounts.discountTotal;
-        let discountVatTotal = quoteDiscounts.discountVatTotal;
-
-        let hasAdvance = quoteAdvances.hasAdvance;
-        let advanceTotal = quoteAdvances.advanceTotal;
-
-        let vatAmount = quoteItemVatTotal - (hasDiscount ? discountVatTotal : 0);
-
-            totalDue = invoiteItemTotal - (hasDiscount ? discountTotal : 0) + (isVatQuote ? vatAmount : 0);
+        let due = invoiteItemTotal;
+            totalDue = due;
 
         return totalDue;
     }
@@ -746,7 +711,6 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         return dd+'-'+mm+'-'+yyyy;
     }
-
     function formatDateToDdMmYyyy(theDateString) {
         const date = new Date(theDateString);
         const day = date.getDate();

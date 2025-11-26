@@ -248,6 +248,14 @@ class InvoiceController extends Controller
 
                 // Update Customer Job Amount
                 CustomerJob::where('id', $customer_job_id)->update(['estimated_amount' => $request->invoiceTotal]);
+                if(isset($request->from_job) && $request->from_job == 1):
+                    CustomerJob::where('id', $customer_job_id)->update([
+                        'customer_job_status_id' => 2,
+                        'cancel_reason_id' => null,
+                        'cancel_reason_note' => null,
+                        'updated_by' => $request->user()->id
+                    ]);
+                endif;
 
                 return response()->json(['msg' => 'Invoice successfully created.', 'red' => route('invoices.show', $invoice->id)], 200);
             else:

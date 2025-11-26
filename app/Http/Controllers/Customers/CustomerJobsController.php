@@ -365,81 +365,65 @@ class CustomerJobsController extends Controller
             $submit_type = $request->submit_type;
             $user_id = $request->user()->id;
 
+            $user = User::find($user_id);
+            $non_vat_status = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
+            $vat_number = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
+
             $invoice = null;
             if($submit_type == 1):
-                $invoice = DB::transaction(function () use ($customer_job_id, $customer_job_status_id, $submit_type, $user_id) {
-                    $user = User::find($user_id);
-                    $job = CustomerJob::find($customer_job_id);
-                    $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
+                $job = CustomerJob::with(['property', 'calendar'])->find($customer_job_id);
 
-                    $non_vat_status = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? 0 : 1);
-                    $vat_number = (isset($user->companies[0]->vat_number) && !empty($user->companies[0]->vat_number) ? $user->companies[0]->vat_number : '');
-                    
-                    $vat_rate = 20;
-                    $unit_price = (isset($job->estimated_amount) && $job->estimated_amount > 0 ? $job->estimated_amount : 0);
-                    $unit = 1; 
-                    $subTotal = $unit_price * $unit;
-                    $vatAmount = ($non_vat_status ? 0 : ($subTotal / $vat_rate) * 100);
-                    $lineTotal = $subTotal + $vatAmount; 
+                $invoice = [
+                    'from_job' => 1,
+                    'invoice_id' => 0,
+                    'invoice_number' => '',
+                    // 'invoice' => [
+                    //     'status' => 'Draft',
+                    //     'pay_status' => 'Unpaid',
+                    //     'expire_date' => '',
+                    // ],
+                    'issued_date' => (isset($job->calendar->date) && !empty($job->calendar->date) ? date('d-m-Y', strtotime($job->calendar->date)) : ''),
+                    'job' => $job,
+                    'customer' => (isset($job->customer) && !empty($job->customer) ? $job->customer : []),
+                    'job_address' => (isset($job->property) && !empty($job->property) ? $job->property : [])
+                ];
 
-                    $invoice = Invoice::create([
-                        'company_id' => $company->id,
-                        'customer_id' => $job->customer_id,
-                        'customer_job_id' => $job->id,
-                        'job_form_id' => 4,
-                        'customer_property_id' => (isset($job->customer_property_id) && $job->customer_property_id > 0 ? $job->customer_property_id : null),
-                        
-                        'issued_date' => date('Y-m-d'),
-                        'expire_date' => date('Y-m-d', strtotime("+30 days")),
-                        
-                        'updated_by' => $user_id,
-                    ]);
-                    $invoice_number = $this->generateInvoiceNumber($invoice->id);
-
-                    $invoiceItems[1] = [
-                        'vat' => $vat_rate,
-                        'edit' => 0,
-                        'price' => $unit_price,
-                        'units' => $unit,
-                        'line_total' => $lineTotal,
-                        'description' => (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item 01'),
-                        'inv_item_title' => (isset($job->description) && !empty($job->description) ? $job->description : 'Invoice Item 01'),
-                        'inv_item_serial' => 1
-                    ];
-                    InvoiceOption::create([
-                        'invoice_id' => $invoice->id,
-                        'name' => 'invoiceItems',
-                        'value' => $invoiceItems
-                    ]);
-
-                    $invoiceExtra = [
-                        'non_vat_invoice' => $non_vat_status,
-                        'vat_number' => $vat_number,
-                    ];
-                    if(isset($company->bank->payment_term) && !empty($company->bank->payment_term)):
-                        $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : '');
-                    else:
-                        $invoiceExtra['payment_term'] = '';
-                    endif;
-                    InvoiceOption::create([
-                        'invoice_id' => $invoice->id,
-                        'name' => 'invoiceExtra',
-                        'value' => $invoiceExtra
-                    ]);
-
-                    return $invoice;
-                });
+                $vatRate = 20;
+                $unitPrice = (isset($job->estimated_amount) && $job->estimated_amount > 0 ? $job->estimated_amount : 0);
+                $unit = 1;
+                $lineSubTotal = $unitPrice * $unit;
+                $vat = ($lineSubTotal * $vatRate) / 100;
+                $lineTotal = ($non_vat_status ? $lineSubTotal : $lineSubTotal + $vat);
+                $invoice['invoiceItemsCount'] = 1;
+                $invoice['invoiceItems'][1] = [
+                    "vat" => $vatRate,
+                    "edit" => "0",
+                    "price" => $unitPrice,
+                    "units" => $unit,
+                    "line_total" => $lineTotal,
+                    "description" => $job->description,
+                    "inv_item_title" => $job->description,
+                    "inv_item_serial" => 1
+                ];
+                $invoice['invoiceNotes'] = (isset($job->details) && !empty($job->details) ? $job->details : '');
+                $invoice['invoiceExtra'] = [
+                    "vat_number" => $vat_number,
+                    "payment_term" => (isset($user->companies[0]->bank->payment_term) && !empty($user->companies[0]->bank->payment_term) ? $user->companies[0]->bank->payment_term : null),
+                    "non_vat_invoice" => $non_vat_status
+                ];
             endif;
-            $job = CustomerJob::where('id', $customer_job_id)->update([
-                'customer_job_status_id' => $customer_job_status_id,
-                'cancel_reason_id' => null,
-                'cancel_reason_note' => null,
-                'updated_by' => $request->user()->id
-            ]);
+            if($submit_type == 2):
+                $job = CustomerJob::where('id', $customer_job_id)->update([
+                    'customer_job_status_id' => $customer_job_status_id,
+                    'cancel_reason_id' => null,
+                    'cancel_reason_note' => null,
+                    'updated_by' => $request->user()->id
+                ]);
+            endif;
 
             return response()->json([
                 'success' => true,
-                'message' => (isset($invoice->id) && $invoice->id > 0) ? 'Invoice created and Customer job successfully mark as completed.' :'Customer job successfully mark as completed.',
+                'message' => ($submit_type == 1) ? 'You will be redirect shortly to the invoice create screen.' : 'Customer job successfully mark as completed.',
                 'job' => $job,
                 'invoice' => $invoice
             ], 200);

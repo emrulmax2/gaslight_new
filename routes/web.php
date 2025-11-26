@@ -36,6 +36,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\Records\InvoiceController;
+use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
@@ -251,6 +252,8 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('company/update-address-info', 'updateAddressInfo')->name('company.update.address.info'); 
         Route::post('company/update-bank-info', 'updateBankInfo')->name('company.update.bank.info'); 
         Route::post('company/update-company-logo', 'updateCompanyLogo')->name('company.update.company.logo'); 
+
+        Route::post('company/update-company-quote-settings', 'updateQuoteSettings')->name('company.update.quote.settings'); 
     });
 
     Route::resource('staff', StaffController::class);
@@ -407,6 +410,30 @@ Route::middleware(Authenticate::class)->group(function() {
 
             Route::post('invoices/edit-ready', 'editReady')->name('invoices.edit.ready');
             Route::post('invoices/action', 'invoiceAction')->name('invoices.action');
+        });
+        Route::controller(QuoteController::class)->group(function() {
+            Route::get('quotes', 'index')->name('quotes');
+            Route::get('quotes/list', 'list')->name('quotes.list');
+            Route::get('quotes/create', 'create')->name('quotes.create');
+            Route::post('quotes/store', 'store')->name('quotes.store');
+            Route::get('quotes/show/{quote}', 'show')->name('quotes.show');
+
+            Route::post('quotes/edit-ready', 'editReady')->name('quotes.edit.ready');
+
+            Route::post('quotes/get-customers', 'getCustomers')->name('quotes.get.customers');
+            Route::post('quotes/get-linked-customer', 'getLInkedCustomer')->name('quotes.linked.customer');
+            Route::post('quotes/get-job-addresses', 'getJobAddressrs')->name('quotes.get.job.addresses');
+            Route::post('quotes/store-job-address', 'storeJobAddress')->name('quotes.store.job.addresses');
+
+            Route::post('quotes/action', 'quoteAction')->name('quotes.action');
+
+            // Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
+            // Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
+            
+
+            // Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
+
+            // 
         });
     });
     

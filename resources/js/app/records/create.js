@@ -938,52 +938,6 @@ import INTAddressLookUps from '../../address_lookup.js';
             if(input.files.length > 0){
                 formData.append('file', $('#certificateForm input#job_sheet_files')[0].files[0]); 
             }
-        }else if(jobFormId == 3){
-            if(localStorage.quoteItems){
-                let quoteItems = localStorage.getItem('quoteItems');
-                options['quoteItems'] = quoteItems;
-                //formData.append('quoteItems', quoteItems);
-            }else{
-                errors['item_error'] = 'Please add at least one item for this quote.&nbsp;';
-            }
-            if(localStorage.quoteDiscounts){
-                let quoteDiscounts = localStorage.getItem('quoteDiscounts');
-                options['quoteDiscounts'] = quoteDiscounts;
-                //formData.append('quoteDiscounts', quoteDiscounts);
-            }
-            if(localStorage.quoteAdvance){
-                let quoteAdvance = localStorage.getItem('quoteAdvance');
-                options['quoteAdvance'] = quoteAdvance;
-                //formData.append('quoteAdvance', quoteAdvance);
-            }
-            if(localStorage.quoteNotes){
-                let quoteNotes = localStorage.getItem('quoteNotes');
-                options['quoteNotes'] = quoteNotes;
-                //formData.append('quoteNotes', JSON.parse(quoteNotes));
-            }
-        }else if(jobFormId == 4){
-            if(localStorage.invoiceItems){
-                let invoiceItems = localStorage.getItem('invoiceItems');
-                options['invoiceItems'] = invoiceItems;
-                //formData.append('quoteItems', quoteItems);
-            }else{
-                errors['item_error'] = 'Please add at least one item for this quote.&nbsp;';
-            }
-            if(localStorage.invoiceDiscounts){
-                let invoiceDiscounts = localStorage.getItem('invoiceDiscounts');
-                options['invoiceDiscounts'] = invoiceDiscounts;
-                //formData.append('quoteDiscounts', quoteDiscounts);
-            }
-            if(localStorage.invoiceAdvance){
-                let invoiceAdvance = localStorage.getItem('invoiceAdvance');
-                options['invoiceAdvance'] = invoiceAdvance;
-                //formData.append('quoteAdvance', quoteAdvance);
-            }
-            if(localStorage.invoiceNotes){
-                let invoiceNotes = localStorage.getItem('invoiceNotes');
-                options['invoiceNotes'] = invoiceNotes;
-                //formData.append('quoteNotes', JSON.parse(quoteNotes));
-            }
         }
         formData.append('options', JSON.stringify(options));
 

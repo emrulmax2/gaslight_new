@@ -202,27 +202,6 @@ class RecordController extends Controller
                         'name' => 'jobSheetDocuments',
                         'value' => $jobSheetDocuments
                     ]);
-                elseif($job_form_id == 3):
-                    $existRow = RecordOption::where('record_id', $certificate_id)->where('name', 'quoteExtra')->get()->first();
-                    $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
-
-                    $quoteExtra = [
-                        'non_vat_quote' => (isset($request->non_vat_quote) && $request->non_vat_quote == 1 ? 1 : 0),
-                        'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
-                        'issued_date' => (isset($request->issued_date) && !empty($request->issued_date) ? date('Y-m-d', strtotime($request->issued_date)) : date('Y-m-d'))
-                    ];
-                    if(!isset($theData->payment_term) || empty($theData->payment_term)):
-                        $quoteExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
-                    else:
-                        $quoteExtra['payment_term'] = $theData->payment_term;
-                    endif;
-                    RecordOption::where('record_id', $record->id)->where('name', 'quoteExtra')->forceDelete();
-                    RecordOption::create([
-                        'record_id' => $record->id,
-                        'job_form_id' => $job_form_id,
-                        'name' => 'quoteExtra',
-                        'value' => $quoteExtra
-                    ]);
                 endif;
 
                 if($request->has('sign') && $request->input('sign') !== null):
@@ -590,58 +569,6 @@ class RecordController extends Controller
                         $i++;
                     endif;
                 endforeach;
-            endif;
-        elseif($record->job_form_id == 3):
-            $data['quoteItemsCount'] = 0;
-            $data['quoteItems'] = $data['quoteDiscounts'] = $data['quoteExtra'] = [];
-            $data['quoteNotes'] = (isset($record->available_options->quoteNotes) && !empty($record->available_options->quoteNotes) ? $record->available_options->quoteNotes : '');
-            
-            if(isset($record->available_options->quoteItems) && !empty($record->available_options->quoteItems)):
-                if(isset($record->available_options->quoteItems) && !empty($record->available_options->quoteItems)):
-                    $q = 1;
-                    foreach($record->available_options->quoteItems as $item):
-                        $data['quoteItems'][$q] = (array) $item;
-
-                        $data['quoteItemsCount'] += 1;
-                        $q++;
-                    endforeach;
-                endif;
-            endif;
-            if(isset($record->available_options->quoteDiscounts) && !empty($record->available_options->quoteDiscounts)):
-                $quoteDiscounts = (array) $record->available_options->quoteDiscounts;
-                $data['quoteDiscounts'] = $quoteDiscounts;
-            endif;
-            if(isset($record->available_options->quoteExtra) && !empty($record->available_options->quoteExtra)):
-                $quoteExtra = (array) $record->available_options->quoteExtra;
-                $data['quoteExtra'] = $quoteExtra;
-            endif;
-        elseif($record->job_form_id == 4):
-            $data['invoiceItemsCount'] = 0;
-            $data['invoiceItems'] = $data['invoiceDiscounts'] = $data['invoiceAdvance'] = $data['invoiceExtra'] = [];
-            $data['invoiceNotes'] = (isset($record->available_options->invoiceNotes) && !empty($record->available_options->invoiceNotes) ? $record->available_options->invoiceNotes : '');
-            
-            if(isset($record->available_options->invoiceItems) && !empty($record->available_options->invoiceItems)):
-                if(isset($record->available_options->invoiceItems) && !empty($record->available_options->invoiceItems)):
-                    $q = 1;
-                    foreach($record->available_options->invoiceItems as $item):
-                        $data['invoiceItems'][$q] = (array) $item;
-
-                        $data['invoiceItemsCount'] += 1;
-                        $q++;
-                    endforeach;
-                endif;
-            endif;
-            if(isset($record->available_options->invoiceDiscounts) && !empty($record->available_options->invoiceDiscounts)):
-                $invoiceDiscounts = (array) $record->available_options->invoiceDiscounts;
-                $data['invoiceDiscounts'] = $invoiceDiscounts;
-            endif;
-            if(isset($record->available_options->invoiceExtra) && !empty($record->available_options->invoiceExtra)):
-                $invoiceExtra = (array) $record->available_options->invoiceExtra;
-                $data['invoiceExtra'] = $invoiceExtra;
-            endif;
-            if(isset($record->available_options->invoiceAdvance) && !empty($record->available_options->invoiceAdvance)):
-                $invoiceAdvance = (array) $record->available_options->invoiceAdvance;
-                $data['invoiceAdvance'] = $invoiceAdvance;
             endif;
         endif;
 
