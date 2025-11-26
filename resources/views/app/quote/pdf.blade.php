@@ -71,13 +71,13 @@
             .bg-darkish2{ background-color: #545454;}
             .color-darkish2{ color: #545454;}
 
-            .invoiceTitle{font-size: 48px;line-height: 1;letter-spacing: 5px;}
-            .invoiceDetails{line-height: 1.3; }
+            .quoteTitle{font-size: 48px;line-height: 1;letter-spacing: 5px;}
+            .quoteDetails{line-height: 1.3; }
 
-            .invoiceItemsTable{border: none; line-height: 1.2;}
-            .invoiceItemsTable tr td, .invoiceItemsTable tr th{padding: 17px 0 17px 30px; border: none;}
-            .invoiceItemsTable tr td:last-child, .invoiceItemsTable tr th:last-child{padding-right: 30px; text-align: right;}
-            .invoiceItemsTable tr:nth-child(odd){background: #ede9e9;}
+            .quoteItemsTable{border: none; line-height: 1.2;}
+            .quoteItemsTable tr td, .quoteItemsTable tr th{padding: 17px 0 17px 30px; border: none;}
+            .quoteItemsTable tr td:last-child, .quoteItemsTable tr th:last-child{padding-right: 30px; text-align: right;}
+            .quoteItemsTable tr:nth-child(odd){background: #ede9e9;}
 
             .calculationTable tr td{ padding: 3px 0; }
             .wrapper{ position: relative; height: 100%; }
@@ -85,11 +85,10 @@
         </style>
     </head>
     @php 
-        $invoiceItems = isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems) ? $invoice->available_options->invoiceItems : [];
-        $invoiceDiscounts = isset($invoice->available_options->invoiceDiscounts) && !empty($invoice->available_options->invoiceDiscounts) ? $invoice->available_options->invoiceDiscounts : [];
-        $invoiceAdvance = isset($invoice->available_options->invoiceAdvance) && !empty($invoice->available_options->invoiceAdvance) ? $invoice->available_options->invoiceAdvance : [];
-        $invoiceNotes = isset($invoice->available_options->invoiceNotes) && !empty($invoice->available_options->invoiceNotes) ? $invoice->available_options->invoiceNotes : '';
-        $invoiceExtra = isset($invoice->available_options->invoiceExtra) && !empty($invoice->available_options->invoiceExtra) ? $invoice->available_options->invoiceExtra : [];
+        $quoteItems = isset($quote->available_options->quoteItems) && !empty($quote->available_options->quoteItems) ? $quote->available_options->quoteItems : [];
+        $quoteDiscounts = isset($quote->available_options->quoteDiscounts) && !empty($quote->available_options->quoteDiscounts) ? $quote->available_options->quoteDiscounts : [];
+        $quoteNotes = isset($quote->available_options->quoteNotes) && !empty($quote->available_options->quoteNotes) ? $quote->available_options->quoteNotes : '';
+        $quoteExtra = isset($quote->available_options->quoteExtra) && !empty($quote->available_options->quoteExtra) ? $quote->available_options->quoteExtra : [];
     @endphp
     <body>
         <div class="wrapper">
@@ -102,35 +101,37 @@
                         @endif
                         <div class="customerDetails mb-8" style="margin-top: 95px;">
                             BILLED TO :<br/>
-                            @if(isset($invoice->customer->company_name) && !empty($invoice->customer->company_name))
-                            <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $invoice->customer->company_name }}</span>
+                            @if(isset($quote->customer->company_name) && !empty($quote->customer->company_name))
+                            <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $quote->customer->company_name }}</span>
                             @endif
-                            <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $invoice->customer->full_name }}</span>
-                            <span class="block" style="line-height: 1.1;">{!! (isset($invoice->customer->full_address) ? $invoice->customer->full_address : '') !!}</span>
+                            <span class="font-bold block" style="font-size: 1r4px; line-height: 1.1;">{{ $quote->customer->full_name }}</span>
+                            <span class="block" style="line-height: 1.1;">{!! (isset($quote->customer->full_address) ? $quote->customer->full_address : '') !!}</span>
                         </div>
+                        @if($quote->customer_property_id > 0)
                         <div class="jobDetails">
                             JOB ADDRESS: 
-                            <span class="block" style="line-height: 1.1;">{!! (isset($invoice->job->property->full_address) ? $invoice->job->property->full_address : '') !!}</span>
+                            <span class="block" style="line-height: 1.1;">{!! (isset($quote->property->full_address) ? $quote->property->full_address : '') !!}</span>
                         </div>
+                        @endif
                     </td>
                     <td class="w-50 text-right v-top" style="padding: 30px 30px 0 0;">
                         <img src="{{ $logoBase64 }}" alt="Gas Safe Engineer APP" style="width: 80px; height: auto;">
-                        <div class="invoiceTitle font-normal uppercase" style="margin-top: 45px;">Invoice</div>
-                        <div class="invoiceDetails" style="margin: 70px 0 40px;">
-                            <span class="block">Invoice No. {{ $invoice->invoice_number }}</span>
-                            @if(!empty($invoice->issued_date) && !empty($invoice->issued_date))
-                                <span class="block">{{ date('F d, Y', strtotime($invoice->issued_date)) }}</span>
+                        <div class="quoteTitle font-normal uppercase" style="margin-top: 45px;">Quote</div>
+                        <div class="quoteDetails" style="margin: 70px 0 40px;">
+                            <span class="block">Quote No. {{ $quote->quote_number }}</span>
+                            @if(!empty($quote->issued_date) && !empty($quote->issued_date))
+                                <span class="block">{{ date('F d, Y', strtotime($quote->issued_date)) }}</span>
                             @endif
                         </div>
                     </td>
                 </tr>
             </table>
-            <table class="invoiceItemsTable" style="position: relative;">
+            <table class="quoteItemsTable" style="position: relative;">
                 <tr>
                     <th class="uppercase font-normal w-50 text-left">Item description</th>
                     <th class="uppercase text-center">QTY</th>
                     <th class="uppercase text-center">price</th>
-                    @if($invoiceExtra->non_vat_invoice != 1):
+                    @if($quoteExtra->non_vat_quote != 1):
                     <th class="uppercase text-center">vat</th>
                     @endif
                     <th class="uppercase font-normal text-right">Total</th>
@@ -142,16 +143,15 @@
                     $DUE = 0;
                     $DISCOUNTTOTAL = 0;
                     $DISCOUNTVATTOTAL = 0;
-                    $ADVANCEAMOUNT = (isset($invoiceAdvance->advance_amount) && $invoiceAdvance->advance_amount > 0 ? $invoiceAdvance->advance_amount : 0);
                 @endphp
-                @if(!empty($invoiceItems))
-                    @foreach($invoiceItems as $item)
+                @if(!empty($quoteItems))
+                    @foreach($quoteItems as $item)
                         @php 
                             $units = (!empty($item->units) && $item->units > 0 ? $item->units : 1);
                             $unitPrice = (!empty($item->price) && $item->price > 0 ? $item->price : 0);
                             $vatRate = (!empty($item->vat) && $item->vat > 0 ? $item->vat : 0);
                             $vatAmount = ($unitPrice * $vatRate) / 100;
-                            $lineTotal = ($invoiceExtra->non_vat_invoice != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
+                            $lineTotal = ($quoteExtra->non_vat_quote != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
                             
                             $SUBTOTAL += ($unitPrice * $units);
                             $VATTOTAL += $vatAmount;
@@ -159,7 +159,7 @@
 
                         <tr>
                             <td class="font-normal w-50 text-left">
-                                {!! (isset($item->description) && !empty($item->description) ? $item->description : 'Invoice Item') !!}
+                                {!! (isset($item->description) && !empty($item->description) ? $item->description : 'Quote Item') !!}
                             </td>
                             <td class="text-center">
                                 {{ ($units < 10 ? '0' : '').$units }}
@@ -167,7 +167,7 @@
                             <td class="text-center">
                                 {{ Number::currency($unitPrice, 'GBP') }}
                             </td>
-                            @if($invoiceExtra->non_vat_invoice != 1)
+                            @if($quoteExtra->non_vat_quote != 1)
                                 <td class="text-center">
                                     {{ $vatRate }}%
                                 </td>
@@ -184,51 +184,51 @@
                     <td class="w-50 v-top" style="padding: 0 0 0 30px;">
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 35px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Please make payments to:</span>
-                            @if(isset($invoice->user->companies[0]->bank->name_on_account) && !empty($invoice->user->companies[0]->bank->name_on_account))
-                                <span class="block">{{ $invoice->user->companies[0]->bank->name_on_account }}</span>
+                            @if(isset($quote->user->companies[0]->bank->name_on_account) && !empty($quote->user->companies[0]->bank->name_on_account))
+                                <span class="block">{{ $quote->user->companies[0]->bank->name_on_account }}</span>
                             @endif
-                            @if(isset($invoice->user->companies[0]->bank->bank_name) && !empty($invoice->user->companies[0]->bank->bank_name))
-                                <span class="block">Bank Name: {{ $invoice->user->companies[0]->bank->bank_name }}</span>
+                            @if(isset($quote->user->companies[0]->bank->bank_name) && !empty($quote->user->companies[0]->bank->bank_name))
+                                <span class="block">Bank Name: {{ $quote->user->companies[0]->bank->bank_name }}</span>
                             @endif
-                            @if(isset($invoice->user->companies[0]->bank->account_number) && !empty($invoice->user->companies[0]->bank->account_number))
-                                <span class="block">Account no: {{ $invoice->user->companies[0]->bank->account_number }}</span>
+                            @if(isset($quote->user->companies[0]->bank->account_number) && !empty($quote->user->companies[0]->bank->account_number))
+                                <span class="block">Account no: {{ $quote->user->companies[0]->bank->account_number }}</span>
                             @endif
                         </div>
-                        @if(isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term))
+                        @if(isset($quoteExtra->payment_term) && !empty($quoteExtra->payment_term))
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Terms:</span>
-                            <span class="block">{{ (isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term) ? $invoiceExtra->payment_term : '') }}</span>
+                            <span class="block">{{ (isset($quoteExtra->payment_term) && !empty($quoteExtra->payment_term) ? $quoteExtra->payment_term : '') }}</span>
                         </div>
                         @endif
-                        @if(isset($invoiceNotes) && !empty($invoiceNotes))
+                        @if(isset($quoteNotes) && !empty($quoteNotes))
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Note:</span>
-                            <span class="block">{{ (isset($invoiceNotes) && !empty($invoiceNotes) ? $invoiceNotes : '') }}</span>
+                            <span class="block">{{ (isset($quoteNotes) && !empty($quoteNotes) ? $quoteNotes : '') }}</span>
                         </div>
                         @endif
                     </td>
                     <td class="w-50 bg-gryish v-top" style="padding-top: 15px;">
                         @php 
-                            $DISCOUNTTITLE = isset($invoiceDiscounts->inv_item_title) ? $invoiceDiscounts->inv_item_title : 'Discount';
-                            $DISCOUNTUNITPRICE = (isset($invoiceDiscounts->amount) ? $invoiceDiscounts->amount : 0);
+                            $DISCOUNTTITLE = isset($quoteDiscounts->inv_item_title) ? $quoteDiscounts->inv_item_title : 'Discount';
+                            $DISCOUNTUNITPRICE = (isset($quoteDiscounts->amount) ? $quoteDiscounts->amount : 0);
 
                             $DISCOUNTTOTAL += $DISCOUNTUNITPRICE;
 
-                            $TOTAL = ($invoiceExtra->non_vat_invoice != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
-                            $DUE = $TOTAL - $ADVANCEAMOUNT;
+                            $TOTAL = ($quoteExtra->non_vat_quote != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
+                            $DUE = $TOTAL;
                         @endphp
                         <table class="bg-darkish2 uppercase color-white calculationTable" style="padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
                             <tr>
                                 <td class="text-left">Subtotal (excl. VAT)</td>
                                 <td class="text-right">{{ Number::currency($SUBTOTAL, 'GBP') }}</td>
                             </tr>
-                            @if($invoiceExtra->non_vat_invoice != 1)
+                            @if($quoteExtra->non_vat_quote != 1)
                             <tr>
                                 <td class="text-left">Vat</td>
                                 <td class="text-right">{{ Number::currency($VATTOTAL, 'GBP') }}</td>
                             </tr>
                             @endif
-                            @if(!empty($invoiceDiscounts))
+                            @if(!empty($quoteDiscounts))
                                 <tr>
                                     <td class="text-left">{{ $DISCOUNTTITLE }}</td>
                                     <td class="text-right">-{{ Number::currency($DISCOUNTTOTAL, 'GBP') }}</td>
@@ -241,10 +241,6 @@
                         </table>
                         <table class="bg-darkish2 uppercase color-white calculationTable" style="margin-top: 25px; padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
                             <tr>
-                                <td class="text-left">Paid</td>
-                                <td class="text-right">{{ Number::currency($ADVANCEAMOUNT, 'GBP') }}</td>
-                            </tr>
-                            <tr>
                                 <td class="text-left">Due</td>
                                 <td class="text-right">{{ Number::currency($DUE, 'GBP') }}</td>
                             </tr>
@@ -255,10 +251,10 @@
 
             <footer>
                 <p>
-                    {{ isset($invoice->user->companies[0]->company_name) && !empty($invoice->user->companies[0]->company_name) ? $invoice->user->companies[0]->company_name : '' }}
+                    {{ isset($quote->user->companies[0]->company_name) && !empty($quote->user->companies[0]->company_name) ? $quote->user->companies[0]->company_name : '' }}
                      | 
-                    {!! (isset($invoice->user->companies[0]->full_address) ? $invoice->user->companies[0]->full_address : '') !!}
-                    {{ (isset($invoice->user->companies[0]->company_phone) && !empty($invoice->user->companies[0]->company_phone) ? ' | '.$invoice->user->companies[0]->company_phone : '') }}
+                    {!! (isset($quote->user->companies[0]->full_address) ? $quote->user->companies[0]->full_address : '') !!}
+                    {{ (isset($quote->user->companies[0]->company_phone) && !empty($quote->user->companies[0]->company_phone) ? ' | '.$quote->user->companies[0]->company_phone : '') }}
                 </p>
                 <div class="h-20 bg-darkish"></div>
             </footer>

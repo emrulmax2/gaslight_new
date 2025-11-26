@@ -246,7 +246,6 @@ export default defineConfig({
                 "resources/js/app/records/installation_commissioning_decommissioning_record.js",
                 "resources/js/app/records/unvented_hot_water_cylinders.js",
                 "resources/js/app/records/job_sheet.js",
-                "resources/js/app/records/quote.js",
                 "resources/js/app/superadmin/settings/email-templates.js",
 
                 "resources/js/app/invoice/index.js",
@@ -255,6 +254,11 @@ export default defineConfig({
                 "resources/js/app/invoice/show.js",
 
                 "resources/js/app/user-settings/reminder-create.js",
+
+                "resources/js/app/quote/index.js",
+                "resources/js/app/quote/form.js",
+                "resources/js/app/quote/create.js",
+                "resources/js/app/quote/show.js",
             ],
             refresh: true,
         }),

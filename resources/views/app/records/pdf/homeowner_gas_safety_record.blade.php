@@ -290,7 +290,7 @@
                         <table class="table table-sm bordered border-primary">
                             <thead>
                                 <tr>
-                                    <th colspan="8" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
+                                    <th colspan="9" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
                                         APPLIANCE DETAILS
                                     </th>
                                 </tr>
@@ -313,6 +313,9 @@
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center align-middle">
                                         Serial No.
                                     </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        GC No.
+                                    </th>
                                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center align-middle">
                                         Flue Type
                                     </th>
@@ -334,6 +337,7 @@
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->model) && !empty($appliance->model) ? $appliance->model : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->appliance_type_id) && $appliance->appliance_type_id > 0 ? typeName($appliance->appliance_type_id) : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->serial_no) && !empty($appliance->serial_no) ? $appliance->serial_no : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->gc_no) && !empty($appliance->gc_no) ? $appliance->gc_no : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->appliance_flue_type_id) && $appliance->appliance_flue_type_id > 0 ? flueName($appliance->appliance_flue_type_id) : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">{{ (isset($appliance->opt_pressure) && !empty($appliance->opt_pressure) ? $appliance->opt_pressure : '') }}</td>
                                         </tr>
@@ -345,6 +349,7 @@
                                 @for($serial; $serial <= 4; $serial++)
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">{{ $serial }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>

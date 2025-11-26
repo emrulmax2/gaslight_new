@@ -38,6 +38,7 @@ class Company extends Model
         'company_logo',
         'company_registration',
         'business_type',
+        'quote_expired_in',
     ];
 
     public function getLogoUrlAttribute(){

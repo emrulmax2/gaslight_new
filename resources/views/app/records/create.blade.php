@@ -17,10 +17,6 @@
     <form method="post" action="#" id="certificateForm" enctype="multipart/form-data">
         <input type="hidden" name="job_form_id" value="{{ $form->id }}"/>
         <input type="hidden" name="certificate_id" id="certificate_id" value="0"/>
-        @if($form->id == 3)
-            <input type="hidden" name="non_vat_quote" id="non_vat_quote" value="{{ $non_vat_quote }}"/>
-            <input type="hidden" name="vat_number" id="vat_number" value="{{ $vat_number }}"/>
-        @endif
 
         @if($form->id == 3)
             <div class="intro-y box mt-5 bg-slate-200 rounded-none border-none px-2 py-2 quoteNoBlockWrap" style="display: none;">

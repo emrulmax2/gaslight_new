@@ -498,7 +498,38 @@ import Litepicker from "litepicker";
             if (response.status == 200) {
                 jobConfirmModal.hide();
                 let res = response.data;
-                let red = (submitType == 1 && res.invoice.id ? route('invoices.show', res.invoice.id) : '');
+                let red = '';
+                if(submitType == 1){
+                    let row = response.data.invoice;
+                    red = route('invoices.create');
+
+
+                    localStorage.clear();
+                    localStorage.setItem('from_job', row.from_job);
+                    localStorage.setItem('invoice_id', row.invoice_id);
+                    //localStorage.setItem('invoice_number', JSON.stringify(row.invoice_number));
+                    localStorage.setItem('invoice', JSON.stringify(row.invoice));
+                    localStorage.setItem('job', JSON.stringify(row.job));
+                    localStorage.setItem('customer', JSON.stringify(row.customer));
+                    localStorage.setItem('job_address', JSON.stringify(row.job_address));
+
+                    
+                    if(row.invoiceNotes){
+                        localStorage.setItem('invoiceNotes', JSON.stringify(row.invoiceNotes));
+                    }
+                    if(row.issued_date){
+                        localStorage.setItem('issued_date', JSON.stringify(row.issued_date));
+                    }
+                    if(row.invoiceItems){
+                        localStorage.setItem('invoiceItemsCount', row.invoiceItemsCount);
+                        localStorage.setItem('invoiceItems', JSON.stringify(row.invoiceItems));
+                    }
+                    if(row.invoiceExtra){
+                        localStorage.setItem('invoiceExtra', JSON.stringify(row.invoiceExtra));
+                    }
+
+                    window.location.href = red;
+                }
                 
                 successModal.show();
                 document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {

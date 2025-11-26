@@ -171,6 +171,19 @@
     </div>
 
     <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Quote & Invoice Settings</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#quoteExpireDayModal">
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Quote Expir In Days</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ $company->quote_expired_in ?? 0 }} Days</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Company Logo</h3>
         <form method="post" action="{{ route('company.update.company.logo') }}" enctype="multipart/form-data" class="relative">
             @csrf

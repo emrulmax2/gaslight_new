@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\GlobalApiController;
 use App\Http\Controllers\Api\Jobs\JobsController;
 use App\Http\Controllers\Api\Pricing\PricingPackageController;
 use App\Http\Controllers\Api\Records\InvoiceController;
+use App\Http\Controllers\Api\Records\QuoteController;
 use App\Http\Controllers\Api\Records\RecordAndDraftController;
 use App\Http\Controllers\Api\Records\RecordController;
 use App\Http\Controllers\Api\UserController;
@@ -90,6 +91,8 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::delete('company/{company}/destroy', 'destroy');
             Route::get('bank-details', 'getCompanyBankDetails');
             Route::get('vat-status', 'vatStatusNumber');
+
+            Route::post('comapny/update-quote-settings', 'updateQuoteSettings');
         });
 
         Route::controller(UserProfileController::class)->group(function() {
@@ -208,6 +211,14 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('invoices/edit/{invoice_id}', 'edit');
             Route::get('invoices/send/{invoice_id}', 'send');
             Route::get('invoices/download/{invoice_id}', 'download');
+        });
+
+        Route::controller(QuoteController::class)->group(function() {
+            Route::get('quotes/list', 'list');
+            Route::post('quotes/store', 'store');
+            Route::get('quotes/edit/{quote_id}', 'edit');
+            Route::get('quotes/send/{quote_id}', 'send');
+            Route::get('quotes/download/{quote_id}', 'download');
         });
 
     });

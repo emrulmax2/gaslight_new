@@ -18,13 +18,13 @@
                 <div class="text-slate-500 heLabel">Sub Total</div>
                 <div class="ml-auto w-[80px] text-slate-700 text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
-            <div class="flex justify-between font-medium text-xs leading-none mb-2 uppercase discountBlock" style="display: none;">
-                <div class="text-slate-500 heLabel">Discount</div>
-                <div class="ml-auto w-[80px] text-danger text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
-            </div>
             <div class="flex justify-between font-medium text-xs leading-none mb-2 uppercase vatTotalBlock" style="display: none;">
                 <div class="text-slate-500 heLabel">Vat Total</div>
                 <div class="ml-auto w-[80px] text-slate-700 text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
+            </div>
+            <div class="flex justify-between font-medium text-xs leading-none mb-2 uppercase discountBlock" style="display: none;">
+                <div class="text-slate-500 heLabel">Discount</div>
+                <div class="ml-auto w-[80px] text-danger text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
         </div>
         <div class="calculationBlock">
@@ -37,6 +37,8 @@
                 <div class="ml-auto w-[80px] text-[#000000] text-right theDesc">{{ Number::currency(0, 'GBP') }}</div>
             </div>
         </div>
+        <input type="hidden" name="quoteSubTotal" id="quoteSubTotal" value="0"/>
+        <input type="hidden" name="quoteTotal" id="quoteTotal" value="0"/>
     </div>
 </div>
 
@@ -46,7 +48,7 @@
             <div class="w-full">
                 <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Quote Date</div>
                 <div class="theDesc w-full relative">
-                    <x-base.litepicker id="issued_date" name="issued_date" value="{{ date('d-m-Y') }}" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text" data-format="DD-MM-YYYY" data-single-mode="true" autocomplete="off"/>
+                    <x-base.form-input type="text" id="issued_date" name="issued_date" value="{{ date('d-m-Y') }}" class="w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none" type="text" autocomplete="off"/>
                     <x-base.lucide class="h-4 w-4 text-success absolute right-0 top-0" icon="calendar" />
                 </div>
             </div>

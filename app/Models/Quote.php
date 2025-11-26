@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends Model
+class Quote extends Model
 {
     use SoftDeletes;
 
@@ -23,11 +23,10 @@ class Invoice extends Model
         'customer_job_id',
         'job_form_id',
         'customer_property_id',
-        'invoice_number',
+        'quote_number',
         'issued_date',
         'expire_date',
         'status',
-        'pay_status',
         
         'created_by',
         'updated_by'
@@ -60,7 +59,7 @@ class Invoice extends Model
     }
 
     public function options(){
-        return $this->hasMany(InvoiceOption::class, 'invoice_id', 'id')->orderBy('id', 'asc');
+        return $this->hasMany(QuoteOption::class, 'quote_id', 'id')->orderBy('id', 'asc');
     }
 
     public function getAvailableOptionsAttribute(){

@@ -215,10 +215,29 @@ class CompanyController extends Controller
         ];
 
 
-         return response()->json([
+        return response()->json([
             'success' => true,
             'data' => $data
         ], 200);
+    }
+
+    public function updateQuoteSettings(Request $request)
+    {
+        $bankDetails = Company::where('id', $request->company_id)->update([
+            'quote_expired_in'       => $request->quote_expired_in ?? 0,
+        ]);
+
+        if($bankDetails):
+            return response()->json([
+                'success' => true,
+                'message' => 'Company quote settings successfully updated.'
+            ], 200);
+        else:
+            return response()->json([
+                'success' => false,
+                'message' => 'No change found.'
+            ], 304);
+        endif;
     }
 
 }
