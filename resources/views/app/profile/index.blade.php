@@ -107,6 +107,24 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Subscriptions</h3>
         <div class="box rounded-md p-0 overflow-hidden">
+            @if(isset($user->userpackage->end) && !empty($user->userpackage->end) && $user->userpackage->end < date('Y-m-d'))
+                <a href="{{ route('company.dashboard.upgrade.subscriptions') }}" class="border-b flex w-full items-center px-5 py-3">
+                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
+                    <span class="font-medium text-slate-500 text-sm inline-flex items-center">
+                        @if(isset($user->userpackage->id) && $user->userpackage->id > 0 )
+                            {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? $user->userpackage->package->title : '') }}
+                            {{ (isset($user->userpackage->price) && !empty($user->userpackage->price) ? ' ('.Number::currency($user->userpackage->price, 'GBP').')' : '') }}
+                        @else 
+                            N/A
+                        @endif
+                        <span class="ml-2 text-danger">{{ (isset($user->userpackage->end) && !empty($user->userpackage->end) ? '('.date('jS F, Y', strtotime($user->userpackage->end)).')' : '') }}</span>
+                        <x-base.button  as="span" class="w-auto rounded-none ml-5 text-white mr-1 px-3 py-0.5" size="sm" variant="danger" >
+                            <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                            Upgrade Now
+                        </x-base.button>
+                    </span>
+                </a>
+            @else
             <a href="{{ route('users.plans', $user->id) }}" class="border-b flex w-full items-center px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
                 <span class="font-medium text-slate-500 text-sm">
@@ -118,6 +136,7 @@
                     @endif
                 </span>
             </a>
+            @endif
             <a href="{{ route('users.index') }}" class="flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="users" />
                 <div>
