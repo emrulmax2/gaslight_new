@@ -131,7 +131,7 @@
                     <th class="uppercase font-normal w-50 text-left">Item description</th>
                     <th class="uppercase text-center">QTY</th>
                     <th class="uppercase text-center">price</th>
-                    @if($quoteExtra->non_vat_quote != 1):
+                    @if(isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1):
                     <th class="uppercase text-center">vat</th>
                     @endif
                     <th class="uppercase font-normal text-right">Total</th>
@@ -151,7 +151,7 @@
                             $unitPrice = (!empty($item->price) && $item->price > 0 ? $item->price : 0);
                             $vatRate = (!empty($item->vat) && $item->vat > 0 ? $item->vat : 0);
                             $vatAmount = ($unitPrice * $vatRate) / 100;
-                            $lineTotal = ($quoteExtra->non_vat_quote != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
+                            $lineTotal = (isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
                             
                             $SUBTOTAL += ($unitPrice * $units);
                             $VATTOTAL += $vatAmount;
@@ -167,7 +167,7 @@
                             <td class="text-center">
                                 {{ Number::currency($unitPrice, 'GBP') }}
                             </td>
-                            @if($quoteExtra->non_vat_quote != 1)
+                            @if(isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1)
                                 <td class="text-center">
                                     {{ $vatRate }}%
                                 </td>
@@ -214,7 +214,7 @@
 
                             $DISCOUNTTOTAL += $DISCOUNTUNITPRICE;
 
-                            $TOTAL = ($quoteExtra->non_vat_quote != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
+                            $TOTAL = (isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
                             $DUE = $TOTAL;
                         @endphp
                         <table class="bg-darkish2 uppercase color-white calculationTable" style="padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
@@ -222,7 +222,7 @@
                                 <td class="text-left">Subtotal (excl. VAT)</td>
                                 <td class="text-right">{{ Number::currency($SUBTOTAL, 'GBP') }}</td>
                             </tr>
-                            @if($quoteExtra->non_vat_quote != 1)
+                            @if(isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1)
                             <tr>
                                 <td class="text-left">Vat</td>
                                 <td class="text-right">{{ Number::currency($VATTOTAL, 'GBP') }}</td>

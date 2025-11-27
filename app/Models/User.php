@@ -19,7 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
 {
     use HasFactory, Notifiable, Impersonate,RequiresSignature, HasApiTokens;
 
-    protected $appends = ['photo_url'];
+    protected $appends = ['photo_url', 'photo_url_api'];
 
     /**
      * The attributes that are mass assignable.
@@ -74,6 +74,15 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
             return Storage::disk('public')->url('users/'.$this->id.'/'.$this->photo);
         } else {
             return Vite::asset('resources/images/placeholders/200x200.jpg');
+        }
+    }
+
+    public function getPhotoUrlApiAttribute()
+    {
+        if ($this->photo !== null && Storage::disk('public')->exists('users/'.$this->id.'/'.$this->photo)) {
+            return Storage::disk('public')->url('users/'.$this->id.'/'.$this->photo);
+        } else {
+            return '';
         }
     }
 

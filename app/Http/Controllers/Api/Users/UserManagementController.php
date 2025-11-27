@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UserManagementController extends Controller
 {
@@ -48,6 +49,23 @@ class UserManagementController extends Controller
         $user->save();
 
         if($user->id):
+            if($request->input('photo') !== null):
+                $base64Image = $request->input('photo');
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)):
+                    $fileType = strtolower($type[1]); // jpg, png, jpeg
+                    $base64Image = substr($base64Image, strpos($base64Image, ',') + 1);
+                    if (!empty($fileType) && in_array($fileType, ['jpg', 'jpeg', 'png'])):
+                        $imageData = base64_decode($base64Image);
+                        if($imageData):
+                            $fileName = $user->id.'_Photo_'.time().'.'.$fileType;
+                            $filePath = 'users/'.$user->id.'/'.$fileName;
+                            Storage::disk('public')->put($filePath, $imageData);
+                            
+                            User::where('id', $user->id)->update(['photo' => $fileName]);
+                        endif;
+                    endif;
+                endif;
+            endif;
             $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
             try{
                 $customer = $stripe->customers->create([

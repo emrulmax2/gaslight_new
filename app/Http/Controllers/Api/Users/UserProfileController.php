@@ -27,15 +27,22 @@ class UserProfileController extends Controller
             $updateData['email'] = (isset($request->email) && !empty($request->email) ? $request->email : null);
         endif;
 
-        if($request->hasFile('photo')):
-            if(isset($user->photo) && !empty($user->photo) && Storage::disk('public')->exists('public/users/'.$user->id.'/'.$user->photo)):
-                Storage::disk('public')->delete('public/users/'.$user->id.'/'.$user->photo);
+        if($request->input('photo') !== null):
+            $base64Image = $request->input('photo');
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)):
+                $fileType = strtolower($type[1]); // jpg, png, jpeg
+                $base64Image = substr($base64Image, strpos($base64Image, ',') + 1);
+                if (!empty($fileType) && in_array($fileType, ['jpg', 'jpeg', 'png'])):
+                    $imageData = base64_decode($base64Image);
+                    if($imageData):
+                        $fileName = $user->id.'_Photo_'.time().'.'.$fileType;
+                        $filePath = 'users/'.$user->id.'/'.$fileName;
+                        Storage::disk('public')->put($filePath, $imageData);
+                        
+                        $updateData['photo'] = $fileName;
+                    endif;
+                endif;
             endif;
-
-            $photo = $request->file('photo');
-            $imageName = 'Avatar_'.$user->id.'_'.time() . '.' . $request->photo->getClientOriginalExtension();
-            $path = $photo->storeAs('users/'.$user->id, $imageName, 'public');
-            $updateData['photo'] = $imageName;
         endif;
 
         if($request->has('gas_safe_id_card')):
@@ -64,6 +71,7 @@ class UserProfileController extends Controller
                 'gas_safe_id_card' => $user->gas_safe_id_card,
                 'oil_registration_number' => $user->oil_registration_number,
                 'installer_ref_no' => $user->installer_ref_no,
+                'photo_url_api' => $user->photo_url_api,
             ],
         ]);
     }
