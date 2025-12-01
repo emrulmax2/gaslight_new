@@ -20,6 +20,8 @@ class RecordAndDraftController extends Controller
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? strtolower($request->query('order')) : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
+        $customer_job_id = ($request->has('customer_job_id') && !empty($request->query('customer_job_id'))) ? $request->query('customer_job_id') : 0;
+        $customer_id = ($request->has('customer_id') && !empty($request->query('customer_id'))) ? $request->query('customer_id') : 0;
 
         $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
                  ->where('created_by', $user_id);
@@ -28,6 +30,12 @@ class RecordAndDraftController extends Controller
         endif;
         if(isset($job_form_id) && $job_form_id > 0):
             $query->where('job_form_id', $job_form_id);
+        endif;
+        if(isset($customer_job_id) && $customer_job_id > 0):
+            $query->where('customer_job_id', $customer_job_id);
+        endif;
+        if(isset($customer_id) && $customer_id > 0):
+            $query->where('customer_id', $customer_id);
         endif;
 
         if (!empty($searchKey)) {

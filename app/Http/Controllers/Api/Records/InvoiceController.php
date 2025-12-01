@@ -27,7 +27,7 @@ class InvoiceController extends Controller
     public function list(Request $request){
         $user_id = $request->user()->id;
         $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'All');
-        $payStatus = ($request->has('pay_status') && !empty($request->query('pay_status')) ? $request->query('pay_status') : 'All');
+        $payStatus = ($request->has('pay_status') && !empty($request->query('pay_status')) ? explode(',', $request->query('pay_status')) : []);
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? strtolower($request->query('order')) : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
@@ -35,7 +35,7 @@ class InvoiceController extends Controller
     
         $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])->orderByRaw(implode(',', $sorts));
         if(!empty($status) && $status !== 'All'): $query->where('status', $status); endif;
-        if(!empty($payStatus) && $payStatus !== 'All'): $query->where('pay_status', $payStatus); endif;
+        if(!empty($payStatus) && count($payStatus) > 0): $query->whereIn('pay_status', $payStatus); endif;
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
                 $q->where('full_name', 'LIKE', '%' . $queryStr . '%');

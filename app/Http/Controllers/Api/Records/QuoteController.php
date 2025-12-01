@@ -23,14 +23,14 @@ class QuoteController extends Controller
 {
     public function list(Request $request){
         $user_id = $request->user()->id;
-        $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'All');
+        $status = ($request->has('status') && !empty($request->query('status')) ? explode(',', $request->query('status')) : []);
         $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'id';
         $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? strtolower($request->query('order')) : 'asc';
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
     
         $query = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'property']);
-        if(!empty($status) && $status !== 'All'): $query->where('status', $status); endif;
+        if(!empty($status) && count($status) > 0): $query->whereIn('status', $status); endif;
         if (!empty($queryStr)):
             $query->where('quote_number', 'LIKE', '%' . $queryStr . '%')->orWhereHas('customer', function ($q) use ($queryStr) {
                 $q->where('full_name', 'LIKE', '%' . $queryStr . '%');

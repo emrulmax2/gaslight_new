@@ -29,7 +29,6 @@ class CustomerJobsController extends Controller
         $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
 
         $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot', 'invoice')
-        ->withCount('posts')
         ->where('customer_id', $customer_id)->whereHas('invoice');
 
        $searchableColumns = Schema::getColumnListing((new CustomerJob)->getTable());
@@ -139,7 +138,7 @@ class CustomerJobsController extends Controller
     public function getSingleCustomerJob(Request $request, $id) {
            try {
             $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot'])
-                    ->withCount("records as number_of_records")
+                    ->withCount("records as number_of_records")->withCount('invoice as number_of_invoices')
                     ->where('id', $id)->first();
 
             $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
