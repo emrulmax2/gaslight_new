@@ -179,7 +179,7 @@ class JobsController extends Controller
        try {
         $user = User::find($request->user()->id);
         $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot'])
-            ->withCount("records as number_of_records")
+            ->withCount("records as number_of_records")->withCount('invoice as number_of_invoices')
             ->findOrFail($id);
 
         $job->customer->makeHidden(["full_address_html", "full_address_with_html"]);
