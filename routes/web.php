@@ -410,6 +410,12 @@ Route::middleware(Authenticate::class)->group(function() {
 
             Route::post('invoices/edit-ready', 'editReady')->name('invoices.edit.ready');
             Route::post('invoices/action', 'invoiceAction')->name('invoices.action');
+
+            Route::post('invoices/make-payment', 'makePayment')->name('invoices.make.payment');
+            Route::post('invoices/cancel', 'cancelInvoice')->name('invoices.cancel');
+            Route::post('invoices/update-status', 'updateStatus')->name('invoices.update.status');
+            Route::post('invoices/get-raw-invoice', 'getRawInvoice')->name('invoices.get.raw');
+            Route::post('invoices/make-refund', 'makeRefund')->name('invoices.make.refund');
         });
         Route::controller(QuoteController::class)->group(function() {
             Route::get('quotes', 'index')->name('quotes');

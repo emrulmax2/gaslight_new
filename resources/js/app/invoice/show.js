@@ -7,12 +7,18 @@
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
     const addCustomerEmailModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addCustomerEmailModal"));
+    const makePaymentModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#makePaymentModal"));
 
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
     });
     document.getElementById('addCustomerEmailModal').addEventListener('hide.tw.modal', function(event) {
         $('#addCustomerEmailModal [name="customer_email"]').val('');
+    });
+    document.getElementById('makePaymentModal').addEventListener('hide.tw.modal', function(event) {
+        $('#makePaymentModal [name="payment_date"]').val('');
+        $('#makePaymentModal [name="payment_method_id"]').val('');
+        $('#makePaymentModal [name="amount"]').val('');
     });
 
     $('#successModal .agreeWith').on('click', function(e){
@@ -267,5 +273,85 @@
                 console.log(error)
             });
         }
+    })
+
+    $('#makePaymentForm').on('input', '[name="amount"]', function(){
+        let amount = $(this).val();
+        let due = $('#makePaymentForm').find('[name="due_amount"]').val() * 1;
+        if(amount.length > 0){
+            if(amount > due){
+                $('#makePaymentForm .acc__input-error.error-amount').html('Amount can not grater than the due amount.').fadeIn();
+                $(this).val('');
+
+                setTimeout(() => {
+                    $('#makePaymentForm .acc__input-error.error-amount').html('').fadeOut();
+                }, 2000);
+            }else{
+                $('#makePaymentForm .acc__input-error.error-amount').html('').fadeOut();
+            }
+        }else{
+            $('#makePaymentForm .acc__input-error.error-amount').html('').fadeOut();
+        }
+    })
+
+
+    $('#makePaymentForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('makePaymentForm');
+        const $theForm = $(this);
+        
+        $('#makePaymentForm .acc__input-error').html('').fadeOut();
+        $('#payBtn', $theForm).attr('disabled', 'disabled');
+        $("#payBtn .theLoader").fadeIn();
+
+        let form_data = new FormData(form);
+        axios({
+            method: "post",
+            url: route('invoices.make.payment'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#payBtn', $theForm).removeAttr('disabled');
+            $("#payBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                makePaymentModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html(response.data.title);
+                    $("#successModal .successModalDesc").html(response.data.message);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                });
+
+                setTimeout(() => {
+                    successModal.hide();
+                    window.location.reload();
+                }, 1500);
+            }
+        }).catch(error => {
+            $('#payBtn', $theForm).removeAttr('disabled');
+            $("#payBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#makePaymentForm .${key}`).addClass('border-danger');
+                        $(`#makePaymentForm  .error-${key}`).html(val).fadeIn();
+                    }
+                } else if (error.response.status == 304) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.message);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
     })
 })()

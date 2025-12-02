@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Records;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MakePaymentRequest;
+use App\Http\Requests\MakeRefundRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\Customer;
@@ -10,10 +12,13 @@ use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\Invoice;
+use App\Models\InvoiceCancelReason;
 use App\Models\InvoiceOption;
+use App\Models\InvoicePayment;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
+use App\Models\PaymentMethod;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
@@ -552,5 +557,134 @@ class InvoiceController extends Controller
             ], 500);
         }
         
+    }
+
+    public function cancellReasons(){
+        try{
+            $reasons = InvoiceCancelReason::orderBy('id', 'ASC')->get();
+            return response()->json([
+                'success' => true,
+                'message' => 'Success',
+                'data' => $reasons
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function makePayment(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+
+            $data = [
+                'invoice_id' => $invoice_id,
+                'payment_date' => (isset($request->payment_date) && !empty($request->payment_date) ? date('Y-m-d', strtotime($request->payment_date)) : date('Y-m-d')),
+                'payment_method_id' => $request->payment_method_id > 0 ? $request->payment_method_id : null,
+                'amount' => $request->amount,
+            ];
+            $payment = InvoicePayment::create($data);
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice payment successfully inserted.',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function updateStatus(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+            $pay_status = $request->pay_status;
+
+            $invoice = Invoice::find($invoice_id);
+            $invoice->pay_status = $pay_status;
+            $invoice->invoice_cancel_reason_id = (isset($request->invoice_cancel_reason_id) && $request->invoice_cancel_reason_id > 0 ? $request->invoice_cancel_reason_id : null);
+            $invoice->cancel_reason_note = (isset($request->cancel_reason_note) && !empty($request->cancel_reason_note) ? $request->cancel_reason_note : null);
+            $invoice->cancelled_by = ($pay_status == 'Canceled' ? $request->user()->id : null);
+            $invoice->cancelled_at = ($pay_status == 'Canceled' ? date('Y-m-d H:i:s') : null);
+            $invoice->updated_by = $request->user()->id;
+            $invoice->updated_at = date('Y-m-d H:i:s');
+            $invoice->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice status successfully updated.',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function getRawInvoice(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+            $invoice = Invoice::find($invoice_id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Success',
+                'row' => $invoice
+            ], 200);
+        }catch(ModelNotFoundException $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Data not found for the selected row.',
+            ], 304);
+        }catch(Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 500);
+        }
+    }
+
+    public function makeRefund(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+
+            $data = [
+                'invoice_id' => $invoice_id,
+                'payment_date' => (isset($request->payment_date) && !empty($request->payment_date) ? date('Y-m-d', strtotime($request->payment_date)) : date('Y-m-d')),
+                'payment_method_id' => $request->payment_method_id > 0 ? $request->payment_method_id : null,
+                'amount' => $request->amount * -1,
+            ];
+            $payment = InvoicePayment::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Refund successfully inserted',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function getPaymentMethods(){
+        try{
+            $methods = PaymentMethod::orderBy('id', 'ASC')->get();
+            return response()->json([
+                'success' => true,
+                'message' => 'Success',
+                'data' => $methods
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
     }
 }

@@ -42,6 +42,7 @@ class QuoteController extends Controller
 
     public function list(Request $request){
         $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
+        $status = (isset($request->status) && !empty($request->status) ? explode(',', $request->status) : ['Draft', 'Send']);
 
         
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
@@ -62,6 +63,7 @@ class QuoteController extends Controller
                 });
             });
         endif;
+        if(!empty($status)): $query->whereIn('status', $status); endif;
         $query->where('created_by', $request->user()->id);
         $Query = $query->get();
 
@@ -111,7 +113,7 @@ class QuoteController extends Controller
                             }elseif($list->status == 'Cancelled'){
                                 $html .= '<button class="ml-auto font-medium bg-warning rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->status.'</button>';
                             }else if($list->status == 'Send'){
-                                $html .= '<button class="ml-auto font-medium bg-send rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->status.'</button>';
+                                $html .= '<button class="ml-auto font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->status.'</button>';
                             }else if($list->status == 'Accepted'){
                                 $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->status.'</button>';
                             }else{

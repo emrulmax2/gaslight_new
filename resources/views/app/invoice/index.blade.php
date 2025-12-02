@@ -18,9 +18,31 @@
     </div>
     
     <!-- BEGIN: HTML Table Data -->
-    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative w-full">
-        <x-base.form-input class="m-0 w-full" id="query" type="text" autocomplete="off" placeholder="Search..."/>
-        <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative w-full flex justify-stretch">
+        <div class="searchBoxInputWrap w-full relative">
+            <x-base.form-input class="m-0 w-full rounded-tr-none rounded-br-none" id="query" type="text" autocomplete="off" placeholder="Search..."/>
+            <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+        </div>
+        <x-base.menu id="statusDropdown">
+            <x-base.menu.button as="x-base.button" class="rounded-tl-none rounded-bl-none" variant="secondary" >
+                <span class="selectedStatusLabel">Unpaid</span>
+                <x-base.lucide class="ml-2 h-4 w-4" icon="ChevronDown" />
+            </x-base.menu.button>
+            <x-base.menu.items class="w-56">
+                <x-base.menu.item class="active singleStatus" data-label="Unpaid" data-value="Unpaid">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Unpaid
+                </x-base.menu.item>
+                <x-base.menu.item class="singleStatus" data-label="Paid" data-value="Paid">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Paid
+                </x-base.menu.item>
+                <x-base.menu.item class="singleStatus" data-label="Refunded/Canceled" data-value="Refunded,Canceled">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Refunded/Canceled
+                </x-base.menu.item>
+            </x-base.menu.items>
+        </x-base.menu>
     </div>
 
     <div class="scrollbar-hidden overflow-x-auto mt-5">
@@ -46,10 +68,16 @@
                         Assigned To
                     </x-base.table.th>
                     <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                        Amount
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
                         Created at
                     </x-base.table.th>
                     <x-base.table.th class="whitespace-nowrap border-b-0 text-right uppercase px-3 py-2 text-[12px] leading-none">
                         Status
+                    </x-base.table.th>
+                    <x-base.table.th class="whitespace-nowrap border-b-0 text-right uppercase px-3 py-2 text-[12px] leading-none">
+                        Action
                     </x-base.table.th>
                 </x-base.table.tr>
             </x-base.table.thead>
@@ -65,6 +93,9 @@
         </x-base.table>
     </div>
 
+    
+
+    @include('app.invoice.index-modal')
     @include('app.action-modals')
 @endsection
 

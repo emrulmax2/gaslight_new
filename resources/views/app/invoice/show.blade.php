@@ -40,12 +40,25 @@
                                 <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                             </x-base.button>
                         @endif
+                        @if($invoice->pay_status == 'Unpaid' && ( isset($invoice->invoice_due) && $invoice->invoice_due > 0))
+                            <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#makePaymentModal" class="makePayment justify-start action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#4ab3f4] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#4ab3f4] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="badge-pound-sterling" />
+                                Make a Payment
+                            </x-base.button>
+                        @endif
                     </div>
                     <input type="hidden" value="1" name="submit_type"/>
                 </div>
             </div>
             <div class="intro-y col-span-12 sm:col-span-9 order-1 sm:order-2">
-                <div class="intro-y box p-5">
+                <div class="intro-y box p-5 relative overflow-hidden">
+                    @if($invoice->pay_status == 'Canceled' || $invoice->pay_status == 'Refunded')
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-danger text-white text-[12px] leading-none uppercase text-center py-1.5">{{ $invoice->pay_status }}</button>
+                    @elseif($invoice->pay_status == 'Paid')
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-success text-white text-[12px] leading-none uppercase text-center py-1.5">{{ $invoice->pay_status }}</button>
+                    @else
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-pending text-white text-[12px] leading-none uppercase text-center py-1.5">{{ $invoice->pay_status }}</button>
+                    @endif
                     @if(!empty($thePdf))
                         <object class="pdfViewer" data="{{ $thePdf }}" type="application/pdf">
                             <embed src="{{ $thePdf }}" type="application/pdf">
