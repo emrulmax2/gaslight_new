@@ -211,6 +211,13 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('invoices/edit/{invoice_id}', 'edit');
             Route::get('invoices/send/{invoice_id}', 'send');
             Route::get('invoices/download/{invoice_id}', 'download');
+
+            Route::get('invoices/cancell-reasons', 'cancellReasons');
+            Route::post('invoices/make-payment', 'makePayment');
+            Route::post('invoices/update-status', 'updateStatus');
+            Route::get('invoices/get-raw-invoice/{invoice_id}', 'getRawInvoice');
+            Route::post('invoices/make-refund', 'makeRefund');
+            Route::get('invoices/payment-methods', 'getPaymentMethods');
         });
 
         Route::controller(QuoteController::class)->group(function() {

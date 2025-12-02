@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Schema;
 class CustomerJobsController extends Controller
 {
     public function list(Request $request) {
-        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : null;
+        $status = $request->filled('status') && $request->query('status') ? $request->query('status') : 0;
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
         $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
@@ -29,7 +29,7 @@ class CustomerJobsController extends Controller
         $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
 
         $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot', 'invoice')
-        ->where('customer_id', $customer_id)->whereHas('invoice');
+        ->where('customer_id', $customer_id);
 
        $searchableColumns = Schema::getColumnListing((new CustomerJob)->getTable());
        if (!empty($searchKey)):

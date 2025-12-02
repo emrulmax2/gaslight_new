@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Records;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobAddressStoreRequest;
+use App\Http\Requests\MakePaymentRequest;
+use App\Http\Requests\MakeRefundRequest;
 use App\Http\Requests\OccupantDetailsStoreRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
@@ -13,7 +15,9 @@ use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\CustomerPropertyOccupant;
 use App\Models\Invoice;
+use App\Models\InvoiceCancelReason;
 use App\Models\InvoiceOption;
+use App\Models\InvoicePayment;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
@@ -26,6 +30,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Number;
 
 class InvoiceController extends Controller
 {
@@ -41,12 +47,15 @@ class InvoiceController extends Controller
                 ['label' => 'Invoice', 'href' => 'javascript:void(0);'],
             ],
             'engineers' => $engineers,
-            'certificate_types' => $certificate_types
+            'certificate_types' => $certificate_types,
+            'payment_methods' => PaymentMethod::where('active', 1)->get(),
+            'reasons' => InvoiceCancelReason::where('active', 1)->get()
         ]);
     }
 
     public function list(Request $request){
         $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
+        $status = (isset($request->status) && !empty($request->status) ? explode(',', $request->status) : ['Unpaid']);
 
         
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
@@ -67,6 +76,7 @@ class InvoiceController extends Controller
                 });
             });
         endif;
+        if(!empty($status) && count($status) > 0): $query->whereIn('pay_status', $status); endif;
         $query->where('created_by', $request->user()->id);
         $Query = $query->get();
 
@@ -111,7 +121,13 @@ class InvoiceController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Assigned To</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.(isset($list->user->name) ? $list->user->name : '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.(isset($list->user->name) ? $list->user->name : '').'</span>';
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div class="flex items-start">';
+                            $html .= '<label class="sm:hidden font-medium m-0">Amount</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal text-xs font-medium leading-[1.3] max-sm:ml-auto">'.($list->invoice_total > 0 ? Number::currency($list->invoice_total, 'GBP') : Number::currency(0, 'GBP')).'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
@@ -123,22 +139,57 @@ class InvoiceController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 border-none px-0 sm:px-3 py-3 sm:py-2 rounded-tr-none sm:rounded-tr rounded-br-none sm:rounded-br">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Status</label>';
-                            if($list->status == 'Cancelled'){
-                                $html .= '<button class="ml-auto font-medium bg-danger rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Cancelled</button>';
-                            }else if($list->status == 'Email Sent'){
-                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Email Sent</button>';
-                            }else if($list->status == 'Approved'){
-                                $html .= '<button class="ml-auto font-medium bg-primary rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Approved</button>';
+                            if($list->pay_status == 'Canceled' || $list->pay_status == 'Refunded'){
+                                $html .= '<button class="ml-auto font-medium bg-danger rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->pay_status.'</button>';
+                            }else if($list->pay_status == 'Paid'){
+                                $html .= '<button class="ml-auto font-medium bg-success rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->pay_status.'</button>';
                             }else{
-                                $html .= '<button class="ml-auto font-medium bg-pending rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Draft</button>';
+                                $html .= '<button class="ml-auto font-medium bg-pending rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">'.$list->pay_status.'</button>';
                             }
+                        $html .= '</div>';
+                    $html .= '</td>';
+                    $html .= '<td class="text-right border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                        $html .= '<div data-tw-merge data-tw-placement="bottom-start" class="dropdown relative inline-block">';
+                            $html .= '<button data-tw-merge data-tw-toggle="dropdown" aria-expanded="false" class="inline-flex items-center justify-center w-[25px] h-[25px] bg-primary text-white cursor-pointer">';
+                                $html .= '<i data-tw-merge data-lucide="settings" class="stroke-1.5 h-4 w-4"></i>';
+                            $html .= '</button>';
+                            $html .= '<div data-transition data-selector=".show" data-enter="transition-all ease-linear duration-150" data-enter-from="absolute !mt-5 invisible opacity-0 translate-y-1" data-enter-to="!mt-1 visible opacity-100 translate-y-0" data-leave="transition-all ease-linear duration-150" data-leave-from="!mt-1 visible opacity-100 translate-y-0" data-leave-to="absolute !mt-5 invisible opacity-0 translate-y-1" class="dropdown-menu absolute z-[9999] hidden w-44">';
+                                $html .= '<div data-tw-merge class="dropdown-content rounded-md border-transparent bg-white shadow-[0px_3px_10px_#00000017] dark:border-transparent dark:bg-darkmode-600">';
+                                    $html .= '<div class="p-2">';
+                                        if($list->pay_status == 'Unpaid'):
+                                            $html .= '<a data-hasdue="'.($list->invoice_due > 0 ? 1 : 0).'" data-status="Paid" data-id="'.$list->id.'" class="paidInvoice cursor-pointer flex items-center p-2 transition duration-300 ease-in-out rounded-md hover:bg-slate-200/60 dark:bg-darkmode-600 dark:hover:bg-darkmode-400 dropdown-item">';
+                                                $html .= '<i data-tw-merge data-lucide="check-circle" class="stroke-1.5 mr-2 h-4 w-4"></i>';
+                                                $html .= 'Mar as Paid';
+                                            $html .= '</a>';
+                                        endif;
+                                        if($list->pay_status != 'Paid' && $list->pay_status != 'Canceled'):
+                                        $html .= '<a data-id="'.$list->id.'" class="cancelInvoice cursor-pointer flex items-center p-2 transition duration-300 ease-in-out rounded-md hover:bg-slate-200/60 dark:bg-darkmode-600 dark:hover:bg-darkmode-400 dropdown-item">';
+                                            $html .= '<i data-tw-merge data-lucide="check-circle" class="stroke-1.5 mr-2 h-4 w-4"></i>';
+                                            $html .= 'Cancel';
+                                        $html .= '</a>';
+                                        endif;
+                                        if($list->pay_status == 'Canceled' || ($list->pay_status == 'Pad' && $list->invoice_due > 0)):
+                                        $html .= '<a data-status="Unpaid" data-id="'.$list->id.'" class="unpaidInvoice cursor-pointer flex items-center p-2 transition duration-300 ease-in-out rounded-md hover:bg-slate-200/60 dark:bg-darkmode-600 dark:hover:bg-darkmode-400 dropdown-item">';
+                                            $html .= '<i data-tw-merge data-lucide="check-circle" class="stroke-1.5 mr-2 h-4 w-4"></i>';
+                                            $html .= 'Move to Unpaid';
+                                        $html .= '</a>';
+                                        endif;
+                                        if($list->pay_status != 'Canceled'):
+                                        $html .= '<a data-id="'.$list->id.'" class="refundInvoice cursor-pointer flex items-center p-2 transition duration-300 ease-in-out rounded-md hover:bg-slate-200/60 dark:bg-darkmode-600 dark:hover:bg-darkmode-400 dropdown-item">';
+                                            $html .= '<i data-tw-merge data-lucide="check-circle" class="stroke-1.5 mr-2 h-4 w-4"></i>';
+                                            $html .= 'Refunded';
+                                        $html .= '</a>';
+                                        endif;
+                                    $html .= '</div>';
+                                $html .= '</div>';
+                            $html .= '</div>';
                         $html .= '</div>';
                     $html .= '</td>';
                 $html .= '</tr>';
             endforeach;
         else:
             $html .= '<tr data-url="" class="intro-x box bg-pending bg-opacity-10 border border-pending border-opacity-5 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
-                $html .= '<td colspan="9" class="border-b dark:border-darkmode-300 border-none px-3 py-3 rounded">';
+                $html .= '<td colspan="10" class="border-b dark:border-darkmode-300 border-none px-3 py-3 rounded">';
                     $html .= '<div class="flex justify-center items-center text-pending">';
                         $html .= 'No matching records found!';
                     $html .= '</div>';
@@ -294,7 +345,8 @@ class InvoiceController extends Controller
             ],
             'form' => $form,
             'invoice' => $invoice,
-            'thePdf' => $thePdf
+            'thePdf' => $thePdf,
+            'payment_methods' => PaymentMethod::where('active', 1)->get()
         ]);
     }
 
@@ -761,5 +813,146 @@ class InvoiceController extends Controller
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
+    }
+
+    public function makePayment(MakePaymentRequest $request){
+        try{
+            $invoice_id = $request->invoice_id;
+
+            $data = [
+                'invoice_id' => $invoice_id,
+                'payment_date' => (isset($request->payment_date) && !empty($request->payment_date) ? date('Y-m-d', strtotime($request->payment_date)) : date('Y-m-d')),
+                'payment_method_id' => $request->payment_method_id > 0 ? $request->payment_method_id : null,
+                'amount' => $request->amount,
+            ];
+            $payment = InvoicePayment::create($data);
+            $invoice = Invoice::find($invoice_id);
+            $message = 'Invoice payment successfully inserted.';
+            $title = 'Congratulations!';
+            if($invoice->invoice_due == 0 || (isset($request->paid) && $request->paid == 1)):
+                $message = 'Invoice payment successfully inserted and status updated to PAID.';
+                $title = (isset($request->paid) && $request->paid == 1 ? 'Paid' : 'Fully Paid!');
+
+                $invoice->update([
+                    'pay_status' => 'Paid',
+                    'invoice_cancel_reason_id' => null,
+                    'cancel_reason_note' => null,
+                    'cancelled_by' => null,
+                    'cancelled_at' => null,
+                ]);
+            endif;
+            return response()->json([
+                'success' => true,
+                'title' => $title,
+                'message' => $message,
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function cancelInvoice(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+
+            $invoice = Invoice::find($invoice_id);
+            $invoice->pay_status = 'Canceled';
+            $invoice->invoice_cancel_reason_id = (!empty($request->invoice_cancel_reason_id) ? $request->invoice_cancel_reason_id : null);
+            $invoice->cancel_reason_note = (!empty($request->cancel_reason_note) ? $request->cancel_reason_note : null);
+            $invoice->cancelled_by = auth()->user()->id;
+            $invoice->cancelled_at = date('Y-m-d H:i:s');
+            $invoice->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice successfully cancelled.',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function updateStatus(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+            $pay_status = $request->pay_status;
+
+            $invoice = Invoice::find($invoice_id);
+            $invoice->pay_status = $pay_status;
+            $invoice->updated_by = auth()->user()->id;
+            $invoice->updated_at = date('Y-m-d H:i:s');
+            $invoice->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice status successfully updated.',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
+
+    public function getRawInvoice(Request $request){
+        try{
+            $invoice_id = $request->invoice_id;
+            $invoice = Invoice::find($invoice_id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Success',
+                'row' => $invoice
+            ], 200);
+        }catch(ModelNotFoundException $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Data not found for the selected row.',
+            ], 304);
+        }catch(Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 500);
+        }
+    }
+
+    public function makeRefund(MakeRefundRequest $request){
+        try{
+            $invoice_id = $request->invoice_id;
+
+            $data = [
+                'invoice_id' => $invoice_id,
+                'payment_date' => (isset($request->payment_date) && !empty($request->payment_date) ? date('Y-m-d', strtotime($request->payment_date)) : date('Y-m-d')),
+                'payment_method_id' => $request->payment_method_id > 0 ? $request->payment_method_id : null,
+                'amount' => $request->amount * -1,
+            ];
+            $payment = InvoicePayment::create($data);
+            $invoice = Invoice::find($invoice_id);
+            $invoice->update([
+                'pay_status' => 'Refunded',
+                'invoice_cancel_reason_id' => null,
+                'cancel_reason_note' => null,
+                'cancelled_by' => null,
+                'cancelled_at' => null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Refund successfully inserted',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
     }
 }

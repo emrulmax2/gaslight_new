@@ -18,9 +18,31 @@
     </div>
     
     <!-- BEGIN: HTML Table Data -->
-    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative w-full">
-        <x-base.form-input class="m-0 w-full" id="query" type="text" autocomplete="off" placeholder="Search..."/>
-        <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+    <div id="searchBox" class="intro-y box mt-5 p-0 border-none relative w-full flex justify-stretch">
+        <div class="searchBoxInputWrap w-full relative">
+            <x-base.form-input class="m-0 w-full rounded-tr-none rounded-br-none" id="query" type="text" autocomplete="off" placeholder="Search..."/>
+            <x-base.lucide class="h-4 w-4 absolute right-2 top-0 bottom-0 m-auto text-slate-400" icon="search" />
+        </div>
+        <x-base.menu id="statusDropdown">
+            <x-base.menu.button as="x-base.button" class="rounded-tl-none rounded-bl-none" variant="secondary" >
+                <span class="selectedStatusLabel">Ongoing</span>
+                <x-base.lucide class="ml-2 h-4 w-4" icon="ChevronDown" />
+            </x-base.menu.button>
+            <x-base.menu.items class="w-56">
+                <x-base.menu.item class="active singleStatus" data-label="Ongoing" data-value="Draft,Send">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Ongoing
+                </x-base.menu.item>
+                <x-base.menu.item class="singleStatus" data-label="Accepted" data-value="Accepted">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                    Accepted
+                </x-base.menu.item>
+                <x-base.menu.item class="singleStatus" data-label="Cancelled/Expired" data-value="Cancelled,Expired">
+                    <x-base.lucide class="mr-2 h-4 w-4" icon="Sidebar" />
+                    Cancelled/Expired
+                </x-base.menu.item>
+            </x-base.menu.items>
+        </x-base.menu>
     </div>
 
     <div class="scrollbar-hidden overflow-x-auto mt-5">
