@@ -42,7 +42,9 @@ use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
 use App\Http\Controllers\SuperAdmin\Settings\EmailTemplateController;
+use App\Http\Controllers\SuperAdmin\Settings\InvoiceCancelReasonController;
 use App\Http\Controllers\SuperAdmin\Settings\JobCancelReasonController;
+use App\Http\Controllers\SuperAdmin\Settings\PaymentMethodController;
 use App\Http\Controllers\SuperAdmin\Settings\PricingPackageController;
 use App\Http\Controllers\SuperAdmin\Settings\ReferralCodeController;
 use App\Http\Controllers\SuperAdmin\Settings\SettingController;
@@ -194,6 +196,24 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::get('site-settings/email-templates', 'index')->name('site.setting.email.template');
         Route::get('site-settings/email-templates/create/{form}', 'create')->name('site.setting.email.template.create');
         Route::post('site-settings/email-templates/store', 'store')->name('site.setting.email.template.store');
+    });
+
+    Route::controller(PaymentMethodController::class)->group(function(){
+        Route::get('site-settings/payment-method', 'index')->name('site.setting.payment.method');
+        Route::get('site-settings/payment-method/list', 'list')->name('site.setting.payment.method.list');
+        Route::post('site-settings/payment-method/store', 'store')->name('site.setting.payment.method.store');
+        Route::post('site-settings/payment-method/update', 'update')->name('site.setting.payment.method.update');
+        Route::delete('site-settings/payment-method/destroy/{method_id}', 'destroy')->name('site.setting.payment.method.destroy'); 
+        Route::post('site-settings/payment-method/restore/{method_id}', 'restore')->name('site.setting.payment.method.restore');
+    });
+
+    Route::controller(InvoiceCancelReasonController::class)->group(function(){
+        Route::get('site-settings/inv-cancel-reason', 'index')->name('site.setting.inv.cancel.reason');
+        Route::get('site-settings/inv-cancel-reason/list', 'list')->name('site.setting.inv.cancel.reason.list');
+        Route::post('site-settings/inv-cancel-reason/store', 'store')->name('site.setting.inv.cancel.reason.store');
+        Route::post('site-settings/inv-cancel-reason/update', 'update')->name('site.setting.inv.cancel.reason.update');
+        Route::delete('site-settings/inv-cancel-reason/destroy/{method_id}', 'destroy')->name('site.setting.inv.cancel.reason.destroy'); 
+        Route::post('site-settings/inv-cancel-reason/restore/{method_id}', 'restore')->name('site.setting.inv.cancel.reason.restore');
     });
        
 });

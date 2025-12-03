@@ -73,6 +73,23 @@
                     </li>
                 </ul>
             </li>
+            <li class="hasChild mt-5">
+                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.inv.cancel.reason' || Route::currentRouteName() == 'superadmin.site.setting.payment.method' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
+                    <i data-lucide="badge-pound-sterling" class="w-4 h-4 mr-2"></i> Invoice Settings <i data-lucide="chevron-down" class="w-4 h-4 ml-auto menuAgnle"></i>
+                </a>
+                <ul class="p-0 m-0 pl-5" style="display: {{ Route::currentRouteName() == 'superadmin.site.setting.inv.cancel.reason' || Route::currentRouteName() == 'superadmin.site.setting.payment.method' ? 'block' : 'none' }};">
+                    <li>
+                        <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.payment.method' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.payment.method') }}">
+                            <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Payment Methods
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.inv.cancel.reason' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.inv.cancel.reason') }}">
+                            <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Cancel Reason
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
 </div>

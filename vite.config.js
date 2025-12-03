@@ -259,6 +259,9 @@ export default defineConfig({
                 "resources/js/app/quote/form.js",
                 "resources/js/app/quote/create.js",
                 "resources/js/app/quote/show.js",
+
+                "resources/js/app/superadmin/settings/payment-method.js",
+                "resources/js/app/superadmin/settings/inv-cancel-reason.js",
             ],
             refresh: true,
         }),
