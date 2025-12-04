@@ -38,7 +38,7 @@ class InvoiceController extends Controller
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
     
-        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])->orderByRaw(implode(',', $sorts));
+        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property']);
         if(!empty($status) && $status !== 'All'): $query->where('status', $status); endif;
         if(!empty($payStatus) && count($payStatus) > 0): $query->whereIn('pay_status', $payStatus); endif;
         if (!empty($queryStr)):
