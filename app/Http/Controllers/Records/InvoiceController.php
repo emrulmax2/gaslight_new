@@ -133,7 +133,14 @@ class InvoiceController extends Controller
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Created At</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal text-xs leading-[1.3] max-sm:ml-auto">'.($list->created_at ? $list->created_at->format('Y-m-d h:i A') : '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal text-xs leading-[1.3] max-sm:ml-auto">';
+                                if($list->status == 'Send'){
+                                    $html .= '<button class="ml-auto font-medium bg-success mb-1 rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Send</button><br/>';
+                                }else {
+                                    $html .= '<button class="ml-auto font-medium bg-primary mb-1 rounded-[2px] text-white text-[10px] leading-none uppercase px-2 py-1">Draft</button><br/>';
+                                }
+                                $html .= ($list->created_at ? $list->created_at->format('Y-m-d h:i A') : '');
+                            $html .= '</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 border-none px-0 sm:px-3 py-3 sm:py-2 rounded-tr-none sm:rounded-tr rounded-br-none sm:rounded-br">';
