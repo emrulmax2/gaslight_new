@@ -50,7 +50,7 @@
         let form_data = new FormData(form);
         axios({
             method: "post",
-            url: route('records.action'),
+            url: route('invoices.action'),
             data: form_data,
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
