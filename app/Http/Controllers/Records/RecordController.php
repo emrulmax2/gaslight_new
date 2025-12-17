@@ -345,6 +345,7 @@ class RecordController extends Controller
             $emailData = ($template ? $this->renderEmailTemplate($record, $template) : []);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
+            $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $record->user->email;
@@ -384,7 +385,7 @@ class RecordController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, 'certificate'), $ccMail); 
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate'), $ccMail); 
             return true;
         else:
             return false;

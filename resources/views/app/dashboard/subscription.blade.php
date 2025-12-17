@@ -6,7 +6,7 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium">Upgrade Subscription</h2>
+        <h2 class="mr-auto text-lg font-medium">Manage Subscription</h2>
         <div class="flex mt-0 w-auto">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
@@ -18,6 +18,54 @@
         @csrf
         <div class="grid grid-cols-12 gap-6 mt-5">
             <div class="col-span-12 sm:col-span-9">
+                <div id="packageSLider" class="packageSLider owl-carousel">
+                    @php 
+                        $bgClass = ['bg-pink-900', 'bg-purple-900', 'bg-orange-900', 'bg-indigo-900'];
+                    @endphp
+                    @if($packages->count() > 0)
+                        @foreach($packages as $pack)
+                            @if((isset($userPackage->package->period) && $userPackage->package->period == 'Free Trail') || (isset($userPackage->package->period) && $userPackage->package->period != 'Free Trail' && $pack->period != 'Free Trail'))
+                            <div class="packageItem relative">
+                                <div class="box packageWrap p-0 pt-[4px] rounded-xl rounded-bl-2xl rounded-br-2xl border {{ $bgClass[$loop->index] }} ">
+                                    <input class="w-0 h-0 opacity-0 absolute left-0 top-0 pricing_package_id" id="pricing_package_{{ $pack->id }}" name="pricing_package_id" type="radio" value="{{ $pack->id }}"/>
+                                    <div class="bg-white rounded-xl px-5 sm:px-7 py-10">
+                                        <div class="packageHeader min-h-[127px] border-b border-b-slate-200">
+                                            <span class="bg-success bg-opacity-30 text-primary inline-flex px-2 py-0.5 font-medium opacity-0 -z-10">Active</span>
+                                            <h4 class="font-medium text-dark leading-none mt-2 mb-3">{{ $pack->title }}</h4>
+                                            <h2 class="text-xl font-bold text-dark leading-none">
+                                                {{ Number::currency($pack->price, 'GBP') }} 
+                                                <span class="text-xs text-slate-500">/{{ $pack->period }}</span>
+                                            </h2>
+                                            @if(isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id)
+                                                <span class="bg-warning bg-opacity-10 text-xs px-1.5 py-0.5 font-medium mt-2 inline-flex">
+                                                    Next auto renew - {{ date('d M Y', strtotime($userPackage->end)) }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="packageBody pt-5">
+                                            <p class=" text-slate-500 flex items-start mb-10">
+                                                <i data-lucide="check-circle" class="w-4 h-4 mr-3" style="flex: 0 0 auto; position: relative; top: 2px;"></i>
+                                                <span>{{ $pack->description }}</span>
+                                            </p>
+                                            @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id))
+                                                <x-base.button type="button" class="rounded-full px-3 w-36 text-center justify-center {{ $pack->period == 'Free Trail' ? 'opacity-0 -z-20' : '' }}" variant="danger" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                                                    Unsubscribe
+                                                </x-base.button>
+                                            @elseif($pack->period !== 'Free Trail') 
+                                                <x-base.button as="a" href="{{ route('company.dashboard.upgrade.subscriptions', $pack->id) }}" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                                                    Get Plan
+                                                </x-base.button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        @endforeach
+                    @endif
+                </div>
                 <div class="intro-y box">
                     <div class="flex flex-col items-center border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400 sm:flex-row">
                         <h2 class="mr-auto text-base font-medium">
@@ -25,6 +73,7 @@
                         </h2>
                     </div>
                     <div class="p-5">
+                        
                         <div class="grid grid-cols-12 gap-x-4 gap-y-2">
                             @if($packages->count() > 0)
                                 @foreach($packages as $pack)
@@ -96,6 +145,9 @@
 @endsection
 <script src="https://js.stripe.com/v3/"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+
+
 @pushOnce('vendors')
     @vite('resources/js/vendors/axios.js')
     @vite('resources/js/vendors/tabulator.js')
@@ -104,10 +156,40 @@
 @endPushOnce
 
 @pushOnce('scripts')
+    @vite('resources/js/app/owl.carousel.js')
+
     <script type="module">
         const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
         const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
         const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+
+        //npm install owl.carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            $('#packageSLider').owlCarousel({
+                loop: false,
+                margin: 10,
+                nav: false,
+                dots: false,
+                autoplay: false,
+                responsive: {
+                    0: { 
+                        items: 1.1,
+                        center: true,
+                        margin: 5,
+                        loop: true
+                    },
+                    768: { 
+                        items: 1.1,
+                        center: true,
+                        margin: 10,
+                        loop: true
+                    },
+                    1024: { 
+                        items: 3 
+                    }
+                }
+            });
+        })
         
         
         document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {

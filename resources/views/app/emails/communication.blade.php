@@ -114,11 +114,11 @@
       <div class="header">
          <table style="border-collapse: collapse; border: 0;">
             <tr>
-               <td style="width: 80px; padding: 0;">
-                  <img src="https://app.gascertificate.app/logos/logo_1_new.png" alt="Logo" style="height:60px; width: auto;">
+               <td style="width: 40%; padding: 0; text-align: left;">
+                  <img src="https://app.gascertificate.app/logos/logo_1_new.png" alt="Logo" style="height:60px; width: auto; display: inline-block;">
                </td>
                <td style="text-align: right;">
-                  <h1 style="color: #FFF; text-align:right; font-size: 18px; line-height: 22px;">Welcome to <br /><a style="color: #FFF;" href="https://gasengineerapp.co.uk">GasEngineerApp.co.uk</a></h1>
+                  <h1 style="color: #FFF; text-align:right; font-size: 18px; line-height: 22px;">{!! $template_title !!}</h1>
                </td>
             </tr>
          </table>
@@ -130,9 +130,7 @@
       <!-- Footer -->
       <div class="footer">
          <div class="contact">
-            <span class="company">Engineer App Ltd</span><br>
-            Phone: <a href="tel:+442072479007">0207 247 9007</a> | Email: <a href="mailto:support@gasengineerapp.co.uk">support@gasengineerapp.co.uk</a><br>
-            Website: <a href="https://www.gasengineerapp.co.uk" target="_blank">www.gasengineerapp.co.uk</a>
+            Powered by <a href="https://www.gasengineerapp.co.uk" target="_blank">www.gasengineerapp.co.uk</a>
          </div>
       </div>
    </div>

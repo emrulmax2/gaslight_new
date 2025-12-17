@@ -68,14 +68,28 @@ class Dashboard extends Controller
         endif;
     }
 
-    public function upgradeSubscriptions(){
+    public function manageSubscriptions(){
+        $user = User::find(auth()->user()->id);
         return view('app.dashboard.subscription',[
+            'title' => 'Manage Subscription - Gas Certificate APP',
+            'breadcrumbs' => [
+                ['label' => 'Manage Subscription', 'href' => 'javascript:void(0);'],
+            ],
+            'user' => User::with('referral')->find(auth()->user()->id),
+            'packages' => PricingPackage::where('active', 1)->orderBy('order', 'ASC')->get(),
+            'userPackage' => UserPricingPackage::with('package')->where('user_id', $user->id)->where('active', 1)->orderByDesc('id')->first()
+        ]);
+    }
+
+    public function upgradeSubscriptions($package_id){
+        $user = User::find(auth()->user()->id);
+        return view('app.dashboard.upgrade-subscription',[
             'title' => 'Upgrade Subscription - Gas Certificate APP',
             'breadcrumbs' => [
                 ['label' => 'Upgrade Subscription', 'href' => 'javascript:void(0);'],
             ],
             'user' => User::with('referral')->find(auth()->user()->id),
-            'packages' => PricingPackage::whereNot('period', 'Free Trail')->where('active', 1)->orderBy('order', 'ASC')->get()
+            'pack' => PricingPackage::find($package_id),
         ]);
     }
 

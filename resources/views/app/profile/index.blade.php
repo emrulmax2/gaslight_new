@@ -107,8 +107,14 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Subscriptions</h3>
         <div class="box rounded-md p-0 overflow-hidden">
+            <a href="{{ route('company.dashboard.manage.subscriptions') }}" class="border-b flex w-full items-center px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
+                <span class="font-medium text-slate-500 text-sm">
+                    Manage Subscription
+                </span>
+            </a>
             @if(isset($user->userpackage->end) && !empty($user->userpackage->end) && $user->userpackage->end < date('Y-m-d'))
-                <a href="{{ route('company.dashboard.upgrade.subscriptions') }}" class="border-b flex w-full items-center px-5 py-3">
+                <a href="{{ route('company.dashboard.manage.subscriptions') }}" class="border-b flex w-full items-center px-5 py-3">
                     <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
                     <span class="font-medium text-slate-500 text-sm inline-flex items-center">
                         @if(isset($user->userpackage->id) && $user->userpackage->id > 0 )
