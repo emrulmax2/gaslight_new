@@ -118,7 +118,7 @@
                         <img src="https://app.gascertificate.app/logos/logo_1_new.png" alt="Logo" style="height:60px; width: auto;">
                     </td>
                     <td style="text-align: right; width: 60%;">
-                        <h1 style="color: #FFF; text-align:right; font-size: 18px; line-height: 22px; word-break: break-word;">{{ $title }}</h1>
+                        <h1 style="color: #FFF; text-align:right; font-size: 18px; line-height: 22px; word-break: break-word;">{!! $template_title !!}</h1>
                     </td>
                 </tr>
             </table>

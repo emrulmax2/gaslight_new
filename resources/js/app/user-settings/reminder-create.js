@@ -191,7 +191,7 @@
                 url: route('user.settings.reminder.templates.destroy.attachment', row_id),
                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
             }).then(response => {
-                if (response.status == 200) {
+                if(response.status == 200) {
                     $('#confirmModal button').removeAttr('disabled');
                     confirmModal.hide();
 
@@ -230,12 +230,15 @@
                     }
                 }
             }).catch(error =>{
+                $('#confirmModal button').removeAttr('disabled');
                 if (error.response) {
                     if (error.response.status == 304) {
+                        confirmModal.hide();
+                        
                         warningModal.show();
                         document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
                             $("#warningModal .warningModalTitle").html("Error Found!");
-                            $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                            $("#warningModal .warningModalDesc").html('Base template not found.');
                         });
 
                         setTimeout(() => {

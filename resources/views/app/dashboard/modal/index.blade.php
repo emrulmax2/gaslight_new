@@ -540,7 +540,7 @@
                     <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
                     Cancle
                 </x-base.button>
-                <x-base.button  as="a" href="{{ route('company.dashboard.upgrade.subscriptions') }}" class="w-auto rounded-full text-white mr-1 px-3" size="sm" variant="facebook" >
+                <x-base.button  as="a" href="{{ route('company.dashboard.manage.subscriptions') }}" class="w-auto rounded-full text-white mr-1 px-3" size="sm" variant="facebook" >
                     <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
                     Upgrade Now
                 </x-base.button>

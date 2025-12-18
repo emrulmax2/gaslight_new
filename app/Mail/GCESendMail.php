@@ -15,16 +15,17 @@ class GCESendMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject, $content, $attachmentList, $template;
+    public $subject, $content, $attachmentList, $templateTitle, $template;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subject, $content, $attachmentList, $template = 'communication') 
+    public function __construct($subject, $content, $attachmentList, $templateTitle = '', $template = 'communication') 
     {
         $this->subject = $subject;
         $this->content = $content;
         $this->attachmentList = $attachmentList;
+        $this->templateTitle = $templateTitle != '' ? $templateTitle : 'Welcome to <br /><a style="color: #FFF;" href="https://gasengineerapp.co.uk">GasEngineerApp.co.uk</a>'; 
         $this->template = $template; 
     }
 
@@ -47,7 +48,8 @@ class GCESendMail extends Mailable
             view: 'app.emails.'.$this->template, 
             with: [
                 'content' => $this->content, 
-                'title' => $this->subject  
+                'title' => $this->subject,
+                'template_title' => $this->templateTitle
             ]
         );
     }

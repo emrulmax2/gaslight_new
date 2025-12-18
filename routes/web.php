@@ -238,7 +238,8 @@ Route::middleware(Authenticate::class)->group(function() {
     Route::controller(Dashboard::class)->group(function () {
         Route::get('/', 'index')->name('company.dashboard')->middleware(CheckFirstLogin::class);
         Route::post('send-invitation-sms', 'sendInvitationSms')->name('company.dashboard.send.invitation.sms');
-        Route::get('upgrade-subscriptions', 'upgradeSubscriptions')->name('company.dashboard.upgrade.subscriptions');
+        Route::get('manage-subscriptions', 'manageSubscriptions')->name('company.dashboard.manage.subscriptions');
+        Route::get('upgrade-subscriptions/{package_id}', 'upgradeSubscriptions')->name('company.dashboard.upgrade.subscriptions');
         Route::post('upgrade-subscription', 'upgradeSubscription')->name('company.dashboard.upgrade.subscription');
     });
 

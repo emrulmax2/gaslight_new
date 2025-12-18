@@ -449,6 +449,8 @@ class InvoiceController extends Controller
             'user', 
             'user.company'])->find($invoice_id);
         $user_id = (isset($invoice->created_by) && $invoice->created_by > 0 ? $invoice->created_by : auth()->user()->id);
+        $companyName = $invoice->user->companies->pluck('company_name')->first();
+        $companyEmail = $invoice->user->companies->pluck('company_email')->first();
         $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
         $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
         if(!empty($customerEmail)):
@@ -456,6 +458,7 @@ class InvoiceController extends Controller
             $emailData = ($template ? $this->renderEmailTemplate($invoice, $template) : []);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $invoice->form->name);
+            $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $invoice->user->email;
@@ -475,11 +478,11 @@ class InvoiceController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
-                'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
+                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
             ];
-            //from_name: Company Name
-            // Replay to: engineer or company email.
+            $configuration['from_name'] = !empty($companyName) ? $companyName : $invoice->user->name; 
+            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $invoice->user->email; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($invoice->id); 
@@ -495,7 +498,7 @@ class InvoiceController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);
             return true;
         else:
             return false;
