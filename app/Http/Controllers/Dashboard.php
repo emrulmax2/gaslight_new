@@ -19,6 +19,7 @@ use App\Models\UserPricingPackageInvoice;
 use App\Models\UserReferralCode;
 use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Stripe;
 
 class Dashboard extends Controller
@@ -81,7 +82,7 @@ class Dashboard extends Controller
         ]);
     }
 
-    public function upgradeSubscriptions($package_id){
+    public function getSubscribed($package_id){
         $user = User::find(auth()->user()->id);
         return view('app.dashboard.upgrade-subscription',[
             'title' => 'Upgrade Subscription - Gas Certificate APP',
@@ -93,7 +94,7 @@ class Dashboard extends Controller
         ]);
     }
 
-    public function upgradeSubscription(UpgradeSubscriptionRequest $request){
+    public function enrolledSubscription(UpgradeSubscriptionRequest $request){
         $user_id = auth()->user()->id;
         $user = User::find($user_id);
         $name = $user->name;
@@ -103,7 +104,7 @@ class Dashboard extends Controller
         $pricing_package_id = $request->pricing_package_id;
         $pricingPackage = PricingPackage::find($pricing_package_id);
 
-        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         try{
             $customer = $stripe->customers->create([
                 'name' => $name,
@@ -163,6 +164,41 @@ class Dashboard extends Controller
         }catch(Exception $e){
             $message = $e->getMessage();
             return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
+        }
+    }
+
+    public function upgradeSubscriptions(Request $request){
+        $package_id = $request->package_id;
+        $user_id = $request->user_id;
+        $user = User::find($user_id);
+
+        $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
+        $userInvoice = UserPricingPackageInvoice::where('user_id', $user_id)->where('user_pricing_package_id', $userPackage->id)->orderBy('id', 'DESC')->get()->first();
+    
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+        try{
+            $subscription = $stripe->subscriptions->update(
+                $userPackage->stripe_subscription_id,
+                [
+                    'cancel_at_period_end' => true,
+                    'metadata' => [
+                        'is_cancelled' => 1,
+                        'upgrade_to' => $package_id,
+                        'user_id' => $userPackage->user_id,
+                    ]
+                ]
+            );
+            $userPackage->update([
+                'cancellation_requested' => 1, 
+                'requested_by' => Auth::user()->id, 
+                'requested_at' => date('Y-m-d H:i:s'),
+                'upgrade_to' => $package_id
+            ]);
+
+            return response()->json(['message' => 'Subscription upgrade request successfully submitted. At the end of the current period your new package will activate.', 'red' => route('profile')], 200);
+        }catch(Exception $e){
+            $message = $e->getMessage();
+            return response()->json(['message' => 'Can not upgrade the subscription due to unexpected errors.', 'red' => ''], 422);
         }
     }
 }

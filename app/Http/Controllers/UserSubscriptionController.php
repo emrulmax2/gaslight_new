@@ -87,7 +87,7 @@ class UserSubscriptionController extends Controller
     public function downloadInvoice(UserPricingPackageInvoice $inv){
         $inv->load(['user', 'package']);
 
-        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         $invoice = $stripe->invoices->retrieve($inv->invoice_id);
         //dd($invoice);
 

@@ -22,6 +22,7 @@ class UserPricingPackage extends Model
         'cancellation_requested',
         'requested_by',
         'requested_at',
+        'upgrade_to',
         
         'created_by',
         'updated_by'

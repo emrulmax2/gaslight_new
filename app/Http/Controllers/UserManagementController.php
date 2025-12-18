@@ -60,7 +60,7 @@ class UserManagementController extends Controller
         $user->save();
 
         if($user->id):
-            $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
             try{
                 $customer = $stripe->customers->create([
                     'name' => $name,
@@ -415,11 +415,18 @@ class UserManagementController extends Controller
         $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
         $userInvoice = UserPricingPackageInvoice::where('user_id', $user_id)->where('user_pricing_package_id', $userPackage->id)->orderBy('id', 'DESC')->get()->first();
         
-        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         try{
             $subscription = $stripe->subscriptions->update(
                 $userPackage->stripe_subscription_id,
-                ['cancel_at_period_end' => true]
+                [
+                    'cancel_at_period_end' => true,
+                    'metadata' => [
+                        'is_cancelled' => 1,
+                        'upgrade_to' => null,
+                        'user_id' => $userPackage->user_id,
+                    ]
+                ]
             );
             // $subscription = $stripe->subscriptions->cancel($userPackage->stripe_subscription_id, [
             //     'cancellation_details' => [
@@ -444,5 +451,73 @@ class UserManagementController extends Controller
             'user' => $user,
             'packages' => PricingPackage::whereNot('period', 'Free Trail')->where('active', 1)->orderBy('order', 'ASC')->get()
         ]);
+    }
+
+    public function paymentMethods(User $user){
+        $user->load('userpackage');
+        $paymentMethods = [];
+        $defaultMethod = '';
+        if(isset($user->userpackage->stripe_customer_id) && !empty($user->userpackage->stripe_customer_id) && $user->userpackage->package->period != 'Free Trail'):
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $paymentMethods = $stripe->customers->allPaymentMethods(
+                $user->userpackage->stripe_customer_id,
+                [
+                    'limit' => 10,
+                    'type' => 'card'
+                ]
+            )->data;
+            usort($paymentMethods, fn($a, $b) => $b->created <=> $a->created);
+            $customer = $stripe->customers->retrieve(
+                $user->userpackage->stripe_customer_id, []
+            );
+            $defaultMethod = $customer->invoice_settings->default_payment_method;
+        endif;
+        //dd($defaultMethod);
+        //dd($paymentMethods);
+
+        return view('app.users.payment-methods', [
+            'title' => 'User Payment Methods - Gas Certificate App',
+            'user' => $user,
+            'packages' => PricingPackage::whereNot('period', 'Free Trail')->where('active', 1)->orderBy('order', 'ASC')->get(),
+            'methods' => $paymentMethods,
+            'default_id' => $defaultMethod
+        ]);
+    }
+
+    public function addPaymentMethod(User $user, $customer_id){
+        $user->load('userpackage');
+
+        return view('app.users.add-payment-method', [
+            'title' => 'Add User Payment Methods - Gas Certificate App',
+            'user' => $user,
+            'customer_id' => $customer_id
+        ]);
+    }
+
+    public function storePaymentMethod(Request $request){
+        try{        
+            $user_id = (isset($request->user_id) && !empty($request->user_id) ? $request->user_id : 0);
+            $customer_id = (isset($request->customer_id) && !empty($request->customer_id) ? $request->customer_id : null);
+            $is_default = (isset($request->is_default) && !empty($request->is_default) ? $request->is_default : 0);
+            $paymentMethod = (isset($request->token) && !empty($request->token) ? $request->token : null);
+
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe->paymentMethods->attach(
+                $paymentMethod,
+                ['customer' => $customer_id]
+            );
+
+            if($is_default == 1):
+                $stripe->customers->update($customer_id, [
+                    'invoice_settings' => [
+                        'default_payment_method' => $paymentMethod,
+                    ],
+                ]);
+            endif;
+            return response()->json(['message' => 'Payment method successfully added.', 'red' => route('users.payment.methods', $user_id)], 200);
+        }catch(Exception $e){
+            $message = $e->getMessage();
+            return response()->json(['message' => 'Something went wrong. Can not add payment method. try again later', 'red' => ''], 304);
+        }
     }
 }
