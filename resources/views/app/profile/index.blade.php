@@ -113,36 +113,7 @@
                     Manage Subscription
                 </span>
             </a>
-            @if(isset($user->userpackage->end) && !empty($user->userpackage->end) && $user->userpackage->end < date('Y-m-d'))
-                <a href="{{ route('company.dashboard.manage.subscriptions') }}" class="border-b flex w-full items-center px-5 py-3">
-                    <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
-                    <span class="font-medium text-slate-500 text-sm inline-flex items-center">
-                        @if(isset($user->userpackage->id) && $user->userpackage->id > 0 )
-                            {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? $user->userpackage->package->title : '') }}
-                            {{ (isset($user->userpackage->price) && !empty($user->userpackage->price) ? ' ('.Number::currency($user->userpackage->price, 'GBP').')' : '') }}
-                        @else 
-                            N/A
-                        @endif
-                        <span class="ml-2 text-danger">{{ (isset($user->userpackage->end) && !empty($user->userpackage->end) ? '('.date('jS F, Y', strtotime($user->userpackage->end)).')' : '') }}</span>
-                        <x-base.button  as="span" class="w-auto rounded-none ml-5 text-white mr-1 px-3 py-0.5" size="sm" variant="danger" >
-                            <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                            Upgrade Now
-                        </x-base.button>
-                    </span>
-                </a>
-            @else
-            <a href="{{ route('users.plans', $user->id) }}" class="border-b flex w-full items-center px-5 py-3">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
-                <span class="font-medium text-slate-500 text-sm">
-                    @if(isset($user->userpackage->id) && $user->userpackage->id > 0 )
-                        {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? $user->userpackage->package->title : '') }}
-                        {{ (isset($user->userpackage->price) && !empty($user->userpackage->price) ? ' ('.Number::currency($user->userpackage->price, 'GBP').')' : '') }}
-                    @else 
-                        N/A
-                    @endif
-                </span>
-            </a>
-            @endif
+            
             <a href="{{ route('users.index') }}" class="flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="users" />
                 <div>
@@ -158,40 +129,14 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Payments</h3>
         <div class="box rounded-md p-0 overflow-hidden">
-            <a href="" class="border-b flex w-full items-start px-5 py-3">
+            <a href="{{ route('users.payment.methods', $user->id) }}" class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="badge-pound-sterling" style="margin-top: 2px;" />
                 
                 <div class="w-full">
                     <span class="font-medium text-slate-500 text-sm">Payment Method</span>
-                    @if(!empty($method))
-                        @php 
-                            $expireM = (isset($method['exp_month']) && !empty($method['exp_month']) ? $method['exp_month'] : '');
-                            $expireY = (isset($method['exp_year']) && !empty($method['exp_year']) ? $method['exp_year'] : '');
-                            $expires = (!empty($expireM) && !empty($expireY) ? date('F Y', strtotime('01-'.$expireM.'-'.$expireY)) : '');
-
-                            $cardName = (isset($method['display_brand']) && !empty($method['display_brand']) ? ucfirst($method['display_brand']) : '');
-                            $cardName .= (isset($method['last4']) && !empty($method['last4']) ? '&nbsp;....'.$method['last4'] : '');
-                        @endphp
-                        <div class="w-full mt-2 flex items-center">
-                            <div class="mr-auto">
-                                @if(isset($method['brand']) && !empty($method['brand']))
-                                    <div class="mb-2">
-                                        <img src="{{ Vite::asset('resources/images/cards/'.$method['brand'].'.png') }}" alt="{{ $cardName }}" class="w-auto h-[20px]"/>
-                                    </div>
-                                @endif
-                                <div class="font-bold text-dark text-base leading-none mb-2">{!! $cardName !!}</div>
-                                <div class=" text-slate-500 text-xs leading-none mb-4"> Expires {{ $expires }}</div>
-                                <span class="text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Default</span>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-ellipsis-vertical-icon lucide-ellipsis-vertical"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
-                            </div>
-                        </div>
-                    @else 
-                        <span class="font-normal text-slate-400 text-xs block">
-                            N/A
-                        </span>
-                    @endif
+                    <span class="font-normal text-slate-400 text-xs block">
+                        Manage your payment methods
+                    </span>
                 </div>
             </a>
             <a href="{{ route('users.payment.history', $user->id) }}" class="flex w-full items-start px-5 py-3">

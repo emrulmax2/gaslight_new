@@ -111,6 +111,13 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::controller(UserSubscriptionController::class)->group(function(){
             Route::get('users/payment-history/{id}', 'paymentHistory');
             Route::get('users/plans/{id}', 'userPlanDetails');
+
+            Route::post('users/cancel-subscription', 'cancelSubscription');
+            Route::get('users/payment-methods/{user}', 'paymentMethods');
+            Route::post('users/store-payment-methods', 'storePaymentMethod');
+
+            Route::post('users/enrolled-subscription', 'enrolledSubscription');
+            Route::post('users/upgrade-subscription', 'upgradeSubscriptions');
         });
 
         Route::controller(UserManagementController::class)->group(function() {

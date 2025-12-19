@@ -239,8 +239,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('/', 'index')->name('company.dashboard')->middleware(CheckFirstLogin::class);
         Route::post('send-invitation-sms', 'sendInvitationSms')->name('company.dashboard.send.invitation.sms');
         Route::get('manage-subscriptions', 'manageSubscriptions')->name('company.dashboard.manage.subscriptions');
-        Route::get('upgrade-subscriptions/{package_id}', 'upgradeSubscriptions')->name('company.dashboard.upgrade.subscriptions');
-        Route::post('upgrade-subscription', 'upgradeSubscription')->name('company.dashboard.upgrade.subscription');
+        Route::get('subscribe/{package_id}', 'getSubscribed')->name('company.dashboard.subscribe');
+        Route::post('enrolled-subscription', 'enrolledSubscription')->name('company.dashboard.enrolled.subscription');
+        Route::post('upgrade-subscription', 'upgradeSubscriptions')->name('company.dashboard.upgrade.subscriptions');
     });
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
@@ -485,6 +486,9 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('users/plans/{user}', 'userPlans')->name('users.plans');
         Route::post('users/cancel-subscription', 'cancelSubscription')->name('users.cancel.subscription');
         Route::get('users/payment-history/{user}', 'paymentHistory')->name('users.payment.history');
+        Route::get('users/payment-methods/{user}', 'paymentMethods')->name('users.payment.methods');
+        Route::get('users/add-payment-methods/{user}/{customer_id}', 'addPaymentMethod')->name('users.add.payment.method');
+        Route::post('users/store-payment-methods', 'storePaymentMethod')->name('users.store.payment.method');
     });
 
     Route::controller(RecordAndDraftController::class)->group(function() {

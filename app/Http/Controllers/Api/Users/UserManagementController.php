@@ -66,7 +66,7 @@ class UserManagementController extends Controller
                     endif;
                 endif;
             endif;
-            $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
             try{
                 $customer = $stripe->customers->create([
                     'name' => $name,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
+use App\Models\PricingPackage;
 use App\Models\UserPricingPackage;
 use App\Models\UserPricingPackageInvoice;
 use Illuminate\Http\Request;
@@ -165,45 +166,131 @@ class UserSubscriptionWebhookController extends Controller
                 endif;
                 break;
             case 'customer.subscription.deleted':
-                $theObject = $event->data->object; 
-                Log::info(json_encode($theObject));
+                $theObject = $event->data->object;
+                Log::info('Stripe subscription deleted', (array) $theObject);
 
-                $subscription_id = $theObject->id;
-                $customer_id = $theObject->customer;
-                $user_id = $theObject->metadata->user_id;
+                $subscriptionId = $theObject->id;
+                $customerId     = $theObject->customer;
+                $metadata       = $theObject->metadata ?? new \stdClass();
 
-                $userPackage = UserPricingPackage::where('stripe_subscription_id', $subscription_id)->orderBy('id', 'DESC')->get()->first();
-                if(!isset($userPackage->id) && !empty($subscription_id)):
-                    $userPackage = UserPricingPackage::where('stripe_customer_id', $customer_id)->orderBy('id', 'DESC')->get()->first();
-                elseif(!isset($userPackage->id) && !empty($user_id)):
-                    $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
-                endif;
-                if(isset($userPackage->id) && $userPackage->id > 0):
-                    $userPackage->update([
-                        'active' => 0,
-                        'cancellation_requested' => 0, 
-                        'requested_by' => null, 
-                        'requested_at' => null,
-                        'updated_by' => 1
-                    ]);
+                $userId         = $metadata->user_id ?? null;
+                $isCancelled    = (int) ($metadata->is_cancelled ?? 0);
+                $upgradeToPack  = (int) ($metadata->upgrade_to ?? 0);
 
-                    if(!empty($user_id) && $user_id > 0):
-                        $subject = 'Your Subscription Has Been Canceled';
+                /**
+                 * 1. Find latest user package
+                 */
+                $userPackage = UserPricingPackage::where('stripe_subscription_id', $subscriptionId)->latest()->first();
+                if (!$userPackage && $customerId) {
+                    $userPackage = UserPricingPackage::where('stripe_customer_id', $customerId)->latest()->first();
+                }
+                if (!$userPackage && $userId) {
+                    $userPackage = UserPricingPackage::where('user_id', $userId)->latest()->first();
+                }
+                if (!$userPackage) {
+                    Log::warning('No UserPricingPackage found for deleted subscription');
+                    break;
+                }
 
-                        $content = 'Hi '.$userPackage->user->name.',<br/><br/>';
-                       
-                        $content .= '<p>We\'re confirming that your subscription to '.$userPackage->package->title.' has been successfully canceled. Your access will remain active until the end of your current billing period, which ends on '.date('jS F, Y', strtotime($userPackage->end)).'.</p>';
-                        $content .= '<p>If this was a mistake or you change your mind, you can easily reactivate your subscription anytime from your portal.</p>';
-                        $content .= '<p>We\'re grateful for the time you spent with us and hope to see you again in the future. If you have any questions or feedback, feel free to reach out.</p>';
-                        
-                        $content .= 'Thanks & Regards<br/>';
-                        $content .= 'Gas Safety Engineer';
+                /**
+                * 2. Mark old package inactive
+                */
+                $userPackage->update([
+                    'active' => 0,
+                    'cancellation_requested' => 0,
+                    'requested_by' => null,
+                    'requested_at' => null,
+                    'upgrade_to' => null,
+                    'updated_by' => 1,
+                ]);
 
-                        GCEMailerJob::dispatch($configuration, [$userPackage->user->email], new GCESendMail($subject, $content, []));
+                /**
+                * 3. Handle upgrade → create new subscription
+                */
+                $upgraded = false;
+                if ($isCancelled === 1 && $upgradeToPack > 0) {
+                    $alreadyActive = UserPricingPackage::where('user_id', $userPackage->user_id)
+                                    ->where('pricing_package_id', $upgradeToPack)
+                                    ->where('active', 1)
+                                    ->exists();
+                    if(!$alreadyActive){
+                        $newPackage = PricingPackage::find($upgradeToPack);
+                        if ($newPackage && $newPackage->stripe_plan) {
+                            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+                            $upgraded = true;
+
+                            $subscription = $stripe->subscriptions->create([
+                                'customer' => $customerId,
+                                'items' => [
+                                    ['price' => $newPackage->stripe_plan]
+                                ],
+                                'currency' => 'GBP',
+                                'metadata' => [
+                                    'user_id' => $userPackage->user_id,
+                                    'auto_created_from_upgrade' => 1,
+                                    'previous_subscription_id' => $subscriptionId,
+                                ],
+                                'payment_behavior' => 'allow_incomplete'
+                            ]);
+
+                            $newUserPackage = UserPricingPackage::create([
+                                'user_id' => $userPackage->user_id,
+                                'pricing_package_id' => $newPackage->id,
+                                'stripe_customer_id' => $customerId,
+                                'stripe_subscription_id' => $subscription->id,
+                                'start' => date('Y-m-d', $subscription->current_period_start),
+                                'end' => date('Y-m-d', $subscription->current_period_end),
+                                'price' => $newPackage->price,
+                                'active' => ($subscription->status && $subscription->status == 'active' ? 1 : 0),
+                                
+                                'updated_by' => 1
+                            ]);
+
+                            if($newUserPackage):
+                                $userPricingPackage = UserPricingPackage::where('user_id', $newUserPackage->user_id)->where('pricing_package_id', $newPackage->id)->get()->first();
+                                $invoice = UserPricingPackageInvoice::create([
+                                    'user_id' => $newUserPackage->user_id,
+                                    'user_pricing_package_id' => $userPricingPackage->id,
+                                    'invoice_id' => $subscription->latest_invoice,
+                                    'start' => date('Y-m-d', $subscription->current_period_start),
+                                    'end' => date('Y-m-d', $subscription->current_period_end),
+                                    'status' => (isset($subscription->status) && !empty($subscription->status) ? $subscription->status : null),
+                                    
+                                    'created_by' => 1,
+                                ]);
+                            endif;
+                        }
+
+                        Log::info('Auto-upgrade subscription created', [
+                            'old_subscription' => $subscriptionId,
+                            'new_subscription' => $subscription->id,
+                        ]);
+                    }
+                }
+
+
+                /**
+                * 4. Send cancellation email (your existing logic)
+                */
+                if ($userPackage->user) {
+                    $subject = 'Your Subscription Has Been Canceled';
+
+                    $content = 'Hi '.$userPackage->user->name.',<br/><br/>';
+                    
+                    $content .= '<p>We\'re confirming that your subscription to '.$userPackage->package->title.' has been successfully canceled. Your access will remain active until the end of your current billing period, which ends on '.date('jS F, Y', strtotime($userPackage->end)).'.</p>';
+                    if($upgraded && $upgradeToPack > 0):
+                        $newPackage = PricingPackage::find($upgradeToPack);
+                        $content .= '<p>You new plan '.$newPackage->title.' will activated from '.date('jS F, Y', strtotime($userPackage->end)).'</p>';
                     endif;
+                    $content .= '<p>If this was a mistake or you change your mind, you can easily reactivate your subscription anytime from your portal.</p>';
+                    $content .= '<p>We\'re grateful for the time you spent with us and hope to see you again in the future. If you have any questions or feedback, feel free to reach out.</p>';
+                    
+                    $content .= 'Thanks & Regards<br/>';
+                    $content .= 'Gas Safety Engineer';
 
-                    $message = 'Subscription successfully cacelled.';
-                endif;
+                    GCEMailerJob::dispatch($configuration, [$userPackage->user->email], new GCESendMail($subject, $content, [], $subject));
+                }
+
                 break;
             default:
                 echo 'Received unknown event type ' . $event->type;

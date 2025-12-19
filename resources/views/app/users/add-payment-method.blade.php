@@ -6,7 +6,7 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium">Upgrade Subscription</h2>
+        <h2 class="mr-auto text-lg font-medium">Add Payment Method</h2>
         <div class="flex mt-0 w-auto">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
@@ -14,32 +14,13 @@
         </div>
     </div>
 
-    <form method="post" action="#" id="upgradeSubscriptionForm">
+    <form method="post" action="#" class="mt-5" id="addPaymentMethodForm">
         @csrf
+        <input type="hidden" name="user_id" value="{{ $user->id }}"/>
+        <input type="hidden" name="customer_id" value="{{ $customer_id }}"/>
         <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-4 relative">
-                <div class="box packageWrap p-0 pt-[4px] rounded-xl rounded-bl-2xl rounded-br-2xl border bg-pink-900">
-                    <input class="w-0 h-0 opacity-0 absolute left-0 top-0 pricing_package_id" id="pricing_package_{{ $pack->id }}" name="pricing_package_id" type="hidden" value="{{ $pack->id }}"/>
-                    <div class="bg-white rounded-xl px-5 sm:px-7 py-7">
-                        <div class="packageHeader min-h-[127px] border-b border-b-slate-200">
-                            <span class="bg-warning bg-opacity-15 inline-flex px-2 py-0.5 font-medium opacity-0 -z-20">Activate</span>
-                            <h4 class="font-medium text-dark leading-none mt-2 mb-3">{{ $pack->title }}</h4>
-                            <h2 class="text-xl font-bold text-dark leading-none">
-                                {{ Number::currency($pack->price, 'GBP') }} 
-                                <span class="text-xs text-slate-500">/{{ $pack->period }}</span>
-                            </h2>
-                        </div>
-                        <div class="packageBody pt-5">
-                            <p class=" text-slate-500 flex items-start mb-7">
-                                <i data-lucide="check-circle" class="w-4 h-4 mr-3" style="flex: 0 0 auto; position: relative; top: 2px;"></i>
-                                <span>{{ $pack->description }}</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-span-12 sm:col-span-8">
-                <div class="px-2 py-3 bg-white mb-4">
+            <div class="col-span-12">
+                <!-- <div class="px-2 py-3 bg-white mb-4">
                     <div class="flex justify-between items-center cursor-pointer todaysDateBlock">
                         <div class="w-full">
                             <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Card Holder Name <span class="text-danger">*</span></div>
@@ -50,7 +31,7 @@
                             <div class="mt-1 text-xs font-medium text-danger acc-input-error error-card_holder_name" style="display: none;"></div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="px-2 py-3 bg-white mb-4">
                     <div class="flex justify-between items-center cursor-pointer todaysDateBlock">
                         <div class="w-full">
@@ -92,7 +73,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <!-- <div class="col-span-12 sm:col-span-4">
                         <div class="px-2 py-3 bg-white">
                             <div class="flex justify-between items-center cursor-pointer todaysDateBlock">
                                 <div class="w-full">
@@ -105,11 +86,19 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-                <x-base.button class="w-full sm:w-auto items-center justify-center text-white" id="upgradeSubBtn" type="button" variant="success">
+                <div class="mb-4">
+                    <x-base.form-check>
+                        <div data-tw-merge class="flex items-center">
+                            <label data-tw-merge for="is_default" class="cursor-pointer mr-5">Is Default</label>
+                            <x-base.form-switch.input class="" id="is_default" name="is_default" value="1" type="checkbox" />
+                        </div>
+                    </x-base.form-check>
+                </div>
+                <x-base.button class="w-full sm:w-auto items-center justify-center text-white" id="addPayMetBtn" type="submit" variant="success">
                     <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                    Upgrade Now
+                        Add Method
                     <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                 </x-base.button>
             </div>
@@ -120,11 +109,10 @@
 @endsection
 <script src="https://js.stripe.com/v3/"></script>
 
+
 @pushOnce('vendors')
-    @vite('resources/js/vendors/axios.js')
-    @vite('resources/js/vendors/tabulator.js')
     @vite('resources/js/vendors/lucide.js')
-    @vite('resources/js/vendors/lodash.js')
+    @vite('resources/js/vendors/axios.js')
 @endPushOnce
 
 @pushOnce('scripts')
@@ -153,16 +141,16 @@
             }
         });
 
-        const form = document.getElementById('upgradeSubscriptionForm')
-        let $theForm = $('#upgradeSubscriptionForm');
-        const stripe = Stripe('{{ env("STRIPE_KEY") }}');
+        const form = document.getElementById('addPaymentMethodForm')
+        let $theForm = $('#addPaymentMethodForm');
+        const stripe = Stripe('{{ config("services.stripe.key") }}');
         const elements = stripe.elements();
 
         let style = {
             base: {
                 iconColor: '#666EE8',
                 color: '#475569',
-                fontSize: '14px',
+                fontSize: '12px',
                 lineHeight: '20px',
                 fontWeight: 400,
                 fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
@@ -193,7 +181,7 @@
 
         const carHolderName = document.getElementById('card_holder_name');
         const postalCode = document.getElementById('postal_code');
-        let $theButton = $('#upgSubBtn', $theForm);
+        let $theButton = $('#addPayMetBtn', $theForm);
 
         cardNumberElement.on('change', function(event) {
             if (event.error) {
@@ -237,45 +225,38 @@
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+            console.log('submitted')
 
             $('.acc-input-error', $theForm).fadeOut().html('');
-            $theButton.attr('disabled');
+            $theButton.attr('disabled', 'disabled');
             $(".theLoader", $theButton).fadeIn();
 
-            if($('.pricing_package_id:checked').length == 0){
-                $('.error-pricing_package_id', $theForm).fadeIn().html('Please select a package.');
+            // if(carHolderName.value == ''){
+            //     $('.error-card_holder_name', $theForm).fadeIn().html('This field is required.');
                 
-                $theButton.removeAttr('disabled');
-                $(".theLoader", $theButton).fadeOut();
+            //     $theButton.removeAttr('disabled');
+            //     $(".theLoader", $theButton).fadeOut();
 
-                return false;
-            }
-            if(carHolderName.value == ''){
-                $('.error-card_holder_name', $theForm).fadeIn().html('This field is required.');
+            //     return false;
+            // }
+            // if(postalCode.value == ''){
+            //     $('.error-postal_code', $theForm).fadeIn().html('This field is required.');
                 
-                $theButton.removeAttr('disabled');
-                $(".theLoader", $theButton).fadeOut();
+            //     $theButton.removeAttr('disabled');
+            //     $(".theLoader", $theButton).fadeOut();
 
-                return false;
-            }
-            if(postalCode.value == ''){
-                $('.error-postal_code', $theForm).fadeIn().html('This field is required.');
-                
-                $theButton.removeAttr('disabled');
-                $(".theLoader", $theButton).fadeOut();
-
-                return false;
-            }
+            //     return false;
+            // }
 
             const { paymentMethod, error } = await stripe.createPaymentMethod({
                 type: 'card',
                 card: cardNumberElement,
-                billing_details:{
-                    name: carHolderName.value,
-                    address: {
-                        postal_code : postalCode.value
-                    }
-                }
+                // billing_details:{
+                //     name: carHolderName.value,
+                //     address: {
+                //         postal_code : postalCode.value
+                //     }
+                // }
             });
 
             if (error) {
@@ -300,10 +281,13 @@
                 let formData = new FormData(form);
                 axios({
                     method: "post",
-                    url: route('company.dashboard.enrolled.subscription'),
+                    url: route('users.store.payment.method'),
                     data: formData,
                     headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                 }).then(response => {
+                    console.log(response.data);
+                    return false;
+
                     $theButton.removeAttr('disabled');
                     $('.theLoader', $theButton).fadeOut();
                     
@@ -331,8 +315,8 @@
                         console.log(error.response);
                         if (error.response.status == 422) {
                             for (const [key, val] of Object.entries(error.response.data.errors)) {
-                                $(`#upgradeSubscriptionForm .${key}`).addClass('border-danger');
-                                $(`#upgradeSubscriptionForm  .error-${key}`).fadeIn().html(val);
+                                $(`#addPaymentMethodForm .${key}`).addClass('border-danger');
+                                $(`#addPaymentMethodForm  .error-${key}`).fadeIn().html(val);
                             }
                         } else if (error.response.status == 304) {
                             warningModal.show();

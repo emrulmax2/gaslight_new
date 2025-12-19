@@ -646,3 +646,20 @@
 #job_calender_date:read-only{
     background: transparent;
 }
+
+.owl-dots{
+    display: flex;
+    justify-content: center;
+    padding: 15px 0 5px;
+    gap: 5px;
+}
+.packageSLider.owl-carousel .owl-nav button.owl-prev, .packageSLider.owl-carousel .owl-nav button.owl-next, .packageSLider.owl-carousel button.owl-dot{
+    width: 12px;
+    height: 6px;
+    background: #cbd5e1;
+}
+.packageSLider.owl-carousel .owl-nav button.owl-prev.active, 
+.packageSLider.owl-carousel .owl-nav button.owl-next.active, 
+.packageSLider.owl-carousel button.owl-dot.active{
+    background: #0d9488;
+}
