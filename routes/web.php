@@ -277,6 +277,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('company/update-staff', 'updateStaff')->name('company.update.staff'); 
 
         Route::post('company/update-company-info', 'updateCompanyInfo')->name('company.update.company.info'); 
+        Route::post('company/update-company-vat', 'updateCompanyVat')->name('company.update.company.vat'); 
         Route::post('company/update-registration-info', 'updateRegistrationInfo')->name('company.update.registration.info'); 
         Route::post('company/update-contact-info', 'updateContactInfo')->name('company.update.contact.info'); 
         Route::post('company/update-address-info', 'updateAddressInfo')->name('company.update.address.info'); 

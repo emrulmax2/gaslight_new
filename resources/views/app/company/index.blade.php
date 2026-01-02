@@ -27,6 +27,13 @@
             <div class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
                 <div>
+                    <span class="font-medium text-slate-500 text-sm block">Gas Safe Registration No</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->gas_safe_registration_no) ? $company->gas_safe_registration_no : 'N/A') }}</span>
+                </div>
+            </div>
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
+                <div>
                     <span class="font-medium text-slate-500 text-sm block">Bysiness Type</span>
                     <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->business_type) ? $company->business_type : 'N/A') }}</span>
                 </div>
@@ -41,10 +48,17 @@
             </div>
             @endif
             <div class="border-b flex w-full items-start px-5 py-3">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="globe" />
                 <div>
-                    <span class="font-medium text-slate-500 text-sm block">Vat Registered</span>
-                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->vat_number) ? $company->vat_number : 'Not Registered for VAT') }}</span>
+                    <span class="font-medium text-slate-500 text-sm block">Company Website</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->company_web_site) ? $company->company_web_site : 'N/A') }}</span>
+                </div>
+            </div>
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="tags" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Company Tagline</span>
+                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->company_tagline) ? $company->company_tagline : 'N/A') }}</span>
                 </div>
             </div>
             <div class="flex w-full items-start px-5 py-3">
@@ -56,17 +70,24 @@
             </div>
         </div>
     </div>
-
+    
     <div class="settingsBox mt-5">
-        <h3 class="font-medium leading-none mb-3 text-dark">Registered Details</h3>
-        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#companyRegistrationModal">
+        <h3 class="font-medium leading-none mb-3 text-dark">Vat Register</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#companyVATModal">
             <div class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
                 <div>
-                    <span class="font-medium text-slate-500 text-sm block">Gas Safe Registration No</span>
-                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->gas_safe_registration_no) ? $company->gas_safe_registration_no : 'N/A') }}</span>
+                    <!-- <span class="font-medium text-slate-500 text-sm block">Vat Registered</span> -->
+                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->vat_number) ? $company->vat_number : 'Not Registered for VAT') }}</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Registered Details</h3>
+        <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#companyRegistrationModal">
+            
             <div class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
                 <div>
@@ -96,7 +117,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Contact Details</h3>
@@ -106,20 +127,6 @@
                 <div>
                     <span class="font-medium text-slate-500 text-sm block">Phone Number</span>
                     <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->company_phone) ? $company->company_phone : 'N/A') }}</span>
-                </div>
-            </div>
-            <div class="border-b flex w-full items-start px-5 py-3">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="globe" />
-                <div>
-                    <span class="font-medium text-slate-500 text-sm block">Company Website</span>
-                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->company_web_site) ? $company->company_web_site : 'N/A') }}</span>
-                </div>
-            </div>
-            <div class="border-b flex w-full items-start px-5 py-3">
-                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="tags" />
-                <div>
-                    <span class="font-medium text-slate-500 text-sm block">Company Tagline</span>
-                    <span class="font-normal text-slate-400 text-xs block">{{ (!empty($company->company_tagline) ? $company->company_tagline : 'N/A') }}</span>
                 </div>
             </div>
             <div class="border-b flex w-full items-start px-5 py-3">
@@ -146,16 +153,31 @@
     </div>
 
     <div class="settingsBox mt-5">
-        <h3 class="font-medium leading-none mb-3 text-dark">Payment Term & Bank Details</h3>
+        <h3 class="font-medium leading-none mb-3 text-dark">Bank Details</h3>
         <div class="box rounded-md p-0 overflow-hidden cursor-pointer" data-tw-toggle="modal" data-tw-target="#companyBankModal">
             <div class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
                 <div>
-                    <span class="font-medium text-slate-500 text-sm block">Bank Details</span>
+                    <span class="font-medium text-slate-500 text-sm block">Account Name</span>
                     <span class="font-normal text-slate-400 text-xs block">
-                        {{ optional($company->companyBankDetails)->bank_name ?? 'N/A' }}, 
-                        {{ optional($company->companyBankDetails)->name_on_account ?? 'N/A' }}, 
-                        {{ optional($company->companyBankDetails)->sort_code ?? 'N/A' }}, 
+                        {{ optional($company->companyBankDetails)->name_on_account ?? 'N/A' }}
+                    </span>
+                </div>
+            </div>
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Sort Code</span>
+                    <span class="font-normal text-slate-400 text-xs block">
+                        {{ optional($company->companyBankDetails)->sort_code ?? 'N/A' }}
+                    </span>
+                </div>
+            </div>
+            <div class="border-b flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="check-circle" />
+                <div>
+                    <span class="font-medium text-slate-500 text-sm block">Account No</span>
+                    <span class="font-normal text-slate-400 text-xs block">
                         {{ optional($company->companyBankDetails)->account_number ?? 'N/A' }}
                     </span>
                 </div>

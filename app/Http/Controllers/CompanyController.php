@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyAddressRequest;
 use App\Http\Requests\CompanyInfoRequest;
+use App\Http\Requests\CompanyVatRequest;
 use App\Models\User;
 use App\Models\Company;
 use Illuminate\Support\Str;
@@ -270,18 +271,34 @@ class CompanyController extends Controller
 
     public function updateCompanyInfo(CompanyInfoRequest $request){
         $company = Company::find($request->company_id);
-        $hasVat = (isset($request->vat_number_check) && $request->vat_number_check == 1 ? true : false);
         $companyData = [
             'company_name' => (!empty($request->company_name) ? $request->company_name : null),
-            'vat_number' => ($hasVat && !empty($request->vat_number) ? $request->vat_number : null),
+            //'vat_number' => ($hasVat && !empty($request->vat_number) ? $request->vat_number : null),
             'business_type' => (!empty($request->business_type) ? $request->business_type : null),
             'company_registration' => ($request->business_type == 'Company' && !empty($request->company_registration) ? $request->company_registration : null),
             'display_company_name' => (!empty($request->display_company_name) && $request->display_company_name > 0 ? $request->display_company_name : 0),
+            'company_web_site' => (!empty($request->company_web_site) ? $request->company_web_site : null),
+            'company_tagline' => (!empty($request->company_tagline) ? $request->company_tagline : null),
         ];
         $companyUpdate = Company::where('id', $company->id)->update($companyData);
 
         if($companyUpdate):
             return response()->json(['msg' => 'Company Information updated successfully', 'red' => '', ], 200);
+        else:
+            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
+        endif;
+    }
+
+    public function updateCompanyVat(CompanyVatRequest $request){
+        $company = Company::find($request->company_id);
+        $hasVat = (isset($request->vat_number_check) && $request->vat_number_check == 1 ? true : false);
+        $companyData = [
+            'vat_number' => ($hasVat && !empty($request->vat_number) ? $request->vat_number : null),
+        ];
+        $companyUpdate = Company::where('id', $company->id)->update($companyData);
+
+        if($companyUpdate):
+            return response()->json(['msg' => 'Company VAT Registration info updated successfully', 'red' => '', ], 200);
         else:
             return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
         endif;
@@ -312,8 +329,6 @@ class CompanyController extends Controller
         
         $companyData = [
             'company_phone' => (!empty($request->company_phone) ? $request->company_phone : null),
-            'company_web_site' => (!empty($request->company_web_site) ? $request->company_web_site : null),
-            'company_tagline' => (!empty($request->company_tagline) ? $request->company_tagline : null),
             'company_email' => (!empty($request->company_email) ? $request->company_email : null),
         ];
 

@@ -15,6 +15,7 @@ import INTAddressLookUps from '../address_lookup.js';
     const companyAddressModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#companyAddressModal"));
     const companyBankModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#companyBankModal"));
     const quoteExpireDayModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#quoteExpireDayModal"));
+    const companyVATModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#companyVATModal"));
     
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
@@ -199,6 +200,66 @@ import INTAddressLookUps from '../address_lookup.js';
                     for (const [key, val] of Object.entries(error.response.data.errors)) {
                         $(`#companyInformationForm .${key}`).addClass('border-danger');
                         $(`#companyInformationForm  .error-${key}`).html(val);
+                    }
+                } else if (error.response.status == 304) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    });
+
+    // Store Company VAT Information
+    $('#companyVATForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('companyVATForm');
+        const $theForm = $(this);
+        
+        $('#vtUpdateBtn', $theForm).attr('disabled', 'disabled');
+        $("#vtUpdateBtn .theLoader").fadeIn();
+
+        let form_data = new FormData(form);
+        axios({
+            method: "POST",
+            url: route('company.update.company.vat'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#vtUpdateBtn', $theForm).removeAttr('disabled');
+            $("#vtUpdateBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                companyVATModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                });
+
+                setTimeout(function(){
+                    successModal.hide();
+                    window.location.reload();
+                }, 1500)
+            }
+        }).catch(error => {
+            $('#vtUpdateBtn', $theForm).removeAttr('disabled');
+            $("#vtUpdateBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#companyVATForm .${key}`).addClass('border-danger');
+                        $(`#companyVATForm  .error-${key}`).html(val);
                     }
                 } else if (error.response.status == 304) {
                     warningModal.show();
