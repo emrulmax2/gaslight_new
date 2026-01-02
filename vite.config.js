@@ -264,6 +264,7 @@ export default defineConfig({
                 "resources/js/app/superadmin/settings/inv-cancel-reason.js",
 
                 "resources/js/app/owl.carousel.js",
+                "resources/js/app/superadmin/settings/default-options.js",
             ],
             refresh: true,
         }),

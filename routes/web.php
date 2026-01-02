@@ -41,6 +41,7 @@ use App\Http\Controllers\Records\RecordController;
 use App\Http\Controllers\SuperAdmin\BoilerBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewBrandController;
 use App\Http\Controllers\SuperAdmin\BoilerNewManualController;
+use App\Http\Controllers\SuperAdmin\Settings\DefaultOptionController;
 use App\Http\Controllers\SuperAdmin\Settings\EmailTemplateController;
 use App\Http\Controllers\SuperAdmin\Settings\InvoiceCancelReasonController;
 use App\Http\Controllers\SuperAdmin\Settings\JobCancelReasonController;
@@ -215,6 +216,13 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::delete('site-settings/inv-cancel-reason/destroy/{method_id}', 'destroy')->name('site.setting.inv.cancel.reason.destroy'); 
         Route::post('site-settings/inv-cancel-reason/restore/{method_id}', 'restore')->name('site.setting.inv.cancel.reason.restore');
     });
+
+
+
+    Route::controller(DefaultOptionController::class)->group(function(){
+        Route::get('site-settings/default-options', 'index')->name('site.setting.default.opt');
+        Route::post('site-settings/default-options-update', 'update')->name('site.setting.default.opt.update');
+    });
        
 });
 
@@ -269,6 +277,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::post('company/update-staff', 'updateStaff')->name('company.update.staff'); 
 
         Route::post('company/update-company-info', 'updateCompanyInfo')->name('company.update.company.info'); 
+        Route::post('company/update-company-vat', 'updateCompanyVat')->name('company.update.company.vat'); 
         Route::post('company/update-registration-info', 'updateRegistrationInfo')->name('company.update.registration.info'); 
         Route::post('company/update-contact-info', 'updateContactInfo')->name('company.update.contact.info'); 
         Route::post('company/update-address-info', 'updateAddressInfo')->name('company.update.address.info'); 

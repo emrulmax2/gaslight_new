@@ -6,6 +6,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Number;
 
 class UserController extends Controller
 {
@@ -42,7 +43,7 @@ class UserController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
 
-        $query = User::with('company')->orderByRaw(implode(',', $sorts));
+        $query = User::with('company', 'userpackage')->orderByRaw(implode(',', $sorts));
         if(!empty($queryStr)):
             $query->where('name','LIKE','%'.$queryStr.'%');
         endif;
@@ -71,9 +72,13 @@ class UserController extends Controller
                         "name" => $list->name,
                         'company_name' => isset($list->company) ? $list->company->company_name : '',
                         'company_id' => isset($list->company) ? $list->company->id : '',
-                        'email' => $list->email,
-                        'status' => isset($list->status) ? 'Active' : 'Inactive',
+                        'email' => $list->email ?? '',
+                        'mobile' => $list->mobile ?? '',
+                        'status' => $list->active ?? 0,
                         'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
+                        'package' => $list->userpackage->package->title ?? '',
+                        'price' => isset($list->userpackage->price) && $list->userpackage->price > 0 ? Number::currency($list->userpackage->price, 'GBP') : Number::currency(0, 'GBP'),
+                        'next_renew' => isset($list->userpackage->end) && !empty($list->userpackage->end) ? date('jS F, Y', strtotime($list->userpackage->end)) : '',
                         'impersonate_url' => route('impersonate', $list->id),
                     ];
                     $i++;

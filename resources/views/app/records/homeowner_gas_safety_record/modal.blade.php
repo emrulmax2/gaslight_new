@@ -9,6 +9,7 @@
             <x-base.dialog.description class="">
                 <input type="hidden" name="appliance_serial" value="0"/>
                 <input type="hidden" name="edit" value="0"/>
+                <h3 class="font-medium mb-5 text-base leading-none">Appliance Details</h3>
                 <div class="grid grid-cols-12 gap-x-3 gap-y-2">
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Location</x-base.form-label>
@@ -67,21 +68,47 @@
                         </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Operating Pressure (mbar) or Heat Input (KW/h) or (BTU/h)</x-base.form-label>
-                        <x-base.form-input value="" name="opt_pressure" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Operating Pressure" />
+                        <x-base.form-label class="mb-1">Operating Pressure</x-base.form-label>
+                        <!-- <x-base.form-input value="" name="opt_pressure" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Operating Pressure" /> -->
+                        <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
+                            <x-base.form-input type="number" step="any" name="opt_pressure" />
+                            <div class="inline-flex justify-end items-center h-full">
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="opt_pressure_unit" id="opt_pressure_unit_mbar" value="mbar" />
+                                    <label class="inline-flex border-r peer-checked:bg-success peer-checked:text-white border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="opt_pressure_unit_mbar">
+                                        mbar
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="opt_pressure_unit" id="opt_pressure_unit_kwh" value="KW/h" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="opt_pressure_unit_kwh">
+                                        KW/h
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="opt_pressure_unit" id="opt_pressure_unit_btuh" value="BTU/h" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full rounded-tr-[3px] rounded-br-[3px]" for="opt_pressure_unit_btuh">
+                                        BTU/h
+                                    </label>
+                                </div>
+                            </div>
+                        </x-base.input-group>
                     </div>
                     <div class="col-span-12 sm:col-span-4"></div>
+                    <div class="col-span-12 pt-5">
+                        <h3 class="font-medium mb-5 text-base leading-none">Flue Tests</h3>
+                    </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Safety Devices</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Operation of Safety Device</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_sd_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_sd_yes" name="safety_devices" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_sd_yes">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_1_sd_yes" name="safety_devices" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_sd_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_sd_no" name="safety_devices" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_sd_no">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_1_sd_no" name="safety_devices" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_sd_na">N/A</x-base.form-check.label>
@@ -204,6 +231,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-span-12 pt-5">
+                        <h3 class="font-medium mb-5 text-base leading-none">Inspection Details</h3>
+                    </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Satisfactory Termination</x-base.form-label>
@@ -228,12 +258,12 @@
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Flue Visual Condition</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_fvc_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_fvc_yes" name="flue_visual_condition" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_fvc_yes">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_1_fvc_yes" name="flue_visual_condition" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_fvc_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_fvc_no" name="flue_visual_condition" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_fvc_no">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_1_fvc_no" name="flue_visual_condition" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_fvc_na">N/A</x-base.form-check.label>
@@ -244,7 +274,7 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Adequate Ventilation</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Ventilation Satisfactory</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_av_yes">Yes</x-base.form-check.label>
@@ -253,10 +283,6 @@
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_av_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_1_av_no" name="adequate_ventilation" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_av_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_av_na" name="adequate_ventilation" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -273,10 +299,6 @@
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_la_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_1_la_no" name="landlord_appliance" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_la_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_la_na" name="landlord_appliance" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
-                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -291,10 +313,6 @@
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_ipt_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_1_ipt_no" name="inspected" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_ipt_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_ipt_na" name="inspected" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -330,10 +348,6 @@
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_as_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_1_as_no" name="appliance_serviced" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_as_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_as_na" name="appliance_serviced" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
-                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -348,10 +362,6 @@
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_asu_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_1_asu_no" name="appliance_safe_to_use" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_1_asu_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_1_asu_na" name="appliance_safe_to_use" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -390,12 +400,16 @@
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Satisfactory Visual Inspection</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_svi_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_svi_yes" name="satisfactory_visual_inspaction" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_svi_yes">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_svi_yes" name="satisfactory_visual_inspaction" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_svi_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_svi_no" name="satisfactory_visual_inspaction" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_svi_no">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_svi_no" name="satisfactory_visual_inspaction" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_svi_nas">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_svi_nas" name="satisfactory_visual_inspaction" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -405,12 +419,12 @@
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Emergency Control Accessible</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_eca_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_eca_yes" name="emergency_control_accessible" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_eca_yes">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_eca_yes" name="emergency_control_accessible" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_eca_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_eca_no" name="emergency_control_accessible" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_eca_no">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_eca_no" name="emergency_control_accessible" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -420,12 +434,12 @@
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Satisfactory Gas Tightness Test</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_sgtt_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_sgtt_yes" name="satisfactory_gas_tightness_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_sgtt_yes">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_sgtt_yes" name="satisfactory_gas_tightness_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_sgtt_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_sgtt_no" name="satisfactory_gas_tightness_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_sgtt_no">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_sgtt_no" name="satisfactory_gas_tightness_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_sgtt_na">N/A</x-base.form-check.label>
@@ -436,15 +450,15 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Equipotential Bonding Satisfactory</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Protective Equipotential Bonding Satisfactory</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_ebs_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_ebs_yes" name="equipotential_bonding_satisfactory" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_ebs_yes">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_ebs_yes" name="equipotential_bonding_satisfactory" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_ebs_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_gip_ebs_no" name="equipotential_bonding_satisfactory" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_ebs_no">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_gip_ebs_no" name="equipotential_bonding_satisfactory" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_gip_ebs_na">N/A</x-base.form-check.label>
@@ -580,10 +594,6 @@
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_hfcbpb_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_4_hfcbpb_no" name="flue_cap_put_back" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_hfcbpb_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="app_4_hfcbpb_na" name="flue_cap_put_back" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
                                 </x-base.form-check>
                             </div>
                         </div>

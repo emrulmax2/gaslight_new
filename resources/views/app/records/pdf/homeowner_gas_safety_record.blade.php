@@ -320,7 +320,7 @@
                                         Flue Type
                                     </th>
                                     <th class="whitespace-normal border-primary bg-primary border-b-0 text-white text-10px uppercase px-2 py-05 text-center w-140px leading-none align-middle">
-                                        OPERATING PRESSURE (MBAR) OR HEAT INPUT (KW/H OR BTU/H)
+                                        OPERATING PRESSURE
                                     </th>
                                 </tr>
                             </thead>
@@ -339,7 +339,10 @@
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->serial_no) && !empty($appliance->serial_no) ? $appliance->serial_no : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->gc_no) && !empty($appliance->gc_no) ? $appliance->gc_no : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->appliance_flue_type_id) && $appliance->appliance_flue_type_id > 0 ? flueName($appliance->appliance_flue_type_id) : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">{{ (isset($appliance->opt_pressure) && !empty($appliance->opt_pressure) ? $appliance->opt_pressure : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 w-140px border-b">
+                                                {{ (isset($appliance->opt_pressure) && !empty($appliance->opt_pressure) ? $appliance->opt_pressure : '') }}
+                                                {{ (isset($appliance->opt_pressure_unit) && !empty($appliance->opt_pressure_unit) ? $appliance->opt_pressure_unit : '') }}
+                                            </td>
                                         </tr>
                                         @php 
                                             $serial += 1;
@@ -373,7 +376,7 @@
                                         #
                                     </th>
                                     <th rowspan="2" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px uppercase px-2 py-1 text-center leading-1-5">
-                                        SAFETY DEVICE(S) <br/>CORRECT OPERATION
+                                        OPERATION OF SAFETY DEVICE
                                     </th>
                                     <th rowspan="2" class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px uppercase px-2 py-1 text-center">
                                         SPILLAGE TEST
@@ -464,7 +467,7 @@
                                         FLUE VISUAL <br/>CONDITION
                                     </th>
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center align-middle">
-                                        ADEQUATE <br/>VENTILATION
+                                        VENTILATION </br> SATISFACTORY
                                     </th>
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center align-middle">
                                         LANDLORD\'S <br/>APPLIANCE
@@ -586,7 +589,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top h-83px">{{ (isset($record->available_options->gsrComments->fault_details) && !empty($record->available_options->gsrComments->fault_details) ? $record->available_options->gsrComments->fault_details : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top" style="height: 81px;">{{ (isset($record->available_options->gsrComments->fault_details) && !empty($record->available_options->gsrComments->fault_details) ? $record->available_options->gsrComments->fault_details : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -600,7 +603,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  h-83px">{{ (isset($record->available_options->gsrComments->rectification_work_carried_out) && !empty($record->available_options->gsrComments->rectification_work_carried_out) ? $record->available_options->gsrComments->rectification_work_carried_out : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  " style="height: 81px;">{{ (isset($record->available_options->gsrComments->rectification_work_carried_out) && !empty($record->available_options->gsrComments->rectification_work_carried_out) ? $record->available_options->gsrComments->rectification_work_carried_out : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>

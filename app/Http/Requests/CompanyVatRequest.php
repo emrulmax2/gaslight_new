@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CompanyInfoRequest extends FormRequest
+class CompanyVatRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,8 @@ class CompanyInfoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => 'required',
-            'business_type' => ['required', 'string', 'max:255'],
-            'company_registration' => ['required_if:business_type, Company'],
-            //'vat_number_check' => 'sometimes',
-            //'vat_number' => ['required_if:vat_number_check,1'],
+            'vat_number_check' => 'sometimes',
+            'vat_number' => ['required_if:vat_number_check,1'],
         ];
     }
 }

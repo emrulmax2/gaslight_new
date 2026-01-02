@@ -56,7 +56,7 @@
                                         @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id))
                                             <x-base.button data-id="{{ $user->id }}" id="unsubscripUserBtn" type="button" class="rounded-full px-3 w-36 text-center justify-center {{ $pack->period == 'Free Trail' ? 'opacity-0 -z-20' : '' }}" variant="danger" >
                                                 <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
-                                                Cancell
+                                                Cancel
                                             </x-base.button>
                                         @elseif($userPackage->package->period == 'Free Trail') 
                                             <x-base.button as="a" href="{{ route('company.dashboard.subscribe', $pack->id) }}" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >

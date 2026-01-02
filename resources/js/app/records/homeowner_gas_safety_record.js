@@ -116,7 +116,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         applianceModal.show();
         document.getElementById("applianceModal").addEventListener("shown.tw.modal", function (event) {
             $('#applianceModal input[name="appliance_serial"]').val(theSerial);
-            $('#applianceModal input[name="edit"]').val(theSerial);
+            $('#applianceModal input[name="edit"]').val(1);
         
             for (const [key, value] of Object.entries(theAppliance)) {
                 if(key == 'appliance_location_id'){
