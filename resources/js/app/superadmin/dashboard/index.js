@@ -29,34 +29,54 @@
             responsiveLayout: 'collapse',
             placeholder: 'No matching records found',
             columns: [
-                
-                {
-                    title: 'Sl',
-                    field: 'id',
-                    headerHozAlign: 'left',
-                },
                 {
                     title: 'Name',
                     field: 'name',
                     headerHozAlign: 'left',
+                    formatter(cell) {
+                        const response = cell.getData();
+                        return `<div>
+                            <div class="font-medium whitespace-nowrap">${response.name}</div>
+                            <div class="text-xs text-slate-500 whitespace-nowrap">${response.company_name}</div>
+                        </div>`;
+                    },
                 },
                 {
                     title: 'Email',
                     field: 'email',
                     headerHozAlign: 'left',
+                    formatter(cell) {
+                        const response = cell.getData();
+                        return `<div>
+                            <div class="font-medium whitespace-nowrap">${response.email}</div>
+                            <div class="text-xs text-slate-500 whitespace-nowrap">${response.mobile}</div>
+                        </div>`;
+                    },
+                },
+                {
+                    title: 'Subscription',
+                    field: 'package',
+                    headerHozAlign: 'left',
+                    formatter(cell) {
+                        const response = cell.getData();
+                        return `<div>
+                            <div class="font-medium whitespace-nowrap">${response.package}</div>
+                            <div class="text-xs text-slate-500 whitespace-nowrap">
+                                <span class="font-medium text-success">${response.price}</span>
+                                ${response.next_renew !== '' ? ' - '+response.next_renew : ''}
+                            </div>
+                        </div>`;
+                    },
                 },
                 {
                     title: 'Status',
                     field: 'status',
                     headerHozAlign: 'left',
+                    formatter(cell) {
+                        const response = cell.getData();
+                        return (response.status == 1 ? '<span class="bg-success text-xs text-white font-medium leading-none px-2 py-0.5">Active</span>' : '<span class="bg-danger text-xs text-white font-medium leading-none px-2 py-0.5">Inactive</span>')
+                    },
                 },
-                
-                {
-                    title: 'Company Name',
-                    field: 'company_name',
-                    headerHozAlign: 'left',
-                },
-                
                 {
                     title: 'Actions',
                     field: 'id',
@@ -67,8 +87,8 @@
                     download: false,
                     formatter(cell, formatterParams) {
                         
-                        return '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition duration-200 border shadow-sm inline-flex items-center justify-center py-2 px-3 rounded-md font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success text-slate-900 dark:border-success mb-2 mr-2 w-32 ">\
-                        Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 mr-2"></i>\
+                        return '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success dark:border-success w-auto ">\
+                        Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 ml-2"></i>\
                     </a>';
                     },
                 },

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\CompanyBankDetails;
 use App\Models\Option;
 use App\Models\PricingPackage;
 use App\Models\RegistrationOtp;
@@ -54,6 +55,8 @@ class RegisteredUserController extends Controller
 
             $vat_number_check = (isset($request->vat_number_check) && $request->vat_number_check > 0 ? $request->vat_number_check : 0);
             $business_type = (!empty($request->business_type) ? $request->business_type : null);
+            $quoteExpireDays = Option::where('category', 'DEFAULT_OPTIONS')->where('name', 'quote_expiry_days')->value('value');
+            $paymentTerms = Option::where('category', 'DEFAULT_OPTIONS')->where('name', 'payment_terms')->value('value');
             $company = Company::create([
                 'user_id' => $user->id,
                 'company_name' => (!empty($request->company_name) ? $request->company_name : null),
@@ -70,8 +73,19 @@ class RegisteredUserController extends Controller
                 'company_postal_code' => (!empty($request->company_postal_code) ? $request->company_postal_code : null),
                 'company_country' => (!empty($request->company_country) ? $request->company_country : null),
                 'gas_safe_registration_no' => (!empty($request->gas_safe_registration_no) ? $request->gas_safe_registration_no : null),
+                'quote_expired_in' => ($quoteExpireDays && $quoteExpireDays > 0 ? $quoteExpireDays : 7),
             ]);
             $company->users()->attach($user->id);
+            if($company->id):
+                CompanyBankDetails::create([
+                    'Company_id' => $company->id,
+                    'bank_name' => null,
+                    'name_on_account' => null,
+                    'sort_code' => null,
+                    'account_number' => null,
+                    'payment_term' => ($paymentTerms && !empty($paymentTerms) ? $paymentTerms : 'Payment is due within thirty (30) days from the invoice date. Please reference the invoice number with your payment.'),
+                ]);
+            endif;
 
 
             $name = $request->name;

@@ -11,7 +11,7 @@
     <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400 settingsMenu">
         <ul class="m-0 p-0">
             <li class="hasChild">
-                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting' || Route::currentRouteName() == 'superadmin.site.setting.api' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
+                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.default.opt' || Route::currentRouteName() == 'superadmin.site.setting' || Route::currentRouteName() == 'superadmin.site.setting.api' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
                     <i data-lucide="globe" class="w-4 h-4 mr-2"></i> Site Settings  <i data-lucide="chevron-down" class="w-4 h-4 ml-auto menuAgnle"></i>
                 </a>
                 <ul class="p-0 m-0 pl-5" style="display: {{ Route::currentRouteName() == 'superadmin.site.setting' || Route::currentRouteName() == 'superadmin.site.setting.api' ? 'block' : 'none' }};">
@@ -23,6 +23,11 @@
                     <li>
                         <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.api' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.api') }}">
                             <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> API Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center mt-4 {{ Route::currentRouteName() == 'superadmin.site.setting.default.opt' ? 'active text-primary' : '' }}" href="{{ route('superadmin.site.setting.default.opt') }}">
+                            <i data-lucide="check-circle" class="w-3 h-3 mr-2"></i> Default Options Setting
                         </a>
                     </li>
                 </ul>

@@ -45,7 +45,7 @@
                                     <div class="font-bold text-dark text-base leading-none mb-2 capitalize">{!! $cardName !!}</div>
                                     <div class=" text-slate-500 text-xs leading-none mb-4"> Expires {{ $expires }}</div>
                                     @if($default_id == $method->id)
-                                    <span class="text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Default</span>
+                                    <span class="text-xs bg-success-40 text-dark leading-none font-medium px-2 py-0.5">Active</span>
                                     @endif
                                 </div>
                                 <div class="ml-auto hidden">

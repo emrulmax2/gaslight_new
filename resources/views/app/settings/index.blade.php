@@ -12,10 +12,10 @@
             <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
             <span class="font-medium text-slate-500 text-sm">My Account</span>
         </a>
-        <a href="{{ route('users.index') }}" class="flex w-full items-center px-5 py-3">
+        <!-- <a href="{{ route('users.index') }}" class="flex w-full items-center px-5 py-3">
             <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" style="margin-top: -2px;" icon="users" />
             <span class="font-medium text-slate-500 text-sm">Company Members</span>
-        </a>
+        </a> -->
     </div>
 </div>
 
@@ -26,10 +26,10 @@
             <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" style="margin-top: -2px;" icon="building" />
             <span class="font-medium text-slate-500 text-sm">Company Settings</span>
         </a>
-        <a href="{{ route('user.subscriptions') }}" class="flex w-full items-center px-5 py-3">
+        <!-- <a href="{{ route('user.subscriptions') }}" class="flex w-full items-center px-5 py-3">
             <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" style="margin-top: -2px;" icon="user-cog" />
             <span class="font-medium text-slate-500 text-sm">Subscriptions & Invoices</span>
-        </a>
+        </a> -->
     </div>
 </div>
 
