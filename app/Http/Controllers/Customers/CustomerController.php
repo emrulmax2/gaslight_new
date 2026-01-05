@@ -30,7 +30,7 @@ class CustomerController extends Controller
         $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
 
 
-        $query = Customer::with('title', 'contact')->where('created_by', auth()->user()->id);
+        $query = Customer::with('title', 'contact', 'address')->where('created_by', auth()->user()->id);
         if(!empty($queryStr)):
             $query->whereHas('address', function($q) use($queryStr){
                 $q->where('full_name','LIKE','%'.$queryStr.'%')

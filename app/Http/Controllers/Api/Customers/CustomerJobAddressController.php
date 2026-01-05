@@ -24,7 +24,7 @@ class CustomerJobAddressController extends Controller
         $status = $request->has('status') && $request->query('status') != '' ? $request->query('status') : 1;
         $customer_id = (isset($request->customer_id) && !empty($request->customer_id) ? $request->customer_id : 0);
         $searchKey = $request->has('search') && !empty($request->query('search')) ? $request->query('search') : '';
-        $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'id';
+        $sortField = $request->has('sort') && !empty($request->query('sort')) ? $request->query('sort') : 'is_primary';
         $sortOrder = $request->has('order') && !empty($request->query('order')) ? $request->query('order') : 'desc';
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         $query->where('customer_id', $customer_id);
