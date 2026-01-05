@@ -68,7 +68,7 @@
                     <x-base.form-switch.input data-propertyid="{{ $property->id }}" checked="{{ isset($property->has_occupants) && $property->has_occupants == 1 ? 1 : 0 }}" class="mr-3 relative -top-[1px]" id="has_occupants" name="has_occupants" value="1" type="checkbox" />
                     <label data-tw-merge for="has_occupants" class="cursor-pointer font-medium mr-5">Occupants</label>
                 </h3>
-                <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#addOccupantModal" class="addOccupantToggler font-medium ml-auto text-success items-center tracking-normal" style="display: {{ isset($property->has_occupants) && $property->has_occupants != 1 ? 'none' : 'inline-flex' }};"><x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="circle-plus" /> Add Occupant</a>
+                <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#addOccupantModal" class="addOccupantToggler font-medium ml-auto text-success items-center tracking-normal" style="display: {{ isset($property->has_occupants) && $property->has_occupants != 1 ? 'none' : 'inline-flex' }};"><x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success inline-flex" icon="circle-plus" /> Add Occupant</a>
             </div>
             <div class="box rounded-md p-0 overflow-hidden occupantTableWrap" style="display: {{ isset($property->has_occupants) && $property->has_occupants != 1 ? 'none' : 'block' }};">
                 <div id="JobAddressOccupantsListTable" class="px-5" data-customer="{{ $customer->id }}" data-propery="{{ $property->id }}"></div>
