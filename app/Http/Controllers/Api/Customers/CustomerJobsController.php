@@ -28,7 +28,7 @@ class CustomerJobsController extends Controller
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         $customer_id = (isset($request->customer_id) && $request->customer_id > 0 ? $request->customer_id : 0);
 
-        $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot', 'invoice')
+        $query = CustomerJob::with('customer', 'property', 'priority', 'thestatus', 'calendar', 'calendar.slot', 'invoice', 'billing')
         ->where('customer_id', $customer_id);
 
        $searchableColumns = Schema::getColumnListing((new CustomerJob)->getTable());
@@ -96,6 +96,7 @@ class CustomerJobsController extends Controller
             $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
             $data = [
                     'customer_id' => $request->customer_id,
+                    'billing_address_id' => $request->billing_address_id ?? null,
                     'customer_property_id' => $request->customer_property_id,
                     'description' => (!empty($request->description) ? $request->description : null),
                     'details' => (!empty($request->details) ? $request->details : null),
@@ -137,7 +138,7 @@ class CustomerJobsController extends Controller
 
     public function getSingleCustomerJob(Request $request, $id) {
            try {
-            $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot'])
+            $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot', 'billing'])
                     ->withCount("records as number_of_records")->withCount('invoice as number_of_invoices')
                     ->where('id', $id)->first();
 

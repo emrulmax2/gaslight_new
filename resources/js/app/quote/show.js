@@ -117,6 +117,7 @@
                 localStorage.setItem('quote_number', JSON.stringify(row.quote_number));
                 localStorage.setItem('quote', JSON.stringify(row.quote));
                 localStorage.setItem('customer', JSON.stringify(row.customer));
+                localStorage.setItem('billing_address', JSON.stringify(row.billing_address));
 
                 if(row.job_address){
                     localStorage.setItem('job_address', JSON.stringify(row.job_address));

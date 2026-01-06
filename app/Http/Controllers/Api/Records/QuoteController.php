@@ -29,7 +29,7 @@ class QuoteController extends Controller
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
     
-        $query = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'property']);
+        $query = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'property', 'billing']);
         if(!empty($status) && count($status) > 0): $query->whereIn('status', $status); endif;
         if (!empty($queryStr)):
             $query->where('quote_number', 'LIKE', '%' . $queryStr . '%')->orWhereHas('customer', function ($q) use ($queryStr) {
@@ -107,6 +107,7 @@ class QuoteController extends Controller
         $quote = Quote::updateOrCreate(['id' => $quote_id], [
             'company_id' => auth()->user()->companies->pluck('id')->first(),
             'customer_id' => $customer_id,
+            'billing_address_id' => $request->billing_address_id,
             'job_form_id' => $job_form_id,
             'customer_property_id' => $customer_property_id,
             
@@ -177,7 +178,7 @@ class QuoteController extends Controller
 
     public function edit($quote_id, Request $request){
         try {
-            $quote = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'property'])
+            $quote = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'property', 'billing'])
                         ->find($quote_id);
             $data = [
                 'quote_id' => $quote->id,
@@ -195,6 +196,28 @@ class QuoteController extends Controller
             endif;
             if($quote->customer_job_id > 0 && isset($quote->job->id)):
                 $data['job'] = $quote->job;
+            endif;
+        
+            $billingAddress = null;
+            if(isset($quote->billing->id) && $quote->billing->id > 0):
+                $billingAddress = $quote->billing;
+            elseif(isset($quote->job->billing->id) && $quote->job->billing->id > 0):
+                $billingAddress = $quote->job->billing;
+            else:
+                $billingAddress = $quote->customer->address;
+            endif;
+            if($billingAddress):
+                $data['billing_address'] = [
+                    'id' => $billingAddress->id ?? '0',
+                    'address_line_1' => $billingAddress->address_line_1 ?? '',
+                    'address_line_2' => $billingAddress->address_line_2 ?? '',
+                    'postal_code' => $billingAddress->postal_code ?? '',
+                    'state' => $billingAddress->state ?? '',
+                    'city' => $billingAddress->city ?? '',
+                    'country' => $billingAddress->country ?? '',
+                    'latitude' => $billingAddress->latitude ?? '',
+                    'longitude' => $billingAddress->longitude ?? '',
+                ];
             endif;
 
             $data['quoteItemsCount'] = 0;
@@ -400,7 +423,7 @@ class QuoteController extends Controller
     }
 
     public function generatePdf($quote_id){
-        $quote = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'options'])->find($quote_id);
+        $quote = Quote::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'property', 'form', 'user', 'user.company', 'options', 'billing'])->find($quote_id);
        
         //dd($record->available_options->quoteItems);
         $companyLogoPath = (isset($quote->user->company->logo_path) && $quote->user->company->logo_path ? $quote->user->company->logo_path : '');

@@ -23,6 +23,7 @@ class JobStoreRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|numeric|gt:0',
+            'billing_address_id' => 'required|numeric|gt:0',
             'customer_property_id' => 'required|numeric|gt:0',
             'job_calender_date' => 'nullable|date',
             'calendar_time_slot_id' => 'required_with:job_calender_date|nullable',
@@ -34,6 +35,8 @@ class JobStoreRequest extends FormRequest
         return [
             'customer_id.required' => 'Customer is required.',
             'customer_id.gt' => 'Customer is required.',
+            'billing_address_id.required' => 'Billing address is required.',
+            'billing_address_id.gt' => 'Billing address is required.',
             'customer_property_id.required' => 'Customer property is required.',
             'customer_property_id.gt' => 'Customer property is required.',
             'job_calender_date.date' => 'Please enter a valid date.',

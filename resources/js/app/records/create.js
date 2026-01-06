@@ -150,16 +150,33 @@ import INTAddressLookUps from '../../address_lookup.js';
                     $('.customerWrap').find('.theDesc').html(customer.full_name).addClass('font-medium');
                     $('.customerWrap').find('.theId').val(customer_id);
 
-                    let customerAddressObj = customer.address;
-                    let customerAddress = '';
-                    customerAddress += (customerAddressObj.address_line_1 != null ? customerAddressObj.address_line_1+' ' : '');
-                    customerAddress += (customerAddressObj.address_line_2 != null ? customerAddressObj.address_line_2+', ' : '');
-                    customerAddress += (customerAddressObj.city != null ? customerAddressObj.city+', ' : '');
-                    customerAddress += (customerAddressObj.state != null ? customerAddressObj.state+', ' : '');
-                    customerAddress += (customerAddressObj.postal_code != null ? customerAddressObj.postal_code : '');
+                    
+                    let billingAddress = '';
+                    let billingAddressId = 0;
+                    if(job.billing_address_id > 0){
+                        let billingAddressObj = job.billing;
+                        billingAddressId = billingAddressObj.id
+                        billingAddress += (billingAddressObj.address_line_1 != null ? billingAddressObj.address_line_1+' ' : '');
+                        billingAddress += (billingAddressObj.address_line_2 != null ? billingAddressObj.address_line_2+', ' : '');
+                        billingAddress += (billingAddressObj.city != null ? billingAddressObj.city+', ' : '');
+                        billingAddress += (billingAddressObj.state != null ? billingAddressObj.state+', ' : '');
+                        billingAddress += (billingAddressObj.postal_code != null ? billingAddressObj.postal_code : '');
+
+                        localStorage.setItem('billing_address', JSON.stringify(billingAddressObj));
+                    }else{
+                        let billingAddressObj = customer.address;
+                        billingAddressId = billingAddressObj.id
+                        billingAddress += (billingAddressObj.address_line_1 != null ? billingAddressObj.address_line_1+' ' : '');
+                        billingAddress += (billingAddressObj.address_line_2 != null ? billingAddressObj.address_line_2+', ' : '');
+                        billingAddress += (billingAddressObj.city != null ? billingAddressObj.city+', ' : '');
+                        billingAddress += (billingAddressObj.state != null ? billingAddressObj.state+', ' : '');
+                        billingAddress += (billingAddressObj.postal_code != null ? billingAddressObj.postal_code : '');
+
+                        localStorage.setItem('billing_address', JSON.stringify(billingAddressObj));
+                    }
                     $('.customerAddressWrap').fadeIn('fast', function(){
-                        $('.theDesc', this).html(customerAddress).addClass('font-medium');
-                        $('.theId', this).val(0);
+                        $('.theDesc', this).html(billingAddress).addClass('font-medium');
+                        $('.theId', this).val(billingAddressId);
                     })
 
                     let theJobAddress = '';
@@ -222,26 +239,12 @@ import INTAddressLookUps from '../../address_lookup.js';
         let customerObj = JSON.parse(customer);
             customer_id = customerObj.id;
 
-        // let customerAddress = '';
-        // customerAddress += (customerObj.address_line_1 != null ? customerObj.address_line_1+' ' : '');
-        // customerAddress += (customerObj.address_line_2 != null ? customerObj.address_line_2+', ' : '');
-        // customerAddress += (customerObj.city != null ? customerObj.city+', ' : '');
-        // customerAddress += (customerObj.state != null ? customerObj.state+', ' : '');
-        // customerAddress += (customerObj.postal_code != null ? customerObj.postal_code : '');
-
-        let customerAddressObj = customerObj.address;
-        let customerAddress = '';
-        customerAddress += (customerAddressObj.address_line_1 != null ? customerAddressObj.address_line_1+' ' : '');
-        customerAddress += (customerAddressObj.address_line_2 != null ? customerAddressObj.address_line_2+', ' : '');
-        customerAddress += (customerAddressObj.city != null ? customerAddressObj.city+', ' : '');
-        customerAddress += (customerAddressObj.state != null ? customerAddressObj.state+', ' : '');
-        customerAddress += (customerAddressObj.postal_code != null ? customerAddressObj.postal_code : '');
-
+        
         $('.customerWrap').find('.theDesc').html(customerObj.full_name).addClass('font-medium');
         $('.customerWrap').find('.theId').val(customer_id);
 
         $('.customerAddressWrap').fadeIn('fast', function(){
-            $('.theDesc', this).html(customerAddress).addClass('font-medium');
+            $('.theDesc', this).html('Click here to add billing address').addClass('font-medium');
             $('.theId', this).val(0);
         })
         $('.customerPropertyWrap').fadeIn('fast', function(){
@@ -312,14 +315,20 @@ import INTAddressLookUps from '../../address_lookup.js';
                     localStorage.removeItem('job');
                     localStorage.removeItem('job_address');
                     localStorage.removeItem('occupant');
+                    localStorage.removeItem('billing_address');
 
-                    let customerAddressObj = customerObj.address;
-                    let customerAddress = '';
-                    customerAddress += (customerAddressObj.address_line_1 != null ? customerAddressObj.address_line_1+' ' : '');
-                    customerAddress += (customerAddressObj.address_line_2 != null ? customerAddressObj.address_line_2+', ' : '');
-                    customerAddress += (customerAddressObj.city != null ? customerAddressObj.city+', ' : '');
-                    customerAddress += (customerAddressObj.state != null ? customerAddressObj.state+', ' : '');
-                    customerAddress += (customerAddressObj.postal_code != null ? customerAddressObj.postal_code : '');
+                    let billingAddressObj = customerObj.address;
+                    let billingAddressId = billingAddressObj.id
+                    let billingAddress = (billingAddressObj.address_line_1 != null ? billingAddressObj.address_line_1+' ' : '');
+                        billingAddress += (billingAddressObj.address_line_2 != null ? billingAddressObj.address_line_2+', ' : '');
+                        billingAddress += (billingAddressObj.city != null ? billingAddressObj.city+', ' : '');
+                        billingAddress += (billingAddressObj.state != null ? billingAddressObj.state+', ' : '');
+                        billingAddress += (billingAddressObj.postal_code != null ? billingAddressObj.postal_code : '');
+                    localStorage.setItem('billing_address', JSON.stringify(billingAddressObj));
+                    $('.customerAddressWrap').fadeIn('fast', function(){
+                        $('.theDesc', this).html(billingAddress).addClass('font-medium');
+                        $('.theId', this).val(billingAddressId);
+                    })
 
                     $('.jobWrap').find('.theDesc').html('Click here to select a job').removeClass('font-medium');
                     $('.jobWrap').find('.theId').val(0);
@@ -327,10 +336,6 @@ import INTAddressLookUps from '../../address_lookup.js';
                     $('.customerWrap').find('.theDesc').html(customerObj.full_name).addClass('font-medium');
                     $('.customerWrap').find('.theId').val(customer_id);
 
-                    $('.customerAddressWrap').fadeIn('fast', function(){
-                        $('.theDesc', this).html(customerAddress).addClass('font-medium');
-                        $('.theId', this).val(0);
-                    })
                     $('.customerPropertyWrap').fadeIn('fast', function(){
                         $('.theDesc', this).html('Click here to add job address').removeClass('font-medium');
                         $('.theId', this).val(0);
@@ -383,6 +388,51 @@ import INTAddressLookUps from '../../address_lookup.js';
     }
     /* On Load Check & Set Customer End */
 
+    /* Customer Billing Address Start */
+    if(localStorage.billing_address){
+        let billing_address = localStorage.getItem('billing_address');
+        let billingAddressObj = JSON.parse(billing_address);
+
+        let billingAddress = '';
+        let billingAddressId = billingAddressObj.id
+        billingAddress += (billingAddressObj.address_line_1 != null ? billingAddressObj.address_line_1+' ' : '');
+        billingAddress += (billingAddressObj.address_line_2 != null ? billingAddressObj.address_line_2+', ' : '');
+        billingAddress += (billingAddressObj.city != null ? billingAddressObj.city+', ' : '');
+        billingAddress += (billingAddressObj.state != null ? billingAddressObj.state+', ' : '');
+        billingAddress += (billingAddressObj.postal_code != null ? billingAddressObj.postal_code : '');
+        
+        $('.customerAddressWrap').fadeIn('fast', function(){
+            $('.theDesc', this).html(billingAddress).addClass('font-medium');
+            $('.theId', this).val(billingAddressId);
+        })
+    }
+    $(document).on('click', '.customerAddressBlock', function(e){
+        e.preventDefault();
+        let $thecustomerAddressBlock = $(this);
+        
+        if(localStorage.customer && customer_id > 0){
+            $.ajax({
+                type: 'POST',
+                data: {customer_id : customer_id},
+                url: route('records.get.job.addresses'),
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                async: false,
+                success: function(data) {
+                    customerJobAddressModal.show();
+                    document.getElementById("customerJobAddressModal").addEventListener("shown.tw.modal", function (event) {
+                        $('#customerJobAddressModal .customerJobAddressWrap').html(data.html);
+                        $('#customerJobAddressModal .addJobAddressBtn').attr('data-customer-id', customer_id).attr('data-type', 'billing');
+                        $('#customerJobAddressModal input[name="address_type"]').val('billing');
+                    });
+                },
+                error:function(e){
+                    console.log('Error');
+                }
+            });
+        }
+    });
+    /* Customer Billing Address End */
+
     /* On Click Add Customer Address Start */
     if(localStorage.job_address){
         let job_address = localStorage.getItem('job_address');
@@ -424,7 +474,8 @@ import INTAddressLookUps from '../../address_lookup.js';
                     customerJobAddressModal.show();
                     document.getElementById("customerJobAddressModal").addEventListener("shown.tw.modal", function (event) {
                         $('#customerJobAddressModal .customerJobAddressWrap').html(data.html);
-                        $('#customerJobAddressModal .addJobAddressBtn').attr('data-customer-id', customer_id);
+                        $('#customerJobAddressModal .addJobAddressBtn').attr('data-customer-id', customer_id).attr('data-type', 'job');
+                        $('#customerJobAddressModal input[name="address_type"]').val('job');
                     });
                 },
                 error:function(e){
@@ -433,39 +484,53 @@ import INTAddressLookUps from '../../address_lookup.js';
             });
         }
     });
+    
+    /* On Click Add Customer Address End */
+
+    /* Address On Choose Start */
     $('#customerJobAddressModal').on('click', '.customerJobAddressItem', function(e){
         e.preventDefault();
         let $theAddress = $(this);
         let theAddressId = $theAddress.attr('data-id');
         let theOccupantName = $theAddress.attr('data-occupant');
         let theAddress = $theAddress.attr('data-address');
+        let type = $('#customerJobAddressModal input[name="address_type"]').val();
+        let jobAddressObj = $theAddress.attr('data-address-obj') != '' ? JSON.parse($theAddress.attr('data-address-obj')) : [];
 
         customerJobAddressModal.hide();
-        $('.customerPropertyWrap').fadeIn('fast', function(){
-            $('.theDesc', this).html(theAddress).addClass('font-medium');
-            $('.theId', this).val(theAddressId);
-        });
+        if(type == 'billing'){
+            localStorage.setItem('billing_address', JSON.stringify(jobAddressObj));
+            $('.customerAddressWrap').fadeIn('fast', function(){
+                $('.theDesc', this).html(theAddress).addClass('font-medium');
+                $('.theId', this).val(theAddressId);
+            })
+        }else{
+            $('.customerPropertyWrap').fadeIn('fast', function(){
+                $('.theDesc', this).html(theAddress).addClass('font-medium');
+                $('.theId', this).val(theAddressId);
+            });
 
-        //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
             $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
                 $('.theDesc', this).html('Click here to add job address occupant');
                 $('.theId', this).val(0);
             });
-        //}
+        }
     });
-    /* On Click Add Customer Address End */
+    /* Address On Choose End */
 
     /* On Click Add Job Address Start */
     $('.addJobAddressBtn').on('click', function(e){
         e.preventDefault();
         let $theBtn = $(this);
         let the_customer_id = $theBtn.attr('data-customer-id');
+        let type = $theBtn.attr('data-type');
 
         customerJobAddressModal.hide();
 
         addJobAddressModal.show();
         document.getElementById('addJobAddressModal').addEventListener('shown.tw.modal', function(event){
             $('#addJobAddressModal input[name="customer_id"]').val(the_customer_id);
+            $('#addJobAddressModal input[name="address_type"]').val(type);
         });
     });
 
@@ -473,6 +538,7 @@ import INTAddressLookUps from '../../address_lookup.js';
         e.preventDefault();
         const form = document.getElementById('addJobAddressForm');
         const $theForm = $(this);
+        let type = $theForm.find('input[name="address_type"]').val();
         
         $('#addressSaveBtn', $theForm).attr('disabled', 'disabled');
         $("#addressSaveBtn .theLoader").fadeIn();
@@ -488,6 +554,7 @@ import INTAddressLookUps from '../../address_lookup.js';
             $("#addressSaveBtn .theLoader").fadeOut();
 
             if (response.status == 200) {
+                addJobAddressModal.hide();
                 let address = response.data.address;
                 let address_id = response.data.id;
                 let theJobAddress = '';
@@ -496,19 +563,21 @@ import INTAddressLookUps from '../../address_lookup.js';
                 theJobAddress += (address.city != null ? address.city+', ' : '');
                 theJobAddress += (address.state != null ? address.state+', ' : '');
                 theJobAddress += (address.postal_code != null ? address.postal_code : '');
-
-                addJobAddressModal.hide();
-                $('.customerPropertyWrap').fadeIn('fast', function(){
-                    $('.theDesc', this).html(theJobAddress).addClass('font-medium');
-                    $('.theId', this).val(address_id);
-                })
-
-                //if(job_form_id != 6 && job_form_id != 7 && job_form_id != 3 && job_form_id != 4){
+                if(type == 'billing'){
+                    $('.customerAddressWrap').fadeIn('fast', function(){
+                        $('.theDesc', this).html(theJobAddress).addClass('font-medium');
+                        $('.theId', this).val(address_id);
+                    })
+                }else{
+                    $('.customerPropertyWrap').fadeIn('fast', function(){
+                        $('.theDesc', this).html(theJobAddress).addClass('font-medium');
+                        $('.theId', this).val(address_id);
+                    })
                     $('.customerPropertyOccupantWrap').fadeIn('fast', function(){
                         $('.theDesc', this).html('Click here to add job address occupant');
                         $('.theId', this).val(0);
                     });
-                //}
+                }
             }
         }).catch(error => {
             $('#addressSaveBtn', $theForm).removeAttr('disabled');
@@ -830,6 +899,9 @@ import INTAddressLookUps from '../../address_lookup.js';
         let options = {};
         if($theForm.find('[name="customer_id"]').val() == 0 || $theForm.find('[name="customer_id"]').val() == ''){
             errors['customer_id'] = 'Please select a customer.';
+        }
+        if($theForm.find('[name="customer_address_id"]').val() == 0 || $theForm.find('[name="customer_address_id"]').val() == ''){
+            errors['customer_address_id'] = 'Billing address can not be empty.';
         }
         if($theForm.find('[name="customer_property_id"]').val() == 0 || $theForm.find('[name="customer_property_id"]').val() == ''){
             errors['customer_property_id'] = 'Job address can not be empty.';

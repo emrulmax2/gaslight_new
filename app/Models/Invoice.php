@@ -20,6 +20,7 @@ class Invoice extends Model
     protected $fillable = [
         'company_id',
         'customer_id',
+        'billing_address_id',
         'customer_job_id',
         'job_form_id',
         'customer_property_id',
@@ -45,6 +46,10 @@ class Invoice extends Model
 
     public function customer(){
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function billing(){
+        return $this->belongsTo(CustomerProperty::class, 'billing_address_id');
     }
 
     public function job(){

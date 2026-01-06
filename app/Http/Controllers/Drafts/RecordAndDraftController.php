@@ -64,7 +64,7 @@ class RecordAndDraftController extends Controller
             foreach($Query as $list):
                 $url = route('records.show', $list->id);
 
-                $html .= '<tr data-url="'.$url.'" class="recordRow cursor-pointer intro-x box border max-sm:px-3 max-sm:pt-2 max-sm:pb-2 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
+                $html .= '<tr data-url="'.$url.'" class="recordRow cursor-pointer intro-x box border px-3 sm:px-0 max-sm:pt-2 max-sm:pb-2 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2 rounded-tl-none sm:rounded-tl rounded-bl-none sm:rounded-bl">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Type</label>';
@@ -90,15 +90,18 @@ class RecordAndDraftController extends Controller
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
-                        $html .= '<div class="flex items-start">';
+                        $html .= '<div class="flex items-start sm:block">';
                             $html .= '<label class="sm:hidden font-medium m-0">Landlord Name</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->customer->full_name ?? '').'</span>';
+                            $html .= '<div>';
+                                $html .= '<div class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->customer->full_name ?? '').'</div>';
+                                $html .= '<div class="text-slate-500 whitespace-normal text-xs leading-[1.3]  max-sm:ml-auto">'.($list->customer->full_address ?? '').'</div>';
+                            $html .= '</div>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start flex-wrap">';
-                            $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Landlord Address</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->customer->full_address ?? '').'</span>';
+                            $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Billing Address</label>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->billing->full_address ?? '').'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';

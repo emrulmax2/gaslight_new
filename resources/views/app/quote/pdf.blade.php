@@ -105,7 +105,15 @@
                             <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $quote->customer->company_name }}</span>
                             @endif
                             <span class="font-bold block" style="font-size: 1r4px; line-height: 1.1;">{{ $quote->customer->full_name }}</span>
-                            <span class="block" style="line-height: 1.1;">{!! (isset($quote->customer->full_address) ? $quote->customer->full_address : '') !!}</span>
+                            <span class="block" style="line-height: 1.1;">
+                                @if(isset($quote->billing->full_address) && !empty($quote->billing->full_address))
+                                    {!! (isset($quote->billing->full_address) ? $quote->billing->full_address : '') !!}
+                                @elseif(isset($quote->job->billing->full_address) && !empty($quote->job->billing->full_address))
+                                    {!! $quote->job->billing->full_address !!}
+                                @else
+                                    {!! (isset($quote->customer->full_address) ? $quote->customer->full_address : '') !!}
+                                @endif
+                            </span>
                         </div>
                         @if($quote->customer_property_id > 0)
                         <div class="jobDetails">

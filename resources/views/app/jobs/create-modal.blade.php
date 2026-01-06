@@ -8,6 +8,7 @@
             </x-base.dialog.title>
             <x-base.dialog.description class="grid grid-cols-12 gap-x-6 gap-y-3">
                 <x-base.form-input name="customer_id" class="w-full" type="hidden" value="0" />
+                <x-base.form-input name="type" class="w-full" type="hidden" value="" />
                 <div class="col-span-12 sm:col-span-6">
                     <h2 class="text-base font-medium mb-2">Job Address Details</h2>
                     <div class="theAddressWrap" id="jobAddressWrap">

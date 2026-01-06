@@ -40,7 +40,7 @@
                         Landlord Name
                     </x-base.table.th>
                     <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
-                        Landlord Address
+                        Billing Address
                     </x-base.table.th>
                     <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
                         Assigned To

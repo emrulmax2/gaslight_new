@@ -13,6 +13,7 @@ class CustomerJob extends Model
     
     protected $fillable = [
         'customer_id',
+        'billing_address_id',
         'customer_property_id',
         'description',
         'details',
@@ -40,6 +41,10 @@ class CustomerJob extends Model
 
     public function customer(){
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function billing(){
+        return $this->belongsTo(CustomerProperty::class, 'billing_address_id');
     }
 
     public function property(){

@@ -106,7 +106,15 @@
                             <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $invoice->customer->company_name }}</span>
                             @endif
                             <span class="font-bold block" style="font-size: 16px; line-height: 1.1;">{{ $invoice->customer->full_name }}</span>
-                            <span class="block" style="line-height: 1.1;">{!! (isset($invoice->customer->full_address) ? $invoice->customer->full_address : '') !!}</span>
+                            <span class="block" style="line-height: 1.1;">
+                                @if(isset($invoice->billing->full_address) && !empty($invoice->billing->full_address))
+                                    {!! (isset($invoice->billing->full_address) ? $invoice->billing->full_address : '') !!}
+                                @elseif(isset($invoice->job->billing->full_address) && !empty($invoice->job->billing->full_address))
+                                    {!! $invoice->job->billing->full_address !!}
+                                @else
+                                    {!! (isset($invoice->customer->full_address) ? $invoice->customer->full_address : '') !!}
+                                @endif
+                            </span>
                         </div>
                         <div class="jobDetails">
                             JOB ADDRESS: 

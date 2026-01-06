@@ -23,7 +23,7 @@ class RecordAndDraftController extends Controller
         $customer_job_id = ($request->has('customer_job_id') && !empty($request->query('customer_job_id'))) ? $request->query('customer_job_id') : 0;
         $customer_id = ($request->has('customer_id') && !empty($request->query('customer_id'))) ? $request->query('customer_id') : 0;
 
-        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
+        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant', 'billing'])
                  ->where('created_by', $user_id);
         if($status != 'All'):
             $query->where('status', $status);

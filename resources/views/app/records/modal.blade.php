@@ -54,11 +54,12 @@
                 <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
             </x-base.dialog.title>
             <x-base.dialog.description class="bg-slate-200">
-                <a href="javascript:void(0);" data-customer-id="0" class="addJobAddressBtn text-primary flex justify-between items-center p-3 bg-white mb-2 text-base">Add New Address<x-base.lucide class="ml-auto h-4 w-4" icon="plus-circle" /></a>
+                <a href="javascript:void(0);" data-type="" data-customer-id="0" class="addJobAddressBtn text-primary flex justify-between items-center p-3 bg-white mb-2 text-base">Add New Address<x-base.lucide class="ml-auto h-4 w-4" icon="plus-circle" /></a>
                 <div class="customerJobAddressWrap">
                     
                 </div>
             </x-base.dialog.description>
+            <input type="hidden" value="" name="address_type"/>
         </form>
     </x-base.dialog.panel>
 </x-base.dialog>
@@ -74,6 +75,7 @@
             </x-base.dialog.title>
             <x-base.dialog.description>
                 <x-base.form-input name="customer_id" class="w-full" type="hidden" value="0" />
+                <input type="hidden" value="" name="address_type"/>
                 <div class="theAddressWrap" id="jobAddressWrap">
                     <div class="mb-3">
                         <x-base.form-label for="customer_address_line_1">Address Lookup</x-base.form-label>

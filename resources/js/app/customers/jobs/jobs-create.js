@@ -32,6 +32,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
     document.getElementById('addJobAddressModal').addEventListener('hide.tw.modal', function(event) {
         $('#addJobAddressModal input[type="text"]').val('');
         $('#addJobAddressModal input[name="customer_id"]').val('0');
+        $('#addJobAddressModal input[name="type"]').val('job_address');
     });
 
     
@@ -102,10 +103,12 @@ import INTAddressLookUps from '../../../address_lookup.js';
         let $form = $theBtn.closest('form');
 
         let customer_id = ($form.find('input[name="customer_id"]').val() > 0 ? $form.find('input[name="customer_id"]').val() : 0);
+        let type = $theBtn.attr('data-type') ? $theBtn.attr('data-type') : 'job_address';
         if(customer_id > 0){
             addJobAddressModal.show();
             document.getElementById('addJobAddressModal').addEventListener('shown.tw.modal', function(event){
                 $('#addJobAddressModal input[name="customer_id"]').val(customer_id);
+                $('#addJobAddressModal input[name="type"]').val(type);
             });
         }else{
             warningModal.show();
@@ -134,14 +137,14 @@ import INTAddressLookUps from '../../../address_lookup.js';
 
             if (response.status == 200) {
                 let row = response.data.row;
-                $('#addJobAddressModal input[name="address_line_1"]').val(row.address_line_1 ? row.address_line_1 : '');
-                $('#addJobAddressModal input[name="address_line_2"]').val(row.address_line_2 ? row.address_line_2 : '');
-                $('#addJobAddressModal input[name="city"]').val(row.city ? row.city : '');
-                $('#addJobAddressModal input[name="state"]').val(row.state ? row.state : '');
-                $('#addJobAddressModal input[name="postal_code"]').val(row.postal_code ? row.postal_code : '');
-                $('#addJobAddressModal input[name="country"]').val(row.country ? row.country : '');
-                $('#addJobAddressModal input[name="latitude"]').val(row.latitude ? row.latitude : '');
-                $('#addJobAddressModal input[name="longitude"]').val(row.longitude ? row.longitude : '');
+                $('#addJobAddressModal input[name="address_line_1"]').val(row.address.address_line_1 ? row.address.address_line_1 : '');
+                $('#addJobAddressModal input[name="address_line_2"]').val(row.address.address_line_2 ? row.address.address_line_2 : '');
+                $('#addJobAddressModal input[name="city"]').val(row.address.city ? row.address.city : '');
+                $('#addJobAddressModal input[name="state"]').val(row.address.state ? row.address.state : '');
+                $('#addJobAddressModal input[name="postal_code"]').val(row.address.postal_code ? row.address.postal_code : '');
+                $('#addJobAddressModal input[name="country"]').val(row.address.country ? row.address.country : '');
+                $('#addJobAddressModal input[name="latitude"]').val(row.address.latitude ? row.address.latitude : '');
+                $('#addJobAddressModal input[name="longitude"]').val(row.address.longitude ? row.address.longitude : '');
             }
         }).catch(error => {
             $theBtn.removeAttr('disabled');
@@ -157,6 +160,7 @@ import INTAddressLookUps from '../../../address_lookup.js';
         const form = document.getElementById('addJobAddressForm');
         const $theForm = $(this);
         let customer_id = $theForm.find('[name="customer_id"]').val();
+        let type = $theForm.find('[name="type"]').val();
         
         $('#addressSaveBtn', $theForm).attr('disabled', 'disabled');
         $("#addressSaveBtn .theLoader").fadeIn();
@@ -174,8 +178,13 @@ import INTAddressLookUps from '../../../address_lookup.js';
             if (response.status == 200) {
                 addJobAddressModal.hide();
 
-                $('#addCustomerJobForm .address_name').val(response.data.address);
-                $('#addCustomerJobForm [name="customer_property_id"]').val(response.data.id);
+                if(type == 'billing_address'){
+                    $('#addCustomerJobForm .billing_address_name').val(response.data.address);
+                    $('#addCustomerJobForm [name="billing_address_id"]').val(response.data.id);
+                }else {
+                    $('#addCustomerJobForm .address_name').val(response.data.address);
+                    $('#addCustomerJobForm [name="customer_property_id"]').val(response.data.id);
+                }
 
                 $('#addCustomerJobForm .searchResultCotainter').fadeOut(function(){
                     $('.resultWrap', this).html('<div class="p-10 flex justify-center items-center"><span class="h-10 w-10"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span></div>');
@@ -208,8 +217,8 @@ import INTAddressLookUps from '../../../address_lookup.js';
         let $theIdInput = $theSearchInput.siblings('.the_id_input');
         let $theResultContainer = $theSearchInput.siblings('.searchResultCotainter');
         let customer_id = (theType == 'address' && $theForm.find('[name="customer_id"]').val() > 0 ? $theForm.find('[name="customer_id"]').val() : 0);
-        let url = (theType == 'address' ? 'jobs.search.address' : 'jobs.search.customers');
-
+        let url = (theType == 'address' || theType == 'billing_address' ? 'jobs.search.address' : 'jobs.search.customers');
+        
         let the_search_query = $theSearchInput.val();
         $theIdInput.val('');
         $theWrap.addClass('active');
@@ -293,6 +302,36 @@ import INTAddressLookUps from '../../../address_lookup.js';
                     console.log('Error');
                 }
             });
+        }if(theType == 'billing_address'){
+            $theWrap.addClass('active');
+            let customer_id = ($theForm.find('[name="customer_id"]').val() > 0 ? $theForm.find('[name="customer_id"]').val() : 0);
+            currentRequest = $.ajax({
+                type: 'POST',
+                data: {customer_id : customer_id},
+                url: route('jobs.get.customer.addresses'),
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                async: false,
+                beforeSend : function()    {           
+                    if(currentRequest != null) {
+                        currentRequest.abort();
+                    }
+                },
+                success: function(data) {
+                    $theResultContainer.fadeIn();
+                    if(data.suc == 1){
+                        $theResultContainer.find('.resultWrap').html(data.html);
+                    }else{
+                        $theResultContainer.find('.resultWrap').html('<div class="font-bold text-slate-300 py-10 text-center">No Result</div>');
+                    }
+
+                    setTimeout(() => {
+                        createIcons({ icons, attrs: { "stroke-width": 1.5 }, nameAttr: "data-lucide" });
+                    }, 50);
+                },
+                error:function(e){
+                    console.log('Error');
+                }
+            });
         }else if(theType == 'customer'){
             $theWrap.addClass('active');
             currentRequest = $.ajax({
@@ -344,6 +383,25 @@ import INTAddressLookUps from '../../../address_lookup.js';
         });
 
         if(dataOf == 'customer'){
+            let customerAddressObj = $theItem.attr('data-address') != '' ? JSON.parse($theItem.attr('data-address')) : [];
+            if(customerAddressObj){
+                let addressId = customerAddressObj.id;
+                let customerAddress = (customerAddressObj.address_line_1 != null ? customerAddressObj.address_line_1+' ' : '');
+                    customerAddress += (customerAddressObj.address_line_2 != null ? customerAddressObj.address_line_2+', ' : '');
+                    customerAddress += (customerAddressObj.city != null ? customerAddressObj.city+', ' : '');
+                    customerAddress += (customerAddressObj.state != null ? customerAddressObj.state+', ' : '');
+                    customerAddress += (customerAddressObj.postal_code != null ? customerAddressObj.postal_code : '');
+
+                $('.billingAddressWrap').fadeIn('fast', function(){
+                    $('.billingAddressWrap .billing_address_name').val(customerAddress).removeAttr('disabled');
+                    $('.billingAddressWrap #billing_address_id').val(addressId);
+                })
+            }else{
+                $('.billingAddressWrap').fadeIn('fast', function(){
+                    $('.billingAddressWrap .billing_address_name').val('').attr('disabled', 'disabled');
+                    $('.billingAddressWrap #billing_address_id').val(0);
+                })
+            }
             $theForm.find('.searchWrap[data-type="address"] .search_input').removeAttr('disabled');
             $theForm.find('.searchWrap[data-type="address"] .the_id_input').val('0');
         }

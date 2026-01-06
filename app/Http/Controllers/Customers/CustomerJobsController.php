@@ -56,7 +56,7 @@ class CustomerJobsController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
 
-        $query = CustomerJob::with('customer', 'property', 'priority', 'theStatus', 'calendar', 'calendar.slot')->orderByRaw(implode(',', $sorts))
+        $query = CustomerJob::with('customer', 'property', 'priority', 'theStatus', 'calendar', 'calendar.slot', 'billing')->orderByRaw(implode(',', $sorts))
                 ->where('customer_id', $customer_id);
         if($status > 0):
             $query->where('customer_job_status_id', $status);
@@ -187,6 +187,7 @@ class CustomerJobsController extends Controller
 
         $data = [
             'customer_id' => $request->customer_id,
+            'billing_address_id' => $request->billing_address_id ?? null,
             'customer_property_id' => $request->customer_property_id,
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
@@ -219,7 +220,7 @@ class CustomerJobsController extends Controller
 
     public function job_edit(Request $request) {
         $job = CustomerJob::where('id', $request->customer_job_id)->firstOrFail();
-        $job->load(['customer', 'property', 'property.customer', 'customer.contact', 'calendar', 'theStatus']);
+        $job->load(['customer', 'property', 'property.customer', 'customer.contact', 'calendar', 'theStatus', 'billing']);
 
         $calendarDate = (isset($job->calendar->date) && !empty($job->calendar->date) ? date('Y-m-d', strtotime($job->calendar->date)) : 0);
         $jobCalendarTimeSlotId = (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id > 0 ? $job->calendar->calendar_time_slot_id : '');
@@ -268,8 +269,8 @@ class CustomerJobsController extends Controller
         $data = [
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
-            'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
-            'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
+            //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
+            //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
             'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : null),
             // 'reference_no' => (!empty($request->reference_no) ? $request->reference_no : null),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
