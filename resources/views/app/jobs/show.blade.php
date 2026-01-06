@@ -47,6 +47,17 @@
         </div>
     </div>
     <div class="settingsBox mt-5">
+        <h3 class="font-medium leading-none mb-3 text-dark">Billing Address</h3>
+        <div class="box rounded-md p-0 overflow-hidden">
+            <a href="javascript:void(0);" class="flex w-full items-start px-5 py-3">
+                <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="map-pin" />
+                <div>
+                    <span class="font-normal text-slate-400 text-xs block">{!! $job->billing->full_address_with_html !!}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Job Address</h3>
         <div class="box rounded-md p-0 overflow-hidden">
             @if(isset($job->property->occupant_name) && !empty($job->property->occupant_name))

@@ -24,6 +24,7 @@ class Record extends Model implements CanBeSigned
     protected $fillable = [
         'company_id',
         'customer_id',
+        'billing_address_id',
         'customer_job_id',
         'job_form_id',
         'customer_property_id',
@@ -47,6 +48,10 @@ class Record extends Model implements CanBeSigned
 
     public function customer(){
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function billing(){
+        return $this->belongsTo(CustomerProperty::class, 'billing_address_id');
     }
 
     public function job(){

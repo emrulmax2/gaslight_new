@@ -64,7 +64,7 @@ class InvoiceController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
     
-        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])->orderByRaw(implode(',', $sorts));
+        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'billing'])->orderByRaw(implode(',', $sorts));
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
                 $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
@@ -107,15 +107,18 @@ class InvoiceController extends Controller
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
-                        $html .= '<div class="flex items-start">';
+                        $html .= '<div class="flex items-start sm:block">';
                             $html .= '<label class="sm:hidden font-medium m-0">Landlord Name</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->customer->full_name ?? '').'</span>';
+                            $html .= '<div>';
+                                $html .= '<div class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] sm:font-medium max-sm:ml-auto capitalize">'.($list->customer->full_name ?? '').'</div>';
+                                $html .= '<div class="text-slate-500 whitespace-normal text-xs leading-[1.3]  max-sm:ml-auto">'.($list->customer->full_address ?? '').'</div>';
+                            $html .= '</div>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start flex-wrap">';
                             $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Landlord Address</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->customer->full_address ?? '').'</span>';
+                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->billing->full_address ?? '').'</span>';
                         $html .= '</div>';
                     $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
@@ -244,6 +247,7 @@ class InvoiceController extends Controller
             $jobRefNo = $this->generateReferenceNo($customer_id, $company);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->customer_address_id ?? null,
                 'customer_property_id' => $customer_property_id,
                 'description' => $jobName,
                 'details' => null,
@@ -261,6 +265,7 @@ class InvoiceController extends Controller
             $invoice = Invoice::updateOrCreate(['id' => $invoice_id, 'job_form_id' => $job_form_id ], [
                 'company_id' => auth()->user()->companies->pluck('id')->first(),
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->customer_address_id ?? null,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
@@ -360,7 +365,7 @@ class InvoiceController extends Controller
     public function editReady(Request $request){
         $invoice_id = $request->invoice_id;
 
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'billing'])
                     ->find($invoice_id);
         $data = [
             'invoice_id' => $invoice->id,
@@ -375,6 +380,28 @@ class InvoiceController extends Controller
             'customer' => $invoice->customer,
             'job_address' => $invoice->job->property
         ];
+        
+        $billingAddress = null;
+        if(isset($invoice->billing->id) && $invoice->billing->id > 0):
+            $billingAddress = $invoice->billing;
+        elseif(isset($invoice->job->billing->id) && $invoice->job->billing->id > 0):
+            $billingAddress = $invoice->job->billing;
+        else:
+            $billingAddress = $invoice->customer->address;
+        endif;
+        if($billingAddress):
+            $data['billing_address'] = [
+                'id' => $billingAddress->id ?? '0',
+                'address_line_1' => $billingAddress->address_line_1 ?? '',
+                'address_line_2' => $billingAddress->address_line_2 ?? '',
+                'postal_code' => $billingAddress->postal_code ?? '',
+                'state' => $billingAddress->state ?? '',
+                'city' => $billingAddress->city ?? '',
+                'country' => $billingAddress->country ?? '',
+                'latitude' => $billingAddress->latitude ?? '',
+                'longitude' => $billingAddress->longitude ?? '',
+            ];
+        endif;
 
         $data['invoiceItemsCount'] = 0;
         $data['invoiceItems'] = [];
@@ -555,7 +582,7 @@ class InvoiceController extends Controller
     }
 
     public function generatePdf($invoice_id){
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($invoice_id);
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing'])->find($invoice_id);
        
         //dd($record->available_options->invoiceItems);
         $companyLogoPath = (isset($invoice->user->company->logo_path) && $invoice->user->company->logo_path ? $invoice->user->company->logo_path : '');
@@ -693,7 +720,7 @@ class InvoiceController extends Controller
 
     public function linkedJob(Request $request){
         $job_id = $request->job_id;
-        $job = CustomerJob::with('customer', 'customer.address', 'property')->find($job_id);
+        $job = CustomerJob::with('customer', 'customer.address', 'property', 'billing')->find($job_id);
 
         return response()->json(['row' => $job], 200);
     }
@@ -771,7 +798,18 @@ class InvoiceController extends Controller
             $html .= '<div class="results existingAddress">';
                 $i = 1;
                 foreach($query as $property):
-                    $html .= '<div data-id="'.$property->id.'" data-occupant="'.(!empty($property->occupant_name) ? $property->occupant_name : $property->customer->full_name).'" data-address="'.$property->full_address.'" class="customerJobAddressItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
+                    $address = [
+                        'id' => $property->id ?? '0',
+                        'address_line_1' => $property->address_line_1 ?? '',
+                        'address_line_2' => $property->address_line_2 ?? '',
+                        'postal_code' => $property->postal_code ?? '',
+                        'state' => $property->state ?? '',
+                        'city' => $property->city ?? '',
+                        'country' => $property->country ?? '',
+                        'latitude' => $property->latitude ?? '',
+                        'longitude' => $property->longitude ?? '',
+                    ];
+                    $html .= '<div data-address-obj=\''.e(json_encode($address)).'\' data-id="'.$property->id.'" data-occupant="'.(!empty($property->occupant_name) ? $property->occupant_name : $property->customer->full_name).'" data-address="'.$property->full_address.'" class="customerJobAddressItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
                         $html .= '<div>';
                             $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
                                 $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin h-4 w-4 stroke-[1.3] text-primary"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';

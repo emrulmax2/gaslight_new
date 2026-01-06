@@ -182,6 +182,7 @@ class JobController extends Controller
         $company = (isset($user->companies[0]) && !empty($user->companies[0]) ? $user->companies[0] : []);
         $data = [
             'customer_id' => $request->customer_id,
+            'billing_address_id' => $request->billing_address_id ?? null,
             'customer_property_id' => $request->customer_property_id,
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
@@ -220,7 +221,7 @@ class JobController extends Controller
 
     public function show(CustomerJob $job){
         $user = User::find(auth()->user()->id);
-        $job->load(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar']);
+        $job->load(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'billing']);
 
         $calendarDate = (isset($job->calendar->date) && !empty($job->calendar->date) ? date('Y-m-d', strtotime($job->calendar->date)) : 0);
         $jobCalendarTimeSlotId = (isset($job->calendar->calendar_time_slot_id) && $job->calendar->calendar_time_slot_id > 0 ? $job->calendar->calendar_time_slot_id : '');
@@ -373,7 +374,18 @@ class JobController extends Controller
                 $html .= '<div class="results px-5 py-4" style="max-height: 250px; overflow-y: auto;">';
                     $i = 1;
                     foreach($query as $customer):
-                        $html .= '<div data-id="'.$customer->id.'" data-of="customer" data-title="'.$customer->customer_full_name.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
+                        $address = [
+                            'id' => $customer->address->id ?? '0',
+                            'address_line_1' => $customer->address->address_line_1 ?? '',
+                            'address_line_2' => $customer->address->address_line_2 ?? '',
+                            'postal_code' => $customer->address->postal_code ?? '',
+                            'state' => $customer->address->state ?? '',
+                            'city' => $customer->address->city ?? '',
+                            'country' => $customer->address->country ?? '',
+                            'latitude' => $customer->address->latitude ?? '',
+                            'longitude' => $customer->address->longitude ?? '',
+                        ];
+                        $html .= '<div data-address=\''.e(json_encode($address)).'\' data-id="'.$customer->id.'" data-of="customer" data-title="'.$customer->customer_full_name.'" class="searchResultItems flex items-center cursor-pointer '.($i != $query->count() ? ' pb-3 border-b border-slate-100 mb-3' : '').'">';
                             $html .= '<div>';
                                 $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
                                     $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" class="lucide lucide-user h-4 w-4 stroke-[1.3] text-primary"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';

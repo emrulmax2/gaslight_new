@@ -128,6 +128,7 @@ class RecordController extends Controller
             $jobRefNo = $this->generateReferenceNo($customer_id, $company);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->customer_address_id,
                 'customer_property_id' => $customer_property_id,
                 'description' => $form->name,
                 'details' => 'Job created for '.$property->full_address,
@@ -145,6 +146,7 @@ class RecordController extends Controller
             $record = Record::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
                 'company_id' => auth()->user()->companies->pluck('id')->first(),
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->customer_address_id,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
@@ -444,7 +446,7 @@ class RecordController extends Controller
     public function editReady(Request $request){
         $record_id = $request->record_id;
 
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
+        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant', 'billing'])
                     ->find($record_id);
         $data = [
             'certificate_id' => $record->id,
@@ -467,6 +469,27 @@ class RecordController extends Controller
                 'occupant_phone' => (isset($record->occupant->occupant_phone) && !empty($record->occupant->occupant_phone) ? $record->occupant->occupant_phone : ''),
             ]
         ];
+        $billingAddress = [];
+        if(isset($record->billing->id) && $record->billing->id > 0):
+            $billingAddress = $record->billing;
+        elseif(isset($record->job->billing->id) && $record->job->billing->id > 0):
+            $billingAddress = $record->job->billing;
+        else:
+            $billingAddress = $record->customer->address;
+        endif;
+        if($billingAddress):
+            $data['billing_address'] = [
+                'id' => $billingAddress->id ?? '0',
+                'address_line_1' => $billingAddress->address_line_1 ?? '',
+                'address_line_2' => $billingAddress->address_line_2 ?? '',
+                'postal_code' => $billingAddress->postal_code ?? '',
+                'state' => $billingAddress->state ?? '',
+                'city' => $billingAddress->city ?? '',
+                'country' => $billingAddress->country ?? '',
+                'latitude' => $billingAddress->latitude ?? '',
+                'longitude' => $billingAddress->longitude ?? '',
+            ];
+        endif;
 
         $optionData = $this->sortOptionData($record_id);
         $data = array_merge($data, $optionData);
@@ -671,7 +694,7 @@ class RecordController extends Controller
 
     public function linkedJob(Request $request){
         $job_id = $request->job_id;
-        $job = CustomerJob::with('customer', 'customer.address', 'property')->find($job_id);
+        $job = CustomerJob::with('customer', 'customer.address', 'property', 'billing')->find($job_id);
 
         return response()->json(['row' => $job], 200);
     }
@@ -685,7 +708,18 @@ class RecordController extends Controller
             $html .= '<div class="results existingAddress">';
                 $i = 1;
                 foreach($query as $property):
-                    $html .= '<div data-id="'.$property->id.'" data-occupant="'.(!empty($property->occupant_name) ? $property->occupant_name : $property->customer->full_name).'" data-address="'.$property->full_address.'" class="customerJobAddressItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
+                    $address = [
+                        'id' => $property->id ?? '0',
+                        'address_line_1' => $property->address_line_1 ?? '',
+                        'address_line_2' => $property->address_line_2 ?? '',
+                        'postal_code' => $property->postal_code ?? '',
+                        'state' => $property->state ?? '',
+                        'city' => $property->city ?? '',
+                        'country' => $property->country ?? '',
+                        'latitude' => $property->latitude ?? '',
+                        'longitude' => $property->longitude ?? '',
+                    ];
+                    $html .= '<div data-address-obj=\''.e(json_encode($address)).'\' data-id="'.$property->id.'" data-occupant="'.(!empty($property->occupant_name) ? $property->occupant_name : $property->customer->full_name).'" data-address="'.$property->full_address.'" class="customerJobAddressItem flex items-center cursor-pointer '.($i != $query->count() ? ' mb-2' : '').' bg-white px-3 py-3">';
                         $html .= '<div>';
                             $html .= '<div class="group flex items-center justify-center border rounded-full primary" style="width: 40px; height: 40px;">';
                                 $html .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="map-pin" class="lucide lucide-map-pin h-4 w-4 stroke-[1.3] text-primary"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
@@ -925,6 +959,7 @@ class RecordController extends Controller
                 $invoice = Invoice::create([
                     'company_id' => auth()->user()->companies->pluck('id')->first(),
                     'customer_id' => $record->customer_id,
+                    'billing_address_id' => $record->billing_address_id ?? null,
                     'customer_job_id' => $record->customer_job_id,
                     'job_form_id' => 4,
                     'customer_property_id' => ($record->customer_property_id > 0 ? $record->customer_property_id : (isset($record->job->customer_property_id) && $record->job->customer_property_id > 0 ? $record->job->customer_property_id : null)),

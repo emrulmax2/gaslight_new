@@ -38,7 +38,7 @@ class InvoiceController extends Controller
         $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
     
-        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property']);
+        $query = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.billing', 'job.property', 'form', 'user', 'user.company', 'property', 'billing']);
         if(!empty($status) && $status !== 'All'): $query->where('status', $status); endif;
         if(!empty($payStatus) && count($payStatus) > 0): $query->whereIn('pay_status', $payStatus); endif;
         if (!empty($queryStr)):
@@ -117,6 +117,7 @@ class InvoiceController extends Controller
             $jobRefNo = $this->generateReferenceNo($customer_id, $company);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->billing_address_id ?? null,
                 'customer_property_id' => $customer_property_id,
                 'description' => $jobName,
                 'details' => null,
@@ -134,6 +135,7 @@ class InvoiceController extends Controller
             $invoice = Invoice::updateOrCreate(['id' => $invoice_id, 'job_form_id' => $job_form_id ], [
                 'company_id' => auth()->user()->companies->pluck('id')->first(),
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->billing_address_id ?? null,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
@@ -215,7 +217,7 @@ class InvoiceController extends Controller
 
     public function edit($invoice_id, Request $request){
         try {
-            $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property'])
+            $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'billing'])
                         ->find($invoice_id);
 
             $fileName = $this->generatePdfFileName($invoice->id);
@@ -235,6 +237,28 @@ class InvoiceController extends Controller
                 'job_address' => $invoice->job->property,
                 'url' => $pdf_url
             ];
+
+            $billingAddress = null;
+            if(isset($invoice->billing->id) && $invoice->billing->id > 0):
+                $billingAddress = $invoice->billing;
+            elseif(isset($invoice->job->billing->id) && $invoice->job->billing->id > 0):
+                $billingAddress = $invoice->job->billing;
+            else:
+                $billingAddress = $invoice->customer->address;
+            endif;
+            if($billingAddress):
+                $data['billing_address'] = [
+                    'id' => $billingAddress->id ?? '0',
+                    'address_line_1' => $billingAddress->address_line_1 ?? '',
+                    'address_line_2' => $billingAddress->address_line_2 ?? '',
+                    'postal_code' => $billingAddress->postal_code ?? '',
+                    'state' => $billingAddress->state ?? '',
+                    'city' => $billingAddress->city ?? '',
+                    'country' => $billingAddress->country ?? '',
+                    'latitude' => $billingAddress->latitude ?? '',
+                    'longitude' => $billingAddress->longitude ?? '',
+                ];
+            endif;
 
             $data['invoiceItemsCount'] = 0;
             $data['invoiceItems'] = $data['invoiceDiscounts'] = $data['invoiceAdvance'] = $data['invoiceExtra'] = [];
@@ -446,7 +470,7 @@ class InvoiceController extends Controller
     }
 
     public function generatePdf($invoice_id){
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($invoice_id);
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing'])->find($invoice_id);
        
         //dd($record->available_options->invoiceItems);
         $logoPath = resource_path('images/gas_safe_register_yellow.png');

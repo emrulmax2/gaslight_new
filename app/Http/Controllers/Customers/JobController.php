@@ -96,6 +96,7 @@ class JobController extends Controller
     public function store(JobStoreRequest $request){
         $data = [
             'customer_id' => $request->customer_id,
+            'billing_address_id' => $request->billing_address_id ?? null,
             'customer_property_id' => $request->customer_property_id,
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),

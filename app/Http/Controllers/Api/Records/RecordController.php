@@ -50,6 +50,7 @@ class RecordController extends Controller
             $jobRefNo = $this->generateReferenceNo($customer_id, $company);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->customer_address_id,
                 'customer_property_id' => $customer_property_id,
                 'customer_property_occupant_id' => $customer_property_occupant_id,
                 'description' => $form->name,
@@ -68,6 +69,7 @@ class RecordController extends Controller
             $record = Record::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
                 'company_id' => $request->user()->companies->pluck('id')->first(),
                 'customer_id' => $customer_id,
+                'billing_address_id' => $request->customer_address_id,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
@@ -181,7 +183,7 @@ class RecordController extends Controller
 
     public function edit($record_id, Request $request){
         try {
-            $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant'])
+            $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant', 'billing'])
                         ->find($record_id);
             if(isset($record->job->has_invoice) && $record->job->has_invoice):
                 $record->job->invoice_id = (isset($record->job->invoice->id) && $record->job->invoice->id > 0 ? $record->job->invoice->id : null);
@@ -215,6 +217,27 @@ class RecordController extends Controller
                 'occupant' => (isset($record->occupant) && $record->occupant->count() > 0 ? $record->occupant : []),
                 'pdf_url' => $pdf_url
             ];
+            $billingAddress = [];
+            if(isset($record->billing->id) && $record->billing->id > 0):
+                $billingAddress = $record->billing;
+            elseif(isset($record->job->billing->id) && $record->job->billing->id > 0):
+                $billingAddress = $record->job->billing;
+            else:
+                $billingAddress = $record->customer->address;
+            endif;
+            if($billingAddress):
+                $data['billing_address'] = [
+                    'id' => $billingAddress->id ?? '0',
+                    'address_line_1' => $billingAddress->address_line_1 ?? '',
+                    'address_line_2' => $billingAddress->address_line_2 ?? '',
+                    'postal_code' => $billingAddress->postal_code ?? '',
+                    'state' => $billingAddress->state ?? '',
+                    'city' => $billingAddress->city ?? '',
+                    'country' => $billingAddress->country ?? '',
+                    'latitude' => $billingAddress->latitude ?? '',
+                    'longitude' => $billingAddress->longitude ?? '',
+                ];
+            endif;
 
             $optionData = $this->sortOptionData($record_id);
             $data = array_merge($data, $optionData);
@@ -444,7 +467,7 @@ class RecordController extends Controller
 
     public function generatePdf($record_id){
         $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($record_id);
+        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing'])->find($record_id);
        
         //dd($record->available_options->invoiceItems);
         $logoPath = resource_path('images/gas_safe_register_yellow.png');
@@ -677,6 +700,7 @@ class RecordController extends Controller
                 $invoice = Invoice::create([
                     'company_id' => auth()->user()->companies->pluck('id')->first(),
                     'customer_id' => $record->customer_id,
+                    'billing_address_id' => $record->billing_address_id ?? null,
                     'customer_job_id' => $record->customer_job_id,
                     'job_form_id' => 4,
                     'customer_property_id' => ($record->customer_property_id > 0 ? $record->customer_property_id : (isset($record->job->customer_property_id) && $record->job->customer_property_id > 0 ? $record->job->customer_property_id : null)),

@@ -118,6 +118,7 @@
                 localStorage.setItem('customer', JSON.stringify(row.customer));
                 localStorage.setItem('job_address', JSON.stringify(row.job_address));
                 localStorage.setItem('occupant', JSON.stringify(row.occupant));
+                localStorage.setItem('billing_address', JSON.stringify(row.billing_address));
 
 
                 if(form_id == 6 || form_id == 7){

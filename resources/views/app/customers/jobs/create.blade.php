@@ -56,7 +56,31 @@
                     Job Details
                 </h2>
             </div>
-            <div class="px-2 py-3 bg-white">
+            <div class="px-2 py-3 bg-white billingAddressWrap">
+                <div class="flex justify-between items-center cursor-pointer billingAddressBlock">
+                    <div class="w-full">
+                        <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Billing Address <span class="text-danger">*</span></div>
+                        <div class="theDesc w-full relative">
+                            <div class="relative searchWrap" data-type="billing_address">
+                                <x-base.form-input autocomplete="off" name="search_input" class="search_input billing_address_name w-full text-[14px] leading-[20px] text-[#475569] block p-0 border-none rounded-none focus:outline-none focus:shadow-none focus:ring-0 bg-transparent shadow-none disabled:bg-white" type="text" placeholder="Search For Address..." />
+                                <x-base.form-input name="billing_address_id" id="billing_address_id" class="w-full the_id_input" type="hidden" value="0" />
+                                <div class="searchResultCotainter absolute left-0 top-full shadow bg-white border rounded-md w-full z-50" style="display: none;">
+                                    <div class="resultWrap">
+                                        <div class="p-10 flex justify-center items-center"><span class="h-10 w-10"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span></div>
+                                    </div>
+
+                                    <x-base.button data-type="billing_address" type="button" class="addAddressBtn text-white font-bold w-full rounded-md rounded-tl-none rounded-tr-none" variant="success">
+                                        <x-base.lucide class="mr-2 h-4 w-4 stroke-[1.3]" icon="plus-circle" />
+                                        Add Address
+                                    </x-base.button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="acc__input-error error-billing_address_id text-danger text-xs"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 py-3 mt-2 bg-white">
                 <div class="flex justify-between items-center cursor-pointer receivedByBlock">
                     <div class="w-full">
                         <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Job Address <span class="text-danger">*</span></div>
@@ -69,7 +93,7 @@
                                         <div class="p-10 flex justify-center items-center"><span class="h-10 w-10"><svg class="h-full w-full" width="25" viewBox="-2 -2 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748"><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)" stroke-width="4"><circle stroke-opacity=".5" cx="18" cy="18" r="18"></circle><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform type="rotate" attributeName="transform" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"></animateTransform></path></g></g></svg></span></div>
                                     </div>
 
-                                    <x-base.button type="button" class="addAddressBtn text-white font-bold w-full rounded-md rounded-tl-none rounded-tr-none" variant="success">
+                                    <x-base.button data-type="job_address" type="button" class="addAddressBtn text-white font-bold w-full rounded-md rounded-tl-none rounded-tr-none" variant="success">
                                         <x-base.lucide class="mr-2 h-4 w-4 stroke-[1.3]" icon="plus-circle" />
                                         Add Address
                                     </x-base.button>
