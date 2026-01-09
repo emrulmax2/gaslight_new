@@ -195,17 +195,17 @@
                             @if(isset($invoice->user->companies[0]->bank->name_on_account) && !empty($invoice->user->companies[0]->bank->name_on_account))
                                 <span class="block">{{ $invoice->user->companies[0]->bank->name_on_account }}</span>
                             @endif
-                            @if(isset($invoice->user->companies[0]->bank->bank_name) && !empty($invoice->user->companies[0]->bank->bank_name))
-                                <span class="block">Bank Name: {{ $invoice->user->companies[0]->bank->bank_name }}</span>
+                            @if(isset($invoice->user->companies[0]->bank->sort_code) && !empty($invoice->user->companies[0]->bank->sort_code))
+                                <span class="block">Sort code: {{ $invoice->user->companies[0]->bank->sort_code }}</span>
                             @endif
                             @if(isset($invoice->user->companies[0]->bank->account_number) && !empty($invoice->user->companies[0]->bank->account_number))
                                 <span class="block">Account no: {{ $invoice->user->companies[0]->bank->account_number }}</span>
                             @endif
                         </div>
-                        @if(isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term))
+                        @if(isset($invoice->user->companies[0]->bank->payment_term) && !empty($invoice->user->companies[0]->bank->payment_term))
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Terms:</span>
-                            <span class="block">{{ (isset($invoiceExtra->payment_term) && !empty($invoiceExtra->payment_term) ? $invoiceExtra->payment_term : '') }}</span>
+                            <span class="block">{{ $invoice->user->companies[0]->bank->payment_term }}</span>
                         </div>
                         @endif
                         @if(isset($invoiceNotes) && !empty($invoiceNotes))
@@ -227,7 +227,7 @@
                         @endphp
                         <table class="bg-darkish2 uppercase color-white calculationTable" style="padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
                             <tr>
-                                <td class="text-left">Subtotal (excl. VAT)</td>
+                                <td class="text-left">Subtotal {{ isset($invoiceExtra->non_vat_invoice) && $invoiceExtra->non_vat_invoice != 1 ? ' (excl. VAT)' : ''}}</td>
                                 <td class="text-right">{{ Number::currency($SUBTOTAL, 'GBP') }}</td>
                             </tr>
                             @if(isset($invoiceExtra->non_vat_invoice) && $invoiceExtra->non_vat_invoice != 1)

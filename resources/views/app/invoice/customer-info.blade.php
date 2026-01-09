@@ -35,10 +35,10 @@
     <div class="px-2 py-3 mt-2 customerAddressWrap bg-white" style="display: none;">
         <a href="javascript:void(0);" class="flex justify-between items-center cursor-pointer customerAddressBlock">
             <div>
-                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Customer Address</div>
-                <div class="theDesc">Click here to add customer address</div>
+                <div class="text-slate-500 mt-1 font-medium text-xs leading-none mb-1 uppercase theLabel">Billing Address</div>
+                <div class="theDesc">Click here to add billing address</div>
             </div>
-            <span style="flex: 0 0 16px; margin-left: 20px;"></span>
+            <span style="flex: 0 0 16px; margin-left: 20px;"><x-base.lucide class="h-4 w-4 text-success" icon="chevron-right" /></span>
             <input type="hidden" name="customer_address_id" value="0" class="theId"/>
         </a>
     </div>

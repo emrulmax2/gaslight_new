@@ -107,7 +107,7 @@
                         </div>
                     </div>
                 </div>
-                <x-base.button class="w-full sm:w-auto items-center justify-center text-white" id="upgradeSubBtn" type="button" variant="success">
+                <x-base.button class="w-full sm:w-auto items-center justify-center text-white" id="upgradeSubBtn" type="submit" variant="success">
                     <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
                     Upgrade Now
                     <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
@@ -193,7 +193,7 @@
 
         const carHolderName = document.getElementById('card_holder_name');
         const postalCode = document.getElementById('postal_code');
-        let $theButton = $('#upgSubBtn', $theForm);
+        let $theButton = $('#upgradeSubBtn', $theForm);
 
         cardNumberElement.on('change', function(event) {
             if (event.error) {
@@ -242,14 +242,6 @@
             $theButton.attr('disabled');
             $(".theLoader", $theButton).fadeIn();
 
-            if($('.pricing_package_id:checked').length == 0){
-                $('.error-pricing_package_id', $theForm).fadeIn().html('Please select a package.');
-                
-                $theButton.removeAttr('disabled');
-                $(".theLoader", $theButton).fadeOut();
-
-                return false;
-            }
             if(carHolderName.value == ''){
                 $('.error-card_holder_name', $theForm).fadeIn().html('This field is required.');
                 
