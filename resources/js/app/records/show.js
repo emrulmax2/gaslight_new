@@ -105,8 +105,6 @@
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             if (response.status == 200) {
-                // console.log(response.data);
-                // return false;
 
                 let row = response.data.row;
                 let form_id = response.data.form;
@@ -128,7 +126,12 @@
                     localStorage.setItem('gsrComments', JSON.stringify(row.gsrComments));
                     localStorage.setItem('applianceCount', row.applianceCount);
                     localStorage.setItem('appliances', JSON.stringify(row.appliances));
-                }else if(form_id == 8 || form_id == 9 || form_id == 10 || form_id == 13){
+                }else if(form_id == 8){
+                    localStorage.setItem('applianceCount', row.applianceCount);
+                    localStorage.setItem('appliances', JSON.stringify(row.appliances));
+                    localStorage.setItem('otherChecksAnswered', row.otherChecksAnswered);
+                    localStorage.setItem('otherChecks', JSON.stringify(row.otherChecks));
+                }else if(form_id == 9 || form_id == 10 || form_id == 13){
                     localStorage.setItem('appliances', JSON.stringify(row.appliances));
                 }else if(form_id == 15){
                     localStorage.setItem('powerFlushChecklist', JSON.stringify(row.powerFlushChecklist));

@@ -40,6 +40,7 @@
             .text-white{color: #FFF;}
             .uppercase {text-transform: uppercase;}
             .whitespace-nowrap{white-space: nowrap;}
+            .text-danger{ color: #b91c1c; }
             
             .w-auto{width: auto;}
             .w-28{width: 7rem;}
@@ -65,6 +66,7 @@
             .w-70px{width: 70px;}
             .w-60px{width: 60px;}
             .h-auto{height: auto;}
+            .h-30px{height: 30px;}
             .h-29px{height: 29px;}
             .h-94px{height: 94px;}
             .h-35px{height: 35px;}
@@ -74,6 +76,7 @@
             .h-100px{height: 100px;}
             .h-112px{height: 112px;}
             .h-25px{height: 25px;}
+            .h-40px{height: 40px;}
             .h-45px{height: 45px;}
             .h-50px{height: 50px;}
             .h-30px{height: 30px;}
@@ -106,6 +109,7 @@
             .pb-2{padding-bottom: 0.25rem;}
             .pt-05{padding-top: 0.125rem;}
             .pb-05{padding-bottom: 0.125rem;}
+            .mb-005{margin-bottom: 0.125rem;}
             .mb-05{margin-bottom: 0.25rem;}
             .mb-1{margin-bottom: 0.5rem;}
             .mt-1-5{margin-top: 0.375rem;}
@@ -116,6 +120,7 @@
             .mb-0{margin-bottom: 0;}
             .m-2{margin: .5rem;}
             .mr-1{margin-right: .25rem;}
+            .mt-1{margin-top: .25rem;}
 
             .bg-danger{ background: #b91c1c; }
             .bg-warning{ background: #f59e0b; }
@@ -157,9 +162,14 @@
                             <div class="inline-block bg-white w-32 text-center rounded-none leading-28px h-35px font-medium text-primary">{{ $record->certificate_number }}</div>
                         </td>
                         <td class="w-col8 text-center align-middle px-5">
-                            <h1 class="text-white text-xl leading-none mt-0 mb-05">
-                                <span class="bg-danger inline-block py-1 px-2 mr-1">Danger Do Not Use</span>
-                                <span class="bg-warning inline-block py-1 px-2">CP14 Gas Warning Notice</span>
+                            <h1 class="text-white leading-none mt-0 mb-0" style="font-weight: normal; font-size: 24px; margin-top: 5px;">
+                                <span class="bg-white inline-block py-1 px-2">
+                                    <img src="{{ $palmBase64 }}" alt="stop" style="height: 31px; width: auto;"/>
+                                </span><span class="bg-danger inline-block" style="padding: 8.5px 1rem;">
+                                    Danger Do Not Use
+                                </span><span class="bg-warning inline-block" style="padding: 8.5px 1rem;">
+                                    CP14 Gas Warning Notice
+                                </span>
                             </h1>
                             <div class="text-white text-12px leading-1-3">
                                 Registered Business/engineer details can be checked at www.gassaferegister.co.uk or by calling 0800 408 5500
@@ -173,7 +183,7 @@
             </table>
         </div>
 
-        <div class="recordInfo mt-1-5">
+        <div class="recordInfo mt-1">
             <table class="table table-sm bordered border-primary">
                 <thead>
                     <tr>
@@ -291,18 +301,24 @@
             </table>
         </div>
 
-        <table class="p-0 border-none mt-1-5">
+        <table class="p-0 border-none mt-1">
             <tbody>
                 <tr>
-                    <td class="w-col7 pr-1 pl-0 pb-0 pt-0 align-top">
+                    <td class="pr-1 pl-0 pb-0 pt-0 align-top">
                         <table class="table table-sm bordered border-primary">
                             <thead>
                                 <tr>
+                                    <th colspan="7" class="whitespace-nowrap border-primary border-b-white border-b-1 border-r border-r-sec bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
+                                        The gas appliances / gas installations
+                                    </th>
                                     <th colspan="7" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
-                                        THE GAS APPLIANCE / GAS INSTALLATION
+                                        Defects identified on gas equipment
                                     </th>
                                 </tr>
                                 <tr>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center w-36px align-middle">
+                                        #
+                                    </th>
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
                                         Location
                                     </th>
@@ -321,33 +337,7 @@
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
                                         GC No.
                                     </th>
-                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Classification
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->appliance_location_id) && $record->available_options->appliances->appliance_location_id > 0 ? locationName($record->available_options->appliances->appliance_location_id) : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->model) && !empty($record->available_options->appliances->model) ? $record->available_options->appliances->model : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->boiler_brand_id) && !empty($record->available_options->appliances->boiler_brand_id) ? boilerBrandName($record->available_options->appliances->boiler_brand_id) : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->appliance_type_id) && $record->available_options->appliances->appliance_type_id > 0 ? typeName($record->available_options->appliances->appliance_type_id) : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->serial_no) && !empty($record->available_options->appliances->serial_no) ? $record->available_options->appliances->serial_no : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->gc_no) && !empty($record->available_options->appliances->gc_no) ? $record->available_options->appliances->gc_no : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->gas_warning_classification_id) && $record->available_options->appliances->gas_warning_classification_id > 0 ? classificationName($record->available_options->appliances->gas_warning_classification_id) : '') }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="w-col5 pl-1 pr-0 pb-0 pt-0 align-top">
-                        <table class="table table-sm bordered border-primary">
-                            <thead>
-                                <tr>
-                                    <th colspan="5" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
-                                        ISSUES
-                                    </th>
-                                </tr>
-                                <tr>
+
                                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">
                                         Gas Escape Issue
                                     </th>
@@ -363,25 +353,72 @@
                                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">
                                         Chimney Issue
                                     </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                                        Other
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                                        Other Details
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @php 
+                                    $serial = 1;
+                                @endphp
+                                @if(isset($record->available_options->appliances) && !empty($record->available_options->appliances))
+                                    @foreach($record->available_options->appliances as $appliance)
+                                        <tr>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">{{ $serial }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->appliance_location_id) && $appliance->appliance_location_id > 0 ? locationName($appliance->appliance_location_id) : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->model) && !empty($appliance->model) ? $appliance->model : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->boiler_brand_id) && !empty($appliance->boiler_brand_id) ? boilerBrandName($appliance->boiler_brand_id) : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->appliance_type_id) && $appliance->appliance_type_id > 0 ? typeName($appliance->appliance_type_id) : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->serial_no) && !empty($appliance->serial_no) ? $appliance->serial_no : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->gc_no) && !empty($appliance->gc_no) ? $appliance->gc_no : '') }}</td>
+
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->gas_escape_issue) && !empty($appliance->gas_escape_issue) ? $appliance->gas_escape_issue : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->pipework_issue) && !empty($appliance->pipework_issue) ? $appliance->pipework_issue : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->ventilation_issue) && !empty($appliance->ventilation_issue) ? $appliance->ventilation_issue : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->meter_issue) && !empty($appliance->meter_issue) ? $appliance->meter_issue : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->chimeny_issue) && !empty($appliance->chimeny_issue) ? $appliance->chimeny_issue : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->other_issue) && !empty($appliance->other_issue) ? $appliance->other_issue : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b">{{ (isset($appliance->other_issue) && $appliance->other_issue == 'Yes' && isset($appliance->other_issue_details) && !empty($appliance->other_issue_details) ? $appliance->other_issue_details : '') }}</td>
+                                        </tr>
+                                        @php 
+                                            $serial += 1;
+                                        @endphp
+                                    @endforeach
+                                @endif
+                                @for($serial; $serial <= 4; $serial++)
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($record->available_options->appliances->gas_escape_issue) && !empty($record->available_options->appliances->gas_escape_issue) ? $record->available_options->appliances->gas_escape_issue : '&nbsp;') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($record->available_options->appliances->pipework_issue) && !empty($record->available_options->appliances->pipework_issue) ? $record->available_options->appliances->pipework_issue : '&nbsp;') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($record->available_options->appliances->ventilation_issue) && !empty($record->available_options->appliances->ventilation_issue) ? $record->available_options->appliances->ventilation_issue : '&nbsp;') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($record->available_options->appliances->meter_issue) && !empty($record->available_options->appliances->meter_issue) ? $record->available_options->appliances->meter_issue : '&nbsp;') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($record->available_options->appliances->chimeny_issue) && !empty($record->available_options->appliances->chimeny_issue) ? $record->available_options->appliances->chimeny_issue : '&nbsp;') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">{{ $serial }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b"></td>
                                 </tr>
+                                @endfor
                             </tbody>
                         </table>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <table class="table table-sm bordered border-primary mt-1-5">
+        <table class="table table-sm bordered border-primary mt-1">
             <thead>
                 <tr>
+                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-05 text-center w-36px align-middle">
+                        #
+                    </th>
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
                         Details of faults
                     </th>
@@ -391,39 +428,86 @@
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
                         Actions Required
                     </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
+                        Classification
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-80px align-top">{{ (isset($record->available_options->appliances->fault_details) && !empty($record->available_options->appliances->fault_details) ? $record->available_options->appliances->fault_details : '') }}</td>
-                    <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-80px align-top">{{ (isset($record->available_options->appliances->action_taken) && !empty($record->available_options->appliances->action_taken) ? $record->available_options->appliances->action_taken : '') }}</td>
-                    <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-80px align-top">{{ (isset($record->available_options->appliances->actions_required) && !empty($record->available_options->appliances->actions_required) ? $record->available_options->appliances->actions_required : '') }}</td>
-                </tr>
+                @php 
+                    $serial = 1;
+                @endphp
+                @if(isset($record->available_options->appliances) && !empty($record->available_options->appliances))
+                    @foreach($record->available_options->appliances as $appliance)
+                        <tr>
+                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r align-top">{{ $serial }}</td>
+                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->fault_details) && !empty($appliance->fault_details) ? $appliance->fault_details : '') }}</td>
+                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->action_taken) && !empty($appliance->action_taken) ? $appliance->action_taken : '') }}</td>
+                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->actions_required) && !empty($appliance->actions_required) ? $appliance->actions_required : '') }}</td>
+                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->gas_warning_classification_id) && $appliance->gas_warning_classification_id > 0 ? classificationName($appliance->gas_warning_classification_id) : '') }}</td>
+                        </tr>
+                        @php 
+                            $serial += 1;
+                        @endphp
+                    @endforeach
+                @endif
+                @for($serial; $serial <= 4; $serial++)
+                    <tr>
+                        <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r align-top">{{ $serial }}</td>
+                        <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
+                        <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
+                        <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
+                        <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
+                    </tr>
+                @endfor
             </tbody>
         </table>
 
-        <table class="p-0 border-none mt-1-5">
+        <table class="p-0 border-none mt-1">
             <tbody>
                 <tr>
                     <td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">
-                    <table class="table table-sm bordered border-primary">
-                        <tbody>
-                            <tr>
-                                <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px uppercase px-2 py-1 leading-none align-middle">Reported to HSE under RIDDOR 11(1) (Gas Incident)</td>
-                                <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">{{ (isset($record->available_options->appliances->reported_to_hse) && !empty($record->available_options->appliances->reported_to_hse) ? $record->available_options->appliances->reported_to_hse : '') }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <table class="table table-sm bordered border-primary">
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px px-2 py-1 leading-none align-middle">Reported to HSE under RIDDOR 11(1) (Gas Incident)</td>
+                                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">{{ (isset($record->available_options->otherChecks->reported_to_hse) && !empty($record->available_options->otherChecks->reported_to_hse) ? $record->available_options->otherChecks->reported_to_hse : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </td>
                     <td class="w-half pl-1 pr-0 pb-0 pt-0 align-top">
                         <table class="table table-sm bordered border-primary">
                             <tbody>
                                 <tr>
-                                    <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px uppercase px-2 py-1 leading-none align-middle">Reported to HSE under RIDDOR 11(2) (Dangerous Gas Fitting)</td>
-                                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">{{ (isset($record->available_options->appliances->reported_to_hde) && !empty($record->available_options->appliances->reported_to_hde) ? $record->available_options->appliances->reported_to_hde : '') }}</td>
+                                    <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-12px px-2 py-1 leading-none align-middle">Reported to HSE under RIDDOR 11(2) (Dangerous Gas Fitting)</td>
+                                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">{{ (isset($record->available_options->otherChecks->reported_to_hde) && !empty($record->available_options->otherChecks->reported_to_hde) ? $record->available_options->otherChecks->reported_to_hde : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>
+                    </td>
+                <tr>
+                <tr>
+                    <td colspan="2" class="pr-0 pl-0 pb-0 pt-0 align-top">
+                        <table class="table table-sm bordered border-primary mt-1-5">
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary whitespace-normal font-medium bg-primary text-white text-12px px-2 py-1 leading-1-2 align-middle">The gas user was not present at the time of this visit and where appropriate, (an IMMEDIATELY DENGEROUS (ID) or AT RISK (AR) solution) the installation has been made safe and this notice left on the premisies.</td>
+                                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-1 text-12px w-130px leading-none align-middle">{{ (isset($record->available_options->otherChecks->left_on_premisies) && !empty($record->available_options->otherChecks->left_on_premisies) ? $record->available_options->otherChecks->left_on_premisies : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                <tr>
+            </tbody>
+        </table>
+        <table class="p-0 border-none mt-1">
+            <tbody>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r border-t border-l align-top">
+                        Where an appliance/installation has been identified as 'Immediately Dangerous' or At Risk, it should not be used until this situation has been resolved.
+                        <span class="text-danger"> However, in a limited number of situations, turning off the gas installation will not remove or reduce the risk. In such circumstances the engineer will explain the situation and advice on the necessary course of action to take.</span>
+                         See overleaf for information on what to do next
                     </td>
                 <tr>
             </tbody>
@@ -433,7 +517,7 @@
             $inspectionDeate = (isset($record->inspection_date) && !empty($record->inspection_date) ? date('d-m-Y', strtotime($record->inspection_date)) : date('d-m-Y'));
             $nextInspectionDate = (isset($record->next_inspection_date) && !empty($record->next_inspection_date) ? date('d-m-Y', strtotime($record->next_inspection_date)) : date('d-m-Y', strtotime('+1 year', strtotime($inspectionDeate))));
         @endphp
-        <table class="table table-sm bordered border-primary mt-1-5">
+        <table class="table table-sm bordered border-primary mt-1">
             <thead>
                 <tr>
                     <th colspan="3" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
@@ -492,6 +576,207 @@
                         <div class="inline-block bg-white w-col9 text-center rounded-none h-30px text-12px font-medium">{{ $nextInspectionDate }}</div>
                     </td>
                 </tr>
+            </tbody>
+        </table>
+        <table class="p-0 bordered border-primary mt-1 bg-light-2 ">
+            <tbody>
+                <tr>
+                    <td class="w-half border-r border-primary text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
+                        I confirm that the situations recorded above, have been identified and brought to the attention of 
+                        the Responsible Person in accordance with the Gas Safety (Installation and Use) Regulations and Gas Industry
+                        Unsafe Situations Procedure.
+                    </td>
+                    <td class="w-half border-primary text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
+                        I confirm that as the responsible person for this gas installation at the address detailed above I have 
+                        been served this Warning Notice. Note: As a gas appliance/installation has been classified as either
+                        Immediately Dangerous or At Risk, as detailed above, continued use of the appliance / installation, 
+                        after being advised not to do so, many be in breach of the Gas Safety (installation and Use)
+                        Regulations.
+
+                    </td>
+                <tr>
+                <tr>
+                    <td colspan="100%" class="w-full border-t border-primary text-primary pl-2 pr-2 py-2 text-12px tracking-normal text-center leading-1-2 align-middle">
+                        Contact details of Gas Emergency Service Providers (ESP's) and Gas Suppliers (GS) in the British Isles
+                    </td>
+                <tr>
+            </tbody>
+        </table>
+        <table class="table table-sm bordered border-primary mt-1">
+            <thead>
+                <tr>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                        Region
+                    </th>
+                    <th colspan="2" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                        Gas Type
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                        Contact Details
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                        Telephone Details
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        England, Scotland and Wales
+                    </td>
+                    <td colspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Natural Gas
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Contact the Gas Emergency Contact Centr
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        0800 111 999
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        LPG*
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Bulk and Metered supplies
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        See telephone number on the bulk storage vessel or at the meter
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Cylinder supplies
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        For cylinder supplies on caravan parks and hire boats, the site owner and/or boat operator may also 
+                        have the responsibilities. Advice may be obtained from
+                        the gas company identified on the cylinder through their emergency contact details.
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        See gas supplier emergency contact details in the
+                        local telephone directory
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td rowspan="3" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Northern Ireland
+                    </td>
+                    <td colspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Natural Gas
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Northern Ireland Gas Emergency Service
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        0800 002 001
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        LPG*
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Bulk and Metered supplies
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        See telephone number on the bulk storage vessel or at the meter
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Cylinder supplies
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        For cylinder supplies on caravan parks and hire boats, the site owner and/or boat operator may also have the responsibilities. Advice may be obtained from
+                        the gas company identified on the cylinder through their emergency contact details.
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        See gas supplier emergency contact details in the
+                        local telephone directory
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Isle of Man
+                    </td>
+                    <td colspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Natural gas & LPG *
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Manx Gas Ltd.
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        0808 1624 444
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Channel Islands - Guernsey
+                    </td>
+                    <td colspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Mains gas & LPG *
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Contact Guernsey Gas Ltd.
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        01481 749000
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Channel Islands - Jersey
+                    </td>
+                    <td colspan="2" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Mains gas & LPG *
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Contact Jersey Gas Company Ltd
+                    </td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        01534 755555
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-3 border-b border-r align-middle">
+                        Mains gas in the Channel Islands is an LPG and air mixture LPG - Liquefied Petroleum Gas
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="p-0 table-sm bordered border-primary mt-1 bg-light-2">
+            <tbody>
+                <tr>
+                    <td class="w-half border-primary text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
+                        <div class="font-bold mb-05">GAS SAFE CONTACT DETAILS</div>
+                        <div class="mb-005">Gas Safe Register</div>
+                        <div class="mb-005">PO Box 6804</div>
+                        <div class="mb-005">Basingstoke,</div>
+                        <div class="mb-005">RG24 4NB</div>
+                        <div class="mb-005">0800 408 5500</div>
+                    </td>
+                    <td class="w-half border-primary text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
+                        <div class="font-bold mb-05">DEFINITIONS</div>
+                        <div class="mb-1">
+                            <strong>IMMEDIATELY DANGEROUS (ID)</strong> - It is a dangerous appliance/installation, which if left connected to a gas supply 
+                            <strong> is an immediate danger to life or property</strong>. Examples of this are combustion products entering the room, and gas escapes.
+                        </div>
+                        <div>
+                            <strong>AT RISK (AR)</strong> - Is a potentially dangerous appliance/installation where one or more faults exist and which, as a result 
+                            <strong>may in the future constitute a danger</strong> to life or property. An example of this is inadequate ventilation
+                        </div>
+                    </td>
+                <tr>
             </tbody>
         </table>
     </body>
