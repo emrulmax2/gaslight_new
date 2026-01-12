@@ -936,6 +936,10 @@ import INTAddressLookUps from '../../address_lookup.js';
             }else{
                 errors['appliance_error'] = 'Please add at least one appliance.&nbsp;';
             }
+            if(localStorage.otherChecks){
+                let otherChecks = localStorage.getItem('otherChecks');
+                options['otherChecks'] = otherChecks;
+            }
         }else if(jobFormId == 9){
             if(localStorage.appliances){
                 let appliances = localStorage.getItem('appliances');

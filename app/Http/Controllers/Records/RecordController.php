@@ -526,7 +526,22 @@ class RecordController extends Controller
                 $data['commentssAnswered'] = count(array_filter($gsrComments, function($v) { return !empty($v); }));
             endif;
         elseif($record->job_form_id == 8):
-            $data['appliances'] = $record->available_options->appliances;
+            $data['applianceCount'] = $data['otherChecksAnswered'] = 0;
+            $data['appliances'] = $data['otherChecks'] = [];
+            if(isset($record->available_options->appliances) && !empty($record->available_options->appliances)):
+                $appserial = 1;
+                foreach($record->available_options->appliances as $appliance):
+                    $data['appliances'][$appserial] = (array) $appliance;
+
+                    $data['applianceCount'] += 1;
+                    $appserial += 1;
+                endforeach;
+            endif;
+            if(isset($record->available_options->otherChecks) && !empty($record->available_options->otherChecks)):
+                $otherChecks = (array) $record->available_options->otherChecks;
+                $data['otherChecks'] = $otherChecks;
+                $data['otherChecksAnswered'] = count(array_filter($otherChecks, function($v) { return !empty($v); }));
+            endif;
         elseif($record->job_form_id == 9):
             $data['appliances'] = $record->available_options->appliances;
         elseif($record->job_form_id == 10):
@@ -604,6 +619,9 @@ class RecordController extends Controller
         $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($record_id);
        
         //dd($record->available_options->invoiceItems);
+        $palmPath = resource_path('images/palm-of-hand.png');
+        $palmBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($palmPath));
+
         $logoPath = resource_path('images/gas_safe_register_yellow.png');
         $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         $report_title = 'Certificate of '.$record->certificate_number;
@@ -617,7 +635,7 @@ class RecordController extends Controller
             Storage::disk('public')->delete('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
         }
         $paper = ($record->job_form_id == 3 || $record->job_form_id == 4 ? 'portrait' : 'landscape');
-        $pdf = Pdf::loadView($VIEW, compact('record', 'logoBase64', 'report_title', 'userSignBase64', 'signatureBase64', 'worktypes'))
+        $pdf = Pdf::loadView($VIEW, compact('record', 'logoBase64', 'report_title', 'userSignBase64', 'signatureBase64', 'worktypes', 'palmBase64'))
             ->setOption(['isRemoteEnabled' => true, 'dpi' => '110'])
             ->setPaper('a4', $paper) //portrait landscape
             ->setWarnings(false);

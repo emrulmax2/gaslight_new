@@ -91,6 +91,7 @@ class Invoice extends Model
         $invoiceItems = isset($this->available_options->invoiceItems) && !empty($this->available_options->invoiceItems) ? $this->available_options->invoiceItems : [];
         $invoiceDiscounts = isset($this->available_options->invoiceDiscounts) && !empty($this->available_options->invoiceDiscounts) ? $this->available_options->invoiceDiscounts : [];
         $invoiceAdvance = isset($this->available_options->invoiceAdvance) && !empty($this->available_options->invoiceAdvance) ? $this->available_options->invoiceAdvance : [];
+        $invoiceExtra = isset($this->available_options->invoiceExtra) && !empty($this->available_options->invoiceExtra) ? $this->available_options->invoiceExtra : [];
 
         $SUBTOTAL = 0;
         $VATTOTAL = 0;
@@ -127,6 +128,7 @@ class Invoice extends Model
         $invoiceItems = isset($this->available_options->invoiceItems) && !empty($this->available_options->invoiceItems) ? $this->available_options->invoiceItems : [];
         $invoiceDiscounts = isset($this->available_options->invoiceDiscounts) && !empty($this->available_options->invoiceDiscounts) ? $this->available_options->invoiceDiscounts : [];
         $invoiceAdvance = isset($this->available_options->invoiceAdvance) && !empty($this->available_options->invoiceAdvance) ? $this->available_options->invoiceAdvance : [];
+        $invoiceExtra = isset($this->available_options->invoiceExtra) && !empty($this->available_options->invoiceExtra) ? $this->available_options->invoiceExtra : [];
 
         $SUBTOTAL = 0;
         $VATTOTAL = 0;
