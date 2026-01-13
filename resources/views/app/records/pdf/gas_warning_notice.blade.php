@@ -167,8 +167,8 @@
                                     <img src="{{ $palmBase64 }}" alt="stop" style="height: 31px; width: auto;"/>
                                 </span><span class="bg-danger inline-block" style="padding: 8.5px 1rem;">
                                     Danger Do Not Use
-                                </span><span class="bg-warning inline-block" style="padding: 8.5px 1rem;">
-                                    CP14 Gas Warning Notice
+                                </span><span class="inline-block" style="padding: 8.5px 1rem; background: #FCEA1E; color: #000;">
+                                    Gas Warning Notice
                                 </span>
                             </h1>
                             <div class="text-white text-12px leading-1-3">
@@ -308,8 +308,8 @@
                         <table class="table table-sm bordered border-primary">
                             <thead>
                                 <tr>
-                                    <th colspan="7" class="whitespace-nowrap border-primary border-b-white border-b-1 border-r border-r-sec bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
-                                        The gas appliances / gas installations
+                                    <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 border-r border-r-sec bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
+                                        Gas appliances
                                     </th>
                                     <th colspan="7" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-12px uppercase leading-none px-2 py-1 align-middle text-left">
                                         Defects identified on gas equipment
@@ -320,22 +320,10 @@
                                         #
                                     </th>
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
+                                        Appliance Type
+                                    </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
                                         Location
-                                    </th>
-                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Model
-                                    </th>
-                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Make
-                                    </th>
-                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Type
-                                    </th>
-                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Serial No.
-                                    </th>
-                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        GC No.
                                     </th>
 
                                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-11px leading-none uppercase px-2 py-1 text-center align-middle">
@@ -354,10 +342,10 @@
                                         Chimney Issue
                                     </th>
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Other
+                                        Other Issue
                                     </th>
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-center align-middle">
-                                        Other Details
+                                        Classification
                                     </th>
                                 </tr>
                             </thead>
@@ -369,20 +357,16 @@
                                     @foreach($record->available_options->appliances as $appliance)
                                         <tr>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">{{ $serial }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->appliance_location_id) && $appliance->appliance_location_id > 0 ? locationName($appliance->appliance_location_id) : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->model) && !empty($appliance->model) ? $appliance->model : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->boiler_brand_id) && !empty($appliance->boiler_brand_id) ? boilerBrandName($appliance->boiler_brand_id) : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->appliance_type_id) && $appliance->appliance_type_id > 0 ? typeName($appliance->appliance_type_id) : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->serial_no) && !empty($appliance->serial_no) ? $appliance->serial_no : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->gc_no) && !empty($appliance->gc_no) ? $appliance->gc_no : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->appliance_location_id) && $appliance->appliance_location_id > 0 ? locationName($appliance->appliance_location_id) : '') }}</td>
 
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->gas_escape_issue) && !empty($appliance->gas_escape_issue) ? $appliance->gas_escape_issue : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->pipework_issue) && !empty($appliance->pipework_issue) ? $appliance->pipework_issue : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->ventilation_issue) && !empty($appliance->ventilation_issue) ? $appliance->ventilation_issue : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->meter_issue) && !empty($appliance->meter_issue) ? $appliance->meter_issue : '') }}</td>
                                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r">{{ (isset($appliance->chimeny_issue) && !empty($appliance->chimeny_issue) ? $appliance->chimeny_issue : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->other_issue) && !empty($appliance->other_issue) ? $appliance->other_issue : '') }}</td>
-                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b">{{ (isset($appliance->other_issue) && $appliance->other_issue == 'Yes' && isset($appliance->other_issue_details) && !empty($appliance->other_issue_details) ? $appliance->other_issue_details : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliance->other_issue) && $appliance->other_issue == 'Yes' && isset($appliance->other_issue_details) && !empty($appliance->other_issue_details) ? $appliance->other_issue_details : '') }}</td>
+                                            <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b">{{ (isset($appliance->gas_warning_classification_id) && $appliance->gas_warning_classification_id > 0 ? classificationName($appliance->gas_warning_classification_id) : '') }}</td>
                                         </tr>
                                         @php 
                                             $serial += 1;
@@ -394,10 +378,7 @@
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r">{{ $serial }}</td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
+                                    
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r"></td>
@@ -423,13 +404,10 @@
                         Details of faults
                     </th>
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
-                        Actions Taken
-                    </th>
-                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
                         Actions Required
                     </th>
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
-                        Classification
+                        Actions Taken
                     </th>
                 </tr>
             </thead>
@@ -442,9 +420,8 @@
                         <tr>
                             <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r align-top">{{ $serial }}</td>
                             <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->fault_details) && !empty($appliance->fault_details) ? $appliance->fault_details : '') }}</td>
-                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->action_taken) && !empty($appliance->action_taken) ? $appliance->action_taken : '') }}</td>
                             <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->actions_required) && !empty($appliance->actions_required) ? $appliance->actions_required : '') }}</td>
-                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->gas_warning_classification_id) && $appliance->gas_warning_classification_id > 0 ? classificationName($appliance->gas_warning_classification_id) : '') }}</td>
+                            <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top">{{ (isset($appliance->action_taken) && !empty($appliance->action_taken) ? $appliance->action_taken : '') }}</td>
                         </tr>
                         @php 
                             $serial += 1;
@@ -454,7 +431,6 @@
                 @for($serial; $serial <= 4; $serial++)
                     <tr>
                         <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px w-36px tracking-normal text-center leading-1-5 border-b border-r align-top">{{ $serial }}</td>
-                        <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
                         <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
                         <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
                         <td class="w-col4 border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-3 border-b border-r h-35px align-top"></td>
