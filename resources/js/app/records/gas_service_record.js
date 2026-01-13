@@ -20,6 +20,7 @@ import INTAddressLookUps from '../../address_lookup.js';
     let appliance_location_id = new TomSelect(document.getElementById('appliance_location_id'), tncTomOptions);
     let boiler_brand_id = new TomSelect(document.getElementById('boiler_brand_id'), tncTomOptions);
     let appliance_type_id = new TomSelect(document.getElementById('appliance_type_id'), tncTomOptions);
+    let appliance_flue_type_id = new TomSelect(document.getElementById('appliance_flue_type_id'), tncTomOptions);
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
@@ -43,16 +44,24 @@ import INTAddressLookUps from '../../address_lookup.js';
         }
     });
 
-    document.getElementById('applianceModal').addEventListener('hide.tw.modal', function(event) {
+    document.getElementById('applianceModal').addEventListener('hidden.tw.modal', function(event) {
         $('#applianceModal input:not([type="radio"]):not([type="checkbox"])').val('');
-        $('#applianceModal textarea').val('');
+        $('#applianceModal textarea').val('').prop('disabled', true);
         $('#applianceModal input[type="radio"]').prop('checked', false);
         $('#applianceModal input[type="checkbox"]').prop('checked', false);
         $('#applianceModal input[name="appliance_serial"]').val('1');
 
+        $('.tightnessTestResult').fadeOut('fast', function(){
+            $('#applianceModal input[name="test_carried_out"]').prop('checked', false);
+        })
+        $('.analyserRatioWraper').fadeOut('fast', function(){
+            $('#applianceModal .analyserRatioWraper input').val('');
+        })
+
         appliance_location_id.clear(true);
         boiler_brand_id.clear(true);
         appliance_type_id.clear(true);
+        appliance_flue_type_id.clear(true);
     });
 
     /* Appliance Auto Load Start */
@@ -86,9 +95,33 @@ import INTAddressLookUps from '../../address_lookup.js';
                         }else{
                             let $theInput = $('#applianceModal [name="'+key+'"]');
                             if($theInput.is('textarea')){
-                                $theInput.val(value ? value : '');
+                                let radioKey = key.replace('_detail', '');
+                                if(applianceObj[radioKey] != undefined && applianceObj[radioKey] == 'No'){
+                                    $theInput.val(value ? value : '').prop('disabled', false);
+                                }else{
+                                    $theInput.val('').prop('disabled', true);
+                                }
                             }else{
                                 if($theInput.attr('type') == 'radio'){
+                                    if(key == 'gas_tightness'){
+                                        if(applianceObj.gas_tightness == 'Yes'){
+                                            $('.tightnessTestResult').fadeIn('fast', function(){
+                                                $('#applianceModal input[value="'+applianceObj.test_carried_out+'"]').prop('checked', true);
+                                            })
+                                        }else{
+                                            $('.tightnessTestResult').fadeOut('fast', function(){
+                                                $('#applianceModal input[name="test_carried_out"]').prop('checked', false);
+                                            })
+                                        }
+                                    }else if(key == 'full_strip_cared_out'){
+                                        if(applianceObj.full_strip_cared_out == 'Yes'){
+                                            $('.analyserRatioWraper').fadeIn()
+                                        }else{
+                                            $('.analyserRatioWraper').fadeOut('fast', function(){
+                                                $('#applianceModal .analyserRatioWraper input').val('');
+                                            })
+                                        }
+                                    }
                                     $('#applianceModal [name="'+key+'"][value="'+value+'"]').prop('checked', true);
                                 }else{
                                     if(key != 'appliance_serial'){
@@ -111,6 +144,46 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         $theBtn.siblings('input').val(thevalue);
         //formDataChanged = true;
+    })
+
+    // Tightness Test
+    $(document).on('change', '#applianceModal input[name="gas_tightness"]', function(e){
+        let checkedValue = $('#applianceModal input[name="gas_tightness"]:checked').val();
+        if(checkedValue == 'Yes'){
+            $('.tightnessTestResult').fadeIn('fast', function(){
+                $('#applianceModal input[name="test_carried_out"]').prop('checked', false);
+            })
+        }else{
+            $('.tightnessTestResult').fadeOut('fast', function(){
+                $('#applianceModal input[name="test_carried_out"]').prop('checked', false);
+            })
+        }
+    })
+
+    // Analyser Ratio
+    $(document).on('change', '#applianceModal input[name="full_strip_cared_out"]', function(e){
+        let checkedValue = $('#applianceModal input[name="full_strip_cared_out"]:checked').val();
+        if(checkedValue == 'Yes'){
+            $('.analyserRatioWraper').fadeIn('fast', function(){
+                $('#applianceModal .analyserRatioWraper input').val('');
+            })
+        }else{
+            $('.analyserRatioWraper').fadeOut('fast', function(){
+                $('#applianceModal .analyserRatioWraper input').val('');
+            })
+        }
+    })
+
+    // Details Option
+    $(document).on('change', '#applianceModal input.hasDetails', function(e){
+        let $theRadio = $(this);
+        let theName = $theRadio.attr('name');
+        let checkedValue = $('#applianceModal input[name="'+theName+'"]:checked').val();
+        if(checkedValue == 'No'){
+            $('#applianceModal textarea[name="'+theName+'_detail"]').val('').prop('disabled', false);
+        }else{
+            $('#applianceModal textarea[name="'+theName+'_detail"]').val('').prop('disabled', true);
+        }
     })
 
     $('#applianceForm').on('submit', function(e){

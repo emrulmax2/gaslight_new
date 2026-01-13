@@ -18,7 +18,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         },
     };
     let appliance_location_id = new TomSelect(document.getElementById('appliance_location_id'), tncTomOptions);
-    let boiler_brand_id = new TomSelect(document.getElementById('boiler_brand_id'), tncTomOptions);
     let appliance_type_id = new TomSelect(document.getElementById('appliance_type_id'), tncTomOptions);
     let gas_warning_classification_id = new TomSelect(document.getElementById('gas_warning_classification_id'), tncTomOptions);
 
@@ -57,7 +56,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         $('#applianceModal input[name="edit"]').val('0');
 
         appliance_location_id.clear(true);
-        boiler_brand_id.clear(true);
         appliance_type_id.clear(true);
 
         $('#applianceModal .classificationWraps').fadeOut('fast', function(){
@@ -122,8 +120,6 @@ import INTAddressLookUps from '../../address_lookup.js';
             for (const [key, value] of Object.entries(theAppliance)) {
                 if(key == 'appliance_location_id'){
                     appliance_location_id.addItem(value)
-                }else if(key == 'boiler_brand_id'){
-                    boiler_brand_id.addItem(value)
                 }else if(key == 'appliance_type_id'){
                     appliance_type_id.addItem(value)
                 }else{
@@ -250,11 +246,8 @@ import INTAddressLookUps from '../../address_lookup.js';
 
         let $applianceType = $theForm.find('.applianceType');
         let applianceTypeName = ($('option:selected', $applianceType).val() !== '' ? $('option:selected', $applianceType).text() : '');
-        let $applianceMake = $theForm.find('.applianceMake')
-        let applianceMakeName = ($('option:selected', $applianceMake).val() !== '' ? $('option:selected', $applianceMake).text() : '');
-
-        let appliance_title = (applianceMakeName != '' ? applianceMakeName+' ' : '');
-            appliance_title += (applianceTypeName != '' ? applianceTypeName : '');
+        
+        let appliance_title = (applianceTypeName != '' ? applianceTypeName : '');
         formated_data['appliance_label'] = 'Appliance '+appliance_serial;
         formated_data['appliance_title'] = (appliance_title != '' ? appliance_title : '');
         

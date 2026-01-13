@@ -22,21 +22,6 @@
                         </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Make</x-base.form-label>
-                        <x-base.form-select class="w-full tom-select py-0 applianceMake" id="boiler_brand_id" name="boiler_brand_id" data-placeholder="Please Select">
-                            <option value="">Please Select</option>
-                            @if($boilers->count() > 0)
-                                @foreach($boilers as $option)
-                                    <option value="{{ $option->id }}">{{ $option->name }}</option>
-                                @endforeach
-                            @endif
-                        </x-base.form-select>
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Model</x-base.form-label>
-                        <x-base.form-input value="" name="model" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Model" />
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Type</x-base.form-label>
                         <x-base.form-select class="w-full tom-select py-0 applianceType" id="appliance_type_id" name="appliance_type_id" data-placeholder="Please Select">
                             <option value="">Please Select</option>
@@ -46,14 +31,6 @@
                                 @endforeach
                             @endif
                         </x-base.form-select>
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Serial Number</x-base.form-label>
-                        <x-base.form-input value="" name="serial_no" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Serial Number" />
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">GC Number</x-base.form-label>
-                        <x-base.form-input value="" name="gc_no" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="GC Number" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">

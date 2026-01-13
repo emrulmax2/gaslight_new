@@ -148,7 +148,9 @@
                         .inline-block {display: inline-block;}
                     </style>
     </head>
-
+    @php 
+        $appliances = $record->available_options->appliances;
+    @endphp
     <body>
         <div class="header bg-primary p-25">
             <table class="grid grid-cols-12 gap-4 items-center">
@@ -300,7 +302,7 @@
                         <table class="table table-sm bordered border-primary">
                             <thead>
                                 <tr>
-                                    <th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                                    <th colspan="7" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
                                         Appliance Details
                                     </th>
                                 </tr>
@@ -323,17 +325,21 @@
                                     <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
                                         GC No.
                                     </th>
+                                    <th class="whitespace-nowrap border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        Flue Type
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->appliance_location_id) && !empty($record->available_options->appliances->appliance_location_id) ? locationName($record->available_options->appliances->appliance_location_id) : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->model) && !empty($record->available_options->appliances->model) ? $record->available_options->appliances->model : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->boiler_brand_id) && !empty($record->available_options->appliances->boiler_brand_id) ? boilerBrandName($record->available_options->appliances->boiler_brand_id) : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->appliance_type_id) && !empty($record->available_options->appliances->appliance_type_id) ? typeName($record->available_options->appliances->appliance_type_id) : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->serial_no) && !empty($record->available_options->appliances->serial_no) ? $record->available_options->appliances->serial_no : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->gc_no) && !empty($record->available_options->appliances->gc_no) ? $record->available_options->appliances->gc_no : '') }}</td>
-                                </tr>$record->available_options->appliances
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->appliance_location_id) && !empty($appliances->appliance_location_id) ? locationName($appliances->appliance_location_id) : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->model) && !empty($appliances->model) ? $appliances->model : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->boiler_brand_id) && !empty($appliances->boiler_brand_id) ? boilerBrandName($appliances->boiler_brand_id) : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->appliance_type_id) && !empty($appliances->appliance_type_id) ? typeName($appliances->appliance_type_id) : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->serial_no) && !empty($appliances->serial_no) ? $appliances->serial_no : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->gc_no) && !empty($appliances->gc_no) ? $appliances->gc_no : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->appliance_flue_type_id) && !empty($appliances->appliance_flue_type_id) ? flueName($appliances->appliance_flue_type_id) : '') }}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </td>
@@ -342,7 +348,7 @@
                             <thead>
                                 <tr>
                                     <th colspan="6" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
-                                        Electronic Combustion Gas Analyser Readings
+                                        Electronic combustion gas analyser (ECGA) readings
                                     </th>
                                 </tr>
                                 <tr>
@@ -356,12 +362,15 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->low_analyser_ratio) && !empty($record->available_options->appliances->low_analyser_ratio) ? $record->available_options->appliances->low_analyser_ratio.' Ratio' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->low_co) && !empty($record->available_options->appliances->low_co) ? $record->available_options->appliances->low_co.' CO (PPM)' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($record->available_options->appliances->low_co2) && !empty($record->available_options->appliances->low_co2) ? $record->available_options->appliances->low_co2.' CO<sub>2</sub> (%)' : '') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->high_analyser_ratio) && !empty($record->available_options->appliances->high_analyser_ratio) ? $record->available_options->appliances->high_analyser_ratio.' Ratio' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ (isset($record->available_options->appliances->high_co) && !empty($record->available_options->appliances->high_co) ? $record->available_options->appliances->high_co.' CO (PPM)' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($record->available_options->appliances->high_co2) && !empty($record->available_options->appliances->high_co2) ? $record->available_options->appliances->high_co2.' CO<sub>2</sub> (%)' : '') !!}</td>
+                                    @php 
+                                        $full_strip_cared_out = (isset($appliances->full_strip_cared_out) && $appliances->full_strip_cared_out == 'Yes' ? true : false);
+                                    @endphp
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ ($full_strip_cared_out && isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio.' Ratio' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ ($full_strip_cared_out && isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co.' CO (PPM)' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! ($full_strip_cared_out && isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2.' CO<sub>2</sub> (%)' : '') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ ($full_strip_cared_out && isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio.' Ratio' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{{ ($full_strip_cared_out && isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co.' CO (PPM)' : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! ($full_strip_cared_out && isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2.' CO<sub>2</sub> (%)' : '') !!}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -378,9 +387,9 @@
                     </th>
                 </tr>
                 <tr>
-                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                    <!-- <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
                         Operating Pressure
-                    </th>
+                    </th> -->
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
                         Rented Accommodation
                     </th>
@@ -388,20 +397,27 @@
                         Type of Work Carried Out
                     </th>
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
-                        If a gas test has been carried out, was this a pass or fail
+                        Has a gas tightness test been carried out?
                     </th>
                     <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
-                        Is electrical bonding (where required satisfactory)
+                        Was the tightness test is a Pass or Fail?
+                    </th>
+                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-1-2 uppercase px-2 py-05 text-center align-middle">
+                        Is electrical bonding (where required) satisfactory?
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->opt_pressure) && !empty($record->available_options->appliances->opt_pressure) ? $record->available_options->appliances->opt_pressure : '') }}</td>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->rented_accommodation) && !empty($record->available_options->appliances->rented_accommodation) ? $record->available_options->appliances->rented_accommodation : '') }}</td>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->type_of_work_carried_out) && !empty($record->available_options->appliances->type_of_work_carried_out) ? $record->available_options->appliances->type_of_work_carried_out : '') }}</td>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->test_carried_out) && !empty($record->available_options->appliances->test_carried_out) ? $record->available_options->appliances->test_carried_out : '') }}</td>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($record->available_options->appliances->is_electricial_bonding) && !empty($record->available_options->appliances->is_electricial_bonding) ? $record->available_options->appliances->is_electricial_bonding : '') }}</td>
+                    @php 
+                        $tightness = (isset($appliances->gas_tightness) && $appliances->gas_tightness == 'Yes' ? true : false);
+                    @endphp
+                    <!-- <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->opt_pressure) && !empty($appliances->opt_pressure) ? $appliances->opt_pressure : '') }}</td> -->
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->rented_accommodation) && !empty($appliances->rented_accommodation) ? $appliances->rented_accommodation : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->type_of_work_carried_out) && !empty($appliances->type_of_work_carried_out) ? $appliances->type_of_work_carried_out : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->gas_tightness) && !empty($appliances->gas_tightness) ? $appliances->gas_tightness : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ ($tightness && isset($appliances->test_carried_out) && !empty($appliances->test_carried_out) ? $appliances->test_carried_out : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{{ (isset($appliances->is_electricial_bonding) && !empty($appliances->is_electricial_bonding) ? $appliances->is_electricial_bonding : '') }}</td>
                 </tr>
             </tbody>
         </table>
@@ -414,7 +430,7 @@
                             <thead>
                                 <tr>
                                     <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
-                                        Appliance Checks
+                                        Safety - General
                                     </th>
                                 </tr>
                                 <tr>
@@ -431,84 +447,47 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Heat Exchanger</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->heat_exchanger) && !empty($record->available_options->appliances->heat_exchanger) ? $record->available_options->appliances->heat_exchanger : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->heat_exchanger_detail) && !empty($record->available_options->appliances->heat_exchanger_detail) ? $record->available_options->appliances->heat_exchanger_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ventilation correct</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->ventillation) && !empty($appliances->ventillation) ? $appliances->ventillation : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->ventillation_detail) && !empty($appliances->ventillation_detail) ? $appliances->ventillation_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Burner / injectors</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->burner_injectors) && !empty($record->available_options->appliances->burner_injectors) ? $record->available_options->appliances->burner_injectors : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->burner_injectors_detail) && !empty($record->available_options->appliances->burner_injectors_detail) ? $record->available_options->appliances->burner_injectors_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Satisfactory flue flow check</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->satisfactory_flue_flow) && !empty($appliances->satisfactory_flue_flow) ? $appliances->satisfactory_flue_flow : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->satisfactory_flue_flow_detail) && !empty($appliances->satisfactory_flue_flow_detail) ? $appliances->satisfactory_flue_flow_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Flame Picture</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->flame_picture) && !empty($record->available_options->appliances->flame_picture) ? $record->available_options->appliances->flame_picture : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->flame_picture_detail) && !empty($record->available_options->appliances->flame_picture_detail) ? $record->available_options->appliances->flame_picture_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Satistactory spillage test</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->satistactory_spillage) && !empty($appliances->satistactory_spillage) ? $appliances->satistactory_spillage : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->satistactory_spillage_detail) && !empty($appliances->satistactory_spillage_detail) ? $appliances->satistactory_spillage_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ignition</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->ignition) && !empty($record->available_options->appliances->ignition) ? $record->available_options->appliances->ignition : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->ignition_detail) && !empty($record->available_options->appliances->ignition_detail) ? $record->available_options->appliances->ignition_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Electrical Connection</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->electrics) && !empty($record->available_options->appliances->electrics) ? $record->available_options->appliances->electrics : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->electrics_detail) && !empty($record->available_options->appliances->electrics_detail) ? $record->available_options->appliances->electrics_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Appliance / System Controls</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->controls) && !empty($record->available_options->appliances->controls) ? $record->available_options->appliances->controls : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->controls_detail) && !empty($record->available_options->appliances->controls_detail) ? $record->available_options->appliances->controls_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Leaks gas / water</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->leak_gas_water) && !empty($record->available_options->appliances->leak_gas_water) ? $record->available_options->appliances->leak_gas_water : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->leak_gas_water_detail) && !empty($record->available_options->appliances->leak_gas_water_detail) ? $record->available_options->appliances->leak_gas_water_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Seals (appliance case etc.)</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->seals) && !empty($record->available_options->appliances->seals) ? $record->available_options->appliances->seals : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->seals_detail) && !empty($record->available_options->appliances->seals_detail) ? $record->available_options->appliances->seals_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Safety device(s) correct</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->savety_devices) && !empty($appliances->savety_devices) ? $appliances->savety_devices : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->savety_devices_detail) && !empty($appliances->savety_devices_detail) ? $appliances->savety_devices_detail : '') }}</td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Pipework</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->pipework) && !empty($record->available_options->appliances->pipework) ? $record->available_options->appliances->pipework : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->pipework_detail) && !empty($record->available_options->appliances->pipework_detail) ? $record->available_options->appliances->pipework_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->pipework) && !empty($appliances->pipework) ? $appliances->pipework : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->pipework_detail) && !empty($appliances->pipework_detail) ? $appliances->pipework_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fans</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->fans) && !empty($record->available_options->appliances->fans) ? $record->available_options->appliances->fans : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->fans_detail) && !empty($record->available_options->appliances->fans_detail) ? $record->available_options->appliances->fans_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Other (regulations etc.)</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->other_regulations) && !empty($appliances->other_regulations) ? $appliances->other_regulations : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->other_regulations_detail) && !empty($appliances->other_regulations_detail) ? $appliances->other_regulations_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fireplace catchment space</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->fireplace) && !empty($record->available_options->appliances->fireplace) ? $record->available_options->appliances->fireplace : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->fireplace_detail) && !empty($record->available_options->appliances->fireplace_detail) ? $record->available_options->appliances->fireplace_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Has the installation been carried out to the relevant standard / manufacturers instructions?</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->instruction_followed) && !empty($appliances->instruction_followed) ? $appliances->instruction_followed : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top"></td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Closure Plate & PRS10 Tape</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->closure_plate) && !empty($record->available_options->appliances->closure_plate) ? $record->available_options->appliances->closure_plate : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->closure_plate_detail) && !empty($record->available_options->appliances->closure_plate_detail) ? $record->available_options->appliances->closure_plate_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Allowable Location</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->allowable_location) && !empty($record->available_options->appliances->allowable_location) ? $record->available_options->appliances->allowable_location : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->fireplace_allowable_location_detail) && !empty($record->available_options->appliances->fireplace_allowable_location_detail) ? $record->available_options->appliances->fireplace_allowable_location_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Boiler Ratio</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->boiler_ratio) && !empty($record->available_options->appliances->boiler_ratio) ? $record->available_options->appliances->boiler_ratio : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->boiler_ratio_detail) && !empty($record->available_options->appliances->boiler_ratio_detail) ? $record->available_options->appliances->boiler_ratio_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Stability</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->stability) && !empty($record->available_options->appliances->stability) ? $record->available_options->appliances->stability : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->stability_detail) && !empty($record->available_options->appliances->stability_detail) ? $record->available_options->appliances->stability_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Return air / Plenum</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->return_air_ple) && !empty($record->available_options->appliances->return_air_ple) ? $record->available_options->appliances->return_air_ple : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->return_air_ple_detail) && !empty($record->available_options->appliances->return_air_ple_detail) ? $record->available_options->appliances->return_air_ple_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Operating Pressure</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">
+                                        {{ (isset($appliances->opt_pressure) && !empty($appliances->opt_pressure) ? $appliances->opt_pressure : '') }}
+                                        {{ (isset($appliances->opt_pressure_unit) && !empty($appliances->opt_pressure_unit) ? $appliances->opt_pressure_unit : '') }}
+                                    </td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -518,7 +497,7 @@
                             <thead>
                                 <tr>
                                     <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
-                                        Safety Checks
+                                        Appliance - Satisfactory
                                     </th>
                                 </tr>
                                 <tr>
@@ -535,91 +514,79 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ventilation</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->ventillation) && !empty($record->available_options->appliances->ventillation) ? $record->available_options->appliances->ventillation : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->ventillation_detail) && !empty($record->available_options->appliances->ventillation_detail) ? $record->available_options->appliances->ventillation_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Burner / Injectors</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->burner_injectors) && !empty($appliances->burner_injectors) ? $appliances->burner_injectors : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->burner_injectors_detail) && !empty($appliances->burner_injectors_detail) ? $appliances->burner_injectors_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Flue Termination</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->flue_termination) && !empty($record->available_options->appliances->flue_termination) ? $record->available_options->appliances->flue_termination : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->flue_termination_detail) && !empty($record->available_options->appliances->flue_termination_detail) ? $record->available_options->appliances->flue_termination_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Ignition and flame picture</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->ignition) && !empty($appliances->ignition) ? $appliances->ignition : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->ignition_detail) && !empty($appliances->ignition_detail) ? $appliances->ignition_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Smoke Pellet Flue Flow Test</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->smoke_pellet_flue_flow) && !empty($record->available_options->appliances->smoke_pellet_flue_flow) ? $record->available_options->appliances->smoke_pellet_flue_flow : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->smoke_pellet_flue_flow_detail) && !empty($record->available_options->appliances->smoke_pellet_flue_flow_detail) ? $record->available_options->appliances->smoke_pellet_flue_flow_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Heat Exchanger</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->heat_exchanger) && !empty($appliances->heat_exchanger) ? $appliances->heat_exchanger : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->heat_exchanger_detail) && !empty($appliances->heat_exchanger_detail) ? $appliances->heat_exchanger_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Smoke Match Spillage Test</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->smoke_pellet_spillage) && !empty($record->available_options->appliances->smoke_pellet_spillage) ? $record->available_options->appliances->smoke_pellet_spillage : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->smoke_pellet_spillage_detail) && !empty($record->available_options->appliances->smoke_pellet_spillage_detail) ? $record->available_options->appliances->smoke_pellet_spillage_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Electrical connection</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->electrics) && !empty($appliances->electrics) ? $appliances->electrics : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->electrics_detail) && !empty($appliances->electrics_detail) ? $appliances->electrics_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Appliance/ System Controls</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->controls) && !empty($appliances->controls) ? $appliances->controls : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->controls_detail) && !empty($appliances->controls_detail) ? $appliances->controls_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fans</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->fans) && !empty($appliances->fans) ? $appliances->fans : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->fans_detail) && !empty($appliances->fans_detail) ? $appliances->fans_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Seals (appliance case etc.)</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->seals) && !empty($appliances->seals) ? $appliances->seals : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->seals_detail) && !empty($appliances->seals_detail) ? $appliances->seals_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Fireplace catchment space</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->fireplace) && !empty($appliances->fireplace) ? $appliances->fireplace : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->fireplace_detail) && !empty($appliances->fireplace_detail) ? $appliances->fireplace_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Closure plate</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->closure_plate) && !empty($appliances->closure_plate) ? $appliances->closure_plate : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->closure_plate_detail) && !empty($appliances->closure_plate_detail) ? $appliances->closure_plate_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Return air/plenum</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->return_air_ple) && !empty($appliances->return_air_ple) ? $appliances->return_air_ple : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->return_air_ple_detail) && !empty($appliances->return_air_ple_detail) ? $appliances->return_air_ple_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Allowable Location</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->allowable_location) && !empty($appliances->allowable_location) ? $appliances->allowable_location : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->allowable_location_detail) && !empty($appliances->allowable_location_detail) ? $appliances->allowable_location_detail : '') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Stability</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->stability) && !empty($appliances->stability) ? $appliances->stability : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->stability_detail) && !empty($appliances->stability_detail) ? $appliances->stability_detail : '') }}</td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Working Pressure</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->working_pressure) && !empty($record->available_options->appliances->working_pressure) ? $record->available_options->appliances->working_pressure : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->working_pressure_detail) && !empty($record->available_options->appliances->working_pressure_detail) ? $record->available_options->appliances->working_pressure_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->working_pressure) && !empty($appliances->working_pressure) ? $appliances->working_pressure : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->working_pressure_detail) && !empty($appliances->working_pressure_detail) ? $appliances->working_pressure_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Safety Device</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->savety_devices) && !empty($record->available_options->appliances->savety_devices) ? $record->available_options->appliances->savety_devices : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->savety_devices_detail) && !empty($record->available_options->appliances->savety_devices_detail) ? $record->available_options->appliances->savety_devices_detail : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Expansion Vassel checked / recharged?</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->expansion_vassel_checked) && !empty($appliances->expansion_vassel_checked) ? $appliances->expansion_vassel_checked : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->expansion_vassel_checked_detail) && !empty($appliances->expansion_vassel_checked_detail) ? $appliances->expansion_vassel_checked_detail : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Gas Tightness Test</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->gas_tightness) && !empty($record->available_options->appliances->gas_tightness) ? $record->available_options->appliances->gas_tightness : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->gas_tightness_detail) && !empty($record->available_options->appliances->gas_tightness_detail) ? $record->available_options->appliances->gas_tightness_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Expansion vessel checked / rech rged</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->expansion_vassel_checked) && !empty($record->available_options->appliances->expansion_vassel_checked) ? $record->available_options->appliances->expansion_vassel_checked : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->expansion_vassel_checked_detail) && !empty($record->available_options->appliances->expansion_vassel_checked_detail) ? $record->available_options->appliances->expansion_vassel_checked_detail : '') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Other (regulations etc.)</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($record->available_options->appliances->other_regulations) && !empty($record->available_options->appliances->other_regulations) ? $record->available_options->appliances->other_regulations : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($record->available_options->appliances->other_regulations_detail) && !empty($record->available_options->appliances->other_regulations_detail) ? $record->available_options->appliances->other_regulations_detail : '') }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="table table-sm bordered border-primary mt-1-5">
-                            <thead>
-                                <tr>
-                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-10px leading-none uppercase px-2 py-05 text-left align-middle">
-                                        Necessary remedial work required
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top h-60px">{{ (isset($record->available_options->appliances->work_required_note) && !empty($record->available_options->appliances->work_required_note) ? $record->available_options->appliances->work_required_note : '') }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                    </td>
-                <tr>
-            </tbody>
-        </table>
-
-        <table class="p-0 border-none mt-1-5">
-            <tbody>
-                <tr>
-                    <td class="w-col5 pr-1 pl-0 pb-0 pt-0 align-top">
-                    <table class="table table-sm bordered border-primary">
-                        <tbody>
-                            <tr>
-                                <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-10px uppercase px-2 py-05 leading-none align-middle">Is the installation and appliance safe to use?</td>
-                                <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-10px w-130px leading-none align-middle">{{ (isset($record->available_options->appliances->is_safe_to_use) && !empty($record->available_options->appliances->is_safe_to_use) ? $record->available_options->appliances->is_safe_to_use : '') }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    </td>
-                    <td class="w-col7 pl-1 pr-0 pb-0 pt-0 align-top">
-                        <table class="table table-sm bordered border-primary">
-                            <tbody>
-                                <tr>
-                                    <td class="border-primary whitespace-nowrap font-medium bg-primary text-white text-10px uppercase px-2 py-05 leading-none align-middle">Has the installation been carried out to the relevant standard/manufacturer\'s instructions? </td>
-                                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-10px w-130px leading-none align-middle">{{ (isset($record->available_options->appliances->instruction_followed) && !empty($record->available_options->appliances->instruction_followed) ? $record->available_options->appliances->instruction_followed : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Is the Installation and appliance safe to use?</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->is_safe_to_use) && !empty($appliances->is_safe_to_use) ? $appliances->is_safe_to_use : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-11px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->is_safe_to_use_detail) && !empty($appliances->is_safe_to_use_detail) ? $appliances->is_safe_to_use_detail : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>
