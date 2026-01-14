@@ -46,9 +46,17 @@ import INTAddressLookUps from '../../address_lookup.js';
     document.getElementById('applianceModal').addEventListener('hide.tw.modal', function(event) {
         $('#applianceModal input:not([type="radio"]):not([type="checkbox"])').val('');
         $('#applianceModal textarea').val('');
+        $('#applianceModal textarea[name="parts_fitted_detail"], #applianceModal textarea[name="parts_required_detail"]').val('').prop('disabled', true);
         $('#applianceModal input[type="radio"]').prop('checked', false);
         $('#applianceModal input[type="checkbox"]').prop('checked', false);
         $('#applianceModal input[name="appliance_serial"]').val('1');
+
+        $('#applianceModal .ratioWrap').fadeOut(function(){
+            $('#applianceModal .ratioWrap input').val('');
+        })
+        $('#applianceModal .ratioWrap').fadeOut(function(){
+            $('#applianceModal .noticeExplainedWrap input[type="radio"]').prop('checked', false);
+        })
 
         appliance_location_id.clear(true);
         boiler_brand_id.clear(true);
@@ -74,7 +82,9 @@ import INTAddressLookUps from '../../address_lookup.js';
         document.getElementById("applianceModal").addEventListener("shown.tw.modal", function (event) {
             if(localStorage.appliances){
                 let applianceObj = JSON.parse(appliances);
+                console.log(applianceObj)
                 if(!$.isEmptyObject(applianceObj)){
+                    let noticeExplainedWrapStat = 0;
                     for (const [key, value] of Object.entries(applianceObj)) {
                         if(key == 'appliance_location_id'){
                             appliance_location_id.addItem(value)
@@ -85,9 +95,26 @@ import INTAddressLookUps from '../../address_lookup.js';
                         }else{
                             let $theInput = $('#applianceModal [name="'+key+'"]');
                             if($theInput.is('textarea')){
-                                $theInput.val(value ? value : '');
+                                if(key.indexOf('_detail') !== -1){
+                                    let radioKey = key.replace('_detail', '');
+                                    if(applianceObj[radioKey] != undefined && applianceObj[radioKey] == 'Yes'){
+                                        $theInput.val(value ? value : '').prop('disabled', false);
+                                    }else{
+                                        $theInput.val('').prop('disabled', true);
+                                    }
+                                }else{
+                                    $theInput.val(value ? value : '');
+                                }
                             }else{
                                 if($theInput.attr('type') == 'radio'){
+                                    if(key == 'emition_combustion_test'){
+                                        if(value == 'Yes'){
+                                            $('#applianceModal .ratioWrap').fadeIn()
+                                        }else{
+                                            $('#applianceModal .ratioWrap').fadeOut()
+                                        }
+                                    }
+                                    noticeExplainedWrapStat += ((key == 'opt_correctly' && value == 'No') || (key == 'conf_safety_standards' && value == 'No') ? 1 : 0);
                                     $('#applianceModal [name="'+key+'"][value="'+value+'"]').prop('checked', true);
                                 }else{
                                     if(key != 'appliance_serial'){
@@ -97,20 +124,56 @@ import INTAddressLookUps from '../../address_lookup.js';
                             }
                         }
                     }
+                    if(noticeExplainedWrapStat > 0){
+                        $('#applianceModal .noticeExplainedWrap').fadeIn()
+                    }else{
+                        $('#applianceModal .noticeExplainedWrap').fadeOut()
+                    }
                 }
             }
         });
     });
 
-    // Toggle N/A Button
-    $(document).on('click', '.naToggleBtn', function(e){
-        e.preventDefault();
-        let $theBtn = $(this);
-        let thevalue = $theBtn.attr('data-value');
+    // Combustion Toggle
+    $('#applianceModal input[name="emition_combustion_test"]').on('change', function(){
+        let checkedCombustion = $('#applianceModal input[name="emition_combustion_test"]:checked').val();
 
-        $theBtn.siblings('input').val(thevalue);
-        //formDataChanged = true;
+        if(checkedCombustion == 'Yes'){
+            $('#applianceModal .ratioWrap').fadeIn(function(){
+                $('#applianceModal .ratioWrap input').val('');
+            })
+        }else{
+            $('#applianceModal .ratioWrap').fadeOut(function(){
+                $('#applianceModal .ratioWrap input').val('');
+            })
+        }
     })
+    $('#applianceModal input[name="opt_correctly"], #applianceModal input[name="conf_safety_standards"]').on('change', function(){
+        let opt_correctly = $('#applianceModal input[name="opt_correctly"]:checked').val();
+        let conf_safety_standards = $('#applianceModal input[name="conf_safety_standards"]:checked').val();
+
+        if(opt_correctly == 'No' || conf_safety_standards == 'No'){
+            $('#applianceModal .noticeExplainedWrap').fadeIn(function(){
+                $('#applianceModal .noticeExplainedWrap input[type="radio"]').prop('checked', true);
+            })
+        }else{
+            $('#applianceModal .noticeExplainedWrap').fadeOut(function(){
+                $('#applianceModal .noticeExplainedWrap input[type="radio"]').prop('checked', false);
+            })
+        }
+    })
+    // Details Option
+    $(document).on('change', '#applianceModal input.hasDetail', function(e){
+        let $theRadio = $(this);
+        let theName = $theRadio.attr('name');
+        let checkedValue = $('#applianceModal input[name="'+theName+'"]:checked').val();
+        if(checkedValue == 'Yes'){
+            $('#applianceModal textarea[name="'+theName+'_detail"]').val('').prop('disabled', false);
+        }else{
+            $('#applianceModal textarea[name="'+theName+'_detail"]').val('').prop('disabled', true);
+        }
+    })
+    
 
     $('#applianceForm').on('submit', function(e){
         e.preventDefault();

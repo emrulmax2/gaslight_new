@@ -126,6 +126,17 @@
                         <x-base.form-label class="mb-1">Specify Details</x-base.form-label>
                         <x-base.form-textarea name="other_issue_details" class="w-full h-[95px] rounded-[3px]" placeholder="Other issue details"></x-base.form-textarea>
                     </div>
+                    <div class="col-span-12 sm:col-span-6 classificationWraps" style="display: none;">
+                        <x-base.form-label class="mb-1">Classifications</x-base.form-label>
+                        <x-base.form-select class="w-full tom-select py-0 pl-0" id="gas_warning_classification_id" name="gas_warning_classification_id" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            @if($classifications->count() > 0)
+                                @foreach($classifications as $option)
+                                    <option value="{{ $option->id }}">{{ $option->name }}</option>
+                                @endforeach
+                            @endif
+                        </x-base.form-select>
+                    </div>
                     <div class="col-span-12 sm:col-span-6">
                         <x-base.form-label class="mb-1">Details of Faults</x-base.form-label>
                         <x-base.form-textarea name="fault_details" class="w-full h-[95px] rounded-[3px]" placeholder="Details of Faults"></x-base.form-textarea>
@@ -137,17 +148,6 @@
                     <div class="col-span-12 sm:col-span-6">
                         <x-base.form-label class="mb-1">Actions Required</x-base.form-label>
                         <x-base.form-textarea name="actions_required" class="w-full h-[95px] rounded-[3px]" placeholder="Actions Required"></x-base.form-textarea>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6 classificationWraps" style="display: none;">
-                        <x-base.form-label class="mb-1">Classifications</x-base.form-label>
-                        <x-base.form-select class="w-full tom-select py-0 pl-0" id="gas_warning_classification_id" name="gas_warning_classification_id" data-placeholder="Please Select">
-                            <option value="">Please Select</option>
-                            @if($classifications->count() > 0)
-                                @foreach($classifications as $option)
-                                    <option value="{{ $option->id }}">{{ $option->name }}</option>
-                                @endforeach
-                            @endif
-                        </x-base.form-select>
                     </div>
                     
                 </div>
