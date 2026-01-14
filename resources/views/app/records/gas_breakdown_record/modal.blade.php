@@ -9,6 +9,9 @@
             <x-base.dialog.description class="">
                 <input type="hidden" name="appliance_serial" value="1"/>
                 <div class="grid grid-cols-12 gap-x-3 gap-y-2">
+                    <div class="col-span-12">
+                        <h2 class="mb-4 font-medium text-base leading-none tracking-normal">Appliance Details</h2>
+                    </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Location</x-base.form-label>
                         <x-base.form-select class="w-full tom-select py-0" id="appliance_location_id" name="appliance_location_id" data-placeholder="Please Select">
@@ -54,17 +57,33 @@
                         <x-base.form-label class="mb-1">GC Number</x-base.form-label>
                         <x-base.form-input value="" name="gc_no" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="GC Number" />
                     </div>
-                    <div class="col-span-12 pt-2">
-                        <x-base.form-label>Combustion Parformance Reading</x-base.form-label>
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Emission / Combustion test</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_emcmt_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_emcmt_yes" name="emition_combustion_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_emcmt_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_emcmt_no" name="emition_combustion_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_emcmt_na">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_emcmt_na" name="emition_combustion_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                </x-base.form-check>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 pt-2 ratioWrap" style="display: none;">
+                        <x-base.form-label>Combustion Parformance Reading (high)</x-base.form-label>
                         <div class="grid grid-cols-12 gap-x-5 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">RATIO</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="performance_analyser_ratio" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="Ratio" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="performance_analyser_ratio" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="Ratio" />
                                     </div>
                                 </div>
                             </div>
@@ -72,10 +91,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">CO (PPM)</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="performance_co" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="CO (PPM)" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="performance_co" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="CO (PPM)" />
                                     </div>
                                 </div>
                             </div>
@@ -83,16 +99,16 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">CO<sub>2</sub> (%)</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="performance_co2" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="CO2 (%)" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="performance_co2" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="CO2 (%)" />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <div class="col-span-12">
+                        <h2 class="mb-4 mt-5 font-medium text-base leading-none tracking-normal">Safety standards</h2>
+                    </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Appliance is operationg correctly</x-base.form-label>
@@ -110,7 +126,7 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Appliance confirms to corrent safety standards</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Appliance confirms to current safety standards</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_actcss_yes">Yes</x-base.form-check.label>
@@ -123,7 +139,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <div class="col-span-12 sm:col-span-4 noticeExplainedWrap" style="display: none;">
                         <div class="bg-slate-100 p-2">
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Safety warning/advice notice explained and left</x-base.form-label>
                             <div class="bg-white">
@@ -179,19 +195,19 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Emission / Combustion test</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Emission/combustion test</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_emcmt_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_emcmt_yes" name="emition_combustion_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_avis_pass">Pass</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_avis_pass" name="emisn_or_comb_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pass"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_emcmt_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_emcmt_no" name="emition_combustion_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_avis_fail">Fail</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_avis_fail" name="emisn_or_comb_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fail"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_emcmt_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_emcmt_na" name="emition_combustion_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_avis_pfna">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_avis_pfna" name="emisn_or_comb_test" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -214,6 +230,31 @@
                                 </x-base.form-check>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Tightness Test carried out</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_ttcot_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_ttcot_yes" name="tightness_carried_out" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_ttcot_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_ttcot_no" name="tightness_carried_out" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_ttcot_na">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_ttcot_na" name="tightness_carried_out" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                </x-base.form-check>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-span-12">
+                        <h2 class="mb-4 mt-5 font-medium text-base leading-none tracking-normal">Breakdown</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
@@ -245,17 +286,18 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-span-12 sm:col-span-4"></div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Parts fitted this visit</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_pftv_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_pftv_yes" name="parts_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.input id="gwn_pftv_yes" name="parts_fitted" class="hasDetail absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_pftv_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_pftv_no" name="parts_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.input id="gwn_pftv_no" name="parts_fitted" class="hasDetail absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -263,7 +305,7 @@
                     <div class="col-span-12 sm:col-span-8">
                         <div class="partsFittedWrap">
                             <x-base.form-label class="mb-1">If yes, Enter name of parts</x-base.form-label>
-                            <x-base.form-textarea name="fitted_parts_name" class="w-full h-[60px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
+                            <x-base.form-textarea disabled name="parts_fitted_detail" class="w-full h-[60px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
@@ -272,11 +314,11 @@
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_prtsreq_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_prtsreq_yes" name="parts_required" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.input id="gwn_prtsreq_yes" name="parts_required" class="hasDetail absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_prtsreq_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_prtsreq_no" name="parts_required" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.input id="gwn_prtsreq_no" name="parts_required" class="hasDetail absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -284,27 +326,17 @@
                     <div class="col-span-12 sm:col-span-8">
                         <div class="partsFittedWrap">
                             <x-base.form-label class="mb-1">If yes, Enter parts name</x-base.form-label>
-                            <x-base.form-textarea name="required_parts_name" class="w-full h-[60px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
+                            <x-base.form-textarea disabled name="parts_required_detail" class="w-full h-[60px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
                         </div>
+                    </div>
+
+
+                    <div class="col-span-12">
+                        <h2 class="mb-4 mt-5 font-medium text-base leading-none tracking-normal">Appliance / system advice and recommendations</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Approved audible carbon monoxide alarm fitted</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_aacmaf_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_aacmaf_yes" name="monoxide_alarm_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_aacmaf_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_aacmaf_no" name="monoxide_alarm_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Approved is safe</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Appliance is safe</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_issafe_yes">Yes</x-base.form-check.label>
@@ -313,6 +345,25 @@
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_issafe_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="gwn_issafe_no" name="is_safe" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_issafe_na">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_issafe_na" name="is_safe" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                </x-base.form-check>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">System improvement(s) recommended</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_sysir_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_sysir_yes" name="improvement_recommended" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_sysir_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_sysir_no" name="improvement_recommended" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -364,15 +415,15 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">System improvements recommended</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Approved audible carbon monoxide alarm fitted*</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_sysir_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_sysir_yes" name="improvement_recommended" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_aacmaf_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_aacmaf_yes" name="monoxide_alarm_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_sysir_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_sysir_no" name="improvement_recommended" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_aacmaf_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_aacmaf_no" name="monoxide_alarm_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
                             </div>
                         </div>
@@ -380,6 +431,7 @@
                     <div class="col-span-12">
                         <x-base.form-label class="mb-1">Engineer Comments</x-base.form-label>
                         <x-base.form-textarea name="enginner_comments" class="w-full h-[80px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
+                        <span class="text-xs leading-none">*Although regular servicing is essential, an audible Carbon Monoxide Alarm is an early warning device that keeps working 24 hours a day should an unforeseen event occur. It is recommended that customers check the expiry date periodically.</span>
                     </div>
                 </div>
             </x-base.dialog.description>
