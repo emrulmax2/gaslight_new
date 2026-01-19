@@ -82,7 +82,6 @@ import INTAddressLookUps from '../../address_lookup.js';
         document.getElementById("applianceModal").addEventListener("shown.tw.modal", function (event) {
             if(localStorage.appliances){
                 let applianceObj = JSON.parse(appliances);
-                console.log(applianceObj)
                 if(!$.isEmptyObject(applianceObj)){
                     let noticeExplainedWrapStat = 0;
                     for (const [key, value] of Object.entries(applianceObj)) {
