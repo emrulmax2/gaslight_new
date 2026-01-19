@@ -50,7 +50,7 @@ class RecordController extends Controller
             $jobRefNo = $this->generateReferenceNo($customer_id, $company);
             $customerJob = CustomerJob::create([
                 'customer_id' => $customer_id,
-                'billing_address_id' => $request->customer_address_id,
+                'billing_address_id' => $request->billing_address_id,
                 'customer_property_id' => $customer_property_id,
                 'customer_property_occupant_id' => $customer_property_occupant_id,
                 'description' => $form->name,
@@ -69,7 +69,7 @@ class RecordController extends Controller
             $record = Record::updateOrCreate(['id' => $certificate_id, 'customer_job_id' => $customer_job_id, 'job_form_id' => $job_form_id ], [
                 'company_id' => $request->user()->companies->pluck('id')->first(),
                 'customer_id' => $customer_id,
-                'billing_address_id' => $request->customer_address_id,
+                'billing_address_id' => $request->billing_address_id,
                 'customer_job_id' => $customer_job_id,
                 'job_form_id' => $job_form_id,
                 'customer_property_id' => $customer_property_id,
