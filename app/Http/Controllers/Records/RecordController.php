@@ -616,7 +616,7 @@ class RecordController extends Controller
 
     public function generatePdf($record_id){
         $worktypes = CommissionDecommissionWorkType::where('active', 1)->orderBy('id', 'ASC')->get();
-        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options'])->find($record_id);
+        $record = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'occupant'])->find($record_id);
        
         //dd($record->available_options->invoiceItems);
         $palmPath = resource_path('images/palm-of-hand.png');
