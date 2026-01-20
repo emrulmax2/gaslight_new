@@ -97,12 +97,13 @@ class JobsController extends Controller
 
         $data = [
             'customer_id' => $request->customer_id,
+            'billing_address_id' => $request->billing_address_id ?? null,
             'customer_property_id' => $request->customer_property_id,
             'description' => (!empty($request->description) ? $request->description : null),
             'details' => (!empty($request->details) ? $request->details : null),
             //'customer_job_priority_id' => (!empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null),
             //'due_date' => (!empty($request->due_date) ? date('Y-m-d', strtotime($request->due_date)) : null),
-            'customer_job_status_id' => 1,
+            'customer_job_status_id' => (!empty($request->customer_job_status_id) ? $request->customer_job_status_id : 1),
             'reference_no' => $this->generateReferenceNo($request->customer_id, $company),
             'estimated_amount' => (!empty($request->estimated_amount) ? $request->estimated_amount : null),
             'created_by' => $request->user()->id,
@@ -119,6 +120,8 @@ class JobsController extends Controller
                 ]
         );
         endif;
+        $job = $job->fresh(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot', 'billing']);
+
 
         return response()->json([
             'message' => 'Job successfully created.',
@@ -178,7 +181,7 @@ class JobsController extends Controller
     public function getJobDetails(Request $request, $id){
        try {
         $user = User::find($request->user()->id);
-        $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot'])
+        $job = CustomerJob::with(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot', 'billing'])
             ->withCount("records as number_of_records")->withCount('invoice as number_of_invoices')
             ->findOrFail($id);
 
@@ -255,11 +258,14 @@ class JobsController extends Controller
 
            $updateData = [];
 
-            if($request->has('customer_id') && $request->customer_id > 0):
+            if($request->has('customer_id')):
                 $updateData['customer_id'] = (isset($request->customer_id) && !empty($request->customer_id) ? $request->customer_id : null);
             endif;
+            if($request->has('billing_address_id')):
+                $updateData['billing_address_id'] = (isset($request->billing_address_id) && !empty($request->billing_address_id) ? $request->billing_address_id : null);
+            endif;
 
-            if($request->has('customer_property_id') && $request->customer_property_id > 0):
+            if($request->has('customer_property_id')):
                 $updateData['customer_property_id'] = (isset($request->customer_property_id) && !empty($request->customer_property_id) ? $request->customer_property_id : null);
             endif;
 
@@ -271,21 +277,13 @@ class JobsController extends Controller
                 $updateData['details'] = (isset($request->details) && !empty($request->details) ? $request->details : null);
             endif;
 
-            if($request->has('estimated_amount')):
-                $updateData['estimated_amount'] = (isset($request->estimated_amount) && !empty($request->estimated_amount) ? $request->estimated_amount : null);
-            endif;
-
-            if($request->has('customer_job_priority_id')):
-                $updateData['customer_job_priority_id'] = (isset($request->customer_job_priority_id) && !empty($request->customer_job_priority_id) ? $request->customer_job_priority_id : null);
-            endif;
-
             if($request->has('customer_job_status_id')):
                 $updateData['customer_job_status_id'] = (isset($request->customer_job_status_id) && !empty($request->customer_job_status_id) ? $request->customer_job_status_id : null);
             endif;
 
-            // if($request->has('reference_no')):
-            //     $updateData['reference_no'] = (isset($request->reference_no) && !empty($request->reference_no) ? $request->reference_no : null);
-            // endif;
+            if($request->has('estimated_amount')):
+                $updateData['estimated_amount'] = (isset($request->estimated_amount) && !empty($request->estimated_amount) ? $request->estimated_amount : null);
+            endif;
 
             $job->update($updateData);
 
@@ -299,8 +297,9 @@ class JobsController extends Controller
                     ]
                 );
             endif;
-
+            
             DB::commit();
+            $job = $job->fresh(['customer', 'property', 'property.customer', 'customer.contact', 'thestatus', 'calendar', 'calendar.slot', 'billing']);
 
             return response()->json([
                 'success' => true,
