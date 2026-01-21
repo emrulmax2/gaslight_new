@@ -76,6 +76,33 @@ class RecordAndDraftController extends Controller
             ]
         ]);
     }
+    
+    public function certificateCount($job_form_id, Request $request){
+        $user_id = $request->user()->id;
+        $status = ($request->has('status') && !empty($request->query('status')) ? $request->query('status') : 'All');
+        $customer_job_id = ($request->has('customer_job_id') && !empty($request->query('customer_job_id'))) ? $request->query('customer_job_id') : 0;
+        $customer_id = ($request->has('customer_id') && !empty($request->query('customer_id'))) ? $request->query('customer_id') : 0;
+
+        $query = Record::where('created_by', $user_id);
+        if($status != 'All'):
+            $query->where('status', $status);
+        endif;
+        if(isset($job_form_id) && $job_form_id > 0):
+            $query->where('job_form_id', $job_form_id);
+        endif;
+        if(isset($customer_job_id) && $customer_job_id > 0):
+            $query->where('customer_job_id', $customer_job_id);
+        endif;
+        if(isset($customer_id) && $customer_id > 0):
+            $query->where('customer_id', $customer_id);
+        endif;
+
+        $records = $query->get();
+        return response()->json([
+            'success' => true,
+            'total_records' => $records->count()
+        ]);
+    }
 
 
     public function getInvoiceNumber(Request $request){
