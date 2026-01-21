@@ -151,6 +151,7 @@
                     $DISCOUNTTOTAL = 0;
                     $DISCOUNTVATTOTAL = 0;
                     $ADVANCEAMOUNT = (isset($invoiceAdvance->advance_amount) && $invoiceAdvance->advance_amount > 0 ? $invoiceAdvance->advance_amount : 0);
+                    $PAYMENTS = (isset($invoice->payments) && $invoice->payments->count() > 0 ? $invoice->payments->sum('amount') : 0);
                 @endphp
                 @if(!empty($invoiceItems))
                     @foreach($invoiceItems as $item)
@@ -223,7 +224,7 @@
                             $DISCOUNTTOTAL += $DISCOUNTUNITPRICE;
 
                             $TOTAL = (isset($invoiceExtra->non_vat_invoice) && $invoiceExtra->non_vat_invoice != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
-                            $DUE = $TOTAL - $ADVANCEAMOUNT;
+                            $DUE = $TOTAL - ($ADVANCEAMOUNT + $PAYMENTS);
                         @endphp
                         <table class="bg-darkish2 uppercase color-white calculationTable" style="padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
                             <tr>
@@ -250,7 +251,7 @@
                         <table class="bg-darkish2 uppercase color-white calculationTable" style="margin-top: 25px; padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
                             <tr>
                                 <td class="text-left">Paid</td>
-                                <td class="text-right">{{ Number::currency($ADVANCEAMOUNT, 'GBP') }}</td>
+                                <td class="text-right">{{ Number::currency(($ADVANCEAMOUNT + $PAYMENTS), 'GBP') }}</td>
                             </tr>
                             <tr>
                                 <td class="text-left">Due</td>

@@ -59,14 +59,11 @@ class InvoiceController extends Controller
         $sortOrder = in_array($sortOrder, ['asc', 'desc']) ? $sortOrder : 'asc';
         $query->orderBy($sortField, $sortOrder);
 
-        $limit = max(1, (int)$request->query('limit', 10));
-        $page = max(1, (int)$request->query('page', 1));
-        $records = $query->paginate($limit, ['*'], 'page', $page);
+        
 
-        $limit = max(1, (int)$request->query('limit', 10));
-        $page = (int)$request->query('page', 1);
+        $limit = $request->query('limit', -1);
 
-        if ($page === -1) {
+        if ($limit === -1) {
             $records = $query->get();
             return response()->json([
                 'success' => true,
@@ -81,6 +78,9 @@ class InvoiceController extends Controller
                 ]
             ]);
         } else {
+            $limit = max(1, (int)$request->query('limit', 10));
+            $page = max(1, (int)$request->query('page', 1));
+            $records = $query->paginate($limit, ['*'], 'page', $page);
             $records = $query->paginate($limit, ['*'], 'page', max(1, $page));
 
             return response()->json([
@@ -470,7 +470,7 @@ class InvoiceController extends Controller
     }
 
     public function generatePdf($invoice_id){
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing'])->find($invoice_id);
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing', 'payments'])->find($invoice_id);
        
         //dd($record->available_options->invoiceItems);
         $logoPath = resource_path('images/gas_safe_register_yellow.png');

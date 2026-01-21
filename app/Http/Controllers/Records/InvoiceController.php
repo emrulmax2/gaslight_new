@@ -585,7 +585,7 @@ class InvoiceController extends Controller
     }
 
     public function generatePdf($invoice_id){
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing'])->find($invoice_id);
+        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'options', 'billing', 'payments'])->find($invoice_id);
        
         //dd($record->available_options->invoiceItems);
         $companyLogoPath = (isset($invoice->user->company->logo_path) && $invoice->user->company->logo_path ? $invoice->user->company->logo_path : '');
