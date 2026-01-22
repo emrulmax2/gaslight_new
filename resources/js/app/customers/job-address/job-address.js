@@ -1,5 +1,5 @@
 import { route } from 'ziggy-js';
-import INTAddressLookUps from '../../../address_lookup.js';
+import { initGetAddressAutocomplete } from '../../../getAddressAutocomplete';
 
 ("use strict");
 var JobAddressListTable = (function () {
@@ -38,9 +38,11 @@ var JobAddressListTable = (function () {
 })();
     
 (function(){
-    if($('.theAddressWrap').length > 0){
-        INTAddressLookUps();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        initGetAddressAutocomplete({
+            token: import.meta.env.VITE_GETADDRESS_API_KEY
+        });
+    });
 
     if ($("#JobAddressListTable").length) {
         JobAddressListTable.init();

@@ -1,12 +1,14 @@
 import { route } from 'ziggy-js';
-import INTAddressLookUps from '../address_lookup.js';
+import { initGetAddressAutocomplete } from '../getAddressAutocomplete.js';
 
 ("use strict");
 (function () { 
     // INIT Address Lookup
-    if($('.theAddressWrap').length > 0){
-        INTAddressLookUps();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        initGetAddressAutocomplete({
+            token: import.meta.env.VITE_GETADDRESS_API_KEY
+        });
+    });
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
