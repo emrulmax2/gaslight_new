@@ -28,13 +28,13 @@
                         </x-base.button>
                         @endif
                         @if(isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email))
-                            <x-base.button value="2" onclick="this.form.submit_type.value = this.value" type="submit" class="formSubmits justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                            <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#sendEmailModal" class="justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
                                 {{ $invoice->status == 'Send' ? 'Resend' : 'Send' }}
                                 <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                             </x-base.button>
                         @else 
-                            <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#addCustomerEmailModal" class="justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                            <x-base.button type="button" data-tw-toggle="modal" data-tw-target="#sendEmailModal" class="justify-start submit_2 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="mail" />
                                 Insert & Send
                                 <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
@@ -84,6 +84,7 @@
 @pushOnce('styles')
     @vite('resources/css/vendors/tabulator.css')
     @vite('resources/css/vendors/tom-select.css')
+    @vite('resources/css/vendors/ckeditor.css')
 @endPushOnce
 
 @pushOnce('vendors')
@@ -93,6 +94,8 @@
     @vite('resources/js/vendors/lodash.js')
     @vite('resources/js/vendors/xlsx.js')
     @vite('resources/js/vendors/tom-select.js')
+    @vite('resources/js/vendors/ckeditor/classic.js')
+    @vite('resources/js/vendors/toastify.js')
 @endPushOnce
 
 @pushOnce('scripts')

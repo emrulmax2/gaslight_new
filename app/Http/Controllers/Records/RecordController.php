@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Records;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobAddressStoreRequest;
 use App\Http\Requests\OccupantDetailsStoreRequest;
+use App\Http\Requests\SendEmailRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\ApplianceFlueType;
@@ -252,7 +253,8 @@ class RecordController extends Controller
             'form' => $form,
             'record' => $record,
             'signature' => $record->signature ? Storage::disk('public')->url($record->signature->filename) : '',
-            'thePdf' => $thePdf
+            'thePdf' => $thePdf,
+            'template' => JobFormEmailTemplate::with('attachment')->where('user_id', auth()->user()->id)->where('job_form_id', $record->job_form_id)->get()->first()
         ]);
     }
 
@@ -290,41 +292,28 @@ class RecordController extends Controller
         $fileName = $this->generatePdfFileName($record->id);
         $pdf = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
 
-        if($submit_type == 2 || $submit_type == 3):
-            if($submit_type == 3 && $request->has('customer_email') && !empty($request->customer_email)):
-                CustomerContactInformation::where('customer_id', $record->customer_id)->update(['email' => $request->customer_email]);
-            endif;
-            $data = [];
-            $data['status'] = 'Email Sent';
+        RecordHistory::create([
+            'record_id' => $request->record_id,
+            'action' => 'Approved',
+            'created_by' => $user_id,
+        ]);
 
-            Record::where('id', $request->record_id)->update($data);
+        $data = [];
+        $data['status'] = 'Approved';
 
-            $email = $this->sendEmail($request->record_id);
-
-            RecordHistory::create([
-                'record_id' => $request->record_id,
-                'action' => 'Email Sent',
-                'created_by' => $user_id,
-            ]);
-            $message = (!$email ? 'Certificate has been approved. Email cannot be sent due to an invalid or empty email address.' : 'Certificate has been approved and a copy of the certificate mailed to the customer');
-        else:
-            RecordHistory::create([
-                'record_id' => $request->record_id,
-                'action' => 'Approved',
-                'created_by' => $user_id,
-            ]);
-
-            $data = [];
-            $data['status'] = 'Approved';
-
-            Record::where('id', $request->record_id)->update($data);
-            $message = 'Certificate successfully approved.';
-        endif;
+        Record::where('id', $request->record_id)->update($data);
+        $message = 'Certificate successfully approved.';
 
         return response()->json(['msg' => $message, 'red' => route('records.show', $request->record_id), 'pdf' => $pdf]);
     }
 
-    public function sendEmail($record_id){
+    public function sendEmail(SendEmailRequest $request){
+        $record_id = $request->record_id;
+        $ccMail = (!empty($request->cc_email_address) ? explode(',', $request->cc_email_address) : []);
+        $subject = $request->subject;
+        $content = $request->content;
+        $customerEmail = $request->customer_email;
+
         $record = Record::with([
             'customer', 
             'property', 
@@ -337,19 +326,28 @@ class RecordController extends Controller
             'form', 
             'user', 
             'user.company'])->find($record_id);
+        CustomerContactInformation::where('customer_id', $record->customer_id)->update(['email' => $customerEmail]);
+
         $user_id = (isset($record->created_by) && $record->created_by > 0 ? $record->created_by : auth()->user()->id);
         $companyName = $record->user->companies->pluck('company_name')->first();
         $companyEmail = $record->user->companies->pluck('company_email')->first();
         $customerName = (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '');
-        $customerEmail = (isset($record->customer->contact->email) && !empty($record->customer->contact->email) ? $record->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $record->job_form_id)->get()->first();
-            $emailData = ($template ? $this->renderEmailTemplate($record, $template) : []);
+            $data = [];
+            $data['status'] = 'Email Sent';
+            Record::where('id', $record_id)->update($data);
+
+            RecordHistory::create([
+                'record_id' => $request->record_id,
+                'action' => 'Email Sent',
+                'created_by' => $user_id,
+            ]);
+
+            $emailData = $this->renderEmailTemplate($record, $subject, $content);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
             $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
-            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $record->user->email;
 
             if($content == ''):
@@ -375,7 +373,9 @@ class RecordController extends Controller
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($record->id); 
+            $pdf = '';
             if (Storage::disk('public')->exists('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName)):
+                $pdf = Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
                 $attachmentFiles[0] = [
                     "pathinfo" => 'records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName,
                     "nameinfo" => $fileName,
@@ -388,13 +388,13 @@ class RecordController extends Controller
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate'), $ccMail); 
-            return true;
+            return response()->json(['msg' => 'Certificate has been approved and a copy of the certificate mailed to the customer', 'red' => route('records.show', $record_id), 'pdf' => $pdf]);
         else:
-            return false;
+            return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);
         endif;
     }
 
-    public function renderEmailTemplate(Record $record, JobFormEmailTemplate $template): array {
+    public function renderEmailTemplate(Record $record, $subject, $content): array {
         // Build shortcode replacements
         $companyName = $record->user->companies->pluck('company_name')->first();
         $shortcodes = [
@@ -416,8 +416,8 @@ class RecordController extends Controller
         ];
 
         // Replace shortcodes in subject and content
-        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
-        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $content);
 
         $attachmentFiles = [];
         if(isset($template->attachment) && $template->attachment->count() > 0):
@@ -439,7 +439,6 @@ class RecordController extends Controller
             'subject' => $subject,
             'content' => $content,
             'attachmentFiles' => $attachmentFiles,
-            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
         ];
     }
 

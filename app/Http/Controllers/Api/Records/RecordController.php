@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Records;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SendEmailRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\CommissionDecommissionWorkType;
 use App\Models\Customer;
+use App\Models\CustomerContactInformation;
 use App\Models\CustomerJob;
 use App\Models\CustomerProperty;
 use App\Models\Invoice;
@@ -293,11 +295,15 @@ class RecordController extends Controller
        
     }
 
-    public function approveEmail(Request $request, $record_id)
+    public function approveEmail(SendEmailRequest $request)
     {
+        $record_id = $request->record_id;
+        $ccMail = (!empty($request->cc_email_address) ? explode(',', $request->cc_email_address) : []);
+        $subject = $request->subject;
+        $content = $request->content;
+        $customerEmail = $request->customer_email;
         try {
             $record = Record::findOrFail($record_id);
-            
             $updateResult = $record->update([
                 'status' => 'Email Sent'
             ]);
@@ -306,11 +312,21 @@ class RecordController extends Controller
                 throw new \Exception("Failed to update record status");
             }
 
+            $contact = CustomerContactInformation::where('customer_id', $record->customer_id)->first();
+            if ($contact->email !== $customerEmail){
+                $updated = $contact->update([
+                    'email' => $customerEmail
+                ]);
+                if (!$updated) {
+                    throw new \RuntimeException('Failed to update customer email.');
+                }
+            }
+
             $emailSent = false;
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($record->id, $request->user_id);
+                $emailSent = $this->sendEmail($record->id, $customerEmail, $ccMail, $subject, $content);
 
                 RecordHistory::create([
                     'record_id' => $record_id,
@@ -512,7 +528,7 @@ class RecordController extends Controller
         return Storage::disk('public')->url('records/'.$record->created_by.'/'.$record->job_form_id.'/'.$fileName);
     }
 
-    public function sendEmail($record_id){
+    public function sendEmail($record_id, $customerEmail, $ccMail = [], $subject, $content){
         $record = Record::with([
             'customer', 
             'property', 
@@ -529,15 +545,12 @@ class RecordController extends Controller
         $companyName = $record->user->companies->pluck('company_name')->first(); 
         $companyEmail = $record->user->companies->pluck('company_email')->first(); 
         $customerName = (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '');
-        $customerEmail = (isset($record->customer->contact->email) && !empty($record->customer->contact->email) ? $record->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $record->job_form_id)->get()->first();
-            $emailData = ($template ? $this->renderEmailTemplate($record, $template) : []);
+            $emailData = $this->renderEmailTemplate($record, $subject, $content);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
             $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
-            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $record->user->email;
 
             if($content == ''):
@@ -580,7 +593,7 @@ class RecordController extends Controller
         endif;
     }
 
-    public function renderEmailTemplate(Record $record, JobFormEmailTemplate $template): array {
+    public function renderEmailTemplate(Record $record, $subject, $content): array {
         // Build shortcode replacements
         $companyName = $record->user->companies->pluck('company_name')->first();
         $shortcodes = [
@@ -602,8 +615,8 @@ class RecordController extends Controller
         ];
 
         // Replace shortcodes in subject and content
-        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
-        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $content);
 
         $attachmentFiles = [];
         if(isset($template->attachment) && $template->attachment->count() > 0):
@@ -624,8 +637,7 @@ class RecordController extends Controller
         return [
             'subject' => $subject,
             'content' => $content,
-            'attachmentFiles' => $attachmentFiles,
-            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
+            'attachmentFiles' => $attachmentFiles
         ];
     }
 

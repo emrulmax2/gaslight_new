@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Records;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MakePaymentRequest;
 use App\Http\Requests\MakeRefundRequest;
+use App\Http\Requests\SendInvoiceEmailRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\Customer;
@@ -307,7 +308,12 @@ class InvoiceController extends Controller
         }
     }
 
-    public function send($invoice_id, Request $request){
+    public function send(SendInvoiceEmailRequest $request){
+        $invoice_id = $request->invoice_id;
+        $ccMail = (!empty($request->cc_email_address) ? explode(',', $request->cc_email_address) : []);
+        $subject = $request->subject;
+        $content = $request->content;
+        $customerEmail = $request->customer_email;
         try {
             $invoice = Invoice::findOrFail($invoice_id);
             $updateResult = $invoice->update([
@@ -318,11 +324,21 @@ class InvoiceController extends Controller
                 throw new \Exception("Failed to update record status");
             }
 
+            $contact = CustomerContactInformation::where('customer_id', $invoice->customer_id)->first();
+            if ($contact->email !== $customerEmail){
+                $updated = $contact->update([
+                    'email' => $customerEmail
+                ]);
+                if (!$updated) {
+                    throw new \RuntimeException('Failed to update customer email.');
+                }
+            }
+
             $emailSent = false;
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($invoice_id, $request->user_id);
+                $emailSent = $this->sendEmail($invoice_id, $customerEmail, $ccMail, $subject, $content);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }
@@ -350,7 +366,7 @@ class InvoiceController extends Controller
         }
     }
 
-    public function sendEmail($invoice_id, $user_id){
+    public function sendEmail($invoice_id, $customerEmail, $ccMail = [], $subject, $content){
         $invoice = Invoice::with([
             'customer', 
             'property', 
@@ -363,19 +379,15 @@ class InvoiceController extends Controller
             'form', 
             'user', 
             'user.company'])->find($invoice_id);
-        $user_id = (isset($invoice->created_by) && $invoice->created_by > 0 ? $invoice->created_by : $user_id);
         $companyName = $invoice->user->companies->pluck('company_name')->first();
         $companyEmail = $invoice->user->companies->pluck('company_email')->first();
         $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
-        $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $invoice->job_form_id)->get()->first();
-            $emailData = ($template ? $this->renderEmailTemplate($invoice, $template) : []);
+            $emailData = $this->renderEmailTemplate($invoice, $subject, $content);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $invoice->form->name);
             $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
-            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $invoice->user->email;
 
             if($content == ''):
@@ -420,7 +432,7 @@ class InvoiceController extends Controller
         endif;
     }
 
-    public function renderEmailTemplate(Invoice $invoice, JobFormEmailTemplate $template): array {
+    public function renderEmailTemplate(Invoice $invoice, $subject, $content): array {
         // Build shortcode replacements
         $companyName = $invoice->user->companies->pluck('company_name')->first();
         $shortcodes = [
@@ -442,8 +454,8 @@ class InvoiceController extends Controller
         ];
 
         // Replace shortcodes in subject and content
-        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
-        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $content);
 
         $attachmentFiles = [];
         if(isset($template->attachment) && $template->attachment->count() > 0):
@@ -465,7 +477,6 @@ class InvoiceController extends Controller
             'subject' => $subject,
             'content' => $content,
             'attachmentFiles' => $attachmentFiles,
-            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
         ];
     }
 
