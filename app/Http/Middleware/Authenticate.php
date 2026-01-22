@@ -23,7 +23,7 @@ class Authenticate
         //     return redirect()->route('client.login');
 
         } else if (!is_null(Auth::guard('superadmin')->user())) {
-            
+            //superadmin authenticated
             return redirect()->route('superadmin.login');
 
         }  else {
