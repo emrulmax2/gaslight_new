@@ -1,10 +1,12 @@
-import INTAddressLookUps from '../../address_lookup.js';
+import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
 
 (function(){
     // INIT Address Lookup
-    if($('.theAddressWrap').length > 0){
-        INTAddressLookUps();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        initGetAddressAutocomplete({
+            token: import.meta.env.VITE_GETADDRESS_API_KEY
+        });
+    });
 
     
     let dateOption = {
