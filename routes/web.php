@@ -417,6 +417,8 @@ Route::middleware(Authenticate::class)->group(function() {
             Route::post('records/store', 'store')->name('records.store');
             Route::get('records/show/{record}', 'show')->name('records.show');
 
+            Route::post('records/send-email', 'sendEmail')->name('records.send.email');
+
             Route::post('records/action', 'recordAction')->name('records.action');
             Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
 
@@ -439,8 +441,9 @@ Route::middleware(Authenticate::class)->group(function() {
             Route::post('invoices/store', 'store')->name('invoices.store');
             Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
 
+            Route::post('invoices/send-email', 'sendEmail')->name('invoices.send.email');
+
             Route::post('invoices/edit-ready', 'editReady')->name('invoices.edit.ready');
-            Route::post('invoices/action', 'invoiceAction')->name('invoices.action');
 
             Route::post('invoices/make-payment', 'makePayment')->name('invoices.make.payment');
             Route::post('invoices/cancel', 'cancelInvoice')->name('invoices.cancel');
@@ -462,7 +465,7 @@ Route::middleware(Authenticate::class)->group(function() {
             Route::post('quotes/get-job-addresses', 'getJobAddressrs')->name('quotes.get.job.addresses');
             Route::post('quotes/store-job-address', 'storeJobAddress')->name('quotes.store.job.addresses');
 
-            Route::post('quotes/action', 'quoteAction')->name('quotes.action');
+            Route::post('quotes/send-email', 'sendEmail')->name('quotes.send.email');
 
             // Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
             // Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');

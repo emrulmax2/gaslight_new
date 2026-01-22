@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\Records;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SendQuoteEmailRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
+use App\Models\CustomerContactInformation;
 use App\Models\CustomerProperty;
 use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
@@ -163,18 +165,6 @@ class QuoteController extends Controller
         /* Store or Update Record */
     }
 
-    // public function createJobName($options){
-    //     $invoiceItems = $options['invoiceItems'];
-    //     $jobName = [];
-    //     if(!empty($invoiceItems)):
-    //         foreach($invoiceItems as $items):
-    //             $jobName[] = $items['description'];
-    //         endforeach;
-    //     endif;
-
-    //     return (!empty($jobName) ? implode(' ', $jobName) : 'New Job');
-    // }
-
 
     public function edit($quote_id, Request $request){
         try {
@@ -263,7 +253,13 @@ class QuoteController extends Controller
         }
     }
 
-    public function send($quote_id, Request $request){
+    public function send(SendQuoteEmailRequest $request){
+        $quote_id = $request->quote_id;
+        $ccMail = (!empty($request->cc_email_address) ? explode(',', $request->cc_email_address) : []);
+        $subject = $request->subject;
+        $content = $request->content;
+        $customerEmail = $request->customer_email;
+
         try {
             $quote = Quote::findOrFail($quote_id);
             $updateResult = $quote->update([
@@ -274,11 +270,21 @@ class QuoteController extends Controller
                 throw new \Exception("Failed to update record status");
             }
 
+            $contact = CustomerContactInformation::where('customer_id', $quote->customer_id)->first();
+            if ($contact->email !== $customerEmail){
+                $updated = $contact->update([
+                    'email' => $customerEmail
+                ]);
+                if (!$updated) {
+                    throw new \RuntimeException('Failed to update customer email.');
+                }
+            }
+
             $emailSent = false;
             $emailError = null;
             
             try {
-                $emailSent = $this->sendEmail($quote_id, $request->user_id);
+                $emailSent = $this->sendEmail($quote_id, $customerEmail, $ccMail, $subject, $content);
             } catch (\Exception $e) {
                 $emailError = $e->getMessage();
             }
@@ -306,7 +312,7 @@ class QuoteController extends Controller
         }
     }
 
-    public function sendEmail($quote_id, $user_id){
+    public function sendEmail($quote_id, $customerEmail, $ccMail = [], $subject, $content){
         $quote = Quote::with([
             'customer', 
             'property', 
@@ -319,16 +325,15 @@ class QuoteController extends Controller
             'form', 
             'user', 
             'user.company'])->find($quote_id);
-        $user_id = (isset($invoice->created_by) && $invoice->created_by > 0 ? $invoice->created_by : $user_id);
-        $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
-        $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
+        $companyName = $quote->user->companies->pluck('company_name')->first();
+        $customerName = (isset($quote->customer->full_name) && !empty($quote->customer->full_name) ? $quote->customer->full_name : '');
+        $customerEmail = (isset($quote->customer->contact->email) && !empty($quote->customer->contact->email) ? $quote->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $quote->job_form_id)->get()->first();
-            $emailData = ($template ? $this->renderEmailTemplate($quote, $template) : []);
+            $emailData = $this->renderEmailTemplate($quote, $subject, $content);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $quote->form->name);
+            $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
-            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $quote->user->email;
 
             if($content == ''):
@@ -346,17 +351,17 @@ class QuoteController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
-                'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
+                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
+                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
             ];
-            //from_name: Company Name
-            // Replay to: engineer or company email.
+            $configuration['from_name'] = !empty($companyName) ? $companyName : $quote->user->name; 
+            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $quote->user->email; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($quote->id); 
-            if (Storage::disk('public')->exists('invoices/'.$quote->created_by.'/'.$fileName)):
+            if (Storage::disk('public')->exists('quotes/'.$quote->created_by.'/'.$fileName)):
                 $attachmentFiles[0] = [
-                    "pathinfo" => 'invoices/'.$quote->created_by.'/'.$fileName,
+                    "pathinfo" => 'quotes/'.$quote->created_by.'/'.$fileName,
                     "nameinfo" => $fileName,
                     "mimeinfo" => 'application/pdf',
                     "disk" => 'public'
@@ -366,14 +371,14 @@ class QuoteController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);
             return true;
         else:
             return false;
         endif;
     }
 
-    public function renderEmailTemplate(Quote $quote, JobFormEmailTemplate $template): array {
+    public function renderEmailTemplate(Quote $quote, $subject, $content): array {
         // Build shortcode replacements
         $companyName = $quote->user->companies->pluck('company_name')->first();
         $shortcodes = [
@@ -395,8 +400,8 @@ class QuoteController extends Controller
         ];
 
         // Replace shortcodes in subject and content
-        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
-        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $content);
 
         $attachmentFiles = [];
         if(isset($template->attachment) && $template->attachment->count() > 0):
@@ -417,8 +422,7 @@ class QuoteController extends Controller
         return [
             'subject' => $subject,
             'content' => $content,
-            'attachmentFiles' => $attachmentFiles,
-            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
+            'attachmentFiles' => $attachmentFiles
         ];
     }
 

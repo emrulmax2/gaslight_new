@@ -197,7 +197,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('records/edit/{record_id}', 'edit');
 
             Route::get('records/approve/{record_id}', 'approve');
-            Route::get('records/approve-and-email/{record_id}', 'approveEmail');
+            Route::post('records/approve-and-email', 'approveEmail');
             Route::get('records/download/{record_id}', 'download');
             Route::post('records/convert-to-invoice/{record_id}', 'convertToInvoice');
 
@@ -217,7 +217,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('invoices/list', 'list');
             Route::post('invoices/store', 'store');
             Route::get('invoices/edit/{invoice_id}', 'edit');
-            Route::get('invoices/send/{invoice_id}', 'send');
+            Route::post('invoices/send', 'send');
             Route::get('invoices/download/{invoice_id}', 'download');
 
             Route::get('invoices/cancell-reasons', 'cancellReasons');
@@ -232,7 +232,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('quotes/list', 'list');
             Route::post('quotes/store', 'store');
             Route::get('quotes/edit/{quote_id}', 'edit');
-            Route::get('quotes/send/{quote_id}', 'send');
+            Route::post('quotes/send', 'send');
             Route::get('quotes/download/{quote_id}', 'download');
         });
 

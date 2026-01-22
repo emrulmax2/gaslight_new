@@ -7,6 +7,9 @@ use App\Http\Requests\JobAddressStoreRequest;
 use App\Http\Requests\MakePaymentRequest;
 use App\Http\Requests\MakeRefundRequest;
 use App\Http\Requests\OccupantDetailsStoreRequest;
+use App\Http\Requests\SendEmailRequest;
+use App\Http\Requests\SendInvitationSmsRequest;
+use App\Http\Requests\SendInvoiceEmailRequest;
 use App\Jobs\GCEMailerJob;
 use App\Mail\GCESendMail;
 use App\Models\Customer;
@@ -361,7 +364,8 @@ class InvoiceController extends Controller
             'form' => $form,
             'invoice' => $invoice,
             'thePdf' => $thePdf,
-            'payment_methods' => PaymentMethod::where('active', 1)->get()
+            'payment_methods' => PaymentMethod::where('active', 1)->get(),
+            'template' => JobFormEmailTemplate::with('attachment')->where('user_id', auth()->user()->id)->where('job_form_id', $invoice->job_form_id)->get()->first()
         ]);
     }
 
@@ -439,33 +443,13 @@ class InvoiceController extends Controller
         return response()->json(['row' => $data, 'form' => $invoice->job_form_id, 'red' => route('invoices.create')], 200);
     }
 
-    public function invoiceAction(Request $request){
-        $user_id = auth()->user()->id;
-        $invoice = Invoice::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company'])
-                    ->find($request->invoice_id);
-        $form = JobForm::find($invoice->job_form_id);
-        $submit_type = $request->submit_type;
+    public function sendEmail(SendInvoiceEmailRequest $request){
+        $invoice_id = $request->invoice_id;
+        $ccMail = (!empty($request->cc_email_address) ? explode(',', $request->cc_email_address) : []);
+        $subject = $request->subject;
+        $content = $request->content;
+        $customerEmail = $request->customer_email;
 
-        $fileName = $this->generatePdfFileName($invoice->id);
-        $pdf = Storage::disk('public')->url('invoices/'.$invoice->created_by.'/'.$fileName);
-
-        if($submit_type == 2 || $submit_type == 3):
-            if($submit_type == 3 && $request->has('customer_email') && !empty($request->customer_email)):
-                CustomerContactInformation::where('customer_id', $invoice->customer_id)->update(['email' => $request->customer_email]);
-            endif;
-            $data = [];
-            $data['status'] = 'Send';
-
-            Invoice::where('id', $request->invoice_id)->update($data);
-
-            $email = $this->sendEmail($request->invoice_id);
-            $message = (!$email ? 'Invoice status has been updated to Send. Email cannot be sent due to an invalid or empty email address.' : 'Invoice has been approved and a copy of the invoice mailed to the customer');
-        endif;
-
-        return response()->json(['msg' => $message, 'red' => route('invoices.show', $request->invoice_id), 'pdf' => $pdf]);
-    }
-
-    public function sendEmail($invoice_id){
         $invoice = Invoice::with([
             'customer', 
             'property', 
@@ -478,19 +462,22 @@ class InvoiceController extends Controller
             'form', 
             'user', 
             'user.company'])->find($invoice_id);
+        CustomerContactInformation::where('customer_id', $invoice->customer_id)->update(['email' => $customerEmail]);
+
         $user_id = (isset($invoice->created_by) && $invoice->created_by > 0 ? $invoice->created_by : auth()->user()->id);
         $companyName = $invoice->user->companies->pluck('company_name')->first();
         $companyEmail = $invoice->user->companies->pluck('company_email')->first();
         $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
-        $customerEmail = (isset($invoice->customer->contact->email) && !empty($invoice->customer->contact->email) ? $invoice->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $template = JobFormEmailTemplate::with('attachment')->where('user_id', $user_id)->where('job_form_id', $invoice->job_form_id)->get()->first();
-            $emailData = ($template ? $this->renderEmailTemplate($invoice, $template) : []);
+            $data = [];
+            $data['status'] = 'Send';
+            Invoice::where('id', $invoice_id)->update($data);
+
+            $emailData = $this->renderEmailTemplate($invoice, $subject, $content);
 
             $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $invoice->form->name);
             $templateTitle = $subject;
             $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
-            $ccMail = (isset($emailData['cc_email_address']) && !empty($emailData['cc_email_address']) ? $emailData['cc_email_address'] : []);
             $ccMail[] = $invoice->user->email;
 
             if($content == ''):
@@ -515,8 +502,10 @@ class InvoiceController extends Controller
             $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $invoice->user->email; 
 
             $attachmentFiles = [];
-            $fileName = $this->generatePdfFileName($invoice->id); 
+            $fileName = $this->generatePdfFileName($invoice->id);
+            $pdf = ''; 
             if (Storage::disk('public')->exists('invoices/'.$invoice->created_by.'/'.$fileName)):
+                $pdf = Storage::disk('public')->url('invoices/'.$invoice->created_by.'/'.$fileName);
                 $attachmentFiles[0] = [
                     "pathinfo" => 'invoices/'.$invoice->created_by.'/'.$fileName,
                     "nameinfo" => $fileName,
@@ -529,13 +518,13 @@ class InvoiceController extends Controller
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);
-            return true;
+            return response()->json(['msg' => 'Invoice successfully send to the customer.', 'red' => route('invoices.show', $invoice_id), 'pdf' => $pdf]);
         else:
-            return false;
+            return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);
         endif;
     }
 
-    public function renderEmailTemplate(Invoice $invoice, JobFormEmailTemplate $template): array {
+    public function renderEmailTemplate(Invoice $invoice, $subject, $content): array {
         // Build shortcode replacements
         $companyName = $invoice->user->companies->pluck('company_name')->first();
         $shortcodes = [
@@ -557,8 +546,8 @@ class InvoiceController extends Controller
         ];
 
         // Replace shortcodes in subject and content
-        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->subject);
-        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $template->content);
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $content);
 
         $attachmentFiles = [];
         if(isset($template->attachment) && $template->attachment->count() > 0):
@@ -580,7 +569,6 @@ class InvoiceController extends Controller
             'subject' => $subject,
             'content' => $content,
             'attachmentFiles' => $attachmentFiles,
-            'cc_email_address' => !empty($template->cc_email_address) ? explode(',', $template->cc_email_address) : [],
         ];
     }
 

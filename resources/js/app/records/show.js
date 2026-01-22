@@ -6,13 +6,10 @@
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
-    const addCustomerEmailModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#addCustomerEmailModal"));
+    const sendEmailModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#sendEmailModal"));
 
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
-    });
-    document.getElementById('addCustomerEmailModal').addEventListener('hide.tw.modal', function(event) {
-        $('#addCustomerEmailModal [name="customer_email"]').val('');
     });
 
     $('#successModal .agreeWith').on('click', function(e){
@@ -26,6 +23,114 @@
             }
         }else{
             successModal.hide();
+        }
+    });
+
+    let lastActiveField = null; // last active field (input or CKEditor)
+    let theEditor = null;
+
+    // Track input focus and mousedown
+    const input = document.getElementById('subject');
+    input.addEventListener('mousedown', () => lastActiveField = input);
+    input.addEventListener('focus', () => lastActiveField = input);
+
+    // Initialize CKEditor
+    ClassicEditor.create(document.getElementById('theEditor'))
+        .then(editor => {
+            theEditor = editor;
+
+            // Optional: move toolbar
+            const toolbarContainer = document.querySelector('.document-editor__toolbar');
+            if (toolbarContainer) {
+                toolbarContainer.appendChild(editor.ui.view.toolbar.element);
+            }
+
+            // Track CKEditor focus
+            editor.editing.view.document.on('focus', () => lastActiveField = editor);
+        })
+        .catch(error => console.error(error));
+
+    if($('.emailTags').length > 0){
+        $(document).on('click', '.emailTags a.dropdown-item', function(e){
+            var theText = $(this).text();
+            navigator.clipboard.writeText(theText);
+            Toastify({
+                node: $("#coppiedNodeEl")
+                    .clone()
+                    .removeClass("hidden")[0],
+                duration: 2000,
+                newWindow: true,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+            }).showToast();
+        });
+    }
+
+    // Tag buttons
+    const tagButtons = document.querySelectorAll('.theTagItem');
+    tagButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tagText = this.textContent;
+            if (!lastActiveField) return;
+
+            // CKEditor active
+            if (lastActiveField === theEditor) {
+                theEditor.model.change(writer => {
+                    const selection = theEditor.model.document.selection;
+                    if (!selection.isCollapsed) {
+                        writer.remove(selection.getFirstRange());
+                    }
+                    writer.insertText(tagText, selection.getFirstPosition());
+                });
+                theEditor.editing.view.focus();
+                return;
+            }
+
+            // Input field active
+            const start = lastActiveField.selectionStart;
+            const end = lastActiveField.selectionEnd;
+            const val = lastActiveField.value;
+            lastActiveField.value = val.substring(0, start) + tagText + val.substring(end);
+
+            lastActiveField.selectionStart = lastActiveField.selectionEnd = start + tagText.length;
+            lastActiveField.focus();
+        });
+    });
+
+    $('#attachments').on('change', function(){
+        let $theAttachment = $("#attachments");
+        let selectedLength = $theAttachment[0].files.length; 
+        let selectedItems = $theAttachment[0].files;
+        let attachmentCount = $('.attachmentCount').attr('data-prevcount') * 1;
+        $('.error-attachments_error').html('')
+        
+        let SingleFileSize = 5242880;
+        let AllFileSize = 20971520;
+        let totalUploadSize = 0;
+        let SingleFileError = 0;
+        if (selectedLength > 0) {
+            for (var i = 0; i < selectedLength; i++) {
+                totalUploadSize = totalUploadSize + selectedItems[i].size;
+                if(selectedItems[i].size > SingleFileSize){
+                    SingleFileError += 1;
+                }
+            }
+
+            if(SingleFileError > 0){
+                $('#attachments').val('');
+                $('.attachmentCount').html((attachmentCount + 0)+' Attachments');
+                $('.error-attachments_error').html('One of you selected file exceeded single file size.')
+            }else if(totalUploadSize > AllFileSize){
+                $('#attachments').val('');
+                $('.attachmentCount').html((attachmentCount + 0)+' Attachments');
+                $('.error-attachments_error').html('Selected items size exceeded your total upload limit.')
+            }else{
+                $('.attachmentCount').html((selectedLength == 1 ? (attachmentCount + 1)+' Attachment' : (attachmentCount +selectedLength)+' Attachments'));
+                $('.error-attachments_error').html('')
+            }
         }
     });
 
@@ -161,72 +266,6 @@
         });
     });
 
-    $('#addCustomerEmailForm').on('submit', function(e){
-        e.preventDefault();
-        const form = document.getElementById('addCustomerEmailForm');
-        let $theForm = $(this);
-        let customer_email = $theForm.find('#customer_email').val();
-
-        if(customer_email == ''){
-            $('#sendMailBtn', $theForm).removeAttr('disabled');
-            $('#sendMailBtn .theLoader', $theForm).fadeOut();
-
-            $theForm.find('.acc__input-error.error-customer_email').fadeIn().html('This field is required.');
-        }else{
-            $theForm.find('.acc__input-error').fadeOut().html('');
-            $('#sendMailBtn', $theForm).attr('disabled', 'disabled');
-            $('#sendMailBtn .theLoader', $theForm).fadeIn();
-
-            let form_data = new FormData(form);
-            form_data.append('submit_type', 3);
-            axios({
-                method: "post",
-                url: route('records.action'),
-                data: form_data,
-                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            }).then(response => {
-                $('#sendMailBtn', $theForm).removeAttr('disabled');
-                $('#sendMailBtn .theLoader', $theForm).fadeOut();
-
-                if (response.status == 200) {
-                    addCustomerEmailModal.hide();
-
-                    successModal.show();
-                    document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
-                        $("#successModal .successModalTitle").html("Congratulations!");
-                        $("#successModal .successModalDesc").html(response.data.msg);
-                        $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', (response.data.red ? response.data.red : ''));
-                    });
-
-                    setTimeout(() => {
-                        successModal.hide();
-                        if(response.data.red){
-                            window.location.href = response.data.red
-                        }
-                    }, 1500);
-                }
-            }).catch(error => {
-                $('#sendMailBtn', $theForm).removeAttr('disabled');
-                $('#sendMailBtn .theLoader', $theForm).fadeOut();
-                if (error.response) {
-                    if (error.response.status == 422) {
-                        warningModal.show();
-                        document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
-                            $("#warningModal .warningModalTitle").html("Error Found!");
-                            $("#warningModal .warningModalDesc").html(error.response.data.msg);
-                        });
-
-                        setTimeout(() => {
-                            warningModal.hide();
-                        }, 1500);
-                    } else {
-                        console.log('error');
-                    }
-                }
-            });
-        }
-    });
-
     $('#createRecordInvoice').on('click', function(e){
         e.preventDefault();
         let $theBtn = $(this);
@@ -266,5 +305,58 @@
             }
         });
     })
+
+    $('#sendEmailForm').on('submit', function(e){
+        e.preventDefault();
+        let $theForm = $(this);
+        const form = document.getElementById('sendEmailForm');
+    
+        $('#sendEmailBtn', $theForm).attr('disabled', 'disabled');
+        $("#sendEmailBtn .theLoader").fadeIn();
+
+        let form_data = new FormData(form);
+        //form_data.append('file', $('#sendEmailForm #attachments')[0].files[0]); 
+        form_data.append("content", theEditor.getData());
+        axios({
+            method: "post",
+            url: route('records.send.email'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#sendEmailBtn', $theForm).removeAttr('disabled');
+            $("#sendEmailBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                sendEmailModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'NONE').attr('data-redirect', (response.data.red ? response.data.red : ''));
+                });
+
+                setTimeout(() => {
+                    successModal.hide();
+                    if(response.data.red){
+                        window.location.href = response.data.red
+                    }
+                }, 1500);
+            }
+        }).catch(error => {
+            $('#sendEmailBtn', $theForm).removeAttr('disabled');
+            $("#sendEmailBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#sendEmailForm .${key}`).addClass('border-danger');
+                        $(`#sendEmailForm  .error-${key}`).html(val);
+                    }
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    });
 
 })()
