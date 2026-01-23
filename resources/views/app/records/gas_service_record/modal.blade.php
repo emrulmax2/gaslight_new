@@ -281,6 +281,29 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Satisfactory Flue termination</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_stfFluTerm_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_stfFluTerm_yes" name="satisfactory_flue_termination" class="hasDetails absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_stfFluTerm_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_stfFluTerm_no" name="satisfactory_flue_termination" class="hasDetails absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_stfFluTerm_na">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_stfFluTerm_na" name="satisfactory_flue_termination" class="hasDetails absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                </x-base.form-check>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-8">
+                        <x-base.form-label class="mb-1">Defects found / remedial action taken</x-base.form-label>
+                        <x-base.form-textarea disabled name="satisfactory_flue_termination_detail" class="w-full h-[60px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
+                    </div>
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="bg-slate-100 p-2">
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Satistactory spillage test</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">

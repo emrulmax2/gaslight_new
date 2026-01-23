@@ -82,12 +82,28 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
                             boiler_brand_id.addItem(value)
                         }else if(key == 'appliance_type_id'){
                             appliance_type_id.addItem(value)
+                        }else if(key == 'appliance_time_temperature_heating_id'){
+                            appliance_time_temperature_heating_id.addItem(value)
                         }else{
                             let $theInput = $('#applianceModal [name="'+key+'"]');
                             if($theInput.is('textarea')){
                                 $theInput.val(value ? value : '');
                             }else{
                                 if($theInput.attr('type') == 'radio'){
+                                    if(key == 'is_in_hard_water_area'){
+                                        if(value == 'Yes'){
+                                            $('#applianceModal .maufacturerWrap').fadeIn()
+                                        }else{
+                                            $('#applianceModal .maufacturerWrap').fadeOut()
+                                        }
+                                    }
+                                    if(key == 'is_scale_reducer_fitted'){
+                                        if(value == 'Yes'){
+                                            $('#applianceModal .reducerFittedWrap').fadeIn()
+                                        }else{
+                                            $('#applianceModal .reducerFittedWrap').fadeOut()
+                                        }
+                                    }
                                     $('#applianceModal [name="'+key+'"][value="'+value+'"]').prop('checked', true);
                                 }else{
                                     if(key != 'appliance_serial'){
@@ -110,6 +126,34 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
 
         $theBtn.siblings('input').val(thevalue);
         //formDataChanged = true;
+    })
+
+    $('#applianceModal input[name="is_in_hard_water_area"]').on('change', function(){
+        let is_in_hard_water_area = $('#applianceModal input[name="is_in_hard_water_area"]:checked').val();
+
+        if(is_in_hard_water_area == 'Yes'){
+            $('#applianceModal .maufacturerWrap').fadeIn(function(){
+                $('#applianceModal .maufacturerWrap input[type="radio"]').prop('checked', false);
+            })
+        }else{
+            $('#applianceModal .maufacturerWrap').fadeOut(function(){
+                $('#applianceModal .maufacturerWrap input[type="radio"]').prop('checked', false);
+            })
+        }
+    })
+
+    $('#applianceModal input[name="is_scale_reducer_fitted"]').on('change', function(){
+        let is_scale_reducer_fitted = $('#applianceModal input[name="is_scale_reducer_fitted"]:checked').val();
+
+        if(is_scale_reducer_fitted == 'Yes'){
+            $('#applianceModal .reducerFittedWrap').fadeIn(function(){
+                $('#applianceModal .reducerFittedWrap input').val('');
+            })
+        }else{
+            $('#applianceModal .reducerFittedWrap').fadeOut(function(){
+                $('#applianceModal .reducerFittedWrap input').val('');
+            })
+        }
     })
 
     $('#applianceForm').on('submit', function(e){
