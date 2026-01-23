@@ -358,17 +358,21 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php 
+                                    $is_in_hard_water_area = (isset($record->available_options->appliances->is_in_hard_water_area) && !empty($record->available_options->appliances->is_in_hard_water_area) ? $record->available_options->appliances->is_in_hard_water_area : '');
+                                    $is_scale_reducer_fitted = (isset($record->available_options->appliances->is_scale_reducer_fitted) && !empty($record->available_options->appliances->is_scale_reducer_fitted) ? $record->available_options->appliances->is_scale_reducer_fitted : '');
+                                @endphp
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">is the installation in a hard water area (above 200ppm)</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->is_in_hard_water_area) && !empty($record->available_options->appliances->is_in_hard_water_area) ? $record->available_options->appliances->is_in_hard_water_area : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ $is_in_hard_water_area }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">If yes and if required by the manufacturer, has the water scale reducer been fitted</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->is_scale_reducer_fitted) && !empty($record->available_options->appliances->is_scale_reducer_fitted) ? $record->available_options->appliances->is_scale_reducer_fitted : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">If required by the manufacturer, has the water scale reducer been fitted</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ ($is_in_hard_water_area == 'Yes' ? $is_scale_reducer_fitted : '') }}</td>
                                 </tr>
                                 <tr>    
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">What type of scale reducer has been fitted</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->what_reducer_fitted) && !empty($record->available_options->appliances->what_reducer_fitted) ? $record->available_options->appliances->what_reducer_fitted : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ ($is_in_hard_water_area == 'Yes' && $is_scale_reducer_fitted == 'Yes' && isset($record->available_options->appliances->what_reducer_fitted) && !empty($record->available_options->appliances->what_reducer_fitted) ? $record->available_options->appliances->what_reducer_fitted : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -411,12 +415,18 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Gas Rate {{ (isset($record->available_options->appliances->dom_gas_rate_unit) && !empty($record->available_options->appliances->dom_gas_rate_unit) ? '('. $record->available_options->appliances->dom_gas_rate_unit.')' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->dom_gas_rate) && !empty($record->available_options->appliances->dom_gas_rate) ? $record->available_options->appliances->dom_gas_rate : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Gas Rate</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">
+                                        {{ (isset($record->available_options->appliances->dom_gas_rate) && !empty($record->available_options->appliances->dom_gas_rate) ? $record->available_options->appliances->dom_gas_rate : '') }}
+                                        {{ (isset($record->available_options->appliances->dom_gas_rate_unit) && !empty($record->available_options->appliances->dom_gas_rate_unit) ? $record->available_options->appliances->dom_gas_rate_unit : '') }}
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Burner operating pressure (or inlet pressure) at maximum rate {{ (isset($record->available_options->appliances->dom_burner_opt_pressure_unit) && !empty($record->available_options->appliances->dom_burner_opt_pressure_unit) ? '('. $record->available_options->appliances->dom_burner_opt_pressure_unit.')' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->dom_burner_opt_pressure) && !empty($record->available_options->appliances->dom_burner_opt_pressure) ? $record->available_options->appliances->dom_burner_opt_pressure : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Operating pressure (or inlet pressure) at maximum rate </td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">
+                                        {{ (isset($record->available_options->appliances->dom_burner_opt_pressure) && !empty($record->available_options->appliances->dom_burner_opt_pressure) ? $record->available_options->appliances->dom_burner_opt_pressure : '') }}
+                                        {{ (isset($record->available_options->appliances->dom_burner_opt_pressure_unit) && !empty($record->available_options->appliances->dom_burner_opt_pressure_unit) ? $record->available_options->appliances->dom_burner_opt_pressure_unit : '') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Cold water inlet temperature (°C)</td>
@@ -448,16 +458,22 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Gas Rate {{ (isset($record->available_options->appliances->gas_rate_unit) && !empty($record->available_options->appliances->gas_rate_unit) ? $record->available_options->appliances->gas_rate_unit : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->gas_rate) && !empty($record->available_options->appliances->gas_rate) ? $record->available_options->appliances->gas_rate : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Gas Rate </td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">
+                                        {{ (isset($record->available_options->appliances->gas_rate) && !empty($record->available_options->appliances->gas_rate) ? $record->available_options->appliances->gas_rate : '') }}
+                                        {{ (isset($record->available_options->appliances->gas_rate_unit) && !empty($record->available_options->appliances->gas_rate_unit) ? $record->available_options->appliances->gas_rate_unit : '') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Central heating output left at factory setting</td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->cho_factory_setting) && !empty($record->available_options->appliances->cho_factory_setting) ? $record->available_options->appliances->cho_factory_setting : '') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Burner operating pressure (or inlet pressure) at maximum rate {{ (isset($record->available_options->appliances->burner_opt_pressure_unit) && !empty($record->available_options->appliances->burner_opt_pressure_unit) ? '('. $record->available_options->appliances->burner_opt_pressure_unit.')' : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">{{ (isset($record->available_options->appliances->burner_opt_pressure) && !empty($record->available_options->appliances->burner_opt_pressure) ? $record->available_options->appliances->burner_opt_pressure : '') }}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Operating pressure (or inlet pressure) at maximum rate </td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col4">
+                                        {{ (isset($record->available_options->appliances->burner_opt_pressure) && !empty($record->available_options->appliances->burner_opt_pressure) ? $record->available_options->appliances->burner_opt_pressure : '') }}
+                                        {{ (isset($record->available_options->appliances->burner_opt_pressure_unit) && !empty($record->available_options->appliances->burner_opt_pressure_unit) ? $record->available_options->appliances->burner_opt_pressure_unit : '') }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-col8">Central heating flow temperature (°C)</td>

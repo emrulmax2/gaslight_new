@@ -40,94 +40,52 @@
                         </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Time and temperature control to hot water</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_tatcthw_yes">Cylinder thermostat and programmer/timer</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_tatcthw_yes" name="tmp_control_hot_water" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Cylinder thermostat and programmer/timer"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_tatcthw_no">Combination boiler</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_tatcthw_no" name="tmp_control_hot_water" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Combination boiler"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Time and temperature control to hot water</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="tmp_control_hot_water" name="tmp_control_hot_water" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Cylinder thermostat and programmer/timer">Cylinder thermostat and programmer/timer</option>
+                            <option value="Combination boiler">Combination boiler</option>
+                        </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Heating zone valves</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_hzv_yes">Fitted</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_hzv_yes" name="heating_zone_vlv" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fitted"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_hzv_no">Not Required</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_hzv_no" name="heating_zone_vlv" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Not Required"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Heating zone valves</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="heating_zone_vlv" name="heating_zone_vlv" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Fitted">Fitted</option>
+                            <option value="Not Required">Not Required</option>
+                        </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Hot water zone valves</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_hwzv_yes">Fitted</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_hwzv_yes" name="hot_water_zone_vlv" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fitted"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_hwzv_no">Not Required</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_hwzv_no" name="hot_water_zone_vlv" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Not Required"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Hot water zone valves</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="hot_water_zone_vlv" name="hot_water_zone_vlv" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Fitted">Fitted</option>
+                            <option value="Not Required">Not Required</option>
+                        </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Thermostic radiator valves</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_tmrvlv_yes">Fitted</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_tmrvlv_yes" name="therm_radiator_vlv" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fitted"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_tmrvlv_no">Not Required</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_tmrvlv_no" name="therm_radiator_vlv" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Not Required"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Thermostic radiator valves</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="therm_radiator_vlv" name="therm_radiator_vlv" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Fitted">Fitted</option>
+                            <option value="Not Required">Not Required</option>
+                        </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Automatic bypass to system</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_autbts_yes">Fitted</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_autbts_yes" name="bypass_to_system" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Fitted"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_autbts_no">Not Required</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_autbts_no" name="bypass_to_system" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Not Required"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Automatic bypass to system</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="bypass_to_system" name="bypass_to_system" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Fitted">Fitted</option>
+                            <option value="Not Required">Not Required</option>
+                        </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Boiler interlock</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_blinloc_yes">Provided</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_blinloc_yes" name="boiler_interlock" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Provided"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_blinloc_no">Not Provided</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_blinloc_no" name="boiler_interlock" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Not Provided"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Boiler interlock</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="boiler_interlock" name="boiler_interlock" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Provided">Provided</option>
+                            <option value="Not Required">Not Required</option>
+                        </x-base.form-select>
                     </div>
 
                     <div class="col-span-12">
@@ -176,26 +134,27 @@
                     </div>
 
                     <div class="col-span-12">
-                        <h2 class="mb-4 mt-4 font-medium text-base leading-none tracking-normal">Central Hot Water Mode</h2>
+                        <h2 class="mb-4 mt-4 font-medium text-base leading-none tracking-normal">Central Heating Mode</h2>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Gas Rate</x-base.form-label>
-                        <x-base.form-input name="gas_rate" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Ratio" />
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Gas rate unit</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_gsrunt_yes">m<sup>3</sup>/hr</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_gsrunt_yes" name="gas_rate_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="m3/hr"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_gsrunt_no">ft<sup>3</sup>/hr</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_gsrunt_no" name="gas_rate_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="ft3/hr"/>
-                                </x-base.form-check>
+                        <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
+                            <x-base.form-input type="number" step="any" name="gas_rate" placeholder="Gas Rate" />
+                            <div class="inline-flex justify-end items-center h-full">
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="gas_rate_unit" id="gas_rate_unit_1" value="m3/hr" />
+                                    <label class="inline-flex border-r peer-checked:bg-success peer-checked:text-white border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="gas_rate_unit_1">
+                                        m<sup>3</sup>/hr
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="gas_rate_unit" id="gas_rate_unit_2" value="ft3/hr" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="gas_rate_unit_2">
+                                        ft<sup>3</sup>/hr
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        </x-base.input-group>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
@@ -216,29 +175,34 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Burner operating pressure (or intel pressure)</x-base.form-label>
-                        <x-base.form-input name="burner_opt_pressure" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Buner pressure" />
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Burner operating pressure (or intel pressure) Unit</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_bopoipunt_yes">mbar</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_bopoipunt_yes" name="burner_opt_pressure_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="mbar"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_bopoipunt_no">kW/h</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_bopoipunt_no" name="burner_opt_pressure_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="kW/h"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_bopoipunt_na">Btu/h</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_bopoipunt_na" name="burner_opt_pressure_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Btu/h"/>
-                                </x-base.form-check>
+                        <x-base.form-label class="mb-1">Operating pressure (or intel pressure)</x-base.form-label>
+                        <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
+                            <x-base.form-input type="number" step="any" name="burner_opt_pressure" placeholder="Buner pressure" />
+                            <div class="inline-flex justify-end items-center h-full">
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="burner_opt_pressure_unit" id="burner_opt_pressure_unit_1" value="mbar" />
+                                    <label class="inline-flex border-r peer-checked:bg-success peer-checked:text-white border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="burner_opt_pressure_unit_1">
+                                        mbar
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="burner_opt_pressure_unit" id="burner_opt_pressure_unit_2" value="kW/h" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="burner_opt_pressure_unit_2">
+                                        kW/h
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="burner_opt_pressure_unit" id="burner_opt_pressure_unit_3" value="Btu/h" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="burner_opt_pressure_unit_3">
+                                        Btu/h
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        </x-base.input-group>
                     </div>
+                    
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Central heating flow temperature</x-base.form-label>
                         <x-base.form-input name="centeral_heat_flow_temp" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
@@ -266,9 +230,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <div class="col-span-12 sm:col-span-4 maufacturerWrap" style="display: none;">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">If yes and if required by the manufacturer, has the water scale reducer been fitted?</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">If required by the manufacturer, has the water scale reducer been fitted?</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_iyairmsf_yes">Yes</x-base.form-check.label>
@@ -281,20 +245,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">What type of scale reducer been fitted?</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_wtosrbf_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_wtosrbf_yes" name="what_reducer_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_wtosrbf_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_wtosrbf_no" name="what_reducer_fitted" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                    <div class="col-span-12 sm:col-span-4 reducerFittedWrap" style="display: none;">
+                        <x-base.form-label class="mb-1">What type of scale reducer been fitted?</x-base.form-label>
+                        <x-base.form-input name="what_reducer_fitted" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
                     </div>
 
                     <div class="col-span-12">
@@ -302,45 +255,49 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Gas Rate</x-base.form-label>
-                        <x-base.form-input name="dom_gas_rate" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Ratio" />
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Gas rate unit</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_dgsrunt_yes">m<sup>3</sup>/hr</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_dgsrunt_yes" name="dom_gas_rate_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="m3/hr"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_dgsrunt_no">ft<sup>3</sup>/hr</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_dgsrunt_no" name="dom_gas_rate_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="ft3/hr"/>
-                                </x-base.form-check>
+                        <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
+                            <x-base.form-input type="number" step="any" name="dom_gas_rate" placeholder="Gas Rate" />
+                            <div class="inline-flex justify-end items-center h-full">
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="dom_gas_rate_unit" id="dom_gas_rate_unit_1" value="m3/hr" />
+                                    <label class="inline-flex border-r peer-checked:bg-success peer-checked:text-white border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="dom_gas_rate_unit_1">
+                                        m<sup>3</sup>/hr
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="dom_gas_rate_unit" id="dom_gas_rate_unit_2" value="ft3/hr" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="dom_gas_rate_unit_2">
+                                        ft<sup>3</sup>/hr
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        </x-base.input-group>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Burner operating pressure (or intel pressure)</x-base.form-label>
-                        <x-base.form-input name="dom_burner_opt_pressure" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Buner pressure" />
-                    </div>
-                    <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Gas rate unit</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_dbopoipunt_yes">mbar</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_dbopoipunt_yes" name="dom_burner_opt_pressure_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="mbar"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_dbopoipunt_no">kW/h</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_dbopoipunt_no" name="dom_burner_opt_pressure_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="kW/h"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_dbopoipunt_na">Btu/h</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_dbopoipunt_na" name="dom_burner_opt_pressure_unit" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Btu/h"/>
-                                </x-base.form-check>
+                        <x-base.form-label class="mb-1">Operating pressure (or intel pressure)</x-base.form-label>
+                        <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
+                            <x-base.form-input type="number" step="any" name="dom_burner_opt_pressure" placeholder="Buner pressure" />
+                            <div class="inline-flex justify-end items-center h-full">
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="dom_burner_opt_pressure_unit" id="dom_burner_opt_pressure_unit_1" value="mbar" />
+                                    <label class="inline-flex border-r peer-checked:bg-success peer-checked:text-white border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="dom_burner_opt_pressure_unit_1">
+                                        mbar
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="dom_burner_opt_pressure_unit" id="dom_burner_opt_pressure_unit_2" value="kW/h" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="dom_burner_opt_pressure_unit_2">
+                                        kW/h
+                                    </label>
+                                </div>
+                                <div class="relative h-full">
+                                    <input type="radio" class="peer absolute w-0 h-0 opacity-0" name="dom_burner_opt_pressure_unit" id="dom_burner_opt_pressure_unit_3" value="Btu/h" />
+                                    <label class="inline-flex peer-checked:bg-success peer-checked:text-white border-r border-r-slate-100 items-center justify-center relative bg-slate-200 text-slate-600 cursor-pointer font-meidum px-2 py-1 h-full" for="dom_burner_opt_pressure_unit_3">
+                                        Btu/h
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        </x-base.input-group>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Cold water intel temperature</x-base.form-label>
@@ -385,42 +342,22 @@
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Pint of termination</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_potrm_yes">Internal</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_potrm_yes" name="point_of_termination" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Internal"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_potrm_no">External</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_potrm_no" name="point_of_termination" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="External"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_potrm_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_potrm_na" name="point_of_termination" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Pint of termination</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="point_of_termination" name="point_of_termination" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Internal">Internal</option>
+                            <option value="External">External</option>
+                            <option value="N/A">N/A</option>
+                        </x-base.form-select>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Method of disposal</x-base.form-label>
-                            <div class="bg-white">
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_modip_yes">Gravity</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_modip_yes" name="dispsal_method" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Gravity"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_modip_no">Pumped</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_modip_no" name="dispsal_method" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Pumped"/>
-                                </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_modip_na">N/A</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_modip_na" name="dispsal_method" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
-                                </x-base.form-check>
-                            </div>
-                        </div>
+                        <x-base.form-label class="mb-1">Method of disposal</x-base.form-label>
+                        <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="dispsal_method" name="dispsal_method" data-placeholder="Please Select">
+                            <option value="">Please Select</option>
+                            <option value="Gravity">Gravity</option>
+                            <option value="Pumped">Pumped</option>
+                            <option value="N/A">N/A</option>
+                        </x-base.form-select>
                     </div>
 
                     <div class="col-span-12">
@@ -433,10 +370,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">RATIO</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="min_ratio" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="Ratio" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="min_ratio" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="Ratio" />
                                     </div>
                                 </div>
                             </div>
@@ -444,10 +378,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">CO (PPM)</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="min_co" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="CO (PPM)" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="min_co" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="CO (PPM)" />
                                     </div>
                                 </div>
                             </div>
@@ -455,10 +386,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">CO<sub>2</sub> (%)</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="min_co2" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="CO2 (%)" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="min_co2" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="CO2 (%)" />
                                     </div>
                                 </div>
                             </div>
@@ -471,10 +399,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">RATIO</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="max_ratio" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="Ratio" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="max_ratio" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="Ratio" />
                                     </div>
                                 </div>
                             </div>
@@ -482,10 +407,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">CO (PPM)</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="max_co" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="CO (PPM)" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="max_co" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="CO (PPM)" />
                                     </div>
                                 </div>
                             </div>
@@ -493,10 +415,7 @@
                                 <div class="readings">
                                     <x-base.form-label class="mb-1 text-center block">CO<sub>2</sub> (%)</x-base.form-label>
                                     <div class="block">
-                                        <x-base.form-input value="" name="max_co2" class="w-full h-[33px] rounded-[3px] rounded-b-none" type="text" placeholder="CO2 (%)" />
-                                        <x-base.button data-value="N/A" type="button" class="naToggleBtn w-full rounded-t-none h-[33px] bg-slate-500 border-slate-500 text-white hover:bg-slate-500 hover:border-slate-500 hover:opacity-80">
-                                            N/A
-                                        </x-base.button>
+                                        <x-base.form-input value="" name="max_co2" class="w-full h-[33px] rounded-[3px]" type="text" placeholder="CO2 (%)" />
                                     </div>
                                 </div>
                             </div>
