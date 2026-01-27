@@ -215,7 +215,7 @@ class RecordController extends Controller
                 ],
                 'job' => $record->job,
                 'customer' => $record->customer,
-                'job_address' => $record->job->property,
+                'job_address' => $record->property,
                 'occupant' => (isset($record->occupant) && $record->occupant->count() > 0 ? $record->occupant : []),
                 'pdf_url' => $pdf_url
             ];

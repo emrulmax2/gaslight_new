@@ -460,7 +460,7 @@ class RecordController extends Controller
             ],
             'job' => $record->job,
             'customer' => $record->customer,
-            'job_address' => $record->job->property,
+            'job_address' => $record->property,
             'occupant' => [
                 'customer_property_occupant_id' => $record->customer_property_occupant_id,
                 'occupant_name' => (isset($record->occupant->occupant_name) && !empty($record->occupant->occupant_name) ? $record->occupant->occupant_name : ''),

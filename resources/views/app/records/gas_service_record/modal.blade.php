@@ -175,7 +175,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-12 pt-2 analyserRatioWraper" style="display: none;">
+                    <div class="col-span-12 pt-2">
                         <x-base.form-label>Inital (low) Combustion Analyser Reading</x-base.form-label>
                         <div class="grid grid-cols-12 gap-x-5 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
