@@ -77,7 +77,7 @@
                         </div>
                     </div>
                     <div class="col-span-12 pt-2 ratioWrap" style="display: none;">
-                        <x-base.form-label>Combustion Parformance Reading (high)</x-base.form-label>
+                        <x-base.form-label>Combustion Parformance Reading (High)</x-base.form-label>
                         <div class="grid grid-cols-12 gap-x-5 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
                                 <div class="readings">
@@ -336,7 +336,7 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
-                            <x-base.form-label class="mb-2 mt-1 block font-medium">Appliance is safe</x-base.form-label>
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Appliance is safe to use</x-base.form-label>
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_issafe_yes">Yes</x-base.form-check.label>

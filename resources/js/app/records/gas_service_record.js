@@ -115,14 +115,6 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
                                                 $('#applianceModal input[name="test_carried_out"]').prop('checked', false);
                                             })
                                         }
-                                    }else if(key == 'full_strip_cared_out'){
-                                        if(applianceObj.full_strip_cared_out == 'Yes'){
-                                            $('.analyserRatioWraper').fadeIn()
-                                        }else{
-                                            $('.analyserRatioWraper').fadeOut('fast', function(){
-                                                $('#applianceModal .analyserRatioWraper input').val('');
-                                            })
-                                        }
                                     }
                                     $('#applianceModal [name="'+key+'"][value="'+value+'"]').prop('checked', true);
                                 }else{
@@ -162,19 +154,6 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
         }
     })
 
-    // Analyser Ratio
-    $(document).on('change', '#applianceModal input[name="full_strip_cared_out"]', function(e){
-        let checkedValue = $('#applianceModal input[name="full_strip_cared_out"]:checked').val();
-        if(checkedValue == 'Yes'){
-            $('.analyserRatioWraper').fadeIn('fast', function(){
-                $('#applianceModal .analyserRatioWraper input').val('');
-            })
-        }else{
-            $('.analyserRatioWraper').fadeOut('fast', function(){
-                $('#applianceModal .analyserRatioWraper input').val('');
-            })
-        }
-    })
 
     // Details Option
     $(document).on('change', '#applianceModal input.hasDetails', function(e){

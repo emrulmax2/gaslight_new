@@ -100,10 +100,6 @@
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_towco_no">Maintenance</x-base.form-check.label>
                                     <x-base.form-check.input id="gwn_towco_no" name="type_of_work_carried_out" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Maintenance"/>
                                 </x-base.form-check>
-                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
-                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_towco_na">Call Out</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_towco_na" name="type_of_work_carried_out" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Call Out"/>
-                                </x-base.form-check>
                             </div>
                         </div>
                     </div>
@@ -175,8 +171,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-12 pt-2 analyserRatioWraper" style="display: none;">
-                        <x-base.form-label>Inital (low) Combustion Analyser Reading</x-base.form-label>
+                    <div class="col-span-12 pt-2">
+                        <x-base.form-label>Inital (Low) Combustion Analyser Reading</x-base.form-label>
                         <div class="grid grid-cols-12 gap-x-5 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
                                 <div class="readings">
@@ -205,7 +201,7 @@
                         </div>
                     </div>
                     <div class="col-span-12 pt-2 analyserRatioWraper" style="display: none;">
-                        <x-base.form-label>Final (high) Combustion Analyser Reading</x-base.form-label>
+                        <x-base.form-label>Final (High) Combustion Analyser Reading</x-base.form-label>
                         <div class="grid grid-cols-12 gap-x-5 gap-y-3">
                             <div class="col-span-12 sm:col-span-4">
                                 <div class="readings">

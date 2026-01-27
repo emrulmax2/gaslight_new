@@ -91,7 +91,7 @@ class UserSubscriptionWebhookController extends Controller
                         $content .= 'Thanks & Regards<br/>';
                         $content .= 'Gas Safety Engineer';
 
-                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []));
+                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []), ['limon@lcc.ac.uk']);
                     elseif($theObject->billing_reason == 'subscription_create'):
                         $subject = 'Payment Issue: We Couldn\'t Process Your Subscription';
 
@@ -102,7 +102,7 @@ class UserSubscriptionWebhookController extends Controller
                         $content .= 'Thanks & Regards<br/>';
                         $content .= 'Gas Safety Engineer';
 
-                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []));
+                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []), ['limon@lcc.ac.uk']);
                     endif;
                 endif;
                 break;
@@ -159,7 +159,7 @@ class UserSubscriptionWebhookController extends Controller
                         $content .= 'Thanks & Regards<br/>';
                         $content .= 'Gas Safety Engineer';
 
-                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []));
+                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []), ['limon@lcc.ac.uk']);
                     endif;
 
                     $message = 'Subscription active status successfully updated.';
@@ -288,7 +288,7 @@ class UserSubscriptionWebhookController extends Controller
                     $content .= 'Thanks & Regards<br/>';
                     $content .= 'Gas Safety Engineer';
 
-                    GCEMailerJob::dispatch($configuration, [$userPackage->user->email], new GCESendMail($subject, $content, [], $subject));
+                    GCEMailerJob::dispatch($configuration, [$userPackage->user->email], new GCESendMail($subject, $content, [], $subject), ['limon@lcc.ac.uk']);
                 }
 
                 break;

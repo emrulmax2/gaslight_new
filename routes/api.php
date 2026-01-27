@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Customers\CustomerJobAddressController;
 use App\Http\Controllers\Api\Customers\CustomerJobsController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\GlobalApiController;
+use App\Http\Controllers\Api\JobForms\JobFormController;
 use App\Http\Controllers\Api\Jobs\JobsController;
 use App\Http\Controllers\Api\Pricing\PricingPackageController;
 use App\Http\Controllers\Api\Records\InvoiceController;
@@ -234,6 +235,11 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('quotes/edit/{quote_id}', 'edit');
             Route::post('quotes/send', 'send');
             Route::get('quotes/download/{quote_id}', 'download');
+        });
+
+        Route::controller(JobFormController::class)->group(function() {
+            Route::get('form/list', 'list');
+            Route::get('form/template', 'formTemplate');
         });
 
     });
