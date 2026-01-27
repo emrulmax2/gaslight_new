@@ -155,7 +155,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
 
         if(opt_correctly == 'No' || conf_safety_standards == 'No'){
             $('#applianceModal .noticeExplainedWrap').fadeIn(function(){
-                $('#applianceModal .noticeExplainedWrap input[type="radio"]').prop('checked', true);
+                $('#applianceModal .noticeExplainedWrap input[type="radio"]').prop('checked', false);
             })
         }else{
             $('#applianceModal .noticeExplainedWrap').fadeOut(function(){
