@@ -98,12 +98,12 @@ class RecordAndDraftController extends Controller
                             $html .= '</div>';
                         $html .= '</div>';
                     $html .= '</td>';
-                    $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
-                        $html .= '<div class="flex items-start flex-wrap">';
-                            $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Billing Address</label>';
-                            $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->billing->full_address ?? '').'</span>';
-                        $html .= '</div>';
-                    $html .= '</td>';
+                    // $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
+                    //     $html .= '<div class="flex items-start flex-wrap">';
+                    //         $html .= '<label class="sm:hidden mb-1.5 font-medium m-0 flex-zero-full">Billing Address</label>';
+                    //         $html .= '<span class="text-slate-500 whitespace-normal sm:text-xs leading-[1.3] max-sm:ml-auto flex-zero-full">'.($list->billing->full_address ?? '').'</span>';
+                    //     $html .= '</div>';
+                    // $html .= '</td>';
                     $html .= '<td class="border-b dark:border-darkmode-300 max-sm:border-b max-sm:border-solid border-none px-0 sm:px-3 py-3 sm:py-2">';
                         $html .= '<div class="flex items-start">';
                             $html .= '<label class="sm:hidden font-medium m-0">Assigned To</label>';

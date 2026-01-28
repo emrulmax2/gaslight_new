@@ -7,6 +7,7 @@ use App\Mail\GCESendMail;
 use App\Models\PricingPackage;
 use App\Models\UserPricingPackage;
 use App\Models\UserPricingPackageInvoice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -63,6 +64,11 @@ class UserSubscriptionWebhookController extends Controller
                     $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
                 endif;
                 if(isset($userPackage->id) && $userPackage->id > 0):
+                    $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+                    $subscription = $stripe->subscriptions->retrieve($subscription_id);
+                    $currentPeriodStart = Carbon::createFromTimestamp((int) $subscription->current_period_start)->toDateString();
+                    $currentPeriodEnd = Carbon::createFromTimestamp((int) $subscription->current_period_end)->toDateString();
+
                     $userPackage->update([
                         'active' => 0,
                         'updated_by' => 1
@@ -71,8 +77,8 @@ class UserSubscriptionWebhookController extends Controller
                         'user_id' => $userPackage->user_id,
                         'user_pricing_package_id' => $userPackage->id,
                         'invoice_id' => $invoice_id,
-                        'start' => date('Y-m-d', strtotime($theObject->period_start)),
-                        'end' => date('Y-m-d', strtotime($theObject->period_end)),
+                        'start' => $currentPeriodStart,
+                        'end' => $currentPeriodEnd,
                         'status' => 'incomplete',
                         
                         'created_by' => 1,
@@ -108,7 +114,7 @@ class UserSubscriptionWebhookController extends Controller
                 break;
             case 'invoice.payment_succeeded':
                 $theObject = $event->data->object; // contains a \Stripe\PaymentMethod
-                Log::info(json_encode($theObject));
+                //Log::info(json_encode($theObject));
                 $invoice_id = $theObject->id;
                 $customer_id = $theObject->customer;
                 $customer_name = $theObject->customer_name;
@@ -123,10 +129,15 @@ class UserSubscriptionWebhookController extends Controller
                     $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
                 endif;
                 if(isset($userPackage->id) && $userPackage->id > 0):
+                    $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+                    $subscription = $stripe->subscriptions->retrieve($subscription_id);
+                    $currentPeriodStart = Carbon::createFromTimestamp((int) $subscription->current_period_start)->toDateString();
+                    $currentPeriodEnd = Carbon::createFromTimestamp((int) $subscription->current_period_end)->toDateString();
+
                     $userPackage->update([
                         'active' => 1,
-                        'start' => date('Y-m-d', strtotime($theObject->period_start)),
-                        'end' => date('Y-m-d', strtotime($theObject->period_end)),
+                        'start' => $currentPeriodStart,
+                        'end' => $currentPeriodEnd,
                         'price' => ($theObject->total / 100),
                         'updated_by' => 1
                     ]);
@@ -134,22 +145,42 @@ class UserSubscriptionWebhookController extends Controller
                         'user_id' => $userPackage->user_id,
                         'user_pricing_package_id' => $userPackage->id,
                         'invoice_id' => $invoice_id,
-                        'start' => date('Y-m-d', strtotime($theObject->period_start)),
-                        'end' => date('Y-m-d', strtotime($theObject->period_end)),
+                        'start' => $currentPeriodStart,
+                        'end' => $currentPeriodEnd,
                         'status' => 'active',
                         
                         'created_by' => 1,
                     ]);
 
+                    if($theObject->billing_reason == 'subscription_create'):
+                        $subject = 'Your Subscription Has Been Successfully Created';
+
+                        $content = 'Hi '.$customer_name.',<br/><br/>';
+                       
+                        $content .= '<p>We\'re happy to let you know that your subscription has been successfully created! Your payment was processed, and your access will continue without interruption.</p>';
+                        $content .= '<p>';
+                            $content .= 'Plan: <strong>'.$userPackage->package->title.'</strong><br/>';
+                            $content .= 'Renewal Date: <strong>'.$currentPeriodStart.' - '.$currentPeriodEnd.'</strong><br/>';
+                            $content .= 'Amount Charged: <strong>'.Number::currency(($theObject->total / 100), 'GBP').'</strong>';
+                        $content .= '</p>';
+
+                        $content .= '<p>No action is needed on your part. If you have any questions or wish to make changes to your subscription, you can manage from your account.</p>';
+                        $content .= '<p>Thank you for being a valued customer!</p>';
+
+                        $content .= 'Thanks & Regards<br/>';
+                        $content .= 'Gas Safety Engineer';
+
+                        GCEMailerJob::dispatch($configuration, [$customer_email], new GCESendMail($subject, $content, []), ['limon@lcc.ac.uk']);
+                    endif;
                     if($theObject->billing_reason == 'subscription_cycle'):
-                        $subject = 'our Subscription Has Been Successfully Renewed';
+                        $subject = 'Your Subscription Has Been Successfully Renewed';
 
                         $content = 'Hi '.$customer_name.',<br/><br/>';
                        
                         $content .= '<p>We\'re happy to let you know that your subscription has been successfully renewed! Your payment was processed, and your access will continue without interruption.</p>';
                         $content .= '<p>';
                             $content .= 'Plan: <strong>'.$userPackage->package->title.'</strong><br/>';
-                            $content .= 'Renewal Date: <strong>'.date('Y-m-d', strtotime($theObject->period_start)).' - '.date('Y-m-d', strtotime($theObject->period_end)).'</strong><br/>';
+                            $content .= 'Renewal Date: <strong>'.$currentPeriodStart.' - '.$currentPeriodEnd.'</strong><br/>';
                             $content .= 'Amount Charged: <strong>'.Number::currency(($theObject->total / 100), 'GBP').'</strong>';
                         $content .= '</p>';
 
@@ -238,8 +269,8 @@ class UserSubscriptionWebhookController extends Controller
                                 'pricing_package_id' => $newPackage->id,
                                 'stripe_customer_id' => $customerId,
                                 'stripe_subscription_id' => $subscription->id,
-                                'start' => date('Y-m-d', $subscription->current_period_start),
-                                'end' => date('Y-m-d', $subscription->current_period_end),
+                                'start' => Carbon::createFromTimestamp((int) $subscription->current_period_start)->toDateString(),
+                                'end' => Carbon::createFromTimestamp((int) $subscription->current_period_end)->toDateString(),
                                 'price' => $newPackage->price,
                                 'active' => ($subscription->status && $subscription->status == 'active' ? 1 : 0),
                                 
@@ -252,8 +283,8 @@ class UserSubscriptionWebhookController extends Controller
                                     'user_id' => $newUserPackage->user_id,
                                     'user_pricing_package_id' => $userPricingPackage->id,
                                     'invoice_id' => $subscription->latest_invoice,
-                                    'start' => date('Y-m-d', $subscription->current_period_start),
-                                    'end' => date('Y-m-d', $subscription->current_period_end),
+                                    'start' => Carbon::createFromTimestamp((int) $subscription->current_period_start)->toDateString(),
+                                    'end' => Carbon::createFromTimestamp((int) $subscription->current_period_end)->toDateString(),
                                     'status' => (isset($subscription->status) && !empty($subscription->status) ? $subscription->status : null),
                                     
                                     'created_by' => 1,
@@ -277,10 +308,10 @@ class UserSubscriptionWebhookController extends Controller
 
                     $content = 'Hi '.$userPackage->user->name.',<br/><br/>';
                     
-                    $content .= '<p>We\'re confirming that your subscription to '.$userPackage->package->title.' has been successfully canceled. Your access will remain active until the end of your current billing period, which ends on '.date('jS F, Y', strtotime($userPackage->end)).'.</p>';
+                    $content .= '<p>We\'re confirming that your subscription to '.$userPackage->package->title.' has been successfully canceled. Your access will remain active until the end of your current billing period, which ends on '.date('jS F, Y', $userPackage->end).'.</p>';
                     if($upgraded && $upgradeToPack > 0):
                         $newPackage = PricingPackage::find($upgradeToPack);
-                        $content .= '<p>You new plan '.$newPackage->title.' will activated from '.date('jS F, Y', strtotime($userPackage->end)).'</p>';
+                        $content .= '<p>You new plan '.$newPackage->title.' will activated from '.date('jS F, Y', $userPackage->end).'</p>';
                     endif;
                     $content .= '<p>If this was a mistake or you change your mind, you can easily reactivate your subscription anytime from your portal.</p>';
                     $content .= '<p>We\'re grateful for the time you spent with us and hope to see you again in the future. If you have any questions or feedback, feel free to reach out.</p>';

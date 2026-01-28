@@ -11,9 +11,11 @@
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
             </x-base.button>
+            @if(isset($user->userpackage->stripe_customer_id) && !empty($user->userpackage->stripe_customer_id))
             <x-base.button as="a" href="{{ route('users.add.payment.method', [$user->id, $user->userpackage->stripe_customer_id]) }}" class="shadow-md ml-2 text-white" variant="success">
                 <x-base.lucide class="h-4 w-4 mr-2" icon="plus-circle" /> Add Method
             </x-base.button>
+            @endif
         </div>
     </div>
 
@@ -56,6 +58,14 @@
                     </div>
                 </a>
                 @endforeach
+            @else 
+            <x-base.alert class="mb-0 flex items-center" variant="soft-pending" >
+                <x-base.lucide
+                    class="mr-2 h-6 w-6"
+                    icon="AlertTriangle"
+                />
+                Plans not found. Upgrade your plan with paid package.
+            </x-base.alert>
             @endif
         </div>
     </div>

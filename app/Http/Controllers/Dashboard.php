@@ -78,7 +78,7 @@ class Dashboard extends Controller
             ],
             'user' => User::with('referral')->find(auth()->user()->id),
             'packages' => PricingPackage::where('active', 1)->orderBy('order', 'ASC')->get(),
-            'userPackage' => UserPricingPackage::with('package')->where('user_id', $user->id)->where('active', 1)->orderByDesc('id')->first()
+            'userPackage' => UserPricingPackage::with('package')->where('user_id', $user->id)->orderByDesc('id')->first()
         ]);
     }
 
