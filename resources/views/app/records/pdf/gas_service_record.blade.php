@@ -346,32 +346,44 @@
                     <td class="w-half pl-1 pr-0 pb-0 pt-0 align-top">
                         <table class="table table-sm bordered border-primary">
                             <thead>
-                                @php 
-                                    $full_strip_cared_out = (isset($appliances->full_strip_cared_out) && !empty($appliances->full_strip_cared_out) ? $appliances->full_strip_cared_out : '&nbsp;');
-                                @endphp
                                 <tr>
-                                    <th colspan="5" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
-                                        Electronic combustion gas analyser (ECGA) readings
-                                    </th>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-10px tracking-normal text-center leading-none border-b border-r w-col2">{!! $full_strip_cared_out !!}</td>
-                                </tr>
-                                <tr>
-                                    <th colspan="3" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                    <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
                                         Initial (low) ECGA reading
                                     </th>
-                                    <th colspan="3" class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                    <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
                                         Final (high) ECGA reading
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        RATIO
+                                    </th>
+                                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        CO (PPM)
+                                    </th>
+                                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        CO<sub>2</sub> (%)
+                                    </th>
+
+                                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        RATIO
+                                    </th>
+                                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        CO (PPM)
+                                    </th>
+                                    <th class="whitespace-normal border-primary bg-primary border-b-0 border-r border-r-sec text-white text-10px leading-none uppercase px-2 py-05 text-center align-middle">
+                                        CO<sub>2</sub> (%)
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co.' CO (PPM)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co.' CO (PPM)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-5 border-b border-r w-col2">{!! (isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co.' CO (PPM)' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co.' CO (PPM)' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -423,11 +435,24 @@
             </tbody>
         </table>
 
+        @php 
+            $full_strip_cared_out = (isset($appliances->full_strip_cared_out) && !empty($appliances->full_strip_cared_out) ? $appliances->full_strip_cared_out : '&nbsp;');
+        @endphp
         <table class="p-0 border-none mt-1-5">
             <tbody>
                 <tr>
                     <td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">
-                        <table class="table table-sm bordered border-primary">
+                        <table class="p-0 border-none">
+                            <tbody>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
+                                        Has a full strip and clean service been cared out
+                                    </th>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-t border-b border-r w-col4">{!! $full_strip_cared_out !!}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm bordered border-primary  mt-1-5">
                             <thead>
                                 <tr>
                                     <th colspan="3" class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-10px uppercase leading-none px-2 py-05 align-middle text-left">
@@ -498,7 +523,7 @@
                             </tbody>
                         </table>
                     </td>
-                    <td class="w-half pr-1 pl-0 pb-0 pt-0 align-top">
+                    <td class="w-half pl-0 pb-0 pt-0 align-top">
                         <table class="table table-sm bordered border-primary">
                             <thead>
                                 <tr>
@@ -654,7 +679,7 @@
                                 </tr>
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>
-                                    <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '')) }}</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>

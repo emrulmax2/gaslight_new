@@ -39,9 +39,9 @@
                     <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
                         Landlord Name
                     </x-base.table.th>
-                    <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
+                    <!-- <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
                         Billing Address
-                    </x-base.table.th>
+                    </x-base.table.th> -->
                     <x-base.table.th class="whitespace-nowrap border-b-0 uppercase px-3 py-2 text-[12px] leading-none">
                         Assigned To
                     </x-base.table.th>
@@ -55,7 +55,7 @@
             </x-base.table.thead>
             <x-base.table.tbody>
                 <x-base.table.tr data-url="" class="intro-x box bg-pending bg-opacity-10 border border-pending border-opacity-5 max-sm:mb-[10px] shadow-[5px_3px_5px_#00000005] rounded">
-                    <x-base.table.td colspan="9" class="border-none px-3 py-3 rounded">
+                    <x-base.table.td colspan="8" class="border-none px-3 py-3 rounded">
                         <div class="flex justify-center items-center text-pending">
                             No matching records found!
                         </div>

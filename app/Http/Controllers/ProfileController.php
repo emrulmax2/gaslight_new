@@ -201,13 +201,13 @@ class ProfileController extends Controller
                         $paymentData['portal_url'] = (isset($session->url) && !empty($session->url) ? $session->url : '');
                         
                     }catch(Exception $e){
-                        //return redirect('profile');
+                        return redirect('profile');
                     }
                 else:
-                    //return redirect('profile');
+                    return redirect('profile');
                 endif;
             }catch(Exception $e){
-                //return redirect('profile');
+                return redirect('profile');
             }
         endif;
 

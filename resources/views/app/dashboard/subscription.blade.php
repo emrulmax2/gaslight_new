@@ -28,7 +28,7 @@
                                 <input class="w-0 h-0 opacity-0 absolute left-0 top-0 pricing_package_id" id="pricing_package_{{ $pack->id }}" name="pricing_package_id" type="radio" value="{{ $pack->id }}"/>
                                 <div class="bg-white rounded-xl px-5 sm:px-7 py-10">
                                     <div class="packageHeader min-h-[127px] border-b border-b-slate-200">
-                                        <span class="bg-success bg-opacity-30 text-primary inline-flex px-2 py-0.5 font-medium {{ (isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id ? '' : 'opacity-0 -z-10')}}">Active</span>
+                                        <span class="bg-success bg-opacity-30 text-primary inline-flex px-2 py-0.5 font-medium {{ (isset($userPackage->pricing_package_id) && $userPackage->active == 1 && $userPackage->pricing_package_id == $pack->id ? '' : 'opacity-0 -z-10')}}">Active</span>
                                         <h4 class="font-medium text-dark leading-none mt-2 mb-3">{{ $pack->title }}</h4>
                                         <h2 class="text-xl font-bold text-dark leading-none">
                                             {{ Number::currency($pack->price, 'GBP') }} 
@@ -38,7 +38,7 @@
                                             <span class="bg-danger bg-opacity-10 text-xs px-1.5 py-0.5 font-medium mt-2 inline-flex">
                                                 Ended on - {{ date('d M Y', strtotime($userPackage->end)) }}
                                             </span>
-                                        @elseif(isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id)
+                                        @elseif(isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id && $userPackage->active == 1)
                                             <span class="bg-warning bg-opacity-10 text-xs px-1.5 py-0.5 font-medium mt-2 inline-flex">
                                                 {{ $userPackage->package->period == 'Free Trail' ? 'Trail ended on ' : 'Next auto renew '}} - {{ date('d M Y', strtotime($userPackage->end)) }}
                                             </span>
@@ -53,7 +53,7 @@
                                             <i data-lucide="check-circle" class="w-4 h-4 mr-3" style="flex: 0 0 auto; position: relative; top: 2px;"></i>
                                             <span>{{ $pack->description }}</span>
                                         </p>
-                                        @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id))
+                                        @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && $userPackage->active == 1)
                                             <x-base.button data-id="{{ $user->id }}" id="unsubscripUserBtn" type="button" class="rounded-full px-3 w-36 text-center justify-center {{ $pack->period == 'Free Trail' ? 'opacity-0 -z-20' : '' }}" variant="danger" >
                                                 <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
                                                 Cancel
