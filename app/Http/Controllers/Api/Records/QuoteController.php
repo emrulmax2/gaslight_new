@@ -329,11 +329,7 @@ class QuoteController extends Controller
         $customerName = (isset($quote->customer->full_name) && !empty($quote->customer->full_name) ? $quote->customer->full_name : '');
         $customerEmail = (isset($quote->customer->contact->email) && !empty($quote->customer->contact->email) ? $quote->customer->contact->email : '');
         if(!empty($customerEmail)):
-            $emailData = $this->renderEmailTemplate($quote, $subject, $content);
-
-            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $quote->form->name);
             $templateTitle = $subject;
-            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail[] = $quote->user->email;
 
             if($content == ''):
@@ -367,8 +363,8 @@ class QuoteController extends Controller
                     "disk" => 'public'
                 ];
             endif;
-            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
-                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            if(isset($quote->email_template->attachmentFiles) && !empty($quote->email_template->attachmentFiles)):
+                $attachmentFiles = array_merge($attachmentFiles, $quote->email_template->attachmentFiles);
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);

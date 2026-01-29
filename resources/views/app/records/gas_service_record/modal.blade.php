@@ -396,14 +396,18 @@
                             <div class="bg-white">
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_smif_yes">Yes</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_smif_yes" name="instruction_followed" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                    <x-base.form-check.input id="gwn_smif_yes" name="instruction_followed" class="hasDetails absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
                                 </x-base.form-check>
                                 <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_smif_no">No</x-base.form-check.label>
-                                    <x-base.form-check.input id="gwn_smif_no" name="instruction_followed" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                    <x-base.form-check.input id="gwn_smif_no" name="instruction_followed" class="hasDetails absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-8">
+                        <x-base.form-label class="mb-1">Defects found / remedial action taken</x-base.form-label>
+                        <x-base.form-textarea disabled name="instruction_followed_detail" class="w-full h-[60px] rounded-[3px]" placeholder="Details"></x-base.form-textarea>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Operating Pressure</x-base.form-label>

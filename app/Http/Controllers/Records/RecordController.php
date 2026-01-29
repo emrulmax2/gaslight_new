@@ -254,7 +254,6 @@ class RecordController extends Controller
             'record' => $record,
             'signature' => $record->signature ? Storage::disk('public')->url($record->signature->filename) : '',
             'thePdf' => $thePdf,
-            'template' => JobFormEmailTemplate::with('attachment')->where('user_id', auth()->user()->id)->where('job_form_id', $record->job_form_id)->get()->first()
         ]);
     }
 
@@ -343,11 +342,7 @@ class RecordController extends Controller
                 'created_by' => $user_id,
             ]);
 
-            $emailData = $this->renderEmailTemplate($record, $subject, $content);
-
-            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
             $templateTitle = $subject;
-            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail[] = $record->user->email;
 
             if($content == ''):
@@ -383,8 +378,8 @@ class RecordController extends Controller
                     "disk" => 'public'
                 ];
             endif;
-            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
-                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            if(isset($record->email_template->attachmentFiles) && !empty($record->email_template->attachmentFiles)):
+                $attachmentFiles = array_merge($attachmentFiles, $record->email_template->attachmentFiles);
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate'), $ccMail); 
@@ -568,7 +563,7 @@ class RecordController extends Controller
             if(isset($record->available_options->appliances) && !empty($record->available_options->appliances)):
                 $appliances = (array) $record->available_options->appliances;
                 $data['appliances'] = $appliances;
-                $data['applianceAnswered'] = count(array_filter($appliances, function($v) { return !empty($v); }));
+                $data['applianceAnswered'] = count(array_filter($appliances, function($v, $k) { return !empty($v) && $k !== 'appliance_serial'; }, ARRAY_FILTER_USE_BOTH));
             endif;
         elseif($record->job_form_id == 17):
             $data['systemAnswered'] = $data['inspectionAnswered'] = 0;

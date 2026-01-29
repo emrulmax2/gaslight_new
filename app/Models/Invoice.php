@@ -15,7 +15,7 @@ class Invoice extends Model
         });
     }
 
-    protected $appends = ['available_options', 'invoice_total', 'invoice_due', 'invoice_paid'];
+    protected $appends = ['available_options', 'invoice_total', 'invoice_due', 'invoice_paid', 'email_template'];
 
     protected $fillable = [
         'company_id',
@@ -142,5 +142,58 @@ class Invoice extends Model
         $INVOICEPAID = $ADVANCEAMOUNT + $invoicePayment;
 
         return $INVOICEPAID;
+    }
+
+    public function getEmailTemplateAttribute(){
+        $template = JobFormEmailTemplate::with('attachment')->where('user_id', $this->created_by)->where('job_form_id', $this->job_form_id)->get()->first();
+        $subject = (isset($template->subject) && !empty($template->subject) ? $template->subject : null);
+        $content = (isset($template->content) && !empty($template->content) ? $template->content : null);
+        $cc_email_address = (isset($template->cc_email_address) && !empty($template->cc_email_address) ? $template->cc_email_address : null);
+
+        $companyName = $this->user->companies->pluck('company_name')->first();
+        $shortcodes = [
+            ':customername'         => $this->customer->full_name ?? '',
+            ':customercompany'      => $this->customer->company_name ?? '',
+            ':jobref'               => $this->job->reference_no ?? '',
+            ':jobbuilding'          => isset($this->job->property->address_line_1) && !empty($this->job->property->address_line_1) ? $this->job->property->address_line_1 : '',
+            ':jobstreet'            => isset($this->job->property->address_line_2) && !empty($this->job->property->address_line_1) ? $this->job->property->address_line_2 : '',
+            ':jobregion'            => isset($this->job->property->state) && !empty($this->job->property->state) ? $this->job->property->state : '',
+            ':jobpostcode'          => isset($this->job->property->postal_code) && !empty($this->job->property->postal_code) ? $this->job->property->postal_code : '',
+            ':jobtown'              => isset($this->job->property->city) && !empty($this->job->property->city) ? $this->job->property->city : '',
+            ':propertyaddress'      => isset($this->property->full_address) && !empty($this->property->full_address) ? $this->property->full_address : '',
+            ':contactphone'         => isset($this->user->mobile) && !empty($this->user->mobile) ? $this->user->mobile : '',
+            ':companyname'          => $companyName ?? '',
+            ':engineername'         => $this->user->name ?? '',
+            ':eventdate'            => isset($this->job->calendar->date) && !empty($this->job->calendar->date) ? date('d-m-Y', strtotime($this->job->calendar->date)) : '',
+            ':eventtime'            => (isset($this->job->calendar->slot->start) && !empty($this->job->calendar->slot->start) ? date('H:i', strtotime($this->job->calendar->slot->start)) : '').(isset($this->job->calendar->slot->end) && !empty($this->job->calendar->slot->end) ? ' - '.date('H:i', strtotime($this->job->calendar->slot->end)) : ''),
+            // Add more shortcodes as needed
+        ];
+
+        // Replace shortcodes in subject and content
+        $subject = str_replace(array_keys($shortcodes), array_values($shortcodes), $subject);
+        $content = str_replace(array_keys($shortcodes), array_values($shortcodes), $content);
+
+        $attachmentFiles = [];
+        if(isset($template->attachment) && $template->attachment->count() > 0):
+            $i = 1;
+            foreach($template->attachment as $attachment):
+                if(isset($attachment->download_url) && !empty($attachment->download_url)):
+                    $attachmentFiles[$i] = [
+                        "pathinfo" => 'template_attachments/'.$template->id.'/'.$attachment->current_file_name,
+                        "nameinfo" => $attachment->current_file_name,
+                        "mimeinfo" => $attachment->doc_type,
+                        "disk" => 'public'
+                    ];
+                    $i++;
+                endif;
+            endforeach;
+        endif;
+
+        return (object)[
+            'subject' => $subject,
+            'content' => $content,
+            'attachmentFiles' => $attachmentFiles,
+            'cc_email_address' => $cc_email_address,
+        ];
     }
 }

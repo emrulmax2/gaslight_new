@@ -383,11 +383,7 @@ class InvoiceController extends Controller
         $companyEmail = $invoice->user->companies->pluck('company_email')->first();
         $customerName = (isset($invoice->customer->full_name) && !empty($invoice->customer->full_name) ? $invoice->customer->full_name : '');
         if(!empty($customerEmail)):
-            $emailData = $this->renderEmailTemplate($invoice, $subject, $content);
-
-            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $invoice->form->name);
             $templateTitle = $subject;
-            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail[] = $invoice->user->email;
 
             if($content == ''):
@@ -421,8 +417,8 @@ class InvoiceController extends Controller
                     "disk" => 'public'
                 ];
             endif;
-            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
-                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            if(isset($invoice->email_template->attachmentFiles) && !empty($invoice->email_template->attachmentFiles)):
+                $attachmentFiles = array_merge($attachmentFiles, $invoice->email_template->attachmentFiles);
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);

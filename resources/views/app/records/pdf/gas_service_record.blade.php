@@ -378,12 +378,12 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co.' CO (PPM)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co.' CO (PPM)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2 : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2 : '&nbsp;') !!}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -510,7 +510,7 @@
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Has the installation been carried out to the relevant standard / manufacturers instructions?</td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->instruction_followed) && !empty($appliances->instruction_followed) ? $appliances->instruction_followed : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->instruction_followed_detail) && !empty($appliances->instruction_followed_detail) ? $appliances->instruction_followed_detail : '') }}</td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Operating Pressure</td>
