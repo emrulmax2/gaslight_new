@@ -541,16 +541,11 @@ class RecordController extends Controller
             'form', 
             'user', 
             'user.company'])->find($record_id);
-        $user_id = (isset($record->created_by) && $record->created_by > 0 ? $record->created_by : auth()->user()->id);
         $companyName = $record->user->companies->pluck('company_name')->first(); 
         $companyEmail = $record->user->companies->pluck('company_email')->first(); 
         $customerName = (isset($record->customer->full_name) && !empty($record->customer->full_name) ? $record->customer->full_name : '');
         if(!empty($customerEmail)):
-            $emailData = $this->renderEmailTemplate($record, $subject, $content);
-
-            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $record->form->name);
             $templateTitle = $subject;
-            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail[] = $record->user->email;
 
             if($content == ''):
@@ -582,8 +577,8 @@ class RecordController extends Controller
                     "disk" => 'public'
                 ];
             endif;
-            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
-                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            if(isset($record->email_template->attachmentFiles) && !empty($record->email_template->attachmentFiles)):
+                $attachmentFiles = array_merge($attachmentFiles, $record->email_template->attachmentFiles);
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate'), $ccMail); 

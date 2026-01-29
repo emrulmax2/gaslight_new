@@ -378,12 +378,12 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co.' CO (PPM)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio.' Ratio' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co.' CO (PPM)' : '&nbsp;') !!}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2.' CO<sub>2</sub> (%)' : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_analyser_ratio) && !empty($appliances->low_analyser_ratio) ? $appliances->low_analyser_ratio : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co) && !empty($appliances->low_co) ? $appliances->low_co : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->low_co2) && !empty($appliances->low_co2) ? $appliances->low_co2 : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_analyser_ratio) && !empty($appliances->high_analyser_ratio) ? $appliances->high_analyser_ratio : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co) && !empty($appliances->high_co) ? $appliances->high_co : '&nbsp;') !!}</td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-center leading-1-2 border-b border-r">{!! (isset($appliances->high_co2) && !empty($appliances->high_co2) ? $appliances->high_co2 : '&nbsp;') !!}</td>
                                 </tr>
                             </tbody>
                         </table>
