@@ -510,7 +510,7 @@
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Has the installation been carried out to the relevant standard / manufacturers instructions?</td>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-60px align-top">{{ (isset($appliances->instruction_followed) && !empty($appliances->instruction_followed) ? $appliances->instruction_followed : '') }}</td>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top"></td>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r align-top">{{ (isset($appliances->instruction_followed_detail) && !empty($appliances->instruction_followed_detail) ? $appliances->instruction_followed_detail : '') }}</td>
                                 </tr>
                                 <tr>
                                     <td class="border-primary text-primary pl-2 pr-2 py-025 text-10px tracking-normal text-left leading-1-1 border-b border-r w-115px align-top">Operating Pressure</td>
