@@ -204,10 +204,10 @@ class QuoteController extends Controller
             $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
             $quoteExtra = [
                 'non_vat_quote' => (isset($request->non_vat_quote) && $request->non_vat_quote == 1 ? 1 : 0),
-                'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : ""),
             ];
             if(!isset($theData->payment_term) || empty($theData->payment_term)):
-                $quoteExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
+                $quoteExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : "");
             else:
                 $quoteExtra['payment_term'] = $theData->payment_term;
             endif;
