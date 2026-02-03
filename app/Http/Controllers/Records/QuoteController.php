@@ -241,7 +241,6 @@ class QuoteController extends Controller
             'form' => $form,
             'quote' => $quote,
             'thePdf' => $thePdf,
-            'template' => JobFormEmailTemplate::with('attachment')->where('user_id', auth()->user()->id)->where('job_form_id', $quote->job_form_id)->get()->first()
         ]);
     }
 
@@ -349,11 +348,7 @@ class QuoteController extends Controller
             $data['status'] = 'Send';
             Quote::where('id', $quote_id)->update($data);
 
-            $emailData = $this->renderEmailTemplate($quote, $subject, $content);
-
-            $subject = (isset($emailData['subject']) && !empty($emailData['subject']) ? $emailData['subject'] : $quote->form->name);
             $templateTitle = $subject;
-            $content = (isset($emailData['content']) && !empty($emailData['content']) ? $emailData['content'] : '');
             $ccMail[] = $quote->user->email;
 
             if($content == ''):
@@ -389,8 +384,8 @@ class QuoteController extends Controller
                     "disk" => 'public'
                 ];
             endif;
-            if(isset($emailData['attachmentFiles']) && !empty($emailData['attachmentFiles'])):
-                $attachmentFiles = array_merge($attachmentFiles, $emailData['attachmentFiles']);
+            if(isset($quote->email_template->attachmentFiles) && !empty($quote->email_template->attachmentFiles)):
+                $attachmentFiles = array_merge($attachmentFiles, $quote->email_template->attachmentFiles);
             endif;
 
             GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);
