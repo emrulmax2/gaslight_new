@@ -209,12 +209,12 @@
                             <span class="block">{{ $invoice->user->companies[0]->bank->payment_term }}</span>
                         </div>
                         @endif
-                        @if(isset($invoiceNotes) && !empty($invoiceNotes))
+                        {{--@if(isset($invoiceNotes) && !empty($invoiceNotes))
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Note:</span>
                             <span class="block">{{ (isset($invoiceNotes) && !empty($invoiceNotes) ? $invoiceNotes : '') }}</span>
                         </div>
-                        @endif
+                        @endif--}}
                     </td>
                     <td class="w-50 bg-gryish v-top" style="padding-top: 15px;">
                         @php 

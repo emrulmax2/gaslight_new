@@ -166,10 +166,10 @@ class InvoiceController extends Controller
                 $theData = (isset($existRow->id) && !empty($existRow->id) ? $existRow->value : []);
                 $invoiceExtra = [
                     'non_vat_invoice' => (isset($request->non_vat_invoice) && $request->non_vat_invoice == 1 ? 1 : 0),
-                    'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : null),
+                    'vat_number' => (isset($request->vat_number) && !empty($request->vat_number) ? $request->vat_number : ""),
                 ];
                 if(!isset($theData->payment_term) || empty($theData->payment_term)):
-                    $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : null);
+                    $invoiceExtra['payment_term'] = (isset($company->bank->payment_term) && !empty($company->bank->payment_term) ? $company->bank->payment_term : "");
                 else:
                     $invoiceExtra['payment_term'] = $theData->payment_term;
                 endif;
