@@ -179,7 +179,8 @@ class QuoteController extends Controller
                     'expire_date' => $quote->expire_date,
                 ],
                 'issued_date' => (isset($quote->issued_date) && !empty($quote->issued_date) ? date('d-m-Y', strtotime($quote->issued_date)) : ''),
-                'customer' => $quote->customer
+                'customer' => $quote->customer,
+                'email_template_data' => $quote->email_template ?? []
             ];
             if($quote->customer_property_id > 0 && isset($quote->property->id)):
                 $data['job_address'] = $quote->property;

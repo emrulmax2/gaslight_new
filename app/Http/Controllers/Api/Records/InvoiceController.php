@@ -235,8 +235,9 @@ class InvoiceController extends Controller
                 'issued_date' => (isset($invoice->issued_date) && !empty($invoice->issued_date) ? date('d-m-Y', strtotime($invoice->issued_date)) : ''),
                 'job' => $invoice->job,
                 'customer' => $invoice->customer,
-                'job_address' => $invoice->job->property,
-                'url' => $pdf_url
+                'job_address' => $invoice->property,
+                'url' => $pdf_url,
+                'email_template_data' => $invoice->email_template ?? []
             ];
 
             $billingAddress = null;
