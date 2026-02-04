@@ -35,6 +35,7 @@ class Record extends Model implements CanBeSigned
         'received_by',
         'relation_id',
         'status',
+        'invoice_id',
         
         'created_by',
         'updated_by'

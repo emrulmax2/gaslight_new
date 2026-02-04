@@ -23,7 +23,7 @@ class RecordAndDraftController extends Controller
         $customer_job_id = ($request->has('customer_job_id') && !empty($request->query('customer_job_id'))) ? $request->query('customer_job_id') : 0;
         $customer_id = ($request->has('customer_id') && !empty($request->query('customer_id'))) ? $request->query('customer_id') : 0;
 
-        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant', 'billing'])
+        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'occupant', 'billing', 'property'])
                  ->where('created_by', $user_id);
         if($status != 'All'):
             $query->where('status', $status);
@@ -40,22 +40,26 @@ class RecordAndDraftController extends Controller
 
         if (!empty($searchKey)) {
             $query->where(function($q) use ($searchKey) {
-                $q->where('certificate_number', 'LIKE', '%' . $searchKey . '%')
-                ->orWhereHas('customer', function ($customerQuery) use ($searchKey) {
-                    $customerQuery->where('full_name', 'LIKE', '%' . $searchKey . '%');
-                })->orWhereHas('property', function($pa) use($searchKey){
-                    $pa->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('address_line_2', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
-                })->orWhereHas('billing', function ($ba) use ($searchKey) {
-                    $ba->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('address_line_2', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
-                    ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
-                })->orWhereHas('occupant', function ($propertyQuery) use ($searchKey) {
-                    $propertyQuery->orWhere('occupant_name', 'LIKE', '%' . $searchKey . '%');
+                $q->where('certificate_number', 'LIKE', "%{$searchKey}%")
+                ->orWhereHas('customer', function ($cq) use ($searchKey) {
+                    $cq->where('full_name', 'LIKE', "%{$searchKey}%");
+                })
+                ->orWhereHas('property', function($pa) use($searchKey){
+                    $pa->where('address_line_1', 'LIKE', "%{$searchKey}%")
+                    ->orWhere('address_line_2', 'LIKE', "%{$searchKey}%")
+                    ->orWhere('postal_code', 'LIKE', "%{$searchKey}%")
+                    ->orWhere('city', 'LIKE', "%{$searchKey}%");
+                })
+                ->orWhereHas('billing', function ($ba) use ($searchKey) {
+                    $ba->where('address_line_1', 'LIKE', "%{$searchKey}%")
+                    ->orWhere('address_line_2', 'LIKE', "%{$searchKey}%")
+                    ->orWhere('postal_code', 'LIKE', "%{$searchKey}%")
+                    ->orWhere('city', 'LIKE', "%{$searchKey}%");
+                })
+                ->orWhereHas('occupant', function ($oq) use ($searchKey) {
+                    $oq->where('occupant_name', 'LIKE', "%{$searchKey}%");
                 });
+
             });
         }
 
