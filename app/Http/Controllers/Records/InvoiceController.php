@@ -326,6 +326,10 @@ class InvoiceController extends Controller
                     ]);
                 endif;
 
+                if(isset($request->record_id) && $request->record_id > 0):
+                    Record::where('id', $request->record_id)->update(['invoice_id' => $invoice->id]);
+                endif;
+
                 return response()->json(['msg' => 'Invoice successfully created.', 'red' => route('invoices.show', $invoice->id)], 200);
             else:
                 return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator.'], 304);

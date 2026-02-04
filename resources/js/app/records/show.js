@@ -284,7 +284,15 @@
             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
         }).then(response => {
             if (response.status == 200) {
-                window.location.href = response.data.red
+                let row = response.data.row;
+                localStorage.clear();
+                localStorage.setItem('job', JSON.stringify(row.job));
+                localStorage.setItem('customer', JSON.stringify(row.customer));
+                localStorage.setItem('billing_address', JSON.stringify(row.billing_address));
+                localStorage.setItem('job_address', JSON.stringify(row.job_address));
+                localStorage.setItem('record_id', row.record_id);
+
+                window.location.href = route('invoices.create');
             }
         }).catch(error => {
             $theBtn.removeClass('active').removeAttr('disabled');

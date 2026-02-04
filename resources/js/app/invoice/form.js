@@ -1,6 +1,8 @@
 import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
 
 (function(){
+    //console.log(JSON.stringify(Object.fromEntries(Object.entries(localStorage)), null, 2));
+
     // INIT Address Lookup
     document.addEventListener('DOMContentLoaded', () => {
         initGetAddressAutocomplete({
@@ -72,6 +74,14 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
     let isVatInvoice = ($('#invoiceForm #non_vat_invoice').val() == 1 ? false : true);
     invoiceCalculation();
     /* Init The Calculation */
+
+    /* Autoload Record ID Start */
+    if(localStorage.record_id && localStorage.getItem('record_id') > 0){
+        $('#record_id').val(localStorage.getItem('record_id'));
+    }else{
+        $('#record_id').val('0');
+    }
+    /* Autoload Record ID End */
 
     /* Generate Or Autoload Invoice Number Start */
     if(localStorage.invoice_number && localStorage.getItem('invoice_number') != ''){

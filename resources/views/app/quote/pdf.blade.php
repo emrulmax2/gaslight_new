@@ -191,7 +191,7 @@
                 <tr>
                     <td class="w-50 v-top" style="padding: 0 0 0 30px;">
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 35px;">
-                            <span class="block font-bold" style="margin-bottom: 6px;">Please make payments to:</span>
+                            <span class="block font-bold" style="margin-bottom: 6px;">Payment Information:</span>
                             @if(isset($quote->user->companies[0]->bank->name_on_account) && !empty($quote->user->companies[0]->bank->name_on_account))
                                 <span class="block">{{ $quote->user->companies[0]->bank->name_on_account }}</span>
                             @endif
@@ -247,12 +247,12 @@
                                 <td class="text-right">{{ Number::currency($TOTAL, 'GBP') }}</td>
                             </tr>
                         </table>
-                        <table class="bg-darkish2 uppercase color-white calculationTable" style="margin-top: 25px; padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
+                        {{--<table class="bg-darkish2 uppercase color-white calculationTable" style="margin-top: 25px; padding: 12px 30px 12px 40px; font-size: 14px; line-height: 1;">
                             <tr>
                                 <td class="text-left">Due</td>
                                 <td class="text-right">{{ Number::currency($DUE, 'GBP') }}</td>
                             </tr>
-                        </table>
+                        </table>--}}
                     </td>
                 </tr>
             </table>

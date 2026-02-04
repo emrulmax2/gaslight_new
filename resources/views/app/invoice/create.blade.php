@@ -19,6 +19,7 @@
         <input type="hidden" name="invoice_id" id="invoice_id" value="0"/>
         <input type="hidden" name="non_vat_invoice" id="non_vat_invoice" value="{{ $non_vat_invoice }}"/>
         <input type="hidden" name="vat_number" id="vat_number" value="{{ $vat_number }}"/>
+        <input type="hidden" name="record_id" id="record_id" value="0"/>
 
         <div class="intro-y box mt-5 bg-slate-200 rounded-none border-none px-2 py-2 invoiceNoBlockWrap" style="display: none;">
             <div class="px-2 py-3 invoiceNoWrap bg-white">
