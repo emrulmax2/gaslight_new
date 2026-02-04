@@ -730,11 +730,11 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
             options['invoiceAdvance'] = invoiceAdvance;
             //formData.append('quoteAdvance', quoteAdvance);
         }
-        if(localStorage.invoiceNotes){
-            let invoiceNotes = localStorage.getItem('invoiceNotes');
-            options['invoiceNotes'] = invoiceNotes;
-            //formData.append('quoteNotes', JSON.parse(quoteNotes));
-        }
+        // if(localStorage.invoiceNotes){
+        //     let invoiceNotes = localStorage.getItem('invoiceNotes');
+        //     options['invoiceNotes'] = invoiceNotes;
+        //     //formData.append('quoteNotes', JSON.parse(quoteNotes));
+        // }
 
         formData.append('options', JSON.stringify(options));
         if(localStorage.from_job && localStorage.getItem('from_job') == 1){

@@ -17,13 +17,20 @@ use App\Models\User;
 use App\Models\UserPricingPackage;
 use App\Models\UserPricingPackageInvoice;
 use App\Models\UserReferralCode;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Stripe;
+use App\Services\SubscriptionService;
 
 class Dashboard extends Controller
 {
+    protected $subscriptionService;
+    public function __construct(SubscriptionService $subscriptionService){
+        $this->subscriptionService = $subscriptionService;
+    }
+
     public function index(): View
     {
         $theUser = auth()->user()->id;
@@ -95,73 +102,20 @@ class Dashboard extends Controller
     }
 
     public function enrolledSubscription(UpgradeSubscriptionRequest $request){
-        $user_id = auth()->user()->id;
-        $user = User::find($user_id);
-        $name = $user->name;
-        $email = $user->email;
-        $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'desc')->get()->first();
-
-        $pricing_package_id = $request->pricing_package_id;
-        $pricingPackage = PricingPackage::find($pricing_package_id);
-
-        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-        try{
-            $customer = $stripe->customers->create([
-                'name' => $name,
-                'email' => $email,
-                'payment_method' => $request->token,
-                'invoice_settings' => [
-                    'default_payment_method' => $request->token
-                ]
-            ]);
-
-            try{
-                $subscription = $stripe->subscriptions->create([
-                    'customer' => $customer->id,
-                    'items' => [
-                        ['price' => $pricingPackage->stripe_plan]
-                    ],
-                    'currency' => 'GBP',
-                    'default_payment_method' => $request->token,
-                    'metadata' => [
-                        'billed_to' => $request->card_holder_name,
-                        'user_id' => $user_id
-                    ],
-                    'payment_behavior' => 'allow_incomplete'
-                ]);
-
-                $userPackage = UserPricingPackage::where('user_id', $user_id)->update([
-                    'user_id' => $user_id,
-                    'pricing_package_id' => $pricing_package_id,
-                    'stripe_customer_id' => $customer->id,
-                    'stripe_subscription_id' => $subscription->id,
-                    'start' => date('Y-m-d', $subscription->current_period_start),
-                    'end' => date('Y-m-d', $subscription->current_period_end),
-                    'price' => $pricingPackage->price,
-                    'active' => ($subscription->status && $subscription->status == 'active' ? 1 : 0),
-                    
-                    'updated_by' => auth()->user()->id
-                ]);
-
-                if($userPackage):
-                    $userPricingPackage = UserPricingPackage::where('user_id', $user_id)->where('pricing_package_id', $pricing_package_id)->get()->first();
-                    $invoice = UserPricingPackageInvoice::create([
-                        'user_id' => $user_id,
-                        'user_pricing_package_id' => $userPricingPackage->id,
-                        'invoice_id' => $subscription->latest_invoice,
-                        'start' => date('Y-m-d', $subscription->current_period_start),
-                        'end' => date('Y-m-d', $subscription->current_period_end),
-                        'status' => (isset($subscription->status) && !empty($subscription->status) ? $subscription->status : null),
-                        
-                        'created_by' => auth()->user()->id,
-                    ]);
-                endif;
-                return response()->json(['message' => 'Your subscription plan successfully upgraded to '.$pricingPackage->title.'.', 'red' => route('company.dashboard')], 200);
-            }catch(Exception $e){
-                $message = $e->getMessage();
-                return response()->json(['message' => 'Can not upgrade your plan due to payment failure.', 'red' => ''], 304);
-            }
-        }catch(Exception $e){
+        try {
+            $user_id = $request->user()->id;
+            $user = User::find($user_id);
+            $pricingPackage = PricingPackage::findOrFail($request->pricing_package_id);
+            
+            $result = $this->subscriptionService->subscribe($user, $pricingPackage, $request->token, $request->card_holder_name);
+            
+            return response()->json([
+                'message' => 'Your subscription plan upgraded request to '.$pricingPackage->title.' successfully submitted.', 
+                'result' => $result,
+                'red' => route('company.dashboard')
+            ], 200);
+            
+        } catch (\Exception $e) {
             $message = $e->getMessage();
             return response()->json(['message' => 'Somthing went wrong. Please try again later.', 'red' => ''], 304);
         }
@@ -171,31 +125,11 @@ class Dashboard extends Controller
         $package_id = $request->package_id;
         $user_id = $request->user_id;
         $user = User::find($user_id);
-
-        $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
-        $userInvoice = UserPricingPackageInvoice::where('user_id', $user_id)->where('user_pricing_package_id', $userPackage->id)->orderBy('id', 'DESC')->get()->first();
-    
-        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+        $newPackage = PricingPackage::find($package_id);
         try{
-            $subscription = $stripe->subscriptions->update(
-                $userPackage->stripe_subscription_id,
-                [
-                    'cancel_at_period_end' => true,
-                    'metadata' => [
-                        'is_cancelled' => 1,
-                        'upgrade_to' => $package_id,
-                        'user_id' => $userPackage->user_id,
-                    ]
-                ]
-            );
-            $userPackage->update([
-                'cancellation_requested' => 1, 
-                'requested_by' => Auth::user()->id, 
-                'requested_at' => date('Y-m-d H:i:s'),
-                'upgrade_to' => $package_id
-            ]);
+            $result = $this->subscriptionService->upgradeToYearly($user, $newPackage);
 
-            return response()->json(['message' => 'Subscription upgrade request successfully submitted. At the end of the current period your new package will activate.', 'red' => route('profile')], 200);
+            return response()->json(['message' => 'Subscription upgrade request successfully submitted. At the end of the current period your new package will activate.', 'red' => ''], 200);
         }catch(Exception $e){
             $message = $e->getMessage();
             return response()->json(['message' => 'Can not upgrade the subscription due to unexpected errors.', 'red' => ''], 422);

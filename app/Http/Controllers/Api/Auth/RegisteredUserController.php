@@ -51,11 +51,50 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
+            'mobile' => $request->input('mobile'),
             'password' => Hash::make($request->input('password')),
+            'gas_safe_id_card' => (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card) ? $request->gas_safe_id_card : null),
             'role' => 'admin',
-            'first_login' => 1
+            'first_login' => 0
         ]);
         if($user->id):
+            $regOtp = RegistrationOtp::where('mobile', $request->input('mobile'))->orderBy('id', 'desc')->get()->first();
+            $regOtp->update(['expire_at' => now()]);
+
+            $vat_number_check = (isset($request->vat_number_check) && $request->vat_number_check > 0 ? $request->vat_number_check : 0);
+            $business_type = (!empty($request->business_type) ? $request->business_type : null);
+            $quoteExpireDays = Option::where('category', 'DEFAULT_OPTIONS')->where('name', 'quote_expiry_days')->value('value');
+            $paymentTerms = Option::where('category', 'DEFAULT_OPTIONS')->where('name', 'payment_terms')->value('value');
+            $company = Company::create([
+                'user_id' => $user->id,
+                'company_name' => (!empty($request->company_name) ? $request->company_name : null),
+                'business_type' => $business_type,
+                'company_registration' => ($business_type == 'Company' && !empty($request->company_registration) ? $request->company_registration : null),
+                'vat_number' => ($vat_number_check == 1 && !empty($request->vat_number) ? $request->vat_number : null),
+                'display_company_name' => (!empty($request->display_company_name) && $request->display_company_name > 0 ? $request->display_company_name : 0),
+                'company_email' => (!empty($request->email) ? $request->email : null),
+                'company_phone' => (!empty($request->mobile) ? $request->mobile : null),
+                'company_address_line_1' => (!empty($request->company_address_line_1) ? $request->company_address_line_1 : null),
+                'company_address_line_2' => (!empty($request->company_address_line_2) ? $request->company_address_line_2 : null),
+                'company_city' => (!empty($request->company_city) ? $request->company_city : null),
+                'company_state' => (!empty($request->company_state) ? $request->company_state : null),
+                'company_postal_code' => (!empty($request->company_postal_code) ? $request->company_postal_code : null),
+                'company_country' => (!empty($request->company_country) ? $request->company_country : null),
+                'gas_safe_registration_no' => (!empty($request->gas_safe_registration_no) ? $request->gas_safe_registration_no : null),
+                'quote_expired_in' => ($quoteExpireDays && $quoteExpireDays > 0 ? $quoteExpireDays : 7),
+            ]);
+            $company->users()->attach($user->id);
+            if($company->id):
+                CompanyBankDetails::create([
+                    'Company_id' => $company->id,
+                    'bank_name' => null,
+                    'name_on_account' => null,
+                    'sort_code' => null,
+                    'account_number' => null,
+                    'payment_term' => ($paymentTerms && !empty($paymentTerms) ? $paymentTerms : 'Payment is due within thirty (30) days from the invoice date. Please reference the invoice number with your payment.'),
+                ]);
+            endif;
+
             $name = $request->name;
             $prefix = strtoupper(substr(str_replace(' ', '', $name), 0, 3));
             UserReferralCode::create([
@@ -71,16 +110,31 @@ class RegisteredUserController extends Controller
             if(!empty($referral_code)):
                 $referral = UserReferralCode::where('code', $referral_code)->where('active', 1)->get()->first();
                 if(isset($referral->id) && $referral->id > 0):
-                    $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'REFEREE_TRAIL')->pluck('value')->first() ?? $TRAIL_PERIOD;
-                    //$TRAIL_PERIOD = env('REFEREE_TRAIL', 90);
+                    if ($referral->is_global == 1) {
+                        $isExpired = $referral->expiry_date && now()->gt($referral->expiry_date);
+                        $usedCount = UserReferred::where('user_referral_code_id', $referral->id)->count();
+                        $usageLimitReached = $referral->max_no_of_use !== null && $usedCount >= $referral->max_no_of_use;
+
+                        if (!$isExpired || !$usageLimitReached) {
+                            $TRAIL_PERIOD = $referral->num_of_days ?? $TRAIL_PERIOD;
+                            $userReferred = UserReferred::create([
+                                'user_referral_code_id' => $referral->id,
+                                'referrer_id' => $referral->user_id,
+                                'referee_id' => $user->id,
+                                'code' => $referral_code,
+                                'created_by' => $user->id,
+                            ]);
+                        }
+                    } else {
+                        $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'REFEREE_TRAIL')->value('value') ?? $TRAIL_PERIOD;
                         $userReferred = UserReferred::create([
                             'user_referral_code_id' => $referral->id,
                             'referrer_id' => $referral->user_id,
                             'referee_id' => $user->id,
                             'code' => $referral_code,
-                        
                             'created_by' => $user->id,
                         ]);
+                    }
                 endif;
             endif;
 
@@ -95,6 +149,27 @@ class RegisteredUserController extends Controller
                 
                 'created_by' => $user->id,
             ]);
+
+            if ($request->has('sign') && $request->input('sign') !== null):
+                $signatureData = str_replace('data:image/png;base64,', '', $request->input('sign'));
+                $signatureData = base64_decode($signatureData);
+                if(strlen($signatureData) > 2621):
+                    $user->deleteSignature();
+                    $imageName = 'signatures/' . Str::uuid() . '.png';
+                    Storage::disk('public')->put($imageName, $signatureData);
+
+                    $signature = new Signature();
+                    $signature->model_type = User::class;
+                    $signature->model_id = $user->id;
+                    $signature->uuid = Str::uuid();
+                    $signature->filename = $imageName;
+                    $signature->document_filename = null;
+                    $signature->certified = false;
+                    $signature->from_ips = json_encode([request()->ip()]);
+                    $signature->save();
+                endif;
+            endif;
+
             event(new Registered($user));
 
             if (!Auth::attempt([

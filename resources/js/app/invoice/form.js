@@ -48,7 +48,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
     const invoiceItemModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceItemModal"));
     const invoiceDiscountModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceDiscountModal"));
     const invoiceAdvanceModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceAdvanceModal"));
-    const invoiceNoteModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceNoteModal"));
+    //const invoiceNoteModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#invoiceNoteModal"));
     
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
@@ -649,7 +649,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
         }
     }
     issuedDate.on('selected', (date) => {
-        localStorage.removeItem('invoiceNotes');
+        //localStorage.removeItem('invoiceNotes');
         if(date){
             let theDate = date.dateInstance.toLocaleDateString('en-GB').replace(/\//g, "-");
             localStorage.setItem('issued_date', JSON.stringify(theDate));
@@ -657,7 +657,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
     });
     /* Issued Date Load Start */
 
-    /* Note Auto Load Start */
+    /* Note Auto Load Start 
     document.getElementById('invoiceNoteModal').addEventListener('hide.tw.modal', function(event) {
         $('#invoiceNoteModal textarea').val('');
     });
@@ -701,7 +701,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
         $("#saveNoteBtn .theLoader").fadeOut();
         invoiceNoteModal.hide();
     });
-    /* Note Auto Load End */
+    Note Auto Load End */
 
     /* Extras Auto Load Start */
     if(localStorage.invoiceExtra && localStorage.invoiceExtra != null){

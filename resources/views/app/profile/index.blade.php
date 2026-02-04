@@ -129,6 +129,7 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Payments</h3>
         <div class="box rounded-md p-0 overflow-hidden">
+            @if($user->userpackage->package->period != 'Free Trail')
             <a href="{{ route('users.payment.methods', $user->id) }}" class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="badge-pound-sterling" style="margin-top: 2px;" />
                 
@@ -139,6 +140,7 @@
                     </span>
                 </div>
             </a>
+            @endif
             <a href="{{ route('users.payment.history', $user->id) }}" class="flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="receipt-pound-sterling" />
                 <div>

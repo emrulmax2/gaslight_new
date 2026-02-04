@@ -43,13 +43,13 @@ class RecordAndDraftController extends Controller
                 $q->where('certificate_number', 'LIKE', '%' . $searchKey . '%')
                 ->orWhereHas('customer', function ($customerQuery) use ($searchKey) {
                     $customerQuery->where('full_name', 'LIKE', '%' . $searchKey . '%');
-                })->orWhereHas('customer.address', function($customerAddrQuery) use($searchKey){
-                    $customerAddrQuery->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
+                })->orWhereHas('property', function($pa) use($searchKey){
+                    $pa->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('address_line_2', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
-                })->orWhereHas('job.property', function ($propertyQuery) use ($searchKey) {
-                    $propertyQuery->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
+                })->orWhereHas('billing', function ($ba) use ($searchKey) {
+                    $ba->orWhere('address_line_1', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('address_line_2', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('postal_code', 'LIKE', '%' . $searchKey . '%')
                     ->orWhere('city', 'LIKE', '%' . $searchKey . '%');
