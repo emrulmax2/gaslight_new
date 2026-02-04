@@ -22,9 +22,14 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Number;
 use Psy\Readline\Hoa\Console;
 use Stripe;
+use App\Services\SubscriptionService;
 
 class UserManagementController extends Controller
 {
+    protected $subscriptionService;
+    public function __construct(SubscriptionService $subscriptionService){
+        $this->subscriptionService = $subscriptionService;
+    }
 
     public function index()
     {
@@ -412,32 +417,12 @@ class UserManagementController extends Controller
     public function cancelSubscription(Request $request){
         $currentUser = User::find(Auth::user()->id);
         $user_id = $request->user_id;
-        $userPackage = UserPricingPackage::where('user_id', $user_id)->orderBy('id', 'DESC')->get()->first();
-        $userInvoice = UserPricingPackageInvoice::where('user_id', $user_id)->where('user_pricing_package_id', $userPackage->id)->orderBy('id', 'DESC')->get()->first();
+        $user = User::find($user_id);
         
-        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         try{
-            $subscription = $stripe->subscriptions->update(
-                $userPackage->stripe_subscription_id,
-                [
-                    'cancel_at_period_end' => true,
-                    'metadata' => [
-                        'is_cancelled' => 1,
-                        'upgrade_to' => null,
-                        'user_id' => $userPackage->user_id,
-                    ]
-                ]
-            );
-            // $subscription = $stripe->subscriptions->cancel($userPackage->stripe_subscription_id, [
-            //     'cancellation_details' => [
-            //         'comment' => 'Canceled by '.$currentUser->name.' at '.date('Y-m-d H:i:s').'.'
-            //     ],
-            //     'invoice_now' => true,
-            //     'prorate' => true
-            // ]);
-            $userPackage->update(['cancellation_requested' => 1, 'requested_by' => Auth::user()->id, 'requested_at' => date('Y-m-d H:i:s')]);
+            $restul = $this->subscriptionService->cancelSubscription($user);
 
-            return response()->json(['message' => 'Subscription successfully cancelled.', 'red' => route('users.index')], 200);
+            return response()->json(['message' => 'Subscription cancelation request successfully submitted. It will be affect at the end of the current preriod.', 'red' => ''], 200);
         }catch(Exception $e){
             $message = $e->getMessage();
             return response()->json(['message' => 'Can not canceled the subscription due to unexpected errors.', 'red' => ''], 422);

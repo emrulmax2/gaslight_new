@@ -213,7 +213,7 @@ class QuoteController extends Controller
 
             $data['quoteItemsCount'] = 0;
             $data['quoteItems'] = [];
-            $data['quoteNotes'] = (isset($quote->available_options->quoteNotes) && !empty($quote->available_options->quoteNotes) ? $quote->available_options->quoteNotes : '');
+            //$data['quoteNotes'] = (isset($quote->available_options->quoteNotes) && !empty($quote->available_options->quoteNotes) ? $quote->available_options->quoteNotes : '');
             
             if(isset($quote->available_options->quoteItems) && !empty($quote->available_options->quoteItems)):
                 if(isset($quote->available_options->quoteItems) && !empty($quote->available_options->quoteItems)):

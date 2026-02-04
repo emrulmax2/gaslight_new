@@ -198,7 +198,7 @@
                         document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                             $("#successModal .successModalTitle").html("Congratulations!");
                             $("#successModal .successModalDesc").html(response.data.message);
-                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', route('profile'));
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', response.data.red);
                         });
 
                         setTimeout(() => {

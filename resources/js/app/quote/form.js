@@ -526,7 +526,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
     });
     /* Issued Date Load Start */
 
-    /* Note Auto Load Start */
+    /* Note Auto Load Start 
     document.getElementById('quoteNoteModal').addEventListener('hide.tw.modal', function(event) {
         $('#quoteNoteModal textarea').val('');
     });
@@ -570,7 +570,7 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
         $("#saveNoteBtn .theLoader").fadeOut();
         quoteNoteModal.hide();
     });
-    /* Note Auto Load End */
+    Note Auto Load End */
 
     /* Extras Auto Load Start */
     if(localStorage.quoteExtra && localStorage.quoteExtra != null){

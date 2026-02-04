@@ -173,9 +173,9 @@
                 localStorage.setItem('billing_address', JSON.stringify(row.billing_address));
 
                 
-                if(row.invoiceNotes){
-                    localStorage.setItem('invoiceNotes', JSON.stringify(row.invoiceNotes));
-                }
+                // if(row.invoiceNotes){
+                //     localStorage.setItem('invoiceNotes', JSON.stringify(row.invoiceNotes));
+                // }
                 if(row.issued_date){
                     localStorage.setItem('issued_date', JSON.stringify(row.issued_date));
                 }

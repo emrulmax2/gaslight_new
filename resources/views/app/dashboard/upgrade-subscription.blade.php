@@ -300,6 +300,7 @@
                     $('.theLoader', $theButton).fadeOut();
                     
                     if (response.status == 200) {
+                        stripe.confirmCardPayment(response.data.result.client_secret)
                         successModal.show();
                         document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
                             $("#successModal .successModalTitle").html("Congratulations!");

@@ -264,7 +264,7 @@ class InvoiceController extends Controller
 
             $data['invoiceItemsCount'] = 0;
             $data['invoiceItems'] = $data['invoiceDiscounts'] = $data['invoiceAdvance'] = $data['invoiceExtra'] = [];
-            $data['invoiceNotes'] = (isset($invoice->available_options->invoiceNotes) && !empty($invoice->available_options->invoiceNotes) ? $invoice->available_options->invoiceNotes : '');
+            //$data['invoiceNotes'] = (isset($invoice->available_options->invoiceNotes) && !empty($invoice->available_options->invoiceNotes) ? $invoice->available_options->invoiceNotes : '');
             
             if(isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems)):
                 if(isset($invoice->available_options->invoiceItems) && !empty($invoice->available_options->invoiceItems)):

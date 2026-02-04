@@ -171,9 +171,9 @@
                     localStorage.setItem('job', JSON.stringify(row.job));
                 }
 
-                if(row.quoteNotes){
-                    localStorage.setItem('quoteNotes', JSON.stringify(row.quoteNotes));
-                }
+                // if(row.quoteNotes){
+                //     localStorage.setItem('quoteNotes', JSON.stringify(row.quoteNotes));
+                // }
                 if(row.issued_date){
                     localStorage.setItem('issued_date', JSON.stringify(row.issued_date));
                 }

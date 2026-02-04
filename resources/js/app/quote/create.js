@@ -603,11 +603,11 @@ import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
             options['quoteDiscounts'] = quoteDiscounts;
             //formData.append('quoteDiscounts', quoteDiscounts);
         }
-        if(localStorage.quoteNotes){
-            let quoteNotes = localStorage.getItem('quoteNotes');
-            options['quoteNotes'] = quoteNotes;
-            //formData.append('quoteNotes', JSON.parse(quoteNotes));
-        }
+        // if(localStorage.quoteNotes){
+        //     let quoteNotes = localStorage.getItem('quoteNotes');
+        //     options['quoteNotes'] = quoteNotes;
+        //     //formData.append('quoteNotes', JSON.parse(quoteNotes));
+        // }
 
         formData.append('options', JSON.stringify(options));
         return { errors : errors, formData : formData};

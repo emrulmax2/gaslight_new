@@ -45,12 +45,16 @@ class RecordAndDraftController extends Controller
         if (!empty($queryStr)):
             $query->whereHas('customer', function ($q) use ($queryStr) {
                 $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
-            })->orWhereHas('job.property', function ($q) use ($queryStr) {
-                $q->where(function($sq) use($queryStr){
-                    $sq->orWhere('address_line_1', 'LIKE', '%'.$queryStr.'%')
-                    ->orWhere('address_line_2', 'LIKE', '%'.$queryStr.'%')->orWhere('postal_code', 'LIKE', '%'.$queryStr.'%')
-                    ->orWhere('city', 'LIKE', '%'.$queryStr.'%');
-                });
+            })->orWhereHas('property', function($pa) use($queryStr){
+                $pa->orWhere('address_line_1', 'LIKE', '%' . $queryStr . '%')
+                ->orWhere('address_line_2', 'LIKE', '%' . $queryStr . '%')
+                ->orWhere('postal_code', 'LIKE', '%' . $queryStr . '%')
+                ->orWhere('city', 'LIKE', '%' . $queryStr . '%');
+            })->orWhereHas('billing', function ($ba) use ($queryStr) {
+                $ba->orWhere('address_line_1', 'LIKE', '%' . $queryStr . '%')
+                ->orWhere('address_line_2', 'LIKE', '%' . $queryStr . '%')
+                ->orWhere('postal_code', 'LIKE', '%' . $queryStr . '%')
+                ->orWhere('city', 'LIKE', '%' . $queryStr . '%');
             })->orWhereHas('occupant', function($q) use ($queryStr){
                 $q->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
             });

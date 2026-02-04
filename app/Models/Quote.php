@@ -15,7 +15,7 @@ class Quote extends Model
         });
     }
 
-    protected $appends = ['available_options', 'email_template'];
+    protected $appends = ['available_options', 'quote_total', 'email_template'];
 
     protected $fillable = [
         'company_id',
@@ -76,6 +76,39 @@ class Quote extends Model
         endif;
 
         return (object) $options;
+    }
+
+    public function getQuoteTotalAttribute(){
+        $quoteItems = isset($this->available_options->quoteItems) && !empty($this->available_options->quoteItems) ? $this->available_options->quoteItems : [];
+        $quoteDiscounts = isset($this->available_options->quoteDiscounts) && !empty($this->available_options->quoteDiscounts) ? $this->available_options->quoteDiscounts : [];
+        $quoteExtra = isset($this->available_options->quoteExtra) && !empty($this->available_options->quoteExtra) ? $this->available_options->quoteExtra : [];
+
+        $SUBTOTAL = 0;
+        $VATTOTAL = 0;
+        $TOTAL = 0;
+        $DUE = 0;
+        $DISCOUNTTOTAL = 0;
+        $DISCOUNTVATTOTAL = 0;
+        if(!empty($quoteItems)):
+            foreach($quoteItems as $item):
+                $units = (!empty($item->units) && $item->units > 0 ? $item->units : 1);
+                $unitPrice = (!empty($item->price) && $item->price > 0 ? $item->price : 0);
+                $vatRate = (!empty($item->vat) && $item->vat > 0 ? $item->vat : 0);
+                $vatAmount = ($unitPrice * $vatRate) / 100;
+                $lineTotal = (isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1 ? ($unitPrice * $units) + $vatAmount : ($unitPrice * $units));
+                
+                $SUBTOTAL += ($unitPrice * $units);
+                $VATTOTAL += $vatAmount;
+            endforeach;
+        endif;
+
+        $DISCOUNTUNITPRICE = (isset($quoteDiscounts->amount) ? $quoteDiscounts->amount : 0);
+        $DISCOUNTTOTAL += $DISCOUNTUNITPRICE;
+        $TOTAL = (isset($quoteExtra->non_vat_quote) && $quoteExtra->non_vat_quote != 1 ? $SUBTOTAL + $VATTOTAL : $SUBTOTAL) - $DISCOUNTTOTAL;
+        
+        $QUOTETOTAL = $TOTAL;
+
+        return $QUOTETOTAL;
     }
 
     public function getEmailTemplateAttribute(){
