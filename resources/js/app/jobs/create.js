@@ -1,12 +1,10 @@
-import { initGetAddressAutocomplete } from '../../getAddressAutocomplete';
+import INTAddressLookUps from '../../address_lookup';
 import Litepicker from 'litepicker';
 
 (function(){
     // INIT Address Lookup
     document.addEventListener('DOMContentLoaded', () => {
-        initGetAddressAutocomplete({
-            token: import.meta.env.VITE_GETADDRESS_API_KEY
-        });
+        INTAddressLookUps();
     });
 
     const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));

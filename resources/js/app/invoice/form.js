@@ -1,13 +1,11 @@
-import { initGetAddressAutocomplete } from "../../getAddressAutocomplete";
+import INTAddressLookUps from "../../address_lookup";
 
 (function(){
     //console.log(JSON.stringify(Object.fromEntries(Object.entries(localStorage)), null, 2));
 
     // INIT Address Lookup
     document.addEventListener('DOMContentLoaded', () => {
-        initGetAddressAutocomplete({
-            token: import.meta.env.VITE_GETADDRESS_API_KEY
-        });
+        INTAddressLookUps();
     });
 
     let tncTomOptions = {
