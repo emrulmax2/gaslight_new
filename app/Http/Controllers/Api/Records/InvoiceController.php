@@ -20,6 +20,7 @@ use App\Models\JobForm;
 use App\Models\JobFormEmailTemplate;
 use App\Models\JobFormPrefixMumbering;
 use App\Models\PaymentMethod;
+use App\Models\Record;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
@@ -182,6 +183,10 @@ class InvoiceController extends Controller
 
                 // Update Customer Job Amount
                 CustomerJob::where('id', $customer_job_id)->update(['estimated_amount' => $request->estimated_amount]);
+
+                if(isset($request->record_id) && $request->record_id > 0):
+                    Record::where('id', $request->record_id)->update(['invoice_id' => $invoice->id]);
+                endif;
 
                 return response()->json([
                     'success' => true,

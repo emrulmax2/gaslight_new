@@ -1,4 +1,4 @@
-import { initGetAddressAutocomplete } from "../../../getAddressAutocomplete.js";
+import INTAddressLookUps from "../../../address_lookup";
 
 ("use strict");
 var JobAddressOccupantsListTable = (function () {
@@ -38,9 +38,7 @@ var JobAddressOccupantsListTable = (function () {
 (function(){
     // INIT Address Lookup
     document.addEventListener('DOMContentLoaded', () => {
-        initGetAddressAutocomplete({
-            token: import.meta.env.VITE_GETADDRESS_API_KEY
-        });
+        INTAddressLookUps();
     });
 
     if($('#has_occupants').prop('checked')){
