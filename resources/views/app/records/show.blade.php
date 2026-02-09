@@ -55,11 +55,19 @@
                                 View Invoice
                             </x-base.button>
                         @else
-                            <x-base.button data-id="{{ $record->id }}"  type="button" id="createRecordInvoice" class="justify-start submit_1 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
-                                <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
-                                Create Invoice
-                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
-                            </x-base.button>
+                            @if(!$record->user->has_bank_details)
+                                <x-base.button  type="button" data-tw-toggle="modal" data-tw-target="#companyBankModal" class="justify-start submit_1 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
+                                    Add Bank Details
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                                </x-base.button>
+                            @else
+                                <x-base.button data-id="{{ $record->id }}"  type="button" id="createRecordInvoice" class="justify-start submit_1 action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#3b5998] [&.active]:text-white hover:bg-[#3b5998] focus:bg-[#3b5998] hover:text-white focus:text-white">
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="plus-circle" />
+                                    Create Invoice
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                                </x-base.button>
+                            @endif
                         @endif
                     </div>
                     <input type="hidden" value="1" name="submit_type"/>

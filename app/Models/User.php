@@ -19,7 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
 {
     use HasFactory, Notifiable, Impersonate,RequiresSignature, HasApiTokens;
 
-    protected $appends = ['photo_url', 'photo_url_api'];
+    protected $appends = ['photo_url', 'photo_url_api', 'bank_details', 'has_bank_details'];
 
     /**
      * The attributes that are mass assignable.
@@ -112,6 +112,19 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
         }
 
         return true;
+    }
+
+    public function getBankDetailsAttribute(){
+        return $this->companies[0]->bank ?? [];
+    }
+
+    public function getHasBankDetailsAttribute(){
+        $bank = $this->companies[0]->bank ?? [];
+        if((!isset($bank->name_on_account) || empty($bank->name_on_account)) || (!isset($bank->sort_code) || empty($bank->sort_code)) || (!isset($bank->account_number) || empty($bank->account_number))):
+            return false;
+        else:
+            return true;
+        endif;
     }
 
     

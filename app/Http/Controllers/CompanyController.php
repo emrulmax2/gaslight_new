@@ -19,6 +19,7 @@ use Creagia\LaravelSignPad\Signature;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class CompanyController extends Controller
 {
@@ -364,20 +365,50 @@ class CompanyController extends Controller
 
     public function updateBankInfo(Request $request){
         
-        $bankDetails = CompanyBankDetails::updateOrInsert(['company_id' => $request->company_id], [
-            'bank_name'       => $request->bank_name ?? null,
-            'name_on_account' => $request->name_on_account ?? null,
-            'account_number'  => $request->account_number ?? null,
-            'sort_code'       => $request->sort_code ?? null,
-            'payment_term'    => $request->payment_term ?? null,
-            'updated_at'      => now(),
-        ]);
+        $rules = [];
 
-        if($bankDetails):
-            return response()->json(['msg' => 'Company Bank Details successfully updated.', 'red' => '', ], 200);
-        else:
-            return response()->json(['msg' => 'No change found.', 'red' => '', ], 304);
-        endif;
+        if ($request->has('validate') && $request->validate == 1) {
+            $rules = [
+                'name_on_account' => 'required|string|max:255',
+                'account_number'  => 'required|digits_between:6,12',
+                'sort_code'       => 'required',
+            ];
+        }
+
+        if (!empty($rules)) {
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'msg'    => 'Validation failed.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+        }
+
+        $bankDetails = CompanyBankDetails::updateOrInsert(
+            ['company_id' => $request->company_id],
+            [
+                'bank_name'       => $request->bank_name ?? null,
+                'name_on_account' => $request->name_on_account ?? null,
+                'account_number'  => $request->account_number ?? null,
+                'sort_code'       => $request->sort_code ?? null,
+                'payment_term'    => $request->payment_term ?? null,
+                'updated_at'      => now(),
+            ]
+        );
+
+        if ($bankDetails) {
+            return response()->json([
+                'msg' => 'Company Bank Details successfully updated.',
+                'red' => '',
+            ], 200);
+        }
+
+        return response()->json([
+            'msg' => 'No change found.',
+            'red' => '',
+        ], 304);
     }
 
     public function updateCompanyLogo(Request $request){

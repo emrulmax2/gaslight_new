@@ -150,4 +150,8 @@ class Record extends Model implements CanBeSigned
             'cc_email_address' => $cc_email_address,
         ];
     }
+
+    public function inspectionNotifications(){
+        return $this->hasMany(RecordInspectionNotification::class);
+    }
 }

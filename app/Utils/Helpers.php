@@ -13,6 +13,9 @@ use App\Models\PowerflushCylinderType;
 use App\Models\PowerflushPipeworkType;
 use App\Models\PowerflushSystemType;
 use App\Models\RadiatorType;
+use App\Models\Record;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 if (!function_exists('merge')) {
     function merge($arrays)
@@ -155,5 +158,91 @@ if (!function_exists('colorName')) {
 if (!function_exists('workTypeName')) {
     function workTypeName($id, $default = ''){
         return CommissionDecommissionWorkType::find($id)?->name ?? $default;
+    }
+}
+
+if (!function_exists('get_due_inspection_counts')) {
+
+    /**
+     * Get monthly due inspection counts excluding already mailed records.
+     *
+     * @return array
+     */
+    function get_due_inspection_counts($year = null)
+    {
+        // determine year
+        $year = $year ? (int) $year : now()->year;
+
+        // start & end of that year
+        $start = Carbon::create($year, 1, 1)->startOfDay();
+        $end   = Carbon::create($year, 12, 31)->endOfDay();
+
+        $records = Record::selectRaw('
+                YEAR(next_inspection_date) as year,
+                MONTH(next_inspection_date) as month,
+                COUNT(*) as total
+            ')
+            ->whereNotNull('next_inspection_date')
+            ->whereBetween('next_inspection_date', [$start, $end])
+            ->groupByRaw('YEAR(next_inspection_date), MONTH(next_inspection_date)')
+            ->whereIn('job_form_id', [6, 9])
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->year . '-' . $item->month;
+            });
+
+        $result = [];
+
+        $current = $start->copy();
+
+        while ($current <= $end) {
+
+            $key = $current->year . '-' . $current->month;
+            $count = isset($records[$key]) ? $records[$key]->total : 0;
+
+            $result[] = [
+                'month'     => $current->format('F'),
+                'month_no'  => $current->month,
+                'year'      => $current->year,
+                'count'     => $count,
+            ];
+
+            $current->addMonth();
+        }
+
+        return $result;
+    }
+}
+
+
+if (!function_exists('get_upcoming_inspection_count')) {
+
+    /**
+     * Get count of upcoming inspections from today until end of current year
+     *
+     * Includes:
+     * - All next_inspection_date from today onward
+     * - Dates until the end of the year
+     * - Includes already sent mails
+     *
+     * @param int|null $userId
+     * @return int
+     */
+    function get_upcoming_inspection_count($userId = null)
+    {
+        $today       = now()->startOfDay();
+        $endOfYear   = now()->endOfYear();
+
+        $query = \App\Models\Record::whereNotNull('next_inspection_date')
+            ->whereDate('next_inspection_date', '>=', $today)
+            ->whereDate('next_inspection_date', '<=', $endOfYear)
+            ->whereIn('job_form_id', [6, 9]);
+
+        // Optional user filter
+        if (!empty($userId)) {
+            $query->where('created_by', $userId);
+        }
+
+        return $query->count();
     }
 }

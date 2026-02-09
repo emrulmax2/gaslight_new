@@ -88,8 +88,10 @@
                     formatter(cell, formatterParams) {
                         
                         return '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success dark:border-success w-auto ">\
-                        Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 ml-2"></i>\
-                    </a>';
+                                    Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 ml-2"></i>\
+                                </a><a href="javascript:void(0);" data-id="'+cell.getData().id+'" class="delete_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-danger border-danger dark:border-danger w-auto ">\
+                                    Delete <i data-lucide="trash-2" class="stroke-1.5 w-5 h-5 ml-2"></i>\
+                                </a>';
                     },
                 },
             ],
@@ -183,5 +185,71 @@
         $("#tabulator-print").on("click", function (event) {
             tabulator.print();
         });
+
+        const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
+        const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+
+        document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
+            $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+        });
+
+        $('#successModal .agreeWith').on('click', function(e){
+            e.preventDefault();
+            let $theBtn = $(this);
+            if($theBtn.attr('data-action') == 'RELOAD'){
+                if($theBtn.attr('data-redirect') != ''){
+                    window.location.href = $theBtn.attr('data-redirect');
+                }else{
+                    window.location.reload();
+                }
+            }else{
+                successModal.hide();
+            }
+        });
+
+        $('#userListTable').on("click", '.delete_row', function () {
+            let id = $(this).attr('data-id');
+            confirmModal.show();
+            document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event) {
+                $('#confirmModal .confirmModalTitle').html('Are you sure?');
+                $('#confirmModal .confirmModalDesc').html('Do you really want to delete these record? This action can not be un done! If yes then please click on the agree btn.');
+                $('#confirmModal .agreeWith').attr('data-id', id);
+                $('#confirmModal .agreeWith').attr('data-action', 'DELETE');
+            });
+        });
+
+        $('#confirmModal .agreeWith').on('click', function(){
+            let $agreeBTN = $(this);
+            let row_id = $agreeBTN.attr('data-id');
+            let action = $agreeBTN.attr('data-action');
+
+            $('#confirmModal button').attr('disabled', 'disabled');
+            if(action == 'DELETE'){
+                axios({
+                    method: 'delete',
+                    url: route('superadmin.users.delete', row_id),
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    if (response.status == 200) {
+                        $('#confirmModal button').removeAttr('disabled');
+                        confirmModal.hide();
+
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.msg);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                        });
+
+                        setTimeout(function(){
+                            successModal.hide();
+                            window.location.reload();
+                        }, 1500)
+                    }
+                }).catch(error =>{
+                    console.log(error)
+                });
+            }
+        })
     }
 })();

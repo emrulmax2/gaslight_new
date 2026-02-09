@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\GlobalApiController;
 use App\Http\Controllers\Api\JobForms\JobFormController;
 use App\Http\Controllers\Api\Jobs\JobsController;
 use App\Http\Controllers\Api\Pricing\PricingPackageController;
+use App\Http\Controllers\Api\Records\InspectionNotificationController;
 use App\Http\Controllers\Api\Records\InvoiceController;
 use App\Http\Controllers\Api\Records\QuoteController;
 use App\Http\Controllers\Api\Records\RecordAndDraftController;
@@ -242,6 +243,10 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('form/template', 'formTemplate');
         });
 
+    });
+
+    Route::controller(InspectionNotificationController::class)->group(function() {
+        Route::get('inspection-reminder', 'list');
     });
 });
 

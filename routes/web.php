@@ -35,6 +35,7 @@ use App\Http\Middleware\SuperAdminLoggedIn;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ImpersonateController;
+use App\Http\Controllers\Records\InspectionNotificationController;
 use App\Http\Controllers\Records\InvoiceController;
 use App\Http\Controllers\Records\QuoteController;
 use App\Http\Controllers\Records\RecordController;
@@ -111,6 +112,7 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         
         Route::get('logout', [SuperAdminAuthController::class, 'logout'])->name('logout');
         Route::get('users-list', [UserController::class, 'list'])->name('users.list');
+        Route::delete('users-list/delete/{user_id}', [UserController::class, 'delete'])->name('users.delete');
  
         Route::resource('boiler-brand', BoilerBrandController::class)->except(['create']);
 
@@ -528,6 +530,10 @@ Route::middleware(Authenticate::class)->group(function() {
 
     Route::controller(UserController::class)->group(function() {
         Route::post('user/update/{user}', 'update')->name('user.update');
+    });
+
+    Route::controller(InspectionNotificationController::class)->group(function() {
+        Route::get('upcoing-inspections', 'index')->name('upcoming.inspection');
     });
 });
 
