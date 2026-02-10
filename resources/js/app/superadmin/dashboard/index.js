@@ -18,16 +18,18 @@
                 queryStr: queryStr,
                 status: status,
             },
-            ajaxFiltering: true,
-            ajaxSorting: true,
+            pagination: true,
+            paginationMode:"remote",
+
+            filterMode: "remote",
+            sortMode: "remote",
             printAsHtml: true,
             printStyled: true,
-            pagination: 'remote',
             paginationSize: 10,
             paginationSizeSelector: [true, 5, 10, 20, 30, 40],
-            layout: 'fitColumns',
-            responsiveLayout: 'collapse',
-            placeholder: 'No matching records found',
+            layout: "fitColumns",
+            responsiveLayout: "collapse",
+            placeholder: "No matching records found",
             columns: [
                 {
                     title: 'Name',
@@ -68,15 +70,15 @@
                         </div>`;
                     },
                 },
-                {
-                    title: 'Status',
-                    field: 'status',
-                    headerHozAlign: 'left',
-                    formatter(cell) {
-                        const response = cell.getData();
-                        return (response.status == 1 ? '<span class="bg-success text-xs text-white font-medium leading-none px-2 py-0.5">Active</span>' : '<span class="bg-danger text-xs text-white font-medium leading-none px-2 py-0.5">Inactive</span>')
-                    },
-                },
+                // {
+                //     title: 'Status',
+                //     field: 'status',
+                //     headerHozAlign: 'left',
+                //     formatter(cell) {
+                //         const response = cell.getData();
+                //         return (response.status == 1 ? '<span class="bg-success text-xs text-white font-medium leading-none px-2 py-0.5">Active</span>' : '<span class="bg-danger text-xs text-white font-medium leading-none px-2 py-0.5">Inactive</span>')
+                //     },
+                // },
                 {
                     title: 'Actions',
                     field: 'id',
@@ -96,7 +98,7 @@
                 },
             ],
             ajaxResponse:function(url, params, response){
-                return response.data;
+                return response;
             },
             renderComplete() {
                 createIcons({

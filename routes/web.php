@@ -239,7 +239,7 @@ Route::controller(RegisteredUserController::class)->middleware(loggedin::class)-
     Route::post('register', 'store')->name('register');
     Route::post('register/validate-referral', 'validateReferral')->name('register.validate.referral');
 
-    Route::post('register/generate-top', 'generateOtp')->name('register.generate.otp');
+    Route::post('register/generate-top', 'generateOtp')->name('register.generate.otp')->middleware('throttle:5,10');
     Route::post('register/validate-top', 'validateOtp')->name('register.validate.otp');
     Route::post('register/validate-email', 'validateEmail')->name('register.validate.email');
 });

@@ -19,11 +19,13 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Creagia\LaravelSignPad\Signature;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\RateLimiter;
 
 class RegisteredUserController extends Controller
 {
@@ -32,8 +34,10 @@ class RegisteredUserController extends Controller
     public function index(): View
     {
         $users = User::all();
+        session(['registration_token' => Str::random(40)]);
         return view('app.auth.register', [
-            'users' => $users
+            'users' => $users,
+            'regToken' => session('registration_token')
         ]);
     }
 
@@ -296,20 +300,100 @@ class RegisteredUserController extends Controller
     }
 
     public function generateOtp(Request $request){
-        $MobileNumber = $request->MobileNumber;
-        $userExist = User::where('mobile', $MobileNumber)->get()->count();
+        $request->validate([
+            'MobileNumber' => ['required','regex:/^07[0-9]{9}$/'],
+            'reg_token'    => ['required'],
+            'cf_token'     => ['required']
+        ]);
 
-        if($userExist > 0){
-            return response()->json(['message' => 'Mobile number already exist.'], 422);
-        }else{
-            $regOtp = $this->createOtp($MobileNumber);
-            $response = $regOtp->sendSMS($MobileNumber);
-            if(!isset($response['success']) || !$response['success']):
-                return response()->json(['message' => 'Something went wrong. Please try later.', 'response' => $response], 422);
-            else:
-                return response()->json(['message' => 'Otp successfully created and sent to your phone.', 'response' => $response], 200);
-            endif;
+        $cf = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret'   => config('services.turnstile.secret'),
+            'response' => $request->cf_token,
+            'remoteip' => $request->ip()
+        ])->json();
+
+        if(!($cf['success'] ?? false)){
+            return response()->json([
+                'message'=>'Captcha verification failed.'
+            ],422);
         }
+
+        // verify step token (anti bot direct call)
+        if ($request->reg_token !== session('registration_token')) {
+            return response()->json(['message'=>'Invalid request for OTP.'],422);
+        }
+
+        $mobile = $request->MobileNumber;
+        // existing user check (faster)
+        if (User::where('mobile', $mobile)->exists()) {
+            return response()->json([
+                'message' => 'Mobile number already exist.'
+            ], 422);
+        }
+
+        // mobile based rate limiter
+        $limitKey = 'otp-mobile-'.$mobile;
+        if (RateLimiter::tooManyAttempts($limitKey, 3)) {
+            return response()->json([
+                'message'=>'Too many OTP requests. Try again later.'
+            ],422);
+        }
+        RateLimiter::hit($limitKey, 600); // lock 10 minutes
+
+        $ipLimitKey = 'otp-ip-'.$request->ip();
+        if(RateLimiter::tooManyAttempts($ipLimitKey,10)){
+            return response()->json([
+                'message'=>'Too many OTP attempts from this network.'
+            ],429);
+        }
+        RateLimiter::hit($ipLimitKey, 600);
+
+        if(str_contains($request->header('user-agent'),'python')){
+            return response()->json([
+                'message'=>'Suspicious user agent found.'
+            ],422);
+        }
+
+        // cooldown 30 sec
+        if (Cache::has('otp-last-'.$mobile)) {
+            return response()->json([
+                'message'=>'Please wait before requesting another OTP.'
+            ],422);
+        }
+        Cache::put('otp-last-'.$mobile, true, 30);
+
+
+        // generate & send
+        $regOtp = $this->createOtp($mobile);
+        $response = $regOtp->sendSMS($mobile);
+
+        if (!isset($response['success']) || !$response['success']) {
+            return response()->json([
+                'message'=>'Something went wrong. Please try later.',
+                'response' => $response
+            ],422);
+        }
+
+        return response()->json([
+            'message'=>'Otp successfully created and sent to your phone',
+            'response' => $response
+        ],200);
+
+
+        // $MobileNumber = $request->MobileNumber;
+        // $userExist = User::where('mobile', $MobileNumber)->get()->count();
+
+        // if($userExist > 0){
+        //     return response()->json(['message' => 'Mobile number already exist.'], 422);
+        // }else{
+        //     $regOtp = $this->createOtp($MobileNumber);
+        //     $response = $regOtp->sendSMS($MobileNumber);
+        //     if(!isset($response['success']) || !$response['success']):
+        //         return response()->json(['message' => 'Something went wrong. Please try later.', 'response' => $response], 422);
+        //     else:
+        //         return response()->json(['message' => 'Otp successfully created and sent to your phone.', 'response' => $response], 200);
+        //     endif;
+        // }
     }
 
     public function createOtp($mobile){
