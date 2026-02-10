@@ -88,63 +88,123 @@ import INTAddressLookUps from "../address_lookup";
         $('.theLoader', next).fadeIn();
         if(the_id == 'stepMobileNumber'){
             let $theMobileInput = $('#mobileNumber');
-            let theName = $theMobileInput.attr('name');
             let theMobileNumber = $theMobileInput.val();
-
             if(theMobileNumber.length == 11){
                 var startWith = theMobileNumber.substr(0, 2);
                 if(startWith == '07'){
                     $theStep.find('.error-mobile').fadeOut().html('');
 
-                    $.ajax({
-                        type: 'POST',
-                        data: {MobileNumber : theMobileNumber},
-                        url: route('register.generate.otp'),
-                        headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                        async: false,
-                        success: function(data) {
-                            next.removeAttr('disabled');
-                            next.find('.theLoader').fadeOut();
+                    turnstile.render("#turnstile-container", {
+                        sitekey: window.turnstileSiteKey,
+                        size: "invisible",
+                        callback: function (cfToken) {
+                            axios.post(route('register.generate.otp'), {
+                                    MobileNumber : theMobileNumber,
+                                    reg_token    : window.regToken,
+                                    cf_token     : cfToken
+                                }, { 
+                                headers:{ 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                            }).then(function(response){
+                                next.removeAttr('disabled');
+                                next.find('.theLoader').fadeOut();
+                                $theStep.find('.error-mobile').fadeOut().html('');
+                                $theStep.find('.otpCodes').val('');
+                                $('#stepVerifiedOtp .mobileNumberShow').text('+44('+theMobileNumber.substr(0,1)+')'+theMobileNumber.substr(1,10));
 
-                            $theStep.find('.error-mobile').fadeOut().html('');
-                            $theStep.find('.otpCodes').val('');
-                            $('#stepVerifiedOtp .mobileNumberShow').text('+44('+theMobileNumber.substr(0, 1)+')'+theMobileNumber.substr(1, 10));
-                            $('#countDownHtml').fadeOut('fast', function(){
-                                $('#resendOtp', this).removeClass('processing opacity-7');
+                                $('#countDownHtml').fadeOut('fast', function(){
+                                    $('#resendOtp', this).removeClass('processing opacity-7');
+                                });
+                                countDownClock('countdown',180);
+                                nextWizardStep = true;
+                            }).catch(function(error){
+                                next.removeAttr('disabled');
+                                next.find('.theLoader').fadeOut();
+                                let responseData = error.response.data;
+                                $theStep.find('.error-mobile').fadeIn().html(responseData.message ?? 'Something went wrong.');
+
+                                clearInterval(countDowns);
+                                $('#countdown').fadeOut().html('');
+                                $theStep.find('.otpCodes').val('');
+
+                                nextWizardStep = false;
                             });
-                            countDownClock('countdown', 180);
-                            nextWizardStep = true;
-                        },
-                        error:function(jqXHR, textStatus, errorThrown){
-                            var responseData = JSON.parse(jqXHR.responseText);
-                            $theStep.find('.error-mobile').fadeIn().html(responseData.message);
-                            
-                            next.removeAttr('disabled');
-                            next.find('.theLoader').fadeOut();
-
-                            clearInterval(countDowns);
-                            $('#countdown').fadeOut().html('');
-                            $theStep.find('.otpCodes').val('');
-                            nextWizardStep = false;
-                            console.log('Error');
                         }
                     });
                 }else{
                     next.removeAttr('disabled');
                     next.find('.theLoader').fadeOut();
-
                     $theStep.find('.error-mobile').fadeIn().html('The number should began with 07.');
+
                     nextWizardStep = false;
                 }
             }else{
                 next.removeAttr('disabled');
                 next.find('.theLoader').fadeOut();
+                $theStep.find('.error-mobile').fadeIn().html('Please enter an 11 digit number.');
 
-                $theStep.find('.form-wizard-next-btn').attr('disabled', 'disabled');
-                $theStep.find('.error-mobile').fadeOut().html('Please enter an 11 digit number.');
                 nextWizardStep = false;
             }
-        }else if(the_id == 'stepVerifiedOtp'){
+        }
+        // if(the_id == 'stepMobileNumber'){
+        //     let $theMobileInput = $('#mobileNumber');
+        //     let theName = $theMobileInput.attr('name');
+        //     let theMobileNumber = $theMobileInput.val();
+
+        //     if(theMobileNumber.length == 11){
+        //         var startWith = theMobileNumber.substr(0, 2);
+        //         if(startWith == '07'){
+        //             $theStep.find('.error-mobile').fadeOut().html('');
+
+        //             $.ajax({
+        //                 type: 'POST',
+        //                 data: {MobileNumber : theMobileNumber, reg_token : window.regToken},
+        //                 url: route('register.generate.otp'),
+        //                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        //                 async: false,
+        //                 success: function(data) {
+        //                     next.removeAttr('disabled');
+        //                     next.find('.theLoader').fadeOut();
+
+        //                     $theStep.find('.error-mobile').fadeOut().html('');
+        //                     $theStep.find('.otpCodes').val('');
+        //                     $('#stepVerifiedOtp .mobileNumberShow').text('+44('+theMobileNumber.substr(0, 1)+')'+theMobileNumber.substr(1, 10));
+        //                     $('#countDownHtml').fadeOut('fast', function(){
+        //                         $('#resendOtp', this).removeClass('processing opacity-7');
+        //                     });
+        //                     countDownClock('countdown', 180);
+        //                     nextWizardStep = true;
+        //                 },
+        //                 error:function(jqXHR, textStatus, errorThrown){
+        //                     var responseData = JSON.parse(jqXHR.responseText);
+        //                     $theStep.find('.error-mobile').fadeIn().html(responseData.message);
+                            
+        //                     next.removeAttr('disabled');
+        //                     next.find('.theLoader').fadeOut();
+
+        //                     clearInterval(countDowns);
+        //                     $('#countdown').fadeOut().html('');
+        //                     $theStep.find('.otpCodes').val('');
+        //                     nextWizardStep = false;
+        //                     console.log('Error');
+        //                 }
+        //             });
+        //         }else{
+        //             next.removeAttr('disabled');
+        //             next.find('.theLoader').fadeOut();
+
+        //             $theStep.find('.error-mobile').fadeIn().html('The number should began with 07.');
+        //             nextWizardStep = false;
+        //         }
+        //     }else{
+        //         next.removeAttr('disabled');
+        //         next.find('.theLoader').fadeOut();
+
+        //         $theStep.find('.form-wizard-next-btn').attr('disabled', 'disabled');
+        //         $theStep.find('.error-mobile').fadeOut().html('Please enter an 11 digit number.');
+        //         nextWizardStep = false;
+        //     }
+        // }
+        else if(the_id == 'stepVerifiedOtp'){
             let theOtp = '';
             $theStep.find('.otpCodes').each(function(e){
                 theOtp += $(this).val();

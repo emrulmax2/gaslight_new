@@ -4,6 +4,7 @@
     <title>Gas Certificate - New Registration </title>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 @endsection
 
 @section('content')
@@ -44,6 +45,10 @@
                                     <x-base.form-input type="number" id="mobileNumber" name="mobile" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="11" placeholder="07123456789" />
                                 </x-base.input-group>
                                 <div class="acc__input-error error-mobile mt-2 text-danger text-xs" style="display: none;"></div>
+                            </div>
+                            <div class="intro-y col-span-12">
+                                <!-- <div class="cf-turnstile" data-sitekey="0x4AAAAAACaCFao-oSn6uOqg"></div> -->
+                                <div id="turnstile-container"></div>
                             </div>
 
                             <div class="intro-y col-span-12 mt-5 flex items-center justify-center sm:justify-between">
@@ -615,10 +620,20 @@
 @pushOnce('scripts')
     @vite('resources/js/app/register.js')
     <script type="module">
-        
+        // Set Registration Token to Window Data.
+        window.regToken = "{{ $regToken }}";
+        window.turnstileSiteKey = "{{ config('services.turnstile.key') }}";
+
         (function () {
             document.addEventListener('DOMContentLoaded', function () {
             lucide.createIcons();
+
+            const widgetId = turnstile.render("#turnstile-container", {
+                sitekey: "{{ config('services.turnstile.key') }}",
+                callback: function (token) {
+                    //console.log("Success:", token);
+                },
+            });
         });
 
        

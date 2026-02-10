@@ -663,3 +663,7 @@
 .packageSLider.owl-carousel button.owl-dot.active{
     background: #0d9488;
 }
+
+#turnstile-container iframe{
+    width: 100% !important;
+}

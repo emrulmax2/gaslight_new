@@ -156,6 +156,7 @@
             </div>
         </div>
     </div>
+    @include('app.action-modals')
 
 @endsection
 

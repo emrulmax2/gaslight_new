@@ -29,7 +29,7 @@
                         <x-base.form-input value="" name="serial_no" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="Serial Number" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Ttime and temperature control to heating</x-base.form-label>
+                        <x-base.form-label class="mb-1">Time and temperature control to heating</x-base.form-label>
                         <x-base.form-select class="w-full tom-select py-0" id="appliance_time_temperature_heating_id" name="appliance_time_temperature_heating_id" data-placeholder="Please Select">
                             <option value="">Please Select</option>
                             @if($timerTemp->count() > 0)

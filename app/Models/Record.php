@@ -104,6 +104,8 @@ class Record extends Model implements CanBeSigned
         $content = (isset($template->content) && !empty($template->content) ? $template->content : null);
         $cc_email_address = (isset($template->cc_email_address) && !empty($template->cc_email_address) ? $template->cc_email_address : null);
 
+        $companyPhone = $this->user->companies[0]->company_phone ?? '';
+
         $companyName = $this->user->companies->pluck('company_name')->first();
         $shortcodes = [
             ':customername'         => $this->customer->full_name ?? '',
@@ -115,7 +117,7 @@ class Record extends Model implements CanBeSigned
             ':jobpostcode'          => isset($this->job->property->postal_code) && !empty($this->job->property->postal_code) ? $this->job->property->postal_code : '',
             ':jobtown'              => isset($this->job->property->city) && !empty($this->job->property->city) ? $this->job->property->city : '',
             ':propertyaddress'      => isset($this->property->full_address) && !empty($this->property->full_address) ? $this->property->full_address : '',
-            ':contactphone'         => isset($this->user->mobile) && !empty($this->user->mobile) ? $this->user->mobile : '',
+            ':contactphone'         => (!empty($companyPhone) ? $companyPhone : (isset($this->user->mobile) && !empty($this->user->mobile) ? $this->user->mobile : '')),
             ':companyname'          => $companyName ?? '',
             ':engineername'         => $this->user->name ?? '',
             ':eventdate'            => isset($this->job->calendar->date) && !empty($this->job->calendar->date) ? date('d-m-Y', strtotime($this->job->calendar->date)) : '',
@@ -149,5 +151,9 @@ class Record extends Model implements CanBeSigned
             'attachmentFiles' => $attachmentFiles,
             'cc_email_address' => $cc_email_address,
         ];
+    }
+
+    public function inspectionNotifications(){
+        return $this->hasMany(RecordInspectionNotification::class);
     }
 }

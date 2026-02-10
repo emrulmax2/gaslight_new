@@ -7,6 +7,13 @@
     const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
     const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
     const sendEmailModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#sendEmailModal"));
+    const companyBankModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#companyBankModal"));
+
+    $('#companyBankModal .cloaseBankeModal').on('click', function(e){
+        e.preventDefault();
+        companyBankModal.hide();
+        window.location.reload();
+    })
 
     document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
         $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
@@ -362,6 +369,66 @@
                         $(`#sendEmailForm .${key}`).addClass('border-danger');
                         $(`#sendEmailForm  .error-${key}`).html(val);
                     }
+                } else {
+                    console.log('error');
+                }
+            }
+        });
+    });
+
+    // Store Company Bank Details
+    $('#companyBankForm').on('submit', function(e){
+        e.preventDefault();
+        const form = document.getElementById('companyBankForm');
+        const $theForm = $(this);
+        
+        $('#bdUpdateBtn', $theForm).attr('disabled', 'disabled');
+        $("#bdUpdateBtn .theLoader").fadeIn();
+
+        let form_data = new FormData(form);
+        axios({
+            method: "POST",
+            url: route('company.update.bank.info'),
+            data: form_data,
+            headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        }).then(response => {
+            $('#bdUpdateBtn', $theForm).removeAttr('disabled');
+            $("#bdUpdateBtn .theLoader").fadeOut();
+
+            if (response.status == 200) {
+                companyBankModal.hide();
+
+                successModal.show();
+                document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                    $("#successModal .successModalTitle").html("Congratulations!");
+                    $("#successModal .successModalDesc").html(response.data.msg);
+                    $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                });
+
+                setTimeout(function(){
+                    successModal.hide();
+                    window.location.reload();
+                }, 1500)
+            }
+        }).catch(error => {
+            $('#bdUpdateBtn', $theForm).removeAttr('disabled');
+            $("#bdUpdateBtn .theLoader").fadeOut();
+            if (error.response) {
+                if (error.response.status == 422) {
+                    for (const [key, val] of Object.entries(error.response.data.errors)) {
+                        $(`#companyBankForm .${key}`).addClass('border-danger');
+                        $(`#companyBankForm .error-${key}`).html(val[0]);
+                    }
+                }else if (error.response.status == 304) {
+                    warningModal.show();
+                    document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#warningModal .warningModalTitle").html("Error Found!");
+                        $("#warningModal .warningModalDesc").html(error.response.data.msg);
+                    });
+
+                    setTimeout(() => {
+                        warningModal.hide();
+                    }, 1500);
                 } else {
                     console.log('error');
                 }

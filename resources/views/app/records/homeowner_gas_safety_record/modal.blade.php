@@ -595,6 +595,10 @@
                                     <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_hfcbpb_no">No</x-base.form-check.label>
                                     <x-base.form-check.input id="app_4_hfcbpb_no" name="flue_cap_put_back" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
                                 </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="app_4_hfcbpb_na">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="app_4_hfcbpb_na" name="flue_cap_put_back" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                </x-base.form-check>
                             </div>
                         </div>
                     </div>

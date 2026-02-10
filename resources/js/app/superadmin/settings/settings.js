@@ -1,4 +1,4 @@
-import INTAddressLookUps from "../../address_lookup";
+import INTAddressLookUps from "../../../address_lookup";
 
 (function(){
     // INIT Address Lookup
