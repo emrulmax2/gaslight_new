@@ -247,6 +247,7 @@ Route::prefix('/v1')->name('api.')->group(function() {
 
     Route::controller(InspectionNotificationController::class)->group(function() {
         Route::get('inspection-reminder', 'list');
+        Route::get('inspection-reminder/monthly-list', 'monthlyList');
     });
 });
 

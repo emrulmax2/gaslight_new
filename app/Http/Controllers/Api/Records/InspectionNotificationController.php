@@ -31,4 +31,67 @@ class InspectionNotificationController extends Controller
             'nextYear' => $nextYear
         ], 200);
     }
+
+    public function monthlyList(Request $request){
+        $user_id = $request->user_id;
+        $monthYear = $request->month_year ?? date('m-Y');
+
+        try {
+            $date = Carbon::createFromFormat('m-Y', $monthYear);
+        } catch (\Exception $e) {
+            $date = now();
+        }
+
+        $user = User::find($user_id);
+        $date = Carbon::createFromFormat('m-Y', $monthYear);
+
+        $start = $date->copy()->startOfMonth();
+        $end   = $date->copy()->endOfMonth();
+
+        $records = Record::query()
+            ->where('created_by', $user_id)
+            ->whereNotNull('next_inspection_date')
+            ->whereBetween('next_inspection_date', [$start, $end])
+            ->whereIn('job_form_id', [6, 9])
+            ->with([
+                'customer',
+                'property',
+                'billing',
+                'inspectionNotifications'
+            ])
+
+            ->orderBy('next_inspection_date', 'asc')
+            ->get();
+
+        $events = [];
+
+        foreach ($records as $record) {
+            $notification = $record->inspectionNotifications
+                ->where('inspection_date', $record->next_inspection_date)
+                ->first();
+
+            $emailSent = $notification ? true : false;
+            $emailSentDate = $notification->created_at ?? null;
+
+            $events[] = [
+                'id' => $record->id,
+                'id' => $record->id,
+                'certificate_number' => $record->certificate_number,
+                'prev_inspection_date' => $record->inspection_date,
+                'next_inspection_date' => $record->next_inspection_date,
+                'status' => $record->status,
+                'customer' => $record->customer ?? [],
+                'property' => $record->property ?? [],
+                'billing' => $record->billing ?? [],
+                'url' => route('records.show', $record->id),
+                'email_sent' => $emailSent,
+                'email_sent_date' => $emailSentDate,
+            ];
+        }
+
+        return response()->json([
+            'data' => $events,
+            'count' => $records->count()
+        ], 200);
+    }
 }
