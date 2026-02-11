@@ -265,6 +265,7 @@ export default defineConfig({
 
                 "resources/js/app/owl.carousel.js",
                 "resources/js/app/superadmin/settings/default-options.js",
+                "resources/js/app/records/inspection-show.js",
             ],
             refresh: true,
         }),
