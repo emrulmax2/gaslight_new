@@ -534,6 +534,8 @@ Route::middleware(Authenticate::class)->group(function() {
 
     Route::controller(InspectionNotificationController::class)->group(function() {
         Route::get('upcoing-inspections', 'index')->name('upcoming.inspection');
+        Route::get('upcoing-inspections/show/{any?}', 'show')->name('upcoming.inspection.show');
+        Route::post('upcoing-inspections/send-reminder', 'send')->name('upcoming.inspection.send.reminder');
     });
 });
 

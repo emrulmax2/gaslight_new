@@ -205,6 +205,7 @@ if (!function_exists('get_due_inspection_counts')) {
                 'month_no'  => $current->month,
                 'year'      => $current->year,
                 'count'     => $count,
+                'url'       => route('upcoming.inspection.show', $current->month.'-'.$current->year)
             ];
 
             $current->addMonth();

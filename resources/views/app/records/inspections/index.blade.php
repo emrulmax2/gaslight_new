@@ -51,7 +51,7 @@
                 @endphp
                 @if(!empty($upcomingMonths))
                     @foreach($upcomingMonths as $m)
-                        <x-base.table.tr class="intro-x cursor-pointer zoom-in">
+                        <x-base.table.tr class="intro-x cursor-pointer zoom-in" data-url="{{ $m['url'] }}" onclick="window.location.href=this.getAttribute('data-url')">
                             <x-base.table.td class="box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600">
                                 <span class="whitespace-nowrap font-medium" >
                                     {{ $m['month'] }}
