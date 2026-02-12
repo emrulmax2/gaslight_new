@@ -2,7 +2,6 @@
 
 @section('head')
     <title>Gas Certificate - New Registration </title>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 @endsection
@@ -624,16 +623,22 @@
         window.regToken = "{{ $regToken }}";
         window.turnstileSiteKey = "{{ config('services.turnstile.key') }}";
 
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof turnstile !== "undefined" && document.getElementById("turnstile-container")) {
+                window.turnstileWidget = turnstile.render("#turnstile-container", {
+                    sitekey: window.turnstileSiteKey,
+                    callback: function (token) {
+                        window.turnstileToken = token;
+                    }
+                });
+            } else {
+                console.error("Turnstile not loaded or container missing");
+            }
+        });
+
         (function () {
             document.addEventListener('DOMContentLoaded', function () {
             lucide.createIcons();
-
-            const widgetId = turnstile.render("#turnstile-container", {
-                sitekey: "{{ config('services.turnstile.key') }}",
-                callback: function (token) {
-                    //console.log("Success:", token);
-                },
-            });
         });
 
        
