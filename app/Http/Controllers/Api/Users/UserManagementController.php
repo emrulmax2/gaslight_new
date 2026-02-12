@@ -327,7 +327,7 @@ class UserManagementController extends Controller
     public function getSingleUser(Request $request, $id)
     {
         try {
-            $user = User::with('companies')->findOrFail($id);
+            $user = User::with('companies', 'referral')->findOrFail($id);
 
             return response()->json([
                 'success' => true,
