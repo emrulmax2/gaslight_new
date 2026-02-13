@@ -168,7 +168,7 @@ if (!function_exists('get_due_inspection_counts')) {
      *
      * @return array
      */
-    function get_due_inspection_counts($year = null)
+    function get_due_inspection_counts($user_id, $year = null)
     {
         // determine year
         $year = $year ? (int) $year : now()->year;
@@ -186,6 +186,7 @@ if (!function_exists('get_due_inspection_counts')) {
             ->whereBetween('next_inspection_date', [$start, $end])
             ->groupByRaw('YEAR(next_inspection_date), MONTH(next_inspection_date)')
             ->whereIn('job_form_id', [6, 9])
+            ->where('created_by', $user_id)
             ->get()
             ->keyBy(function ($item) {
                 return $item->year . '-' . $item->month;
