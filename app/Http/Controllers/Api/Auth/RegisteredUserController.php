@@ -95,15 +95,7 @@ class RegisteredUserController extends Controller
                 ]);
             endif;
 
-            $name = $request->name;
-            $prefix = strtoupper(substr(str_replace(' ', '', $name), 0, 3));
-            UserReferralCode::create([
-                'user_id' => $user->id,
-                'code' => $prefix.random_int(100000, 999999),
-                'active' => 1,
-
-                'created_by' => $user->id,
-            ]);
+            $referral = $this->generateRefferalCode($user->id, $request->name);
 
             $TRAIL_PERIOD = Option::where('category', 'USER_REGISTRATION')->where('name', 'DEFAULT_TRAIL')->pluck('value')->first() ?? 14;
             //$TRAIL_PERIOD = env('DEFAULT_TRAIL', 14);
@@ -201,6 +193,31 @@ class RegisteredUserController extends Controller
                 'message' => 'Registration Failed!',
             ], 200);
         endif;
+    }
+
+    public function generateRefferalCode($user_id, $name){
+        // split by space & get last word
+        $nameParts = preg_split('/\s+/', $name);
+        $lastWord  = strtoupper(end($nameParts));
+
+        // generate unique code
+        do {
+            $random   = random_int(10, 99); // 2 digit number
+            $code     = $lastWord . $random;
+
+            $exists = UserReferralCode::where('code', $code)->exists();
+
+        } while ($exists);
+
+        // create record
+        $referral = UserReferralCode::create([
+            'user_id'    => $user_id,
+            'code'       => $code,
+            'active'     => 1,
+            'created_by' => $user_id,
+        ]);
+
+        return $referral;
     }
 
     public function validateReferral(Request $request){

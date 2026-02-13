@@ -47,7 +47,7 @@
             </x-base.table.thead> -->
             <x-base.table.tbody>
                 @php 
-                    $upcomingMonths = get_due_inspection_counts($year);
+                    $upcomingMonths = get_due_inspection_counts(auth()->user()->id, $year);
                 @endphp
                 @if(!empty($upcomingMonths))
                     @foreach($upcomingMonths as $m)
