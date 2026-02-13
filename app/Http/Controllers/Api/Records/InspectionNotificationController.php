@@ -57,6 +57,7 @@ class InspectionNotificationController extends Controller
             ->whereBetween('next_inspection_date', [$start, $end])
             ->whereIn('job_form_id', [6, 9])
             ->with([
+                'form',
                 'customer',
                 'property',
                 'billing',
@@ -83,6 +84,7 @@ class InspectionNotificationController extends Controller
                 'prev_inspection_date' => $record->inspection_date,
                 'next_inspection_date' => $record->next_inspection_date,
                 'status' => $record->status,
+                'form' => $record->form ?? [],
                 'customer' => $record->customer ?? [],
                 'property' => $record->property ?? [],
                 'billing' => $record->billing ?? [],
