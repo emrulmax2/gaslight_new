@@ -51,10 +51,10 @@
         
         <!-- BEGIN: Account Menu -->
         @php 
-            $dueInspectionCounts = get_due_inspection_counts(); 
-            $activeMonthsCount = count(array_filter($dueInspectionCounts, function ($m) {
+            $dueInspectionCounts = get_due_inspection_counts(auth()->user()->id); 
+            $activeMonthsCount = (!empty($dueInspectionCounts) ? count(array_filter($dueInspectionCounts, function ($m) {
                 return $m['count'] > 0;
-            }));
+            })) : 0);
         @endphp
         <x-base.menu class="ml-auto">
             <x-base.menu.button
