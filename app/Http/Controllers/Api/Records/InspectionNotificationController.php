@@ -28,7 +28,7 @@ class InspectionNotificationController extends Controller
         $nextYear = (($year + 1) <= $currentYear) ? $year + 1 : null;
 
         return response()->json([
-            'data' => get_due_inspection_counts($year),
+            'data' => get_due_inspection_counts($user_id, $year),
             'year' => $year,
             'previousYear' => $previousYear,
             'nextYear' => $nextYear
@@ -134,7 +134,7 @@ class InspectionNotificationController extends Controller
 
             $content .= '<p>We hope you are well.</p>';
             $content .= '<p>This is a friendly reminder regarding your recent <strong>'.$record->form->name.'</strong> for the property listed below. Based on our records, the document is approaching its review, service, or renewal period, and we recommend arranging the next inspection or follow-up where applicable.</p>';
-            $content .= '<p>Property Address: <strong>'.$record->property->full_address.'</strong><br/>
+            $content .= '<p>Property Address: <strong>'.(isset($record->property->full_address) && !empty($record->property->full_address) ? $record->property->full_address : 'N/A').'</strong><br/>
                         Certificate Expiry Date: <strong>'.date('d-m-Y', strtotime($inspectionDate)).'</strong></p>';
             $content .= '<p>Regular servicing and inspections help ensure your gas appliances and systems continue operating safely and efficiently.</p>';
             $content .= '<p>If you would like to arrange an appointment, request a follow-up visit, or simply need advice regarding this record, please feel free to reply to this email or contact our team directly. We’ll be happy to assist you.</p>';
