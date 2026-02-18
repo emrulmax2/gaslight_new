@@ -119,16 +119,17 @@ class SubscriptionService{
         // Create subscription schedule for YEARLY (starts after monthly ends)
         $schedule = $this->stripe->subscriptionSchedules->create([
             'customer' => $userPackage->stripe_customer_id,
-            'start_date' => $currentSubscription->end,
+            'start_date' => $currentSubscription->current_period_end,
             'phases' => [[
                     'items' => [[
                             'price' => $newPackage->stripe_plan,
                             'quantity' => 1,
                     ]],
-                    'duration' => [
-                        'interval' => 'year',
-                        'interval_count' => 1,
-                    ],
+                    // 'duration' => [
+                    //     'interval' => 'year',
+                    //     'interval_count' => 1,
+                    // ],
+                    'iterations' => 1,
             ]],
             'metadata' => [
                 'action' => 'upgrade',
@@ -383,14 +384,6 @@ class SubscriptionService{
 
             if (!$user_id) {
                 Log::info('User id can not be null', [
-                    'subscription_id' => $subscription_id,
-                    'invoice_id' => $invoice_id
-                ]);
-                return;
-            }
-
-            if (UserPricingPackageInvoice::where('invoice_id', $invoice_id)->exists()) {
-                Log::info('Invoice already exist.', [
                     'subscription_id' => $subscription_id,
                     'invoice_id' => $invoice_id
                 ]);
