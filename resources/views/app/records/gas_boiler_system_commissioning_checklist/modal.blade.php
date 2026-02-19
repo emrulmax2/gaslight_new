@@ -177,7 +177,7 @@
                     </div>
 
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Operating pressure (or intel pressure)</x-base.form-label>
+                        <x-base.form-label class="mb-1">Operating pressure (or inlet pressure)</x-base.form-label>
                         <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
                             <x-base.form-input type="number" step="any" name="burner_opt_pressure" placeholder="Buner pressure" />
                             <div class="inline-flex justify-end items-center h-full">
@@ -274,7 +274,7 @@
                         </x-base.input-group>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Operating pressure (or intel pressure)</x-base.form-label>
+                        <x-base.form-label class="mb-1">Operating pressure (or inlet pressure)</x-base.form-label>
                         <x-base.input-group class="w-full h-[35px] rounded-[3px]" inputGroup >
                             <x-base.form-input type="number" step="any" name="dom_burner_opt_pressure" placeholder="Buner pressure" />
                             <div class="inline-flex justify-end items-center h-full">
@@ -300,7 +300,7 @@
                         </x-base.input-group>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Cold water intel temperature</x-base.form-label>
+                        <x-base.form-label class="mb-1">Cold water inlet temperature</x-base.form-label>
                         <x-base.form-input name="dom_cold_water_temp" value="" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
@@ -342,7 +342,7 @@
                         </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
-                        <x-base.form-label class="mb-1">Pint of termination</x-base.form-label>
+                        <x-base.form-label class="mb-1">Point of termination</x-base.form-label>
                         <x-base.form-select class="w-full h-[35px] rounded-[3px]" id="point_of_termination" name="point_of_termination" data-placeholder="Please Select">
                             <option value="">Please Select</option>
                             <option value="Internal">Internal</option>
