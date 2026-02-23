@@ -87,9 +87,28 @@
                         <x-base.form-label class="mb-1">Flow rate</x-base.form-label>
                         <x-base.form-input value="" name="flow_rate" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <!-- <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Fully commissioned</x-base.form-label>
                         <x-base.form-input value="" name="fully_commissioned" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                    </div> -->
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Fully commissioned</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_fluecom_yes">Yes</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_fluecom_yes" name="fully_commissioned" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Yes"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_fluecom_no">No</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_fluecom_no" name="fully_commissioned" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="No"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-2 relative">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_fluecom_na">N/A</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_fluecom_na" name="fully_commissioned" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="N/A"/>
+                                </x-base.form-check>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </x-base.dialog.description>
