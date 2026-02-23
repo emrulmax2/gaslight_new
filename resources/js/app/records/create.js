@@ -439,15 +439,17 @@ import INTAddressLookUps from "../../address_lookup";
         let jobAddressObj = JSON.parse(job_address);
 
         let theJobAddress = '';
-        theJobAddress += (jobAddressObj.address_line_1 != null ? jobAddressObj.address_line_1+' ' : '');
-        theJobAddress += (jobAddressObj.address_line_2 != null ? jobAddressObj.address_line_2+', ' : '');
-        theJobAddress += (jobAddressObj.city != null ? jobAddressObj.city+', ' : '');
-        theJobAddress += (jobAddressObj.state != null ? jobAddressObj.state+', ' : '');
-        theJobAddress += (jobAddressObj.postal_code != null ? jobAddressObj.postal_code : '');
-        $('.customerPropertyWrap').fadeIn('fast', function(){
-            $('.theDesc', this).html(theJobAddress).addClass('font-medium');
-            $('.theId', this).val(jobAddressObj.id);
-        });
+        if(!$.isEmptyObject(jobAddressObj)){
+            theJobAddress += (jobAddressObj.address_line_1 != null ? jobAddressObj.address_line_1+' ' : '');
+            theJobAddress += (jobAddressObj.address_line_2 != null ? jobAddressObj.address_line_2+', ' : '');
+            theJobAddress += (jobAddressObj.city != null ? jobAddressObj.city+', ' : '');
+            theJobAddress += (jobAddressObj.state != null ? jobAddressObj.state+', ' : '');
+            theJobAddress += (jobAddressObj.postal_code != null ? jobAddressObj.postal_code : '');
+            $('.customerPropertyWrap').fadeIn('fast', function(){
+                $('.theDesc', this).html(theJobAddress).addClass('font-medium');
+                $('.theId', this).val(jobAddressObj.id);
+            });
+        }
 
         if(localStorage.occupant){
             let occupant = localStorage.getItem('occupant');
