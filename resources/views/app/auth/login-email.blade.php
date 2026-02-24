@@ -64,7 +64,7 @@
                                     Remember me
                                 </label>
                             </div>
-                            <a href="">Forgot Password?</a>
+                            <a data-tw-toggle="modal" data-tw-target="#forgetPasswordModal" href="javascript:void(0);">Forgot Password?</a>
                         </div>
                         <div class="mt-5 text-center xl:mt-8 xl:text-left">
                             <x-base.button id="btn-login" 
@@ -207,7 +207,34 @@
         <!-- END: Notification Toggle -->
     @endif        
 
-
+    <!-- BEGIN: SEND SMS Invitation Modal Content -->
+    <x-base.dialog id="forgetPasswordModal" staticBackdrop>
+        <x-base.dialog.panel>
+            <form method="post" action="#" id="forgetPasswordForm">
+                <x-base.dialog.title>
+                    <h2 class="mr-auto text-base font-medium">Forgot Password</h2>
+                    <a class="absolute right-0 top-0 mr-3 mt-3" data-tw-dismiss="modal" href="#" ><x-base.lucide class="h-6 w-6 text-slate-400" icon="X" /></a>
+                </x-base.dialog.title>
+                <x-base.dialog.description >
+                    <div class="mb-3">
+                        <x-base.form-label for="email">Email <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input name="email" id="email" class="w-full" type="email" placeholder="emp@example.com" />
+                        <div class="acc__input-error error-email text-danger text-xs"></div>
+                    </div>
+                </x-base.dialog.description>
+                <x-base.dialog.footer>
+                    <x-base.button class="mr-1 w-20" data-tw-dismiss="modal" type="button" variant="outline-secondary" ><x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />Cancel </x-base.button>
+                    <x-base.button class="w-auto" id="sendLinkBtn" type="submit" variant="primary">
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                        Send Link
+                        <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                    </x-base.button>
+                </x-base.dialog.footer>
+            </form>
+        </x-base.dialog.panel>
+    </x-base.dialog>
+    <!-- END: SEND SMS Invitation Modal Content -->
+    @include('app.action-modals')
 @endsection
 
 
@@ -222,6 +249,28 @@
     @vite('resources/js/app/otp-login.js')
     <script type="module">
         (function () {
+            const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
+            const warningModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#warningModal"));
+            const forgetPasswordModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#forgetPasswordModal"));
+            
+            document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
+                $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+            });
+
+            $('#successModal .agreeWith').on('click', function(e){
+                e.preventDefault();
+                let $theBtn = $(this);
+                if($theBtn.attr('data-action') == 'RELOAD'){
+                    if($theBtn.attr('data-redirect') != ''){
+                        window.location.href = $theBtn.attr('data-redirect');
+                    }else{
+                        window.location.reload();
+                    }
+                }else{
+                    successModal.hide();
+                }
+            });
+
             
             if($('#success-notification-toggle').length>0) {
 
@@ -291,6 +340,66 @@
 
             $('#btn-login').on('click', function() {
                 login()
+            })
+
+            $('#forgetPasswordForm').on('submit', function(e){
+                e.preventDefault();
+                const form = document.getElementById('forgetPasswordForm');
+                const $theForm = $(this);
+                
+                $('#forgetPasswordForm .acc__input-error').html('').removeClass('mt-1');
+                $('#sendLinkBtn', $theForm).attr('disabled', 'disabled');
+                $("#sendLinkBtn .theLoader").fadeIn();
+
+                let form_data = new FormData(form);
+                axios({
+                    method: "post",
+                    url: route('forgot.password.email'),
+                    data: form_data,
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    $('#sendLinkBtn', $theForm).removeAttr('disabled');
+                    $("#sendLinkBtn .theLoader").fadeOut();
+
+                    if (response.status == 200) {
+                        forgetPasswordModal.hide();
+                        
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.message);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                        });
+
+                        setTimeout(() => {
+                            successModal.hide();
+                            window.location.reload();
+                        }, 1500);
+                    }
+                }).catch(error => {
+                    $('#sendLinkBtn', $theForm).removeAttr('disabled');
+                    $("#sendLinkBtn .theLoader").fadeOut();
+                    if (error.response) {
+                        if (error.response.status == 422) {
+                            for (const [key, val] of Object.entries(error.response.data.errors)) {
+                                $(`#forgetPasswordForm .${key}`).addClass('border-danger');
+                                $(`#forgetPasswordForm  .error-${key}`).html(val).addClass('mt-1');
+                            }
+                        } else if (error.response.status == 304) {
+                            warningModal.show();
+                            document.getElementById("warningModal").addEventListener("shown.tw.modal", function (event) {
+                                $("#warningModal .warningModalTitle").html("Error Found!");
+                                $("#warningModal .warningModalDesc").html(error.response.data.message);
+                            });
+
+                            setTimeout(() => {
+                                warningModal.hide();
+                            }, 1500);
+                        } else {
+                            console.log('error');
+                        }
+                    }
+                });
             })
         })()
     </script>

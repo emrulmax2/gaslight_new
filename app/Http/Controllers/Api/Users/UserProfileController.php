@@ -79,13 +79,30 @@ class UserProfileController extends Controller
     public function updatePassword(UserProfilePasswordUpdateRequest $request){
         $user = $request->user();
 
+        // Check if old password matches
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Old password is incorrect.'
+            ], 422);
+        }
+
+        // Prevent updating to the same password
+        if (Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'New password cannot be the same as the old password.'
+            ], 422);
+        }
+
+        // Update password
         $user->update([
-            'password' => Hash::make($request->validated('password'))
+            'password' => Hash::make($request->password)
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Password updated successfully',
+            'message' => 'Password updated successfully.'
         ]);
     }
     

@@ -23,6 +23,7 @@ class UserProfilePasswordUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'old_password' => 'required',
             'password' => ['required','string', Password::min(8)->mixedCase()->numbers()->symbols()->uncompromised()],
             'password_confirmation' => 'required|same:password' 
         ];
