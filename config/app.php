@@ -123,5 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'mobile_reset_url' => env('MOBILE_RESET_URL', 'myapp://reset-password'),
+
 
 ];

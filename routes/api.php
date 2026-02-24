@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\PasswordResetController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\BoilerBrandAndManualPageController;
 use App\Http\Controllers\Api\CompanyController;
@@ -35,6 +36,9 @@ Route::prefix('/v1')->name('api.')->group(function() {
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/login/otp-login',[LoginController::class, 'otpLogin']);
     Route::post('/login/send-otp',[LoginController::class, 'sendOtp']);
+
+    Route::middleware('throttle:10,1')->post('/auth/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('/auth/reset-password', [PasswordResetController::class, 'reset']);
 
 
     

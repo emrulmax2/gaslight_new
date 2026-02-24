@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ThemeController;
@@ -10,6 +11,7 @@ use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CheckFirstLogin;
 use App\Http\Middleware\loggedin;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
 use App\Http\Controllers\BoilerBrandAndManualPageController;
 use App\Http\Controllers\Calculator\GasRateCalculator;
@@ -96,6 +98,10 @@ Route::controller(AuthController::class)->middleware(loggedin::class)->group(fun
     Route::post('login/otp-login', 'otpLogin')->name('login.otp.check');
     Route::post('login/send-otp', 'sendOtp')->name('login.send.otp');
 });
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('forgot.password.email');
+
+Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 Route::prefix('/super-admin')->name('superadmin.')->group(function() {
 
