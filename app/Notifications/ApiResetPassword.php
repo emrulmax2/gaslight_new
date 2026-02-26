@@ -8,6 +8,6 @@ class ApiResetPassword extends ResetPassword
     {
         return config('app.mobile_reset_url')
             . '?token=' . $this->token
-            . '&email=' . urlencode($notifiable->email);
+            . '\&email=' . urlencode($notifiable->email);
     }
 }

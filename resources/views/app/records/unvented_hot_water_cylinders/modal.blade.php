@@ -58,9 +58,9 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label class="mb-1">Capacity (Ltrs)</x-base.form-label>
-                        <x-base.form-input value="" name="capacity" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="capacity" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <div class="col-span-12 sm:col-span-4"> 
                         <div class="bg-slate-100 p-2">
                             <x-base.form-label class="mb-2 mt-1 block font-medium">Makers warning labels attached</x-base.form-label>
                             <div class="bg-white">
@@ -137,35 +137,35 @@
                 <div class="grid grid-cols-12 gap-x-3 gap-y-2">
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>System operating pressure (bar)</x-base.form-label>
-                        <x-base.form-input value="" name="system_opt_pressure" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="system_opt_pressure" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Operating pressure of expansion vassel (bar)</x-base.form-label>
-                        <x-base.form-input value="" name="opt_presure_exp_vsl" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="opt_presure_exp_vsl" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Operating pressure of expansion valve (bar)</x-base.form-label>
-                        <x-base.form-input value="" name="opt_presure_exp_vlv" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="opt_presure_exp_vlv" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Operating temperature of temperature relief valve (C)</x-base.form-label>
-                        <x-base.form-input value="" name="tem_relief_vlv" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="tem_relief_vlv" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Operating temperature (C)</x-base.form-label>
-                        <x-base.form-input value="" name="opt_temperature" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="opt_temperature" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Pressure of combined temperature and pressure of relief valve (bar)</x-base.form-label>
-                        <x-base.form-input value="" name="combined_temp_presr" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="combined_temp_presr" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Maximum primary circuit pressure (bar)</x-base.form-label>
-                        <x-base.form-input value="" name="max_circuit_presr" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="max_circuit_presr" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Flow temperature (indirectly heated vassel) (C)</x-base.form-label>
-                        <x-base.form-input value="" name="flow_temp" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="flow_temp" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     
                     
@@ -174,19 +174,19 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Normal size of D1 (mm)</x-base.form-label>
-                        <x-base.form-input value="" name="d1_mormal_size" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="d1_mormal_size" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Length of D1 (mm)</x-base.form-label>
-                        <x-base.form-input value="" name="d1_length" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="d1_length" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Number of discharges</x-base.form-label>
-                        <x-base.form-input value="" name="d1_discharges_no" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="d1_discharges_no" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Size of manifold, if more than one discharge</x-base.form-label>
-                        <x-base.form-input value="" name="d1_manifold_size" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="d1_manifold_size" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">
@@ -239,11 +239,30 @@
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Norminal size of D2 (mm)</x-base.form-label>
-                        <x-base.form-input value="" name="d2_mormal_size" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                        <x-base.form-input value="" name="d2_mormal_size" class="w-full h-[35px] rounded-[3px]" step="any" type="number" placeholder="" />
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <!-- <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label>Pipework Material</x-base.form-label>
                         <x-base.form-input value="" name="d2_pipework_material" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                    </div> -->
+                    <div class="col-span-12 sm:col-span-4">
+                        <div class="bg-slate-100 p-2">
+                            <x-base.form-label class="mb-2 mt-1 block font-medium">Pipework Material</x-base.form-label>
+                            <div class="bg-white">
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_d2pipwm_yes">Copper</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_d2pipwm_yes" name="d2_pipework_material" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Copper"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_d2pipwm_no">PVC</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_d2pipwm_no" name="d2_pipework_material" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="PVC"/>
+                                </x-base.form-check>
+                                <x-base.form-check class="cursor-pointer font-medium ml-0 px-2 py-1.5 relative border-b">
+                                    <x-base.form-check.label class="font-medium ml-0 block w-full" for="gwn_d2pipwm_other">Other</x-base.form-check.label>
+                                    <x-base.form-check.input id="gwn_d2pipwm_other" name="d2_pipework_material" class="absolute right-2 top-0 bottom-0 my-auto" type="radio" value="Other"/>
+                                </x-base.form-check>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-span-12 sm:col-span-4">
                         <div class="bg-slate-100 p-2">

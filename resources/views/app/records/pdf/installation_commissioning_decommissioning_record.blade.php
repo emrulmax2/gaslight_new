@@ -338,8 +338,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">{{ (isset($record->available_options->appliances->details_work_carried_out) && !empty($record->available_options->appliances->details_work_carried_out) ? $record->available_options->appliances->details_work_carried_out : '') }}</td>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">{{ (isset($record->available_options->appliances->details_work_required) && !empty($record->available_options->appliances->details_work_required) ? $record->available_options->appliances->details_work_required : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half h-112px align-top">{{ (isset($record->available_options->appliances->details_work_carried_out) && !empty($record->available_options->appliances->details_work_carried_out) ? $record->available_options->appliances->details_work_carried_out : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half h-112px align-top">{{ (isset($record->available_options->appliances->details_work_required) && !empty($record->available_options->appliances->details_work_required) ? $record->available_options->appliances->details_work_required : '') }}</td>
                 </tr>
             </tbody>
         </table>
@@ -357,8 +357,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">{{ (isset($record->available_options->appliances->is_safe_to_use) && !empty($record->available_options->appliances->is_safe_to_use) ? $record->available_options->appliances->is_safe_to_use : '') }}</td>
-                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half">{{ (isset($record->available_options->appliances->have_labels_affixed) && !empty($record->available_options->appliances->have_labels_affixed) ? $record->available_options->appliances->have_labels_affixed : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half h-112px align-top">{{ (isset($record->available_options->appliances->is_safe_to_use) && !empty($record->available_options->appliances->is_safe_to_use) ? $record->available_options->appliances->is_safe_to_use : '') }}</td>
+                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-12px tracking-normal text-left leading-1-2 border-b border-r w-half h-112px align-top">{{ (isset($record->available_options->appliances->have_labels_affixed) && !empty($record->available_options->appliances->have_labels_affixed) ? $record->available_options->appliances->have_labels_affixed : '') }}</td>
                 </tr>
             </tbody>
         </table>
