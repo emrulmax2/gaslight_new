@@ -171,8 +171,7 @@ class UserManagementController extends Controller
 
 
 
-   public function list(Request $request)
-    {
+    public function list(Request $request){
         try {
             $validated = $request->validate([
                 'user_id' => 'required|integer|exists:users,id',
@@ -327,7 +326,7 @@ class UserManagementController extends Controller
     public function getSingleUser(Request $request, $id)
     {
         try {
-            $user = User::with('companies', 'referral')->findOrFail($id);
+            $user = User::with('companies', 'referral', 'userpackage')->findOrFail($id);
 
             return response()->json([
                 'success' => true,
