@@ -50,12 +50,6 @@
         <!-- END: Breadcrumb -->
         
         <!-- BEGIN: Account Menu -->
-        @php 
-            $dueInspectionCounts = get_due_inspection_counts(auth()->user()->id); 
-            $activeMonthsCount = (!empty($dueInspectionCounts) ? count(array_filter($dueInspectionCounts, function ($m) {
-                return $m['count'] > 0;
-            })) : 0);
-        @endphp
         <x-base.menu class="ml-auto">
             <x-base.menu.button
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"

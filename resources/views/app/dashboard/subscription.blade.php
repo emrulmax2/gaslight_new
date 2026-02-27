@@ -53,21 +53,23 @@
                                             <i data-lucide="check-circle" class="w-4 h-4 mr-3" style="flex: 0 0 auto; position: relative; top: 2px;"></i>
                                             <span>{{ $pack->description }}</span>
                                         </p>
-                                        @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && $userPackage->active == 1)
-                                            <x-base.button data-id="{{ $user->id }}" id="unsubscripUserBtn" type="button" class="rounded-full px-3 w-36 text-center justify-center {{ $pack->period == 'Free Trail' ? 'opacity-0 -z-20' : '' }}" variant="danger" >
-                                                <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
-                                                Cancel
-                                            </x-base.button>
-                                        @elseif($userPackage->package->period == 'Free Trail') 
-                                            <x-base.button as="a" href="{{ route('company.dashboard.subscribe', $pack->id) }}" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
-                                                <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                                                Get Plan
-                                            </x-base.button>
-                                        @elseif($pack->period !== 'Free Trail') 
-                                            <x-base.button type="button" data-packid="{{ $pack->id }}" data-id="{{ $user->id }}" id="updateSubscriptionBtn" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
-                                                <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
-                                                Upgrade Now
-                                            </x-base.button>
+                                        @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && (!isset($userPackage->cancellation_requested) || $userPackage->cancellation_requested != 1))
+                                            @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && $userPackage->active == 1)
+                                                <x-base.button data-id="{{ $user->id }}" id="unsubscripUserBtn" type="button" class="rounded-full px-3 w-36 text-center justify-center {{ $pack->period == 'Free Trail' ? 'opacity-0 -z-20' : '' }}" variant="danger" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                                                    Cancel
+                                                </x-base.button>
+                                            @elseif($userPackage->package->period == 'Free Trail') 
+                                                <x-base.button as="a" href="{{ route('company.dashboard.subscribe', $pack->id) }}" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                                                    Get Plan
+                                                </x-base.button>
+                                            @elseif($pack->period !== 'Free Trail' && (!isset($userPackage->upgrade_to) || $userPackage->upgrade_to != $pack->id)) 
+                                                <x-base.button type="button" data-packid="{{ $pack->id }}" data-id="{{ $user->id }}" id="updateSubscriptionBtn" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                                                    Upgrade Now
+                                                </x-base.button>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
