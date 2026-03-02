@@ -116,7 +116,7 @@
                         <div class="image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ isset($users[0]['photo']) ? Vite::asset($users[0]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
+                                src="{{ isset($users[0]['photo']) && Storage::disk('public')->exists('users/'.$users[0]['id'].'/'.$users[0]['photo']) ? Storage::disk('public')->url('users/'.$users[0]['id'].'/'.$users[0]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ isset($users[0]['name']) ? $users[0]['name'] : '' }}"
@@ -125,7 +125,7 @@
                         <div class="-ml-3 image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ isset($users[1]['photo']) ? Vite::asset($users[1]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
+                                src="{{ isset($users[1]['photo']) && Storage::disk('public')->exists('users/'.$users[1]['id'].'/'.$users[1]['photo']) ? Storage::disk('public')->url('users/'.$users[1]['id'].'/'.$users[1]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ isset($users[1]['name']) ? $users[1]['name'] : '' }}"
@@ -134,7 +134,7 @@
                         <div class="-ml-3 image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ isset($users[0]['photo']) ? Vite::asset($users[0]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
+                                src="{{ isset($users[2]['photo']) && Storage::disk('public')->exists('users/'.$users[2]['id'].'/'.$users[2]['photo']) ? Storage::disk('public')->url('users/'.$users[2]['id'].'/'.$users[2]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ isset($users[0]['name']) ? $users[0]['name'] : '' }}"
@@ -143,7 +143,7 @@
                         <div class="-ml-3 image-fit zoom-in h-9 w-9 2xl:h-11 2xl:w-11">
                             <x-base.tippy
                                 class="rounded-full border-[3px] border-white/50"
-                                src="{{ isset($users[1]['photo']) ? Vite::asset($users[1]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
+                                src="{{ isset($users[3]['photo']) && Storage::disk('public')->exists('users/'.$users[3]['id'].'/'.$users[3]['photo']) ? Storage::disk('public')->url('users/'.$users[3]['id'].'/'.$users[3]['photo']) : Vite::asset('resources/images/placeholders/200x200.jpg') }}"
                                 alt="Tailwise - Admin Dashboard Template"
                                 as="img"
                                 content="{{ isset($users[1]['name']) ? $users[1]['name'] : '' }}"
