@@ -526,7 +526,7 @@
                     <td class="w-col3 pl-1 pr-0 pb-0 pt-0 align-top">
                         <table class="table table-sm bordered border-primary">
                             <thead>
-                                <tr>
+                                <tr> 
                                     <th colspan="2" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
                                         GAS INSTALLATION PIPEWORK
                                     </th>
