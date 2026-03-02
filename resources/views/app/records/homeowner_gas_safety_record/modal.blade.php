@@ -572,15 +572,23 @@
             <x-base.dialog.description class="">
                 <div class="grid grid-cols-12 gap-x-3 gap-y-2">
                     <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label class="mb-1">Give Any Details of Any Faults</x-base.form-label>
+                        <x-base.form-label class="mb-1">Safety Related Defect(s) Identified</x-base.form-label>
                         <x-base.form-textarea name="fault_details" class="w-full h-[95px] rounded-[3px]" placeholder="Give Any Details of Any Faults">{{ (isset($gsr->fault_details) && !empty($gsr->fault_details) ? $gsr->fault_details : '') }}</x-base.form-textarea>
                     </div>
                     <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label class="mb-1">Rectification Work Carried Out</x-base.form-label>
+                        <x-base.form-label class="mb-1">GIUSP Classification eg. AR, ID</x-base.form-label>
+                        <x-base.form-input value="" name="giusp_classification" class="w-full h-[35px] rounded-[3px]" type="text" placeholder="" />
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <x-base.form-label class="mb-1">Warning/Advisory Insert Form Serial No</x-base.form-label>
+                        <x-base.form-textarea name="war_advisory_form_serial" class="w-full h-[95px] rounded-[3px]" placeholder="Rectification Work Carried Out">{{ (isset($gsr->rectification_work_carried_out) && !empty($gsr->rectification_work_carried_out) ? $gsr->rectification_work_carried_out : '') }}</x-base.form-textarea>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <x-base.form-label class="mb-1">Remedial Action Taken</x-base.form-label>
                         <x-base.form-textarea name="rectification_work_carried_out" class="w-full h-[95px] rounded-[3px]" placeholder="Rectification Work Carried Out">{{ (isset($gsr->rectification_work_carried_out) && !empty($gsr->rectification_work_carried_out) ? $gsr->rectification_work_carried_out : '') }}</x-base.form-textarea>
                     </div>
                     <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label class="mb-1">Details of Works Carried Out</x-base.form-label>
+                        <x-base.form-label class="mb-1">Details of Work Carried Out, or Further Action Required</x-base.form-label>
                         <x-base.form-textarea name="details_work_carried_out" class="w-full h-[95px] rounded-[3px]" placeholder="Rectification Work Carried Out">{{ (isset($gsr->details_work_carried_out) && !empty($gsr->details_work_carried_out) ? $gsr->details_work_carried_out : '') }}</x-base.form-textarea>
                     </div>
                     <div class="col-span-12 sm:col-span-4">

@@ -103,6 +103,7 @@
                         .pb-05{padding-bottom: 0.125rem;}
                         .mb-05{margin-bottom: 0.25rem;}
                         .mb-1{margin-bottom: 0.5rem;}
+                        .mt-1{margin-top: 0.25rem;}
                         .mt-1-5{margin-top: 0.375rem;}
                         .mb-2{margin-bottom: 0.5rem;}
                         .mt-2{margin-top: 0.5rem;}
@@ -165,7 +166,7 @@
             </table>
         </div>
 
-        <div class="recordInfo mt-1-5">
+        <div class="recordInfo mt-1">
             <table class="table table-sm bordered border-primary">
                 <thead>
                     <tr>
@@ -283,7 +284,7 @@
             </table>
         </div>
         
-        <table class="p-0 border-none mt-1-5">
+        <table class="p-0 border-none mt-1">
             <tbody>
                 <tr>
                     <td class="w-col9 pr-1 pl-0 pb-0 pt-0 align-top">
@@ -526,7 +527,7 @@
                         <table class="table table-sm bordered border-primary">
                             <thead>
                                 <tr>
-                                    <th colspan="2" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
+                                    <th colspan="2" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
                                         GAS INSTALLATION PIPEWORK
                                     </th>
                                 </tr>
@@ -551,10 +552,10 @@
                             </tbody>
                         </table>
 
-                        <table class="table table-sm bordered border-primary mt-1-5">
+                        <table class="table table-sm bordered border-primary mt-1">
                             <thead>
                                 <tr>
-                                    <th colspan="2" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
+                                    <th colspan="2" class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
                                         AUDIBLE CO ALARM
                                     </th>
                                 </tr>
@@ -579,35 +580,62 @@
                             </tbody>
                         </table>
 
-                        <table class="table table-sm bordered border-primary mt-1-5">
+                        <table class="table table-sm bordered border-primary mt-1">
                             <thead>
                                 <tr>
-                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
-                                        GIVE DETAILS OF ANY FAULTS
+                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Safety Related Defect(s) Identified
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top" style="height: 81px;">{{ (isset($record->available_options->gsrComments->fault_details) && !empty($record->available_options->gsrComments->fault_details) ? $record->available_options->gsrComments->fault_details : '') }}</td>
+                                    <td style="height: 50px;" class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top">{{ (isset($record->available_options->gsrComments->fault_details) && !empty($record->available_options->gsrComments->fault_details) ? $record->available_options->gsrComments->fault_details : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table table-sm bordered border-primary mt-1-5">
+                        <table class="table table-sm bordered border-primary mt-1">
                             <thead>
                                 <tr>
-                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-12px leading-none uppercase px-2 py-1 text-left align-middle">
+                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        GIUSP Classification eg. AR, ID
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top">{{ (isset($record->available_options->gsrComments->giusp_classification) && !empty($record->available_options->gsrComments->giusp_classification) ? $record->available_options->gsrComments->giusp_classification : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm bordered border-primary mt-1">
+                            <thead>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
+                                        Warning/Advisory Insert Form Serial No
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="height: 40px;" class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  ">{{ (isset($record->available_options->gsrComments->war_advisory_form_serial) && !empty($record->available_options->gsrComments->war_advisory_form_serial) ? $record->available_options->gsrComments->war_advisory_form_serial : '') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm bordered border-primary mt-1">
+                            <thead>
+                                <tr>
+                                    <th class="whitespace-nowrap border-primary border-b-1 bg-primary text-white text-11px leading-none uppercase px-2 py-05 text-left align-middle">
                                         RECTIFICATION WORK CARRIED OUT
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  " style="height: 81px;">{{ (isset($record->available_options->gsrComments->rectification_work_carried_out) && !empty($record->available_options->gsrComments->rectification_work_carried_out) ? $record->available_options->gsrComments->rectification_work_carried_out : '') }}</td>
+                                    <td style="height: 40px;" class="border-primary text-primary pl-2 pr-2 py-05 text-11px tracking-normal text-left leading-1-3 align-top  ">{{ (isset($record->available_options->gsrComments->rectification_work_carried_out) && !empty($record->available_options->gsrComments->rectification_work_carried_out) ? $record->available_options->gsrComments->rectification_work_carried_out : '') }}</td>
                                 </tr>
                             </tbody>
                         </table>
-
                     </td>
                 </tr>
             </tbody>
