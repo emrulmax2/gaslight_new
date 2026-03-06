@@ -6,7 +6,7 @@
 
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center flex-row">
-        <h2 class="mr-auto text-lg font-medium">Upcoming Inspections</h2>
+        <h2 class="mr-auto text-lg font-medium">Upcoming Inspections for the year <span class="font-bold underline">{{ $year }}</span></h2>
         <div class="flex mt-0 w-auto">
             <x-base.button as="a" href="{{ route('company.dashboard') }}" class="shadow-md" variant="linkedin">
                 <x-base.lucide class="h-4 w-4" icon="home" />
@@ -47,19 +47,19 @@
             </x-base.table.thead> -->
             <x-base.table.tbody>
                 @php 
-                    $upcomingMonths = get_due_inspection_counts(auth()->user()->id, $year);
+                    $upcomingMonths = get_due_inspection_counts(auth()->user()->id, $start, $end);
                 @endphp
                 @if(!empty($upcomingMonths))
                     @foreach($upcomingMonths as $m)
                         <x-base.table.tr class="intro-x cursor-pointer zoom-in" data-url="{{ $m['url'] }}" onclick="window.location.href=this.getAttribute('data-url')">
-                            <x-base.table.td class="box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600">
+                            <x-base.table.td class="{{ ($m['count'] > 0 ? 'bg-success bg-opacity-5' : 'bg-danger  bg-opacity-5') }} box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600">
                                 <span class="whitespace-nowrap font-medium" >
                                     {{ $m['month'] }}
                                 </span>
                             </x-base.table.td>
-                            <x-base.table.td @class([ 'box w-56 rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600', 'before:absolute before:inset-y-0 before:left-0 before:my-auto before:block before:h-8 before:w-px before:bg-slate-200 before:dark:bg-darkmode-400',])>
+                            <x-base.table.td class="{{ ($m['count'] > 0 ? 'bg-success bg-opacity-5' : 'bg-danger  bg-opacity-5') }} px-5 py-3 border-b dark:border-darkmode-300 box w-56 rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 before:absolute before:inset-y-0 before:left-0 before:my-auto before:block before:h-8 before:w-px before:bg-slate-200 before:dark:bg-darkmode-400">
                                 <div class="flex items-center justify-center">
-                                    <span class="text-success font-medium">{{ $m['count'] }}</span>
+                                    <span class="{{ ($m['count'] > 0 ? 'text-success' : 'text-danger') }} font-medium">{{ $m['count'] }}</span>
                                 </div>
                             </x-base.table.td>
                         </x-base.table.tr>
