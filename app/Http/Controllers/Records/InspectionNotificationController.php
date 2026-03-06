@@ -22,11 +22,14 @@ class InspectionNotificationController extends Controller
         $userCreatedYear = Carbon::parse($user->created_at)->year;
         $currentYear = now()->year;
 
+        $start = Carbon::create($year, 1, 1)->startOfDay();
+        $end   = Carbon::create($year, 12, 31)->endOfDay();
+
         // Previous Year
         $previousYear = (($year - 1) >= $userCreatedYear) ? $year - 1 : null;
 
         // Next Year
-        $nextYear = (($year + 1) <= $currentYear) ? $year + 1 : null;
+        $nextYear = $year + 1;
         
         return view('app.records.inspections.index', [
             'title' => 'Next Inspections - Gas Certificate APP',
@@ -34,6 +37,8 @@ class InspectionNotificationController extends Controller
                 ['label' => 'Upcoming Inspections', 'href' => 'javascript:void(0);'],
             ],
             'year' => $year,
+            'start' => $start,
+            'end' => $end,
             'previousYear' => $previousYear,
             'nextYear' => $nextYear
         ]);

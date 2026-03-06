@@ -168,15 +168,11 @@ if (!function_exists('get_due_inspection_counts')) {
      *
      * @return array
      */
-    function get_due_inspection_counts($user_id, $year = null)
+    function get_due_inspection_counts($user_id, $start, $end)
     {
-        // determine year
-        $year = $year ? (int) $year : now()->year;
-
-        // start & end of that year
-        $start = Carbon::create($year, 1, 1)->startOfDay();
-        $end   = Carbon::create($year, 12, 31)->endOfDay();
-
+        $start = Carbon::parse($start)->startOfDay();
+        $end = Carbon::parse($end)->endOfDay();
+        
         $records = Record::selectRaw('
                 YEAR(next_inspection_date) as year,
                 MONTH(next_inspection_date) as month,

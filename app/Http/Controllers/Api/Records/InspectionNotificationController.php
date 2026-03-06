@@ -17,22 +17,21 @@ class InspectionNotificationController extends Controller
     public function list(Request $request){
         $user_id = $request->user_id;
         $user = User::find($user_id);
-        $year = (int) $request->input('year', now()->year);
-        $userCreatedYear = Carbon::parse($user->created_at)->year;
-        $currentYear = now()->year;
+        $start = $request->start;
+        $end = $request->end;
 
-        // Previous Year
-        $previousYear = (($year - 1) >= $userCreatedYear) ? $year - 1 : null;
 
-        // Next Year
-        $nextYear = (($year + 1) <= $currentYear) ? $year + 1 : null;
-
-        return response()->json([
-            'data' => get_due_inspection_counts($user_id, $year),
-            'year' => $year,
-            'previousYear' => $previousYear,
-            'nextYear' => $nextYear
-        ], 200);
+        if(!empty($start) && $end):
+            return response()->json([
+                'success' => true,
+                'data' => get_due_inspection_counts($user_id, $start, $end),
+            ], 200);
+        else:
+            return response()->json([
+                'success' => false,
+                'message' => 'Please pass a valid start & end date.'
+            ], 422);
+        endif;
     }
 
     public function monthlyList(Request $request){
