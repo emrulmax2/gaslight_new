@@ -429,7 +429,7 @@
                 </tr>
 
                 <tr>
-                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col2"> </td>
+                    <td class="border-primary whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col2">Rediator Location</td>
                     <td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Top</td>
                     <td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Bottom</td>
                     <td class="border-primary border-l whitespace-nowrap text-primary pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">Left</td>
@@ -443,7 +443,7 @@
                     @php $s = 1; @endphp
                     @foreach($record->available_options->radiators as $radiator)
                         <tr>
-                            <td class="border-primary border-t whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col2">#{{ $s.' '.(isset($radiator->rediator_location) && !empty($radiator->rediator_location) ? $radiator->rediator_location : 'Radiator') }}</td>
+                            <td class="border-primary border-t whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col2">{{ (isset($radiator->rediator_location) && !empty($radiator->rediator_location) ? $radiator->rediator_location : 'Radiator') }}</td>
                             <td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">{{ (isset($radiator->tmp_b_top) && !empty($radiator->tmp_b_top) ? $radiator->tmp_b_top : '') }}</td>
                             <td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">{{ (isset($radiator->tmp_b_bottom) && !empty($radiator->tmp_b_bottom) ? $radiator->tmp_b_bottom : '') }}</td>
                             <td class="border-primary border-t border-l whitespace-nowrap text-primary font-medium pl-2 pr-2 py-05 text-11px leading-none tracking-normal align-middle w-col10-8by-1">{{ (isset($radiator->tmp_b_left) && !empty($radiator->tmp_b_left) ? $radiator->tmp_b_left : '') }}</td>

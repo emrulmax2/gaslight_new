@@ -407,11 +407,11 @@ class InvoiceController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
                 // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
             ];
             $configuration['from_name'] = !empty($companyName) ? $companyName : $invoice->user->name; 
-            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $invoice->user->email; 
+            $configuration['reply_to'] = !empty($companyEmail) ? $companyEmail : $invoice->user->email; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($invoice->id); 
