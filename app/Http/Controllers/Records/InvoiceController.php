@@ -493,11 +493,10 @@ class InvoiceController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
-                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
-            ];
-            $configuration['from_name'] = !empty($companyName) ? $companyName : $invoice->user->name; 
-            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $invoice->user->email; 
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
+                'from_name'    =>  !empty($companyName) ? $companyName : $invoice->user->name, 
+                'reply_to'    =>  !empty($companyEmail) ? $companyEmail : $invoice->user->email, 
+            ]; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($invoice->id);
@@ -515,7 +514,7 @@ class InvoiceController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $invoice->email_template->attachmentFiles);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, '', $configuration['reply_to'], $configuration['from_name']), $ccMail);
             return response()->json(['msg' => 'Invoice successfully send to the customer.', 'red' => route('invoices.show', $invoice_id), 'pdf' => $pdf]);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);

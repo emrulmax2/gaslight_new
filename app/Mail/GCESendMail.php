@@ -10,23 +10,29 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Mail\Mailables\Address;
 
 class GCESendMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $subject, $content, $attachmentList, $templateTitle, $template;
+    public $replyToEmail;
+    public $replyToName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subject, $content, $attachmentList, $templateTitle = '', $template = 'communication') 
+    public function __construct($subject, $content, $attachmentList, $templateTitle = '', $template = 'communication', $replyToEmail = null, $replyToName = null) 
     {
         $this->subject = $subject;
         $this->content = $content;
         $this->attachmentList = $attachmentList;
         $this->templateTitle = $templateTitle != '' ? $templateTitle : 'Welcome to <br /><a style="color: #FFF;" href="https://gasengineerapp.co.uk">GasEngineerApp.co.uk</a>'; 
         $this->template = $template; 
+
+        $this->replyToEmail = $replyToEmail;
+        $this->replyToName = $replyToName;
     }
 
     /**
@@ -35,7 +41,8 @@ class GCESendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->subject, 
+            subject: $this->subject,
+            replyTo: $this->replyToEmail ? [new Address($this->replyToEmail, $this->replyToName)] : []
         );
     }
 
