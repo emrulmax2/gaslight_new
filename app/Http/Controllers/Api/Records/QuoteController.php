@@ -348,11 +348,11 @@ class QuoteController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
                 
-                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'),
                 // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
             ];
             $configuration['from_name'] = !empty($companyName) ? $companyName : $quote->user->name; 
-            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $quote->user->email; 
+            $configuration['reply_to'] = !empty($companyEmail) ? $companyEmail : $quote->user->email; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($quote->id); 
