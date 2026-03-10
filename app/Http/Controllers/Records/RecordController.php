@@ -360,11 +360,10 @@ class RecordController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'), 
                 
-                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
-                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'), 
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
+                'from_name'    =>  !empty($companyName) ? $companyName : $record->user->name, 
+                'reply_to'    =>  !empty($companyEmail) ? $companyEmail : $record->user->email, 
             ];
-            $configuration['from_name'] = !empty($companyName) ? $companyName : $record->user->name; 
-            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $record->user->email; 
 
             $attachmentFiles = [];
             $fileName = $this->generatePdfFileName($record->id); 
@@ -382,7 +381,7 @@ class RecordController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $record->email_template->attachmentFiles);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate'), $ccMail); 
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate', $configuration['reply_to'], $configuration['from_name']), $ccMail); 
             return response()->json(['msg' => 'Certificate has been approved and a copy of the certificate mailed to the customer', 'red' => route('records.show', $record_id), 'pdf' => $pdf]);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);
