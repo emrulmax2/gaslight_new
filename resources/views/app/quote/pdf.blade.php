@@ -190,7 +190,7 @@
             <table style="position: relative;">
                 <tr>
                     <td class="w-50 v-top" style="padding: 0 0 0 30px;">
-                        <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 35px;">
+                        {{--<div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 35px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Payment Information:</span>
                             @if(isset($quote->user->companies[0]->bank->name_on_account) && !empty($quote->user->companies[0]->bank->name_on_account))
                                 <span class="block">{{ $quote->user->companies[0]->bank->name_on_account }}</span>
@@ -208,7 +208,7 @@
                             <span class="block">{{ $invoice->user->companies[0]->bank->payment_term }}</span>
                         </div>
                         @endif
-                        {{--@if(isset($quoteNotes) && !empty($quoteNotes))
+                        @if(isset($quoteNotes) && !empty($quoteNotes))
                         <div class="paymentInfo" style="font-size: 14px; line-height: 1.1; margin-top: 25px;">
                             <span class="block font-bold" style="margin-bottom: 6px;">Note:</span>
                             <span class="block">{{ (isset($quoteNotes) && !empty($quoteNotes) ? $quoteNotes : '') }}</span>
