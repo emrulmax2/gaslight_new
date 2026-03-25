@@ -329,7 +329,7 @@
             <thead>
                 <tr>
                     <th class="whitespace-nowrap border-primary border-b-white border-b-1 border-r border-r-sec bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">
-                        Detailed description of the work car
+                        Detailed description of the work carried out
                     </th>
                     <th class="whitespace-nowrap border-primary border-b-white border-b-1 bg-primary text-white text-11px uppercase leading-none px-2 py-1 align-middle text-left">
                         Description of additional work required
@@ -390,7 +390,7 @@
                                 </tr>
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Issued By</td>
-                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->user->name) && !empty($record->user->name) ? $record->user->name : '') }}</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{!! (isset($record->user->name) && !empty($record->user->name) ? $record->user->name : '&nbsp;') !!}</td>
                                 </tr>
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Date of Issue</td>
@@ -412,11 +412,11 @@
                                 </tr>
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Received By</td>
-                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : '') }}</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{!! (isset($record->relation->name) && !empty($record->relation->name) ? $record->relation->name : '&nbsp;') !!}</td>
                                 </tr>
                                 <tr>
                                     <td class="uppercase border-t-0 border-l-0 border-r-0 border-b-0 border-primary bg-light-2 text-primary font-medium pl-2 pr-2 py-05 leading-none text-12px w-105px tracking-normal align-middle">Print Name</td>
-                                    <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{{ (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : '') }}</td>
+                                    <td class="border-t-0 border-l-0 border-r-0 border-b-0 border-primary font-medium pl-2 pr-2 pt-1 pb-1 text-12px leading-none align-middle">{!! (isset($record->received_by) && !empty($record->received_by) ? $record->received_by : '&nbsp;') !!}</td>
                                 </tr>
                             </tbody>
                         </table>

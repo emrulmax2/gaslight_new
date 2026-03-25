@@ -575,7 +575,7 @@
                     <td colspan="100%" class="w-full border-t border-primary text-primary pl-2 pr-2 py-2 text-12px tracking-normal text-center leading-1-2 align-middle">
                         Contact details of Gas Emergency Service Providers (ESP's) and Gas Suppliers (GS) in the British Isles
                     </td>
-                <tr>
+                </tr>
             </tbody>
         </table>
         <table class="table table-sm bordered border-primary mt-1">
@@ -733,7 +733,7 @@
         <table class="p-0 table-sm bordered border-primary mt-1 bg-light-2">
             <tbody>
                 <tr>
-                    <td class="w-half border-primary text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
+                    <td class="w-half text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
                         <div class="font-bold mb-05">GAS SAFE CONTACT DETAILS</div>
                         <div class="mb-005">Gas Safe Register</div>
                         <div class="mb-005">PO Box 6804</div>
@@ -741,7 +741,7 @@
                         <div class="mb-005">RG24 4NB</div>
                         <div class="mb-005">0800 408 5500</div>
                     </td>
-                    <td class="w-half border-primary text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
+                    <td class="w-half text-primary pl-2 pr-2 py-1 text-12px tracking-normal text-left leading-1-2 align-top">
                         <div class="font-bold mb-05">DEFINITIONS</div>
                         <div class="mb-1">
                             <strong>IMMEDIATELY DANGEROUS (ID)</strong> - It is a dangerous appliance/installation, which if left connected to a gas supply 
@@ -752,7 +752,7 @@
                             <strong>may in the future constitute a danger</strong> to life or property. An example of this is inadequate ventilation
                         </div>
                     </td>
-                <tr>
+                </tr>
             </tbody>
         </table>
     </body>
