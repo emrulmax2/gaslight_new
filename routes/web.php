@@ -475,6 +475,8 @@ Route::middleware(Authenticate::class)->group(function() {
 
             Route::post('quotes/send-email', 'sendEmail')->name('quotes.send.email');
 
+            Route::post('quotes/update-status', 'updateStatus')->name('quotes.update.status');
+
             // Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
             // Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
             

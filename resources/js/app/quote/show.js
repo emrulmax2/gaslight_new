@@ -213,6 +213,20 @@
         });
     });
 
+    $(document).on('click', '#cancelledQuoteBtn', function(e){
+        e.preventDefault();
+        let $theBtn = $(this);
+        let record_id = $theBtn.attr('data-id');
+
+        confirmModal.show();
+        document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
+            $('#confirmModal .confirmModalTitle').html('Are you sure?');
+            $('#confirmModal .confirmModalDesc').html('Do you really want to cancel this quote? Click on agree to continue.');
+            $('#confirmModal .agreeWith').attr('data-id', record_id);
+            $('#confirmModal .agreeWith').attr('data-action', 'CANCELQUOTE');
+        });
+    });
+
     // Confirm Modal Action
     $('#confirmModal .agreeWith').on('click', function(){
         let $agreeBTN = $(this);
@@ -220,7 +234,33 @@
         let action = $agreeBTN.attr('data-action');
 
         $('#confirmModal button').attr('disabled', 'disabled');
-        if(action == 'CREATEQUOTE'){
+        if(action == 'CANCELQUOTE'){
+            axios({
+                method: 'post',
+                url: route('quotes.update.status'),
+                data: {quote_id : row_id, status : 'Cancelled'},
+                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+            }).then(response => {
+                if (response.status == 200) {
+                    $('#confirmModal button').removeAttr('disabled');
+                    confirmModal.hide();
+
+                    successModal.show();
+                    document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                        $("#successModal .successModalTitle").html("Congratulations!");
+                        $("#successModal .successModalDesc").html(response.data.msg);
+                        $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                    });
+
+                    setTimeout(() => {
+                        successModal.hide();
+                        window.location.reload();
+                    }, 1500);
+                }
+            }).catch(error =>{
+                console.log(error)
+            });
+        }else if(action == 'CREATEQUOTE'){
             axios({
                 method: 'post',
                 url: route('records.create.quote'),
