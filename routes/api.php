@@ -240,6 +240,8 @@ Route::prefix('/v1')->name('api.')->group(function() {
             Route::get('quotes/edit/{quote_id}', 'edit');
             Route::post('quotes/send', 'send');
             Route::get('quotes/download/{quote_id}', 'download');
+
+            Route::post('quotes/update-status', 'updateStatus');
         });
 
         Route::controller(JobFormController::class)->group(function() {

@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 use Illuminate\Support\Str;
 
 class QuoteController extends Controller
@@ -674,5 +675,28 @@ class QuoteController extends Controller
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later or contact with the administrator', 'red' => ''], 304);
         endif;
+    }
+
+    public function updateStatus(Request $request){
+        try{
+            $quote_id = $request->quote_id;
+            $status = $request->status;
+
+            $quote = Quote::find($quote_id);
+            $quote->status = $status;
+            $quote->updated_by = $request->user()->id;
+            $quote->updated_at = date('Y-m-d H:i:s');
+            $quote->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Quote status successfully updated.',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
     }
 }

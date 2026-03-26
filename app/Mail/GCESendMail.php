@@ -35,6 +35,22 @@ class GCESendMail extends Mailable
         $this->replyToName = $replyToName;
     }
 
+    public function build(){
+        return $this->withSymfonyMessage(function ($message) {
+            $headers = $message->getHeaders();
+
+            // Remove ALL reply-to headers added anywhere
+            if ($headers->has('Reply-To')) {
+                $headers->remove('Reply-To');
+            }
+
+            // Add ONLY clean reply-to
+            if (!empty($this->replyToEmail) && filter_var($this->replyToEmail, FILTER_VALIDATE_EMAIL)) {
+                $message->replyTo($this->replyToEmail);
+            }
+        });
+    }
+
     /**
      * Get the message envelope.
      */

@@ -40,12 +40,37 @@
                                 <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                             </x-base.button>
                         @endif
+                        @if($quote->status == 'Draft')
+                            <x-base.button data-id="{{ $quote->id }}" id="acceptedQuoteBtn" type="button" class="justify-start action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#0d9488] [&.active]:text-white hover:bg-[#0d9488] focus:bg-[#0d9488] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                                Accepted
+                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                            </x-base.button>
+                            <x-base.button data-id="{{ $quote->id }}" id="cancelledQuoteBtn" type="button" class="justify-start action_btns w-full mb-2 border-0 cursor-pointer text-slate-500 shadow-none [&.active]:bg-[#b91c1c] [&.active]:text-white hover:bg-[#b91c1c] focus:bg-[#b91c1c] hover:text-white focus:text-white">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                                Cancel
+                                <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                            </x-base.button>
+                        @endif
                     </div>
                     <input type="hidden" value="1" name="submit_type"/>
                 </div>
             </div>
             <div class="intro-y col-span-12 sm:col-span-9 order-1 sm:order-2">
-                <div class="intro-y box p-5">
+                <div class="intro-y box p-5 relative overflow-hidden">
+                    @if($quote->status == 'Expired')
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-danger text-white text-[12px] leading-none uppercase text-center py-1.5">{{ $quote->status }}</button>
+                    @elseif($quote->status == 'Cancelled')
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-warning text-white text-[10px] leading-none uppercase text-center py-1.5">{{ $quote->status }}</button>
+                    @elseif($quote->status == 'Send')
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-primary text-white text-[10px] leading-none uppercase text-center py-1.5">{{ $quote->status }}</button>
+                    @elseif($quote->status == 'Accepted')
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-success text-white text-[10px] leading-none uppercase text-center py-1.5">{{ $quote->status }}</button>
+                    @else
+                        <button class="ml-auto -rotate-45 absolute w-[158px] top-[14px] left-[-49px] font-medium bg-pending text-white text-[10px] leading-none uppercase text-center py-1.5">{{ $quote->status }}</button>
+                    @endif
+
+
                     @if(!empty($thePdf))
                         <object class="pdfViewer" data="{{ $thePdf }}" type="application/pdf">
                             <embed src="{{ $thePdf }}" type="application/pdf">

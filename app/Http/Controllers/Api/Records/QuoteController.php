@@ -517,4 +517,27 @@ class QuoteController extends Controller
         }
         
     }
+
+    public function updateStatus(Request $request){
+        try{
+            $quote_id = $request->quote_id;
+            $status = $request->status;
+
+            $quote = Quote::find($quote_id);
+            $quote->status = $status;
+            $quote->updated_by = $request->user()->id;
+            $quote->updated_at = date('Y-m-d H:i:s');
+            $quote->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Quote status successfully updated.',
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later or contact with the administrator',
+            ], 304);
+        }
+    }
 }

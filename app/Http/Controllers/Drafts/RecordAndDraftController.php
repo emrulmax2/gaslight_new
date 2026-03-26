@@ -40,23 +40,33 @@ class RecordAndDraftController extends Controller
             $sorts[] = $sort['field'].' '.$sort['dir'];
         endforeach;
     
-        $query = Record::with(['customer', 'customer.address', 'customer.contact', 'job', 'job.property', 'form', 'user', 'user.company', 'property', 'occupant'])
-                 ->orderByRaw(implode(',', $sorts));
+        $query = Record::with([
+            'customer', 'customer.address', 'customer.contact',
+            'job', 'job.property', 'form',
+            'user', 'user.company',
+            'property', 'occupant'
+        ])->orderByRaw(implode(',', $sorts));
+
         if (!empty($queryStr)):
-            $query->whereHas('customer', function ($q) use ($queryStr) {
-                $q->where('full_name', 'LIKE', '%' . $queryStr . '%');
-            })->orWhereHas('property', function($pa) use($queryStr){
-                $pa->orWhere('address_line_1', 'LIKE', '%' . $queryStr . '%')
-                ->orWhere('address_line_2', 'LIKE', '%' . $queryStr . '%')
-                ->orWhere('postal_code', 'LIKE', '%' . $queryStr . '%')
-                ->orWhere('city', 'LIKE', '%' . $queryStr . '%');
-            })->orWhereHas('billing', function ($ba) use ($queryStr) {
-                $ba->orWhere('address_line_1', 'LIKE', '%' . $queryStr . '%')
-                ->orWhere('address_line_2', 'LIKE', '%' . $queryStr . '%')
-                ->orWhere('postal_code', 'LIKE', '%' . $queryStr . '%')
-                ->orWhere('city', 'LIKE', '%' . $queryStr . '%');
-            })->orWhereHas('occupant', function($q) use ($queryStr){
-                $q->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
+            $query->where(function ($q) use ($queryStr) {
+                $q->whereHas('customer', function ($q2) use ($queryStr) {
+                    $q2->where('full_name', 'LIKE', '%' . $queryStr . '%');
+                })->orWhereHas('property', function ($pa) use ($queryStr) {
+                    $pa->where('address_line_1', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('address_line_2', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('postal_code', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('city', 'LIKE', '%' . $queryStr . '%');
+                })->orWhereHas('billing', function ($ba) use ($queryStr) {
+                    $ba->where('address_line_1', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('address_line_2', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('postal_code', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('city', 'LIKE', '%' . $queryStr . '%');
+                })->orWhereHas('occupant', function ($q3) use ($queryStr) {
+                    $q3->where('occupant_name', 'LIKE', '%' . $queryStr . '%');
+                })->orWhereHas('form', function ($q4) use ($queryStr) {
+                    $q4->where('name', 'LIKE', '%' . $queryStr . '%')
+                    ->orWhere('slug', 'LIKE', '%' . $queryStr . '%');
+                });
             });
         endif;
         $query->where('created_by', $request->user()->id);
