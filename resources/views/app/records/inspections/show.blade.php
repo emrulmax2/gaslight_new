@@ -89,6 +89,11 @@
                                     {{ $row['email_sent'] ? 'Resend' : 'Send' }}
                                     <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
+                                <x-base.button data-id="{{ $row['id'] }}" size="sm" class="w-auto text-white duplicateRecordBtn ml-1" type="button" variant="primary">
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="copy-check" />
+                                    Duplicate
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                                </x-base.button>
                             </div>
                         </x-base.table.td>
                     </x-base.table.tr>
