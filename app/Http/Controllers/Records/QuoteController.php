@@ -388,7 +388,7 @@ class QuoteController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $quote->email_template->attachmentFiles);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, '', $configuration['reply_to'], $configuration['from_name']), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'communication', $configuration['reply_to'], $configuration['from_name']), $ccMail);
             return response()->json(['msg' => 'Quote successfully send to the customer.', 'red' => route('quotes.show', $quote_id), 'pdf' => $pdf]);
         else:
             return response()->json(['msg' => 'Something went wrong. Please try again later.'], 304);

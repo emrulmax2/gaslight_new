@@ -426,7 +426,7 @@ class InvoiceController extends Controller
                 $attachmentFiles = array_merge($attachmentFiles, $invoice->email_template->attachmentFiles);
             endif;
 
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, '', $configuration['reply_to'], $configuration['from_name']), $ccMail);
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'communication', $configuration['reply_to'], $configuration['from_name']), $ccMail);
             return true;
         else:
             return false;

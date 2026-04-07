@@ -137,16 +137,17 @@ class ProfileController extends Controller
             $user = User::find($user_id);
             $user->update(['password' => Hash::make($request->input('password'))]);
 
+            
             $configuration = [
                 'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
                 'smtp_port' => env('MAIL_PORT', '587'),
-                'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
+                'smtp_username' => env('MAIL_USERNAME', 'info@gascertificate.co.uk'),
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
-                'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+                'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'), 
                 
-                'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
                 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
-
+                'reply_to'    =>  env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
             ];
 
             $subject = 'Your Password Has Been Successfully Changed';
@@ -166,7 +167,7 @@ class ProfileController extends Controller
             $content .= 'Thanks & Regards<br/>';
             $content .= 'Gas Safety Engineer';
 
-            GCEMailerJob::dispatch($configuration, [$user->email], new GCESendMail($subject, $content, []));
+            GCEMailerJob::dispatch($configuration, [$user->email], new GCESendMail($subject, $content, [], $subject, 'communication', $configuration['reply_to'], $configuration['from_name']), []);
             
             return response()->json(['msg' => 'You password successfully updated.'], 200);
         else:
