@@ -145,6 +145,7 @@ class InspectionNotificationController extends Controller
                         '.$companyPhone.'</p>';
             
             $sendTo = [$customerEmail];
+
             $configuration = [
                 'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
                 'smtp_port' => env('MAIL_PORT', '587'),
@@ -152,15 +153,14 @@ class InspectionNotificationController extends Controller
                 'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
                 'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'), 
                 
-                // 'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
-                // 'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'), 
+                'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
+                'from_name'    =>  !empty($companyName) ? $companyName : $record->user->name,
+                'reply_to'    =>  !empty($companyEmail) ? $companyEmail : $record->user->email, 
             ];
-            $configuration['from_name'] = !empty($companyName) ? $companyName : $record->user->name; 
-            $configuration['from_email'] = !empty($companyEmail) ? $companyEmail : $record->user->email; 
 
             $attachmentFiles = [];
             
-            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate'), $ccMail); 
+            GCEMailerJob::dispatch($configuration, $sendTo, new GCESendMail($subject, $content, $attachmentFiles, $templateTitle, 'certificate', $configuration['reply_to'], $configuration['from_name']), $ccMail);
             RecordInspectionNotification::updateOrCreate(['record_id' => $record->id, 'inspection_date' => $inspectionDate], [
                 'record_id' => $record->id,
                 'inspection_date' => $inspectionDate,

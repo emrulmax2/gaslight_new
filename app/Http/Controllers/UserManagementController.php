@@ -167,20 +167,21 @@ class UserManagementController extends Controller
     }
 
     public function sendMail($emails, $subject, $content, $attachments = []){
+
         $configuration = [
             'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
             'smtp_port' => env('MAIL_PORT', '587'),
-            'smtp_username' => env('MAIL_USERNAME', 'no-reply@lcc.ac.uk'),
+            'smtp_username' => env('MAIL_USERNAME', 'info@gascertificate.co.uk'),
             'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
-            'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'), 
             
-            'from_email'    => env('MAIL_FROM_ADDRESS', 'no-reply@lcc.ac.uk'),
+            'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
             'from_name'    =>  env('MAIL_FROM_NAME', 'Gas Safe Engineer'),
-
+            'reply_to'    =>  env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
         ];
 
         try{
-            GCEMailerJob::dispatch($configuration, $emails, new GCESendMail($subject, $content, $attachments));
+            GCEMailerJob::dispatch($configuration, $emails, new GCESendMail($subject, $content, $attachments, $subject, 'communication', $configuration['reply_to'], $configuration['from_name']), []);
             $message = 'Mail Success';
         }catch(Exception $e){
             //$message = $e->getMessage();
