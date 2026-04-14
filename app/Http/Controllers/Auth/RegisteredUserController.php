@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GCEMailerJob;
+use App\Mail\GCESendMail;
 use App\Models\Company;
 use App\Models\CompanyBankDetails;
+use App\Models\EmailRegisterOtp;
 use App\Models\Option;
 use App\Models\PricingPackage;
 use App\Models\RegistrationOtp;
@@ -46,6 +49,9 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
+            'email_verified_at' => Carbon::now(),
+            'last_login_ip' => $request->getClientIp(),
+            'last_login_at' => Carbon::now(),
             'mobile' => $request->input('mobile'),
             'password' => Hash::make($request->input('password')),
             'gas_safe_id_card' => (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card) ? $request->gas_safe_id_card : null),
@@ -54,8 +60,8 @@ class RegisteredUserController extends Controller
         ]);
 
         if($user->id):
-            $regOtp = RegistrationOtp::where('mobile', $request->input('mobile'))->orderBy('id', 'desc')->get()->first();
-            $regOtp->update(['expire_at' => now()]);
+            $regOtp = EmailRegisterOtp::where('email', $request->input('email'))->first();
+            $regOtp->delete();
 
             $vat_number_check = (isset($request->vat_number_check) && $request->vat_number_check > 0 ? $request->vat_number_check : 0);
             $business_type = (!empty($request->business_type) ? $request->business_type : null);
@@ -448,4 +454,126 @@ class RegisteredUserController extends Controller
             return response()->json(['message' => 'No Match Found'], 200);
         }
     }
+
+    public function generateEmailOtp(Request $request){
+        $request->validate([
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|confirmed|min:8',
+            'mobile' => ['required','regex:/^07[0-9]{9}$/'],
+            'reg_token'    => ['required'],
+            'cf_token'     => ['required']
+        ],[
+            'email.required' => 'Email is required.',
+            'email.email' => 'Insert an valid email.',
+            'email.unique' => 'Email address already exist.',
+            'password.required' => 'This field is required.',
+            'password.confirmed' => 'Password does not match.',
+            'password.min' => 'Password needs minimum 8 cars.',
+            'mobile.required' => 'This field is required.',
+            'mobile.regex' => 'Mobile number should be start with 07.',
+        ]);
+
+        $user = User::where('email', $request->email)->orWhere('mobile', $request->mobile)->first();
+        if ($user):
+            return response()->json([
+                'status' => false,
+                'msg' => 'Email address or Mobile number already exist.'
+            ], 304);
+        endif;
+
+        // Prevent spam (1 active OTP at a time)
+        $existingOtp = EmailRegisterOtp::where('email', $request->email)->where('expires_at', '>', now())->first();
+        if ($existingOtp):
+            return response()->json([
+                'status' => false,
+                'msg' => 'OTP already sent. Please wait.'
+            ], 304);
+        endif;
+
+        $otp = rand(100000, 999999);
+        EmailRegisterOtp::updateOrCreate(
+            ['email' => $request->email],
+            [
+                'otp' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(5)
+            ]
+        );
+
+        $configuration = [
+            'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
+            'smtp_port' => env('MAIL_PORT', '587'),
+            'smtp_username' => env('MAIL_USERNAME', 'info@gascertificate.co.uk'),
+            'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
+            'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            
+            'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
+            'from_name'    =>  env('APP_NAME', 'Gas Engineer App') 
+        ];
+        $subject = 'Registration Email Verification Code.';
+        $content = '<p>Hi '.$request->email.'</p>';
+        $content .= '<p>Thank you for using email verification for registration.</p>';
+        $content .= '<p>You can verify your email by entering the code below.</p>';
+        $content .= '<p>';
+            $content .= '<strong>Verify via Code:</strong><br/>';
+            $content .= 'Verirication Code: <strong>'.$otp.'</strong><br/>';
+            $content .= '(This code is valid for next 15 minutes)';
+        $content .= '</p>';
+        $content .= '<p>Thanks & Regards<br/>Gas Engineer App</p>';
+
+        GCEMailerJob::dispatch($configuration, [$request->email], new GCESendMail($subject, $content, [], $subject, 'communication', '', $configuration['from_name']), []);
+
+        return response()->json([
+            'status' => true,
+            'msg' => 'OTP sent Successfully. Please check your inbox.'
+        ], 200);
+    }
+
+    public function validateEmailOtp(Request $request){
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6'
+        ]);
+
+        $record = EmailRegisterOtp::where('email', $request->email)->first();
+        if (!$record) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'OTP not found.'
+            ], 304);
+        }
+
+        // Expired
+        if ($record->isExpired()) {
+            $record->delete();
+
+            return response()->json([
+                'status' => false,
+                'msg' => 'OTP has been expired.'
+            ], 304);
+        }
+
+        // Too many attempts
+        if ($record->attempts >= 5) {
+            $record->delete();
+
+            return response()->json([
+                'status' => false,
+                'msg' => 'Too many attempts. Request new OTP.'
+            ], 304);
+        }
+
+        // Wrong OTP
+        if (!Hash::check($request->otp, $record->otp)) {
+            $record->increment('attempts');
+
+            return response()->json([
+                'status' => false,
+                'msg' => 'Invalid OTP. Please insert a valid OTP.'
+            ], 304);
+        }
+
+        return response()->json(['msg' => 'Match found. Continue for the next step'], 200);
+
+    }
+    
 }

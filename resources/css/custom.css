@@ -545,7 +545,9 @@
 .form-wizard input[type=number]::-webkit-inner-spin-button, 
 .form-wizard input[type=number]::-webkit-outer-spin-button ,
 #otpLoginForm input[type=number]::-webkit-inner-spin-button, 
-#otpLoginForm input[type=number]::-webkit-outer-spin-button { 
+.otpFields input[type=number]::-webkit-outer-spin-button ,
+.otpFields input[type=number]::-webkit-inner-spin-button, 
+.otpFields input[type=number]::-webkit-outer-spin-button { 
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;

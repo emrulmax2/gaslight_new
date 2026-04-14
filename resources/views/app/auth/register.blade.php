@@ -33,9 +33,41 @@
                 </div>
                 <form class="form-wizard" id="userRegistrationForm" action="#" enctype="multipart/form-data">
                     <div class="wizard-fieldset mt-10 show" id="stepMobileNumber">
-                        <div class="text-base font-medium">Mobile Number</div>
+                        <div class="text-base font-medium">Account Information</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5">
                             <div class="intro-y col-span-12">
+                                <x-base.form-label for="name">Email <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <x-base.form-input id="email" name="email" type="email" class="require" />
+                                <div class="acc__input-error error-email mt-2 text-danger text-left text-xs"></div>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label>Password <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <div class="relative">
+                                    <x-base.form-input type="password" placeholder="************" name="password" id="password" />
+                                    <span id="togglePasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                                        <i id="togglePasswordIcon" data-lucide="eye-off"></i>
+                                    </span>
+                                </div>
+                                <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-2">
+                                    <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                    <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                    <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                    <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                </div>
+                                <div class="acc__input-error error-password mt-2 text-danger text-left text-xs"></div>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label>Password Confirmation <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <div class="relative">
+                                    <x-base.form-input class="block" type="password" placeholder="************" name="password_confirmation" id="password_confirmation" />
+                                    <span id="toggleConfirmPasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" >
+                                        <i id="togglePasswordConfirmationIcon" data-lucide="eye-off"></i>
+                                    </span>
+                                </div>
+                                <div class="acc__input-error error-password_confirmation mt-2 text-danger text-left text-xs"></div>
+                            </div>
+                            <div class="intro-y col-span-12">
+                                <x-base.form-label for="name">Mobile Number <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.input-group inputGroup>
                                     <x-base.input-group.text id="input-group-email" class="inline-flex items-center pr-5">
                                         <img src="{{ Vite::asset('resources/images/flags/uk.svg') }}" class="w-5 h-auto mr-2" alt="UK Flag"/>
@@ -45,7 +77,7 @@
                                 </x-base.input-group>
                                 <div class="acc__input-error error-mobile mt-2 text-danger text-xs" style="display: none;"></div>
                             </div>
-                            <div class="intro-y col-span-12">
+                            <div class="intro-y col-span-12 pt-3">
                                 <!-- <div class="cf-turnstile" data-sitekey="0x4AAAAAACaCFao-oSn6uOqg"></div> -->
                                 <div id="turnstile-container"></div>
                             </div>
@@ -62,7 +94,7 @@
                         <div class="text-base font-medium">OTP Verification</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5">
                             <div class="intro-y col-span-12">
-                                Enter the code from the SMS we sent to <span class="mobileNumberShow font-bold text-dark"></span>
+                                Enter the code from your mail inbox we sent to <span class="mobileNumberShow font-bold text-dark"></span>
                             </div>
                             <div class="intro-y col-span-12">
                                 <div id="countdown" class="font-medium text-center text-success leading-none mb-3">03:00</div>
@@ -71,6 +103,8 @@
                                     <x-base.form-input id="otp2" name="otp_2" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
                                     <x-base.form-input id="otp3" name="otp_3" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
                                     <x-base.form-input id="otp4" name="otp_4" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                    <x-base.form-input id="otp5" name="otp_5" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                    <x-base.form-input id="otp5" name="otp_5" type="number" class="w-[35px] mx-1 text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
                                 </div>
                                 <div class="acc__input-error error-otp mt-2 text-danger text-center text-xs"></div>
                                 <div id="countDownHtml" class="text-center leading-none mt-5" style="display: none;">
@@ -133,37 +167,6 @@
                                 <x-base.form-label for="vat_number">VAT Number <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.form-input id="vat_number" type="text" name="vat_number" value=""/>
                                 <div class="acc__input-error error-vat_number mt-2 text-danger text-left text-xs"></div>
-                            </div>
-                            <div class="intro-y col-span-12">
-                                <x-base.form-label for="name">Email <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <x-base.form-input id="email" name="email" type="email" class="require" />
-                                <div class="acc__input-error error-email mt-2 text-danger text-left text-xs"></div>
-                            </div>
-                            <div class="intro-y col-span-12 sm:col-span-6">
-                                <x-base.form-label>Password <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <div class="relative">
-                                    <x-base.form-input type="password" placeholder="************" name="password" id="password" />
-                                    <span id="togglePasswordShow" class="absolute inset-y-0 right-0 flex items-left pr-3 cursor-pointer">
-                                        <i id="togglePasswordIcon" data-lucide="eye-off"></i>
-                                    </span>
-                                </div>
-                                <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-2">
-                                    <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                    <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                    <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                    <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                </div>
-                                <div class="acc__input-error error-password mt-2 text-danger text-left text-xs"></div>
-                            </div>
-                            <div class="intro-y col-span-12 sm:col-span-6">
-                                <x-base.form-label>Password Confirmation <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <div class="relative">
-                                    <x-base.form-input class="block" type="password" placeholder="************" name="password_confirmation" id="password_confirmation" />
-                                    <span id="toggleConfirmPasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" >
-                                        <i id="togglePasswordConfirmationIcon" data-lucide="eye-off"></i>
-                                    </span>
-                                </div>
-                                <div class="acc__input-error error-password_confirmation mt-2 text-danger text-left text-xs"></div>
                             </div>
 
                             <div class="intro-y col-span-12 mt-5 flex items-center justify-center sm:justify-between">
@@ -629,6 +632,8 @@
                     sitekey: window.turnstileSiteKey,
                     callback: function (token) {
                         window.turnstileToken = token;
+                        const theBtn = document.querySelector('#stepMobileNumber .form-wizard-next-btn');
+                        theBtn.removeAttribute("disabled");
                     }
                 });
             } else {

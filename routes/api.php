@@ -37,6 +37,9 @@ Route::prefix('/v1')->name('api.')->group(function() {
     Route::post('/login/otp-login',[LoginController::class, 'otpLogin']);
     Route::post('/login/send-otp',[LoginController::class, 'sendOtp']);
 
+    Route::post('/login/send-email-otp',[LoginController::class, 'sendEmailOtp']);
+    Route::post('/login/quick-login',[LoginController::class, 'quickLogin']);
+
     Route::middleware('throttle:10,1')->post('/auth/forgot-password', [PasswordResetController::class, 'sendResetLink']);
     Route::post('/auth/reset-password', [PasswordResetController::class, 'reset']);
 
@@ -52,6 +55,9 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::post('register/validate-otp', 'validateOtp')->name('register.validate.otp');
         Route::post('register/validate-email', 'validateEmail')->name('register.validate.email');
         Route::post('register-new', 'registerNew')->name('register.new');
+
+        Route::post('register/generate-email-top', 'generateEmailOtp');
+        Route::post('register/validate-email-top', 'validateEmailOtp');
     });
 
     // Protected routes (require Bearer Token)
