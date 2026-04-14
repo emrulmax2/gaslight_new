@@ -239,16 +239,7 @@ class AuthController extends Controller
         endif;
 
         // Prevent spam (1 active OTP at a time)
-        $existingOtp = EmailLoginOtp::where('email', $email)
-            ->where('expires_at', '>', now())
-            ->first();
-
-        if ($existingOtp):
-            return response()->json([
-                'status' => false,
-                'message' => 'OTP already sent. Please wait.'
-            ], 304);
-        endif;
+        $deleteExistingOtp = EmailLoginOtp::where('email', $email)->forceDelete();
 
         $otp = rand(100000, 999999);
         EmailLoginOtp::updateOrCreate(
@@ -329,7 +320,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'OTP has been expired.'
-            ], 304);
+            ], 410);
         }
 
         // Too many attempts
@@ -349,7 +340,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid OTP. Please insert a valid OTP.'
-            ], 400);
+            ], 401);
         }
 
         // OTP verified → delete record
@@ -420,7 +411,7 @@ class AuthController extends Controller
                 'last_login_at' => Carbon::now()
             ]);
 
-            return redirect('/dashboard')->with('success', 'Login successful');
+            return redirect('/')->with('success', 'Login successful');
         }else{
             return redirect('/login')->with('error', 'User email does not exist.');
         }
