@@ -89,9 +89,12 @@
                         <div class="border-t border-slate-200 h-[1px] relative mt-7 mb-7">
                             <span class="font-medium leading-none italic absolute left-0 right-0 mx-auto w-[35px] top-[-6px] bg-white text-center">OR</span>
                         </div>
-                        <x-base.button as="a" href="{{ route('login') }}" class="w-full" variant="outline-success">
-                            <x-base.lucide class="w-4 h-4 mr-2" icon="smartphone" />
-                            <span class="signin-text">Continue with Mobile</span>
+                        <x-base.button as="a" href="{{ route('login') }}" 
+                            class="w-full py-3.5 xl:mr-3 text-primary"
+                            variant="secondary"
+                            rounded
+                        >
+                            <span class="signin-text">Quick Sign In</span>
                         </x-base.button>
                     </div>
                 </div>

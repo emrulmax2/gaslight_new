@@ -34,7 +34,62 @@
                     </div>
                     
                     <div class="mt-6">
-                        <form id="otpLoginForm" action="#" method="post">
+                        @if(session('error'))
+                            <div role="alert" class="magicError alert relative border rounded-md px-3 py-2 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-5 flex items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>
+                                {{ session('error') }}
+                            </div>
+                        @endif
+                        <form method="post" action="#" id="quickLoginForm">
+                            <div class="quickLoginSteps quickLoginFirstStep">
+                                <x-base.form-label>Email*</x-base.form-label>
+                                <x-base.form-input id="quickEmail"
+                                    class="block rounded-[0.6rem] border-slate-300/80 px-4 py-3.5 login__input mb-5"
+                                    type="text"
+                                    placeholder="username@example.com"
+                                    name="email"
+                                />
+                                <div class="acc__input-error error-email mt-2 text-danger text-xs hidden"></div> 
+                                <x-base.button id="quickLoginBtn" type="button" class="w-full bg-gradient-to-r from-theme-1/70 to-theme-2/70 py-3.5 xl:mr-3" variant="primary" rounded >
+                                    <span class="signin-text">Quick Sign In</span>
+                                    <x-base.loading-icon class="h-4 w-4 ml-2 hidden theLoader" icon="oval" color="#fff" />
+                                </x-base.button>
+
+                                <div class="text-center pt-3">
+                                    <a class="text-base text-success underline hover:text-primary" href="{{ route('login.with.email') }}">Sign in with Password</a>
+                                </div>
+                            </div>
+
+                            <div class="quickLoginSteps quickLoginLastStep" style="display: none;">
+                                <h3 class="text-xl font-medium mb-1">We have sent you a verification email</h3>
+                                <p class="text-base mb-5 text-slate-500">Please check your email: <span class="theEmailId text-dark">username@example.com</span></p>
+                                <div class="otpWrap">
+                                    <x-base.form-label>Verification Code</x-base.form-label>
+                                    <div class="flex justify-between items-center mb-5 otpFields">
+                                        <x-base.form-input id="otp1" name="otp_1" type="number" class="w-[50px] h-[50px] text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                        <x-base.form-input id="otp2" name="otp_2" type="number" class="w-[50px] h-[50px] text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                        <x-base.form-input id="otp3" name="otp_3" type="number" class="w-[50px] h-[50px] text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                        <x-base.form-input id="otp4" name="otp_4" type="number" class="w-[50px] h-[50px] text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                        <x-base.form-input id="otp5" name="otp_5" type="number" class="w-[50px] h-[50px] text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                        <x-base.form-input id="otp6" name="otp_6" type="number" class="w-[50px] h-[50px] text-center px-0 otpCodes font-bold" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="1" />
+                                    </div>
+                                    <div class="acc__input-error error-otp mt-1 mb-3 text-danger text-xs hidden"></div>
+                                </div>
+                                <ul class="text-slate-500 list-disc ml-3 mb-4">
+                                    <li class="mb-1">The verfification link and code are valid for the next 15 minutes.</li>
+                                    <li class="mb-1">You must verify your account before login.</li>
+                                    <li class="mb-1">Set your password in My Account</li>
+                                    <li class="mb-1">You can also verify your account usign the link in the email.</li>
+                                </ul>
+                                <p class="text-base text-slate-500">Don't receive the verification email? <a href="#" class="text-dark">Send Again</a></p>
+                                <x-base.button id="quickVerifyLoginBtn" type="submit" class="mt-6 w-full bg-gradient-to-r from-theme-1/70 to-theme-2/70 py-3.5 xl:mr-3" variant="primary" rounded >
+                                    <span class="signin-text">Verify & Continue</span>
+                                    <x-base.loading-icon class="h-4 w-4 ml-2 hidden theLoader" icon="oval" color="#fff" />
+                                </x-base.button>
+                            </div>
+                        </form>
+
+
+                        <!--<form id="otpLoginForm" action="#" method="post">
                             <input type="hidden" name="user_id" id="uid" value="0"/>
                             <div id="mobileNumberWrap">
                                 <div class="mobileNumberInput">
@@ -83,7 +138,7 @@
                         <x-base.button as="a" href="{{ route('login.with.email') }}" class="w-full" variant="outline-success">
                             <x-base.lucide class="w-4 h-4 mr-2" icon="mail" />
                             <span class="signin-text">Continue with Email</span>
-                        </x-base.button>
+                        </x-base.button>-->
                     </div>
                 </div>
             </div>
@@ -210,10 +265,15 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/otp-login.js')
+    @vite('resources/js/app/login.js')
+    <!-- @vite('resources/js/app/otp-login.js') -->
     <script type="module">
         (function () {
-            
+            if($('.magicError').length > 0){
+                setTimeout(() => {
+                    $('.magicError').remove();
+                }, 2500);
+            }
             // if($('#success-notification-toggle').length>0) {
 
             //     $("#success-notification-toggle").on("click", function () {

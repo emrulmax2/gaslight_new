@@ -267,6 +267,8 @@ export default defineConfig({
                 "resources/js/app/superadmin/settings/default-options.js",
                 "resources/js/app/records/inspection.js",
                 "resources/js/app/records/inspection-show.js",
+                
+                "resources/js/app/login.js",
             ],
             refresh: true,
         }),

@@ -97,6 +97,10 @@ Route::controller(AuthController::class)->middleware(loggedin::class)->group(fun
 
     Route::post('login/otp-login', 'otpLogin')->name('login.otp.check');
     Route::post('login/send-otp', 'sendOtp')->name('login.send.otp');
+
+    Route::post('login/send-email-otp', 'sendEmailOtp')->name('login.send.email.otp');
+    Route::post('login/quick-login', 'quickLogin')->name('login.quick.login');
+    Route::get('login/magic-login', 'magicLogin')->name('login.magic.otp')->middleware('signed');
 });
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('forgot.password.email');
 
@@ -248,6 +252,9 @@ Route::controller(RegisteredUserController::class)->middleware(loggedin::class)-
     Route::post('register/generate-top', 'generateOtp')->name('register.generate.otp')->middleware('throttle:5,10');
     Route::post('register/validate-top', 'validateOtp')->name('register.validate.otp');
     Route::post('register/validate-email', 'validateEmail')->name('register.validate.email');
+
+    Route::post('register/generate-email-top', 'generateEmailOtp')->name('register.generate.email.otp');
+    Route::post('register/validate-email-top', 'validateEmailOtp')->name('register.validate.email.otp');
 });
 
 Route::middleware(Authenticate::class)->group(function() {

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
+use App\Jobs\GCEMailerJob;
+use App\Mail\GCESendMail;
+use App\Models\EmailLoginOtp;
 use App\Models\Option;
 use App\Models\User;
 use App\Models\UserOtp;
@@ -13,7 +16,10 @@ use Illuminate\Support\Facades\Cache;
 
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -216,6 +222,208 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'Invalid OTP.'], 304);
+    }
+
+    public function sendEmailOtp(Request $request){
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+        $email = $request->email;
+
+        $user = User::where('email', $email)->first();
+        if (!$user):
+            return response()->json([
+                'status' => false,
+                'message' => 'Email not registered.'
+            ], 404);
+        endif;
+
+        // Prevent spam (1 active OTP at a time)
+        $existingOtp = EmailLoginOtp::where('email', $email)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if ($existingOtp):
+            return response()->json([
+                'status' => false,
+                'message' => 'OTP already sent. Please wait.'
+            ], 304);
+        endif;
+
+        $otp = rand(100000, 999999);
+        EmailLoginOtp::updateOrCreate(
+            ['email' => $email],
+            [
+                'otp' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(15)
+            ]
+        );
+
+        // Encrypt payload
+        $payload = Crypt::encrypt([
+            'email' => $email,
+            'otp' => $otp
+        ]);
+
+        // Create signed URL (expires in 15 mins)
+        $url = URL::temporarySignedRoute(
+            'login.magic.otp',
+            now()->addMinutes(15),
+            ['data' => $payload]
+        );
+
+        $configuration = [
+            'smtp_host' => env('MAIL_HOST', 'smtp.gmail.com'),
+            'smtp_port' => env('MAIL_PORT', '587'),
+            'smtp_username' => env('MAIL_USERNAME', 'info@gascertificate.co.uk'),
+            'smtp_password' => env('MAIL_PASSWORD', 'PASSWORD'),
+            'smtp_encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            
+            'from_email'    => env('MAIL_FROM_ADDRESS', 'info@gascertificate.co.uk'), 
+            'from_name'    =>  env('APP_NAME', 'Gas Engineer App') 
+        ];
+        $subject = 'Login Verification Code.';
+        $content = '<p>Hi '.$email.'</p>';
+        $content .= '<p>Thank you for using email verification for login.</p>';
+        $content .= '<p>You can verify your email by entering the code below or by clicking the verification link in the email</p>';
+        $content .= '<p>';
+            $content .= '<strong>Verify via Code:</strong><br/>';
+            $content .= 'Verirication Code: <strong>'.$otp.'</strong><br/>';
+            $content .= '(This code is valid for next 15 minutes)';
+        $content .= '</p>';
+        $content .= '<p>';
+            $content .= '<strong>Verify via Link:</strong><br/>';
+            $content .= '<a href="'.$url.'" style="color:blue; text-decoration: underline;">Click here to verify your email address</a><br/>';
+            $content .= '(This link is valid for next 15 minutes)';
+        $content .= '</p>';
+        $content .= '<p>Thanks & Regards<br/>Gas Engineer App</p>';
+
+        GCEMailerJob::dispatch($configuration, [$email], new GCESendMail($subject, $content, [], $subject, 'communication', '', $configuration['from_name']), []);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'OTP sent Successfully. Please check your inbox.'
+        ], 200);
+
+    }
+
+
+    public function quickLogin(Request $request){
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6'
+        ]);
+
+        $record = EmailLoginOtp::where('email', $request->email)->first();
+        if (!$record) {
+            return response()->json([
+                'status' => false,
+                'message' => 'OTP not found.'
+            ], 404);
+        }
+
+        // Expired
+        if ($record->isExpired()) {
+            $record->delete();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'OTP has been expired.'
+            ], 304);
+        }
+
+        // Too many attempts
+        if ($record->attempts >= 5) {
+            $record->delete();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Too many attempts. Request new OTP.'
+            ], 429);
+        }
+
+        // Wrong OTP
+        if (!Hash::check($request->otp, $record->otp)) {
+            $record->increment('attempts');
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid OTP. Please insert a valid OTP.'
+            ], 400);
+        }
+
+        // OTP verified → delete record
+        $user = User::where('email', $request->email)->first();
+        if($user){
+            Auth::login($user);
+
+            $record->delete();
+            if($user->email_verified_at == ''):
+                $user->update(['email_verified_at' => date('Y-m-d H:i:s')]);
+            endif;
+            $user->update([
+                'last_login_ip' => $request->getClientIp(),
+                'last_login_at' => Carbon::now()
+            ]);
+
+            $user->update([
+                'last_login_ip' => $request->getClientIp(),
+                'last_login_at' => Carbon::now()
+            ]);
+
+            return response()->json(['message' => 'Successfully logged in.', 'first_login' => $user->first_login], 200);
+        }else{
+            return response()->json(['message' => 'Wrong email or OTP.'], 401);
+        }
+    }
+
+
+    public function magicLogin(Request $request){
+        try {
+            $data = Crypt::decrypt($request->data);
+            $email = $data['email'];
+            $otp   = $data['otp'];
+        } catch (\Exception $e) {
+            return redirect('/login')->with('error', 'Invalid or tampered link provided.');
+        }
+
+        $record = EmailLoginOtp::where('email', $email)->first();
+        if (!$record) {
+            return redirect('/login')->with('error', 'OTP does not match. Tempered link provided.');
+        }
+
+        if ($record->expires_at < now()) {
+            $record->delete();
+            return redirect('/login')->with('error', 'Link expired.');
+        }
+
+        if (!Hash::check($otp, $record->otp)) {
+            return redirect('/login')->with('error', 'OTP does not match. Tempered link provided.');
+        }
+
+
+        $user = User::where('email', $email)->first();
+        if($user){
+            Auth::login($user);
+
+            $record->delete();
+            if($user->email_verified_at == ''):
+                $user->update(['email_verified_at' => date('Y-m-d H:i:s')]);
+            endif;
+            $user->update([
+                'last_login_ip' => $request->getClientIp(),
+                'last_login_at' => Carbon::now()
+            ]);
+
+            $user->update([
+                'last_login_ip' => $request->getClientIp(),
+                'last_login_at' => Carbon::now()
+            ]);
+
+            return redirect('/dashboard')->with('success', 'Login successful');
+        }else{
+            return redirect('/login')->with('error', 'User email does not exist.');
+        }
     }
     
 }
