@@ -238,8 +238,14 @@ class AuthController extends Controller
             ], 404);
         endif;
 
-        // Prevent spam (1 active OTP at a time)
-        $deleteExistingOtp = EmailLoginOtp::where('email', $email)->forceDelete();
+        // Check existing OTP
+        $existingOtp = EmailLoginOtp::where('email', $email)->first();
+        if ($existingOtp && !$existingOtp->isExpired()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'OTP already sent. Please wait before requesting again.'
+            ], 429);
+        }
 
         $otp = rand(100000, 999999);
         EmailLoginOtp::updateOrCreate(

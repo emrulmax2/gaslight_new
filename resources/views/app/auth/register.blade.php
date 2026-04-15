@@ -3,7 +3,8 @@
 @section('head')
     <title>Gas Certificate - New Registration </title>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script> -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit" defer></script>
 @endsection
 
 @section('content')
@@ -20,7 +21,7 @@
                     </div>
                 </div>
                 <div class="mt-10">
-                    <div class="text-2xl font-medium">Sign Up with Mobile</div>
+                    <div class="text-2xl font-medium">Sign Up</div>
                     <div class="mt-2.5 text-slate-600">
                         Already have an account?
                         <a
@@ -39,43 +40,6 @@
                                 <x-base.form-label for="name">Email <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.form-input id="email" name="email" type="email" class="require" />
                                 <div class="acc__input-error error-email mt-2 text-danger text-left text-xs"></div>
-                            </div>
-                            <div class="intro-y col-span-12 sm:col-span-6">
-                                <x-base.form-label>Password <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <div class="relative">
-                                    <x-base.form-input type="password" placeholder="************" name="password" id="password" />
-                                    <span id="togglePasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
-                                        <i id="togglePasswordIcon" data-lucide="eye-off"></i>
-                                    </span>
-                                </div>
-                                <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-2">
-                                    <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                    <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                    <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                    <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
-                                </div>
-                                <div class="acc__input-error error-password mt-2 text-danger text-left text-xs"></div>
-                            </div>
-                            <div class="intro-y col-span-12 sm:col-span-6">
-                                <x-base.form-label>Password Confirmation <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <div class="relative">
-                                    <x-base.form-input class="block" type="password" placeholder="************" name="password_confirmation" id="password_confirmation" />
-                                    <span id="toggleConfirmPasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" >
-                                        <i id="togglePasswordConfirmationIcon" data-lucide="eye-off"></i>
-                                    </span>
-                                </div>
-                                <div class="acc__input-error error-password_confirmation mt-2 text-danger text-left text-xs"></div>
-                            </div>
-                            <div class="intro-y col-span-12">
-                                <x-base.form-label for="name">Mobile Number <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <x-base.input-group inputGroup>
-                                    <x-base.input-group.text id="input-group-email" class="inline-flex items-center pr-5">
-                                        <img src="{{ Vite::asset('resources/images/flags/uk.svg') }}" class="w-5 h-auto mr-2" alt="UK Flag"/>
-                                        +44
-                                    </x-base.input-group.text>
-                                    <x-base.form-input type="number" id="mobileNumber" name="mobile" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="11" placeholder="07123456789" />
-                                </x-base.input-group>
-                                <div class="acc__input-error error-mobile mt-2 text-danger text-xs" style="display: none;"></div>
                             </div>
                             <div class="intro-y col-span-12 pt-3">
                                 <!-- <div class="cf-turnstile" data-sitekey="0x4AAAAAACaCFao-oSn6uOqg"></div> -->
@@ -130,10 +94,10 @@
                         </div>
                     </div>
                     <div class="wizard-fieldset mt-10" id="stepBusinessInfo">
-                        <div class="text-base font-medium">Business Information</div>
+                        <div class="text-base font-medium">Profile Information</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5">
                             <div class="intro-y col-span-12 sm:col-span-6">
-                                <x-base.form-label for="name">Name <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <x-base.form-label for="name">Full Name <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.form-input id="name" name="name" class="require" type="text" />
                                 <div class="acc__input-error error-name mt-2 text-danger text-left text-xs"></div>
                             </div>
@@ -145,7 +109,7 @@
                             <div class="intro-y col-span-12 sm:col-span-6">
                                 <x-base.form-label for="business_type">Business Type <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.form-select id="business_type" name="business_type" class="require">
-                                    <option>Please Select</option>
+                                    <option value="">Please Select</option>
                                     <option value="Company">Company</option>
                                     <option value="Sole trader">Sole Trader</option>
                                     <option value="Other">Other</option>
@@ -167,6 +131,43 @@
                                 <x-base.form-label for="vat_number">VAT Number <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.form-input id="vat_number" type="text" name="vat_number" value=""/>
                                 <div class="acc__input-error error-vat_number mt-2 text-danger text-left text-xs"></div>
+                            </div>
+                            <div class="intro-y col-span-12">
+                                <x-base.form-label for="name">Mobile Number <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <x-base.input-group inputGroup>
+                                    <x-base.input-group.text id="input-group-email" class="inline-flex items-center pr-5">
+                                        <img src="{{ Vite::asset('resources/images/flags/uk.svg') }}" class="w-5 h-auto mr-2" alt="UK Flag"/>
+                                        +44
+                                    </x-base.input-group.text>
+                                    <x-base.form-input type="number" id="mobileNumber" name="mobile" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="11" placeholder="07123456789" />
+                                </x-base.input-group>
+                                <div class="acc__input-error error-mobile mt-2 text-danger text-left text-xs"></div>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label>Password <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <div class="relative">
+                                    <x-base.form-input type="password" placeholder="************" name="password" id="password" />
+                                    <span id="togglePasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                                        <i id="togglePasswordIcon" data-lucide="eye-off"></i>
+                                    </span>
+                                </div>
+                                <div id="password-strength" class="mt-3.5 grid h-1.5 w-full grid-cols-12 gap-2">
+                                    <div id="strength-1" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                    <div id="strength-2" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                    <div id="strength-3" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                    <div id="strength-4" class="col-span-3 h-full rounded border border-slate-400/20 bg-slate-400/30"></div>
+                                </div>
+                                <div class="acc__input-error error-password mt-2 text-danger text-left text-xs"></div>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label>Password Confirmation <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <div class="relative">
+                                    <x-base.form-input class="block" type="password" placeholder="************" name="password_confirmation" id="password_confirmation" />
+                                    <span id="toggleConfirmPasswordShow" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" >
+                                        <i id="togglePasswordConfirmationIcon" data-lucide="eye-off"></i>
+                                    </span>
+                                </div>
+                                <div class="acc__input-error error-password_confirmation mt-2 text-danger text-left text-xs"></div>
                             </div>
 
                             <div class="intro-y col-span-12 mt-5 flex items-center justify-center sm:justify-between">
@@ -218,8 +219,98 @@
                                 <div class="acc__input-error error-company_postal_code text-danger text-xs mt-1"></div>
                             </div>
                             <x-base.form-input value="" name="company_country" id="company_country" class="w-full country" type="hidden" />
+
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label for="gas_safe_registration_no">Gas Safe Reg. No <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <x-base.form-input id="gas_safe_registration_no" name="gas_safe_registration_no" class="require" type="text" />
+                                <div class="acc__input-error error-gas_safe_registration_no text-danger text-xs mt-1"></div>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label for="gas_safe_id_card">Gas Safe ID Card No <span class="text-danger ml-2">*</span></x-base.form-label>
+                                <x-base.form-input id="gas_safe_id_card" name="gas_safe_id_card" class="require" type="text" />
+                                <div class="acc__input-error error-gas_safe_id_card text-danger text-xs mt-1"></div>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-6">
+                                <x-base.form-label>Referral Code</x-base.form-label>
+                                <div class="relative">
+                                    <x-base.form-input class="block" type="text" placeholder="" name="referral_code" id="referral_code" />
+                                    <span id="toggleReferralStatus" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                                        <i id="checkLogo" class="allLogo h-4 w-4 text-success" data-lucide="check-circle" style="display: none;"></i>
+                                        <i id="crossLogo" class="allLogo h-4 w-4 text-danger" data-lucide="x-circle" style="display: none;"></i>
+                                        <x-base.loading-icon id="theLoader" style="display: none;" class="allLogo h-4 w-4 text-primary" icon="oval" />
+                                    </span>
+                                </div>
+                                <div class="acc__input-error error-referral_code text-danger text-xs mt-1"></div>
+                            </div>
+
+                            <div class="intro-y col-span-12">
+                                <div class="gsfSignature border rounded-[3px] h-auto py-0 bg-slate-100 rounded-b-none flex justify-center items-center">
+                                    <x-creagia-signature-pad name='sign'
+                                        border-color="#e5e7eb"
+                                        submit-name="Save"
+                                        clear-name="Clear Signature"
+                                        submit-id="signSaveBtn"
+                                        clear-id="clear"
+                                        pad-classes="w-auto h-48 bg-white mt-0"
+                                    />
+                                    <div class="customeUploads my-10 border-2 border-dashed border-slate-500 flex items-center text-center h-[200px] max-h-[200px] sm:w-[70%] rounded-[5px] p-[20px]" style="display: none">
+                                        <label for="signature_file" class="text-center upload-message my-[3em] relative w-full cursor-pointer">
+                                            <div class="customeUploadsContent">
+                                                <span class="text-lg font-medium">
+                                                    Drop files here or click to upload.
+                                                </span><br/>
+                                                <span class="text-gray-600">
+                                                    This is signature file upload. Selected files should<br/>
+                                                    not over <span class="font-medium">2MB</span> and should be image file.
+                                                </span><br/>
+                                            </div>
+                                            <img src="" alt="signature" id="signature_image" class="h-[80px] w-auto inline-block" style="display: none"/>
+                                        </label>
+                                        <input type="file" id="signature_file" name="signature_file" accept="image/*" class="w-0 h-0 opacity-0 absolute left-0 top-0"/>
+                                    </div>
+                                </div>
+                                <div class="intSetupSignatureBtns flex">
+                                    <x-base.button type="button" class="signBtns w-[50%] rounded-br-none active flex justify-center items-center rounded-t-none [&.active]:bg-success [&.active]:text-white" variant="secondary">
+                                        Draw Signature
+                                    </x-base.button>
+                                    <x-base.button type="button" class="uploadBtns w-[50%] rounded-bl-none flex justify-center items-center rounded-t-none [&.active]:bg-success [&.active]:text-white" variant="secondary">
+                                        Upload Signature
+                                    </x-base.button>
+                                </div>
+                                <div class="acc__input-error error-signature text-danger text-xs mt-1"></div>
+                            </div>
+                            <div class="intro-y col-span-12" id="registerSuccess" style="display: none;">
+                                <x-base.alert class="my-7 flex items-center rounded-[0.6rem] border-primary/20 bg-primary/5 px-4 py-3 leading-[1.7]" ariant="outline-success" >
+                                    <div class="">
+                                        <x-base.lucide class="mr-2 h-7 w-7 fill-primary/10 stroke-[0.8]" icon="Lightbulb" />
+                                    </div>
+                                    <div class="ml-1 mr-8">
+                                        Register <span class="font-medium">Sucessful</span>! check the
+                                        <span id="email" class="font-medium">given email</span> for the verification link.
+                                    </div>
+                                    <x-base.alert.dismiss-button class="btn-close text-primary">
+                                        <x-base.lucide class="w-5 h-5" icon="X" />
+                                    </x-base.alert.dismiss-button>
+                                </x-base.alert>
+                            </div>
                             
                             <div class="intro-y col-span-12 mt-5 flex items-center justify-center sm:justify-between">
+                                <x-base.button type="button"
+                                    class="w-24 form-wizard-previous-btn"
+                                    variant="secondary"
+                                >
+                                    Previous
+                                </x-base.button>
+                                <x-base.button type="button"
+                                    id="submitTheFormWithSignature"
+                                    class="ml-2 sm:ml-auto w-auto min-w-24 text-white"
+                                    variant="success"
+                                >
+                                    Submit
+                                    <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
+                                </x-base.button>
+                            </div>
+                            <!-- <div class="intro-y col-span-12 mt-5 flex items-center justify-center sm:justify-between">
                                 <x-base.button type="button"
                                     class="w-24 form-wizard-previous-btn"
                                     variant="secondary"
@@ -233,10 +324,12 @@
                                     Next
                                     <x-base.loading-icon style="display: none;" class="ml-2 h-4 w-4 theLoader" color="#FFFFFF" icon="oval" />
                                 </x-base.button>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
-                    <div class="wizard-fieldset mt-10" id="stepOtherInfo">
+
+
+                    <!-- <div class="wizard-fieldset mt-10" id="stepOtherInfo">
                         <div class="text-base font-medium">Other Information</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5 theAddressWrap" id="companyAddressWrap">
                             <div class="intro-y col-span-12 sm:col-span-6">
@@ -342,7 +435,7 @@
                                 </x-base.button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </form>
             </div>
         </div>

@@ -55,12 +55,25 @@
                 $theBtn.find('.theLoader').fadeOut();
                 console.log(error.response)
                 if (error.response) {
-                    if (error.response.status == 422) {
+                    if(error.response.status == 429){
+                        $theBtn.removeAttr('disabled');
+                        $theBtn.find('.theLoader').fadeOut();
+                        $('#quickLoginForm .quickLoginFirstStep').fadeOut('fast', function(){
+                            $('#quickLoginForm .quickLoginLastStep').fadeIn('fast', function(){
+                                $('input', this).val();
+                            })
+                        });
+                        $('.error-otp').removeClass('hidden').html(error.response.data.message);
+
+                        setTimeout(() => {
+                            $('.error-otp').addClass('hidden').html('');
+                        }, 5000);
+                    } else if (error.response.status == 422) {
                         for (const [key, val] of Object.entries(error.response.data.errors)) {
                             $(`#quickLoginForm .quickLoginFirstStep .${key}`).addClass('border-danger');
                             $(`#quickLoginForm .quickLoginFirstStep  .error-${key}`).html(val);
                         }
-                    } else if (error.response.status == 404 || error.response.status == 429) {
+                    } else if (error.response.status == 404) {
                         $('#quickLoginForm .quickLoginFirstStep').prepend('<div role="alert" class="otpError alert relative border rounded-md px-3 py-2 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-5 flex items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>'+error.response.data.message+'</div>')
 
                         setTimeout(() => {
