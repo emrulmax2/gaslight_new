@@ -27,33 +27,42 @@ import INTAddressLookUps from "../address_lookup";
         $('.error-otp').html('');
 
         if(!$theLink.hasClass('processing')){
-            $theLink.addClass('processing opacity-7');
+            $theLink.addClass('processing opacity-4');
 
-            let $theMobileInput = $('#mobileNumber');
-            let theName = $theMobileInput.attr('name');
-            let theMobileNumber = $theMobileInput.val();
+            let $theEmailInput = $('#email');
+            let theEmail = $theEmailInput.val();
 
-            $.ajax({
-                type: 'POST',
-                data: {MobileNumber : theMobileNumber},
-                url: route('register.generate.otp'),
-                headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                async: false,
-                success: function(data) {
-                    $('#countDownHtml').fadeOut('fast', function(){
-                        $('#resendOtp', this).removeClass('processing opacity-7');
+            turnstile.render("#turnstile-container", {
+                sitekey: window.turnstileSiteKey,
+                size: "invisible",
+                callback: function (cfToken) {
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            email : theEmail,
+                            reg_token    : window.regToken,
+                            cf_token     : cfToken
+                        },
+                        url: route('register.generate.email.otp'),
+                        headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                        async: false,
+                        success: function(data) {
+                            $('#countDownHtml').fadeOut('fast', function(){
+                                $('#resendOtp', this).removeClass('processing opacity-4');
+                            });
+                            countDownClock('countdown', 180);
+                        },
+                        error:function(e){
+                            $('.error-otp').html('Try again later.')
+                            clearInterval(countDowns);
+                            $('#countdown').fadeOut().html('');
+                            console.log('Error');
+
+                            setTimeout(() => {
+                                $('.error-otp').html('')
+                            }, 5000);
+                        }
                     });
-                    countDownClock('countdown', 180);
-                },
-                error:function(e){
-                    $('.error-otp').html('Try again later.')
-                    clearInterval(countDowns);
-                    $('#countdown').fadeOut().html('');
-                    console.log('Error');
-
-                    setTimeout(() => {
-                        $('.error-otp').html('')
-                    }, 5000);
                 }
             });
         }
@@ -89,48 +98,12 @@ import INTAddressLookUps from "../address_lookup";
         if(the_id == 'stepMobileNumber'){
             let theSetpError = 0;
 
+            let email = $theStep.find('#email').val();
             if($theStep.find('#email').val() == '' || ($theStep.find('#email').val() != '' && !isValidEmail($theStep.find('#email').val()))){
                 $theStep.find('.acc__input-error.error-email').html('Email is required.');
                 theSetpError += 1;
             }else{
                 $theStep.find('.acc__input-error.error-email').html('');
-            }
-            if($theStep.find('#password').val() != '' && $theStep.find('#password_confirmation').val() != ''){
-                if($theStep.find('#password').val() != $theStep.find('#password_confirmation').val()){
-                    $theStep.find('.acc__input-error.error-password_confirmation').html('Password does not match.');
-                    theSetpError += 1;
-                }else{
-                    $theStep.find('.acc__input-error.error-password_confirmation').html('');
-                }
-            }else{
-                if($theStep.find('#password').val() == ''){
-                    $theStep.find('.acc__input-error.error-password').html('This field is required');
-                    theSetpError += 1;
-                }else{
-                    $theStep.find('.acc__input-error.error-password').html('');
-                }
-                if($theStep.find('#password_confirmation').val() == ''){
-                    $theStep.find('.acc__input-error.error-password_confirmation').html('This field is required');
-                    theSetpError += 1;
-                }else{
-                    $theStep.find('.acc__input-error.error-password_confirmation').html('');
-                }
-            }
-
-            let email = $theStep.find('#email').val();
-            let $theMobileInput = $('#mobileNumber');
-            let theMobileNumber = $theMobileInput.val();
-            if(theMobileNumber.length == 11){
-                var startWith = theMobileNumber.substr(0, 2);
-                if(startWith == '07'){
-                    $theStep.find('.acc__input-error.error-mobile').html('');
-                }else{
-                    $theStep.find('.acc__input-error.error-mobile').html('Mobile number should start with 07.');
-                    theSetpError += 1;
-                }
-            }else{
-                $theStep.find('.acc__input-error.error-mobile').html('Mobile number should be 11 digit.');
-                theSetpError += 1;
             }
 
             if(theSetpError == 0){
@@ -140,9 +113,6 @@ import INTAddressLookUps from "../address_lookup";
                     callback: function (cfToken) {
                         axios.post(route('register.generate.email.otp'), {
                                 email : $theStep.find('#email').val(),
-                                password: $theStep.find('#password').val(),
-                                password_confirmation: $theStep.find('#password_confirmation').val(),
-                                mobile : theMobileNumber,
                                 reg_token    : window.regToken,
                                 cf_token     : cfToken
                             }, { 
@@ -157,9 +127,9 @@ import INTAddressLookUps from "../address_lookup";
                             $('#stepVerifiedOtp .mobileNumberShow').text(email);
 
                             $('#countDownHtml').fadeOut('fast', function(){
-                                $('#resendOtp', this).removeClass('processing opacity-7');
+                                $('#resendOtp', this).removeClass('processing opacity-4');
                             });
-                            countDownClock('countdown', 300);
+                            countDownClock('countdown', 180);
                             nextWizardStep = true;
                             goNextStep(next);
                         }).catch(function(error){
@@ -168,13 +138,32 @@ import INTAddressLookUps from "../address_lookup";
                             let responseData = error.response.data;
                             //$theStep.find('.error-mobile').fadeIn().html(responseData.message ?? 'Something went wrong.');
 
-                            if (error.response.status == 422) {
+                            if(error.response.status == 429){
+                                next.removeAttr('disabled');
+                                next.find('.theLoader').fadeOut();
+                                $theStep.find('.acc__input-error').fadeOut().html('');
+
+                                $theStep.find('.otpCodes').val('');
+                                $('#stepVerifiedOtp .mobileNumberShow').text(email);
+                                $('#stepVerifiedOtp .error-otp').html(error.response.data.message);
+                                setTimeout(() => {
+                                    $('#stepVerifiedOtp .error-otp').html('');
+                                }, 5000);
+
+                                $('#countDownHtml').fadeOut('fast', function(){
+                                    $('#resendOtp', this).removeClass('processing opacity-4');
+                                });
+                                $('#countdown').fadeIn();
+                                countDownClock('countdown', 180);
+                                nextWizardStep = true;
+                                goNextStep(next);
+                            } else if (error.response.status == 422) {
                                 for (const [key, val] of Object.entries(error.response.data.errors)) {
                                     $(`#stepMobileNumber .${key}`).addClass('border-danger');
                                     $(`#stepMobileNumber  .error-${key}`).html(val);
                                 }
-                            } else if (error.response.status == 304) {
-                                $('#stepMobileNumber').prepend('<div role="alert" class="formError alert relative border rounded-md px-3 py-2 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-5 flex items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>'+error.response.data.msg+'</div>')
+                            } else if (error.response.status == 400) {
+                                $('#stepMobileNumber').prepend('<div role="alert" class="formError alert relative border rounded-md px-3 py-2 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-5 flex items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>'+error.response.data.message+'</div>')
 
                                 setTimeout(() => {
                                     $('#stepMobileNumber .formError').remove();
@@ -201,8 +190,7 @@ import INTAddressLookUps from "../address_lookup";
 
                 nextWizardStep = false;
             }
-        }
-        else if(the_id == 'stepVerifiedOtp'){
+        } else if(the_id == 'stepVerifiedOtp'){
             let theOtp = '';
             $theStep.find('.otpCodes').each(function(e){
                 theOtp += $(this).val();
@@ -228,7 +216,7 @@ import INTAddressLookUps from "../address_lookup";
                         goNextStep(next);
                     },
                     error:function(jqXHR, textStatus, errorThrown){
-                        var message = jqXHR.responseJSON.msg;
+                        var message = jqXHR.responseJSON.message;
 
                         next.removeAttr('disabled');
                         next.find('.theLoader').fadeOut();
@@ -256,7 +244,45 @@ import INTAddressLookUps from "../address_lookup";
         }else if(the_id == 'stepBusinessInfo'){
             let theSetpError = 0;
 
-            $($theStep).find('require').each(function(e){
+            let $theMobileInput = $('#mobileNumber');
+            let theMobileNumber = $theMobileInput.val();
+
+            if($theStep.find('#password').val() != '' && $theStep.find('#password_confirmation').val() != ''){
+                if($theStep.find('#password').val() != $theStep.find('#password_confirmation').val()){
+                    $theStep.find('.acc__input-error.error-password_confirmation').html('Password does not match.');
+                    theSetpError += 1;
+                }else{
+                    $theStep.find('.acc__input-error.error-password_confirmation').html('');
+                }
+            }else{
+                if($theStep.find('#password').val() == ''){
+                    $theStep.find('.acc__input-error.error-password').html('This field is required');
+                    theSetpError += 1;
+                }else{
+                    $theStep.find('.acc__input-error.error-password').html('');
+                }
+                if($theStep.find('#password_confirmation').val() == ''){
+                    $theStep.find('.acc__input-error.error-password_confirmation').html('This field is required');
+                    theSetpError += 1;
+                }else{
+                    $theStep.find('.acc__input-error.error-password_confirmation').html('');
+                }
+            }
+
+            if(theMobileNumber.length == 11){
+                var startWith = theMobileNumber.substr(0, 2);
+                if(startWith == '07'){
+                    $theStep.find('.acc__input-error.error-mobile').html('');
+                }else{
+                    $theStep.find('.acc__input-error.error-mobile').html('Mobile number should start with 07.');
+                    theSetpError += 1;
+                }
+            }else{
+                $theStep.find('.acc__input-error.error-mobile').html('Mobile number should be 11 digit.');
+                theSetpError += 1;
+            }
+
+            $($theStep).find('.require').each(function(e){
                 let theInputName = $(this).attr('name');
                 let $theField = $(this);
                 if(theInputName == 'business_type'){
@@ -295,27 +321,6 @@ import INTAddressLookUps from "../address_lookup";
                 $theStep.find('.acc__input-error.error-vat_number').html('');
             }
 
-            // if($theStep.find('#email').val() != ''){
-            //     let the_email = $theStep.find('#email').val()
-            //     $.ajax({
-            //         type: 'POST',
-            //         data: {email : the_email},
-            //         url: route('register.validate.email'),
-            //         headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            //         async: false,
-            //         success: function(data) {
-
-            //             $theStep.find('.acc__input-error.error-email').html('');
-            //         },
-            //         error:function(e){
-
-            //             $theStep.find('.acc__input-error.error-email').html('Email id already exist.');
-            //             theSetpError += 1;
-            //             console.log('Error');
-            //         }
-            //     });
-            // }
-
             if(theSetpError > 0){
                 nextWizardStep = false;
             }else{
@@ -345,57 +350,53 @@ import INTAddressLookUps from "../address_lookup";
             }
             next.removeAttr('disabled');
             next.find('.theLoader').fadeOut();
-        }else if(the_id == 'stepOtherInfo'){
-            let theSetpError = 0;
-
-            $($theStep).find('.require').each(function(e){
-                let theInputName = $(this).attr('name');
-                let $theField = $(this);
-                
-                if($theField.val() == ''){
-                    $theStep.find('.acc__input-error.error-'+theInputName).html('This field is required.');
-                    theSetpError += 1;
-                }else{
-                    $theStep.find('.acc__input-error.error-'+theInputName).html('');
-                }
-            });
-
-            if($theStep.find('#referral_code').val() != ''){
-                let referral_code = $theStep.find('#referral_code').val();
-                $.ajax({
-                    type: 'POST',
-                    data: {referral_code : referral_code},
-                    url: route('register.validate.referral'),
-                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                    async: false,
-                    success: function(data) {
-                        if(data.suc == 1){
-                            $theStep.find('.acc__input-error.error-referral_code').html('');
-                        }else{
-                            $theStep.find('.acc__input-error.error-referral_code').html('Invalid referral code.');
-                            theSetpError += 1;
-                        }
-                    },
-                    error:function(e){
-                        $theStep.find('.acc__input-error.error-referral_code').html('Try again later.');
-                        theSetpError += 1;
-                        console.log('Error');
-                    }
-                });
-            }
-
-            if(theSetpError > 0){
-                nextWizardStep = false;
-            }else{
-                goNextStep(next);
-            }
-            next.removeAttr('disabled');
-            next.find('.theLoader').fadeOut();
         }
-         
-        // if (nextWizardStep) {
-        //     next.parents('.wizard-fieldset').removeClass("show");
-        //     next.parents('.wizard-fieldset').next('.wizard-fieldset').addClass("show");
+        // else if(the_id == 'stepOtherInfo'){
+        //     let theSetpError = 0;
+
+        //     $($theStep).find('.require').each(function(e){
+        //         let theInputName = $(this).attr('name');
+        //         let $theField = $(this);
+                
+        //         if($theField.val() == ''){
+        //             $theStep.find('.acc__input-error.error-'+theInputName).html('This field is required.');
+        //             theSetpError += 1;
+        //         }else{
+        //             $theStep.find('.acc__input-error.error-'+theInputName).html('');
+        //         }
+        //     });
+
+        //     if($theStep.find('#referral_code').val() != ''){
+        //         let referral_code = $theStep.find('#referral_code').val();
+        //         $.ajax({
+        //             type: 'POST',
+        //             data: {referral_code : referral_code},
+        //             url: route('register.validate.referral'),
+        //             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+        //             async: false,
+        //             success: function(data) {
+        //                 if(data.suc == 1){
+        //                     $theStep.find('.acc__input-error.error-referral_code').html('');
+        //                 }else{
+        //                     $theStep.find('.acc__input-error.error-referral_code').html('Invalid referral code.');
+        //                     theSetpError += 1;
+        //                 }
+        //             },
+        //             error:function(e){
+        //                 $theStep.find('.acc__input-error.error-referral_code').html('Try again later.');
+        //                 theSetpError += 1;
+        //                 console.log('Error');
+        //             }
+        //         });
+        //     }
+
+        //     if(theSetpError > 0){
+        //         nextWizardStep = false;
+        //     }else{
+        //         goNextStep(next);
+        //     }
+        //     next.removeAttr('disabled');
+        //     next.find('.theLoader').fadeOut();
         // }
     });
 
@@ -413,14 +414,14 @@ import INTAddressLookUps from "../address_lookup";
 
         if(the_id == 'stepVerifiedOtp'){
             $('#countDownHtml').fadeOut('fast', function(){
-                $('#resendOtp', this).removeClass('processing opacity-7');
+                $('#resendOtp', this).removeClass('processing opacity-4');
             });
             clearInterval(countDowns);
             $('#countdown').fadeOut().html('');
             $theStep.find('.otpCodes').val('');
         }else if(the_id == 'stepBusinessInfo'){
             $('#countDownHtml').fadeIn('fast', function(){
-                $('#resendOtp', this).removeClass('processing opacity-7');
+                $('#resendOtp', this).removeClass('processing opacity-4');
             });
             clearInterval(countDowns);
             $('#countdown').fadeOut().html('');
@@ -521,6 +522,72 @@ import INTAddressLookUps from "../address_lookup";
         }
     })
 
+    let typingTimer;
+    let lastSentCode = null;
+    let isRequestPending = false;
+    const debounceDelay = 600;
+
+    $('#referral_code').on('keyup paste', function () {
+        $('#theLoader, #checkLogo, #crossLogo').fadeOut(100);
+        clearTimeout(typingTimer);
+
+        let code = $(this).val().trim();
+
+        typingTimer = setTimeout(function () {
+            validateReferral(code);
+        }, debounceDelay);
+    });
+
+    function validateReferral(code) {
+        // ignore empty / too short
+        if (!code || code.length < 3) {
+            $('.error-referral_code').removeClass('text-pending text-success').addClass('text-danger').html('');
+            $('#theLoader, #checkLogo, #crossLogo').fadeOut(100);
+            return;
+        }
+
+        // prevent duplicate same value request
+        if (code === lastSentCode) return;
+
+        // prevent multiple parallel requests
+        if (isRequestPending) return;
+
+        lastSentCode = code;
+        isRequestPending = true;
+
+        $('#checkLogo, #crossLogo').fadeOut(100);
+        $('#theLoader').fadeIn(400);
+
+        axios.post(route('register.validate.referral'), {
+            referral_code: code
+        }).then(function (response) {
+            if (response.data.suc == 1) {
+                $('#theLoader').fadeOut(100, function(){
+                    $('#checkLogo').fadeIn(400);
+                });
+            } else {
+                $('#referral_code').val('');
+                $('#theLoader').fadeOut(100, function(){
+                    $('#crossLogo').fadeIn(400);
+                });
+
+                setTimeout(() => {
+                    $('#crossLogo').fadeOut(100);
+                }, 2500);
+            }
+        }).catch(function () {
+            $('#referral_code').val('');
+            $('#theLoader, #checkLogo, #crossLogo').fadeOut(100);
+            $('.error-referral_code').html('Error! Can not validate.');
+
+            setTimeout(() => {
+                $('.error-referral_code').html('');
+            }, 2500);
+        }).finally(function () {
+            isRequestPending = false;
+        });
+    }
+
 
     $('#submitTheFormWithSignature').on('click', function(e){
         e.preventDefault();
@@ -539,17 +606,30 @@ import INTAddressLookUps from "../address_lookup";
 
         let theSign = $theForm.find('.sign').val();
         let theSignImage = $theForm.find('#signature_file');
-        
-        if(theSign.length <= 4358 && $('#signature_file').get(0).files.length === 0 ){
-            $theForm.find('.acc__input-error.error-signature').html('Signature can not be empty.');
-            $theBtn.siblings('.form-wizard-previous-btn').removeAttr('disabled');
-            $theBtn.removeAttr('disabled', 'disabled');
-            $theBtn.find(".theLoader").fadeOut();
 
-            setTimeout(() => {
-                $theForm.find('.acc__input-error.error-signature').html('');
-            }, 5000);
+        let $theStep = $('#stepContactDetails');
+        let submissionError = 0;
+        
+        $theStep.find('.require').each(function(e){
+            let theInputName = $(this).attr('name');
+            let $theField = $(this);
+            
+            if($theField.val() == ''){
+                $theStep.find('.acc__input-error.error-'+theInputName).html('This field is required.');
+                submissionError += 1;
+            }else{
+                $theStep.find('.acc__input-error.error-'+theInputName).html('');
+            }
+        });
+        if(theSign.length <= 4358 && $('#signature_file').get(0).files.length === 0 ){
+            $theStep.find('.acc__input-error.error-signature').html('Signature can not be empty.');
+            submissionError += 1;
         }else{
+            $theStep.find('.acc__input-error.error-signature').html('');
+        }
+
+        console.log(submissionError);
+        if(submissionError == 0){
             let formData = new FormData(form);
             axios({
                 method: "post",
@@ -587,7 +667,28 @@ import INTAddressLookUps from "../address_lookup";
                     }).showToast();
                 }
             });
+        }else{
+            $theBtn.siblings('.form-wizard-previous-btn').removeAttr('disabled');
+            $theBtn.removeAttr('disabled', 'disabled');
+            $theBtn.find(".theLoader").fadeOut();
+
+            setTimeout(() => {
+                $theStep.find('.acc__input-error').html('');
+            }, 5000);
         }
+
+        // if(theSign.length <= 4358 && $('#signature_file').get(0).files.length === 0 ){
+        //     $theForm.find('.acc__input-error.error-signature').html('Signature can not be empty.');
+        //     $theBtn.siblings('.form-wizard-previous-btn').removeAttr('disabled');
+        //     $theBtn.removeAttr('disabled', 'disabled');
+        //     $theBtn.find(".theLoader").fadeOut();
+
+        //     setTimeout(() => {
+        //         $theForm.find('.acc__input-error.error-signature').html('');
+        //     }, 5000);
+        // }else{
+            
+        // }
     });
 
     function showPreview(inputId, targetImageId) {
@@ -612,7 +713,7 @@ import INTAddressLookUps from "../address_lookup";
                 clearInterval(countDowns);
                 $element.fadeOut().html('');
                 $('#countDownHtml').fadeIn('fast', function(){
-                    $('#resendOtp', this).removeClass('processing opacity-7');
+                    $('#resendOtp', this).removeClass('processing opacity-4');
                 });
             } else {
                 var m = Math.floor(timeLeft / 60);

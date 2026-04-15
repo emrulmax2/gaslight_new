@@ -669,3 +669,6 @@
 #turnstile-container iframe{
     width: 100% !important;
 }
+.opacity-4{
+    opacity: .4;
+}

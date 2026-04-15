@@ -114,8 +114,7 @@ class LoginController extends Controller
         ]);
     }
 
-   public function otpLogin(Request $request)
-    {
+    public function otpLogin(Request $request){
         try {
             $validated = $request->validate([
                 'user_id' => 'required|exists:users,id',
@@ -194,16 +193,13 @@ class LoginController extends Controller
         endif;
 
         // Prevent spam (1 active OTP at a time)
-        $existingOtp = EmailLoginOtp::where('email', $email)
-            ->where('expires_at', '>', now())
-            ->first();
-
-        if ($existingOtp):
+        $existingOtp = EmailLoginOtp::where('email', $email)->first();
+        if ($existingOtp && !$existingOtp->isExpired()) {
             return response()->json([
                 'status' => false,
-                'message' => 'OTP already sent. Please wait.'
-            ], 304);
-        endif;
+                'message' => 'OTP already sent. Please wait before requesting again.'
+            ], 429);
+        }
 
         $otp = rand(100000, 999999);
         EmailLoginOtp::updateOrCreate(
@@ -270,11 +266,13 @@ class LoginController extends Controller
         ]);
 
         $record = EmailLoginOtp::where('email', $request->email)->first();
+
+        // OTP record not found
         if (!$record) {
             return response()->json([
                 'status' => false,
-                'message' => 'OTP not found.'
-            ], 404);
+                'message' => 'Invalid or expired OTP.'
+            ], 400);
         }
 
         // Expired
@@ -283,8 +281,8 @@ class LoginController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'OTP has been expired.'
-            ], 304);
+                'message' => 'OTP has expired.'
+            ], 410);
         }
 
         // Too many attempts
@@ -303,24 +301,22 @@ class LoginController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'Invalid OTP. Please insert a valid OTP.'
-            ], 400);
+                'message' => 'Invalid OTP.'
+            ], 401);
         }
 
-        // OTP verified → delete record
+        // OTP verified
         $user = User::where('email', $request->email)->first();
-        if($user){
+
+        if ($user) {
             Auth::login($user);
             $token = $user->createToken('gasCertifiedToken')->accessToken;
 
             $record->delete();
-            if($user->email_verified_at == ''):
-                $user->update(['email_verified_at' => date('Y-m-d H:i:s')]);
-            endif;
-            $user->update([
-                'last_login_ip' => $request->getClientIp(),
-                'last_login_at' => Carbon::now()
-            ]);
+
+            if (!$user->email_verified_at) {
+                $user->update(['email_verified_at' => now()]);
+            }
 
             $user->update([
                 'last_login_ip' => $request->getClientIp(),
@@ -333,9 +329,12 @@ class LoginController extends Controller
                 'token' => $token,
                 'user' => $user,
             ], 200);
-        }else{
-            return response()->json(['message' => 'Wrong email or OTP.'], 401);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Invalid credentials.'
+        ], 401);
     }
 
 }

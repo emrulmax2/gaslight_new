@@ -458,37 +458,53 @@ class RegisteredUserController extends Controller
     public function generateEmailOtp(Request $request){
         $request->validate([
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|confirmed|min:8',
-            'mobile' => ['required','regex:/^07[0-9]{9}$/'],
             'reg_token'    => ['required'],
             'cf_token'     => ['required']
         ],[
             'email.required' => 'Email is required.',
             'email.email' => 'Insert an valid email.',
             'email.unique' => 'Email address already exist.',
-            'password.required' => 'This field is required.',
-            'password.confirmed' => 'Password does not match.',
-            'password.min' => 'Password needs minimum 8 cars.',
-            'mobile.required' => 'This field is required.',
-            'mobile.regex' => 'Mobile number should be start with 07.',
         ]);
 
-        $user = User::where('email', $request->email)->orWhere('mobile', $request->mobile)->first();
+        $cfResponse = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret' => config('services.turnstile.secret'),
+            'response' => $request->cf_token,
+            'remoteip' => $request->ip(),
+        ]);
+
+        if (!$cfResponse->json('success')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Captcha verification failed.'
+            ], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
         if ($user):
             return response()->json([
                 'status' => false,
-                'msg' => 'Email address or Mobile number already exist.'
-            ], 304);
+                'message' => 'Email address or Mobile number already exist.'
+            ], 400);
         endif;
 
-        // Prevent spam (1 active OTP at a time)
-        $existingOtp = EmailRegisterOtp::where('email', $request->email)->where('expires_at', '>', now())->first();
-        if ($existingOtp):
+        // Check existing OTP
+        $existingOtp = EmailRegisterOtp::where('email', $request->email)->first();
+        if ($existingOtp && !$existingOtp->isExpired()) {
             return response()->json([
                 'status' => false,
-                'msg' => 'OTP already sent. Please wait.'
-            ], 304);
-        endif;
+                'message' => 'OTP already sent. Please wait before requesting again.'
+            ], 429);
+        }
+
+        // OPTIONAL: Rate limit (extra safety)
+        $key = 'otp_email_'.$request->ip();
+        if (cache()->has($key)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Too many requests. Please try again later.'
+            ], 429);
+        }
+        cache()->put($key, true, now()->addSeconds(60));
 
         $otp = rand(100000, 999999);
         EmailRegisterOtp::updateOrCreate(
@@ -524,7 +540,7 @@ class RegisteredUserController extends Controller
 
         return response()->json([
             'status' => true,
-            'msg' => 'OTP sent Successfully. Please check your inbox.'
+            'message' => 'OTP sent Successfully. Please check your inbox.'
         ], 200);
     }
 
@@ -535,11 +551,13 @@ class RegisteredUserController extends Controller
         ]);
 
         $record = EmailRegisterOtp::where('email', $request->email)->first();
+
+        // OTP not found
         if (!$record) {
             return response()->json([
                 'status' => false,
-                'msg' => 'OTP not found.'
-            ], 304);
+                'message' => 'Invalid or expired OTP.'
+            ], 400);
         }
 
         // Expired
@@ -548,8 +566,8 @@ class RegisteredUserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'msg' => 'OTP has been expired.'
-            ], 304);
+                'message' => 'OTP has expired.'
+            ], 410);
         }
 
         // Too many attempts
@@ -558,8 +576,8 @@ class RegisteredUserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'msg' => 'Too many attempts. Request new OTP.'
-            ], 304);
+                'message' => 'Too many attempts. Request new OTP.'
+            ], 429);
         }
 
         // Wrong OTP
@@ -568,12 +586,14 @@ class RegisteredUserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'msg' => 'Invalid OTP. Please insert a valid OTP.'
-            ], 304);
+                'message' => 'Invalid OTP. No match found.'
+            ], 401);
         }
 
-        return response()->json(['msg' => 'Match found. Continue for the next step'], 200);
-
+        return response()->json([
+            'status' => true,
+            'message' => 'OTP verified. Continue to next step.'
+        ], 200);
     }
     
 }

@@ -29,6 +29,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Creagia\LaravelSignPad\Signature;
+use Illuminate\Support\Facades\Http;
 
 class RegisteredUserController extends Controller
 {
@@ -520,36 +521,36 @@ class RegisteredUserController extends Controller
 
     public function generateEmailOtp(Request $request){
         $request->validate([
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:users,email'
         ],[
             'email.required' => 'Email is required.',
             'email.email' => 'Insert an valid email.',
             'email.unique' => 'Email address already exist.',
         ]);
 
-        $user = User::where('email', $request->email)->orWhere('mobile', $request->mobile)->first();
+        $user = User::where('email', $request->email)->first();
         if ($user):
             return response()->json([
                 'status' => false,
-                'msg' => 'Email address or Mobile number already exist.'
-            ], 404);
+                'message' => 'Email address or Mobile number already exist.'
+            ], 400);
         endif;
 
-        // Prevent spam (1 active OTP at a time)
-        $existingOtp = EmailRegisterOtp::where('email', $request->email)->where('expires_at', '>', now())->first();
-        if ($existingOtp):
+        // Check existing OTP
+        $existingOtp = EmailRegisterOtp::where('email', $request->email)->first();
+        if ($existingOtp && !$existingOtp->isExpired()) {
             return response()->json([
                 'status' => false,
-                'msg' => 'OTP already sent. Please wait.'
-            ], 304);
-        endif;
+                'message' => 'OTP already sent. Please wait before requesting again.'
+            ], 429);
+        }
 
         $otp = rand(100000, 999999);
         EmailRegisterOtp::updateOrCreate(
             ['email' => $request->email],
             [
                 'otp' => Hash::make($otp),
-                'expires_at' => now()->addMinutes(5)
+                'expires_at' => now()->addMinutes(3)
             ]
         );
 
@@ -590,11 +591,13 @@ class RegisteredUserController extends Controller
         ]);
 
         $record = EmailRegisterOtp::where('email', $request->email)->first();
+
+        // OTP not found
         if (!$record) {
             return response()->json([
                 'status' => false,
-                'msg' => 'OTP not found.'
-            ], 404);
+                'message' => 'Invalid or expired OTP.'
+            ], 400);
         }
 
         // Expired
@@ -603,8 +606,8 @@ class RegisteredUserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'msg' => 'OTP has been expired.'
-            ], 304);
+                'message' => 'OTP has expired.'
+            ], 410);
         }
 
         // Too many attempts
@@ -613,8 +616,8 @@ class RegisteredUserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'msg' => 'Too many attempts. Request new OTP.'
-            ], 422);
+                'message' => 'Too many attempts. Request new OTP.'
+            ], 429);
         }
 
         // Wrong OTP
@@ -623,8 +626,8 @@ class RegisteredUserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'msg' => 'Invalid OTP. Please insert a valid OTP.'
-            ], 400);
+                'message' => 'Invalid OTP. No match found.'
+            ], 401);
         }
 
         return response()->json(['msg' => 'Match found. Continue for the next step'], 200);
