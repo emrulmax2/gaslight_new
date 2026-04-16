@@ -220,6 +220,7 @@
                             </div>
                             <x-base.form-input value="" name="company_country" id="company_country" class="w-full country" type="hidden" />
 
+                            <div class="intro-y col-span-12 sm:col-span-6"></div>
                             <div class="intro-y col-span-12 sm:col-span-6">
                                 <x-base.form-label for="gas_safe_registration_no">Gas Safe Reg. No <span class="text-danger ml-2">*</span></x-base.form-label>
                                 <x-base.form-input id="gas_safe_registration_no" name="gas_safe_registration_no" class="require" type="text" />
@@ -230,7 +231,7 @@
                                 <x-base.form-input id="gas_safe_id_card" name="gas_safe_id_card" class="require" type="text" />
                                 <div class="acc__input-error error-gas_safe_id_card text-danger text-xs mt-1"></div>
                             </div>
-                            <div class="intro-y col-span-12 sm:col-span-6">
+                            <div class="intro-y col-span-12">
                                 <x-base.form-label>Referral Code</x-base.form-label>
                                 <div class="relative">
                                     <x-base.form-input class="block" type="text" placeholder="" name="referral_code" id="referral_code" />

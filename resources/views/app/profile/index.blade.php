@@ -148,7 +148,18 @@
                     <span class="font-normal text-slate-400 text-xs block">
                         {{ (isset($user->userpackage->start) && !empty($user->userpackage->start) ? date('jS F, Y', strtotime($user->userpackage->start)).' - ' : '') }}
                         {{ (isset($user->userpackage->end) && !empty($user->userpackage->end) ? date('jS F, Y', strtotime($user->userpackage->end)) : '') }}
-                        {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? ' ('.$user->userpackage->package->title.')' : '') }}
+                        @if(isset($user->userpackage->package->period) && $user->userpackage->package->period == 'Free Trail')
+                            @if(isset($user->userpackage->start) && !empty($user->userpackage->start) && isset($user->userpackage->end) && !empty($user->userpackage->end))
+                                @php 
+                                    $start = Carbon::parse($user->userpackage->start);
+                                    $end = Carbon::parse($user->userpackage->end);
+                                    echo $start->diffInDays($end); 
+                                @endphp
+                            @endif
+                            Free Trail
+                        @else
+                            {{ (isset($user->userpackage->package->title) && !empty($user->userpackage->package->title) ? ' ('.$user->userpackage->package->title.')' : '') }}
+                        @endif
                     </span>
                 </div>
             </a>
