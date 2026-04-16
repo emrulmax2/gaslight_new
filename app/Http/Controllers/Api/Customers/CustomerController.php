@@ -18,47 +18,57 @@ use Illuminate\Support\Facades\Schema;
 class CustomerController extends Controller
 {
 
-    public function list(Request $request)
-    {
+    public function list(Request $request){
         $query = Customer::with('contact')->where('created_by', $request->user()->id);
-        $sortField = ($request->has('sort') && !empty($request->query('sort'))) ? $request->query('sort') : 'full_name';
-        $sortOrder = ($request->has('order') && !empty($request->query('order'))) ? $request->query('order') : 'asc';
-        $searchKey = ($request->has('search') && !empty($request->query('search'))) ? $request->query('search') : '';
 
-        $searchableColumns = Schema::getColumnListing((new Customer)->getTable());
+        // Sorting (with safety)
+        $allowedSorts = ['id', 'full_name', 'created_at'];
+        $sortField = in_array($request->query('sort'), $allowedSorts) ? $request->query('sort') : 'full_name';
+        $sortOrder = $request->query('order') === 'desc' ? 'desc' : 'asc';
+        $searchKey = $request->query('search');
+
+        // Search
         if (!empty($searchKey)) {
-            $query->where(function($q) use ($searchableColumns, $searchKey) {
-                foreach ($searchableColumns as $field) {
-                    $q->orWhere($field, 'like', '%' . $searchKey . '%');
-                }
+            $query->where(function($q) use ($searchKey) {
+                $q->where('full_name', 'like', "%$searchKey%")
+                ->orWhere('company_name', 'like', "%$searchKey%")
+                ->orWhere('vat_no', 'like', "%$searchKey%")
+
+                ->orWhereHas('address', function($aq) use($searchKey){
+                    $aq->where(function($aq) use ($searchKey) {
+                        $aq->where('address_line_1', 'like', "%$searchKey%")
+                            ->orWhere('address_line_2', 'like', "%$searchKey%")
+                            ->orWhere('postal_code', 'like', "%$searchKey%");
+                    });
+                })
+
+                ->orWhereHas('contact', function($cq) use($searchKey){
+                    $cq->where(function($cq) use ($searchKey) {
+                        $cq->where('mobile', 'like', "%$searchKey%")
+                            ->orWhere('email', 'like', "%$searchKey%");
+                    });
+                });
             });
         }
-        
+        // Sorting
         $query->orderBy($sortField, $sortOrder);
+        $total = $query->count();
+
+        // Offset & Limit logic
+        $offset = $request->query('offset', 0);
+        $limit  = $request->query('limit');
+
+        if (is_numeric($offset) && is_numeric($limit)) {
+            $query->offset((int) $offset)->limit((int) $limit);
+        }
+
+        // Get data
         $customers = $query->get();
+
         return response()->json([
             'data' => $customers,
-            'total' => $customers->count()
+            'total' => $total
         ]);
-
-        // $limit = $request->query('limit', 10);
-        // $page = $request->query('page', 1);
-        // $limit = max(1, (int)$limit);
-        // $page = max(1, (int)$page);
-        
-        // $titles = $query->paginate($limit, ['*'], 'page', $page);
-
-        // return response()->json([
-        //     'data' => $titles->items(),
-        //     'meta' => [
-        //         'total' => $titles->total(),
-        //         'per_page' => $titles->perPage(),
-        //         'current_page' => $titles->currentPage(),
-        //         'last_page' => $titles->lastPage(),
-        //         'from' => $titles->firstItem(),
-        //         'to' => $titles->lastItem(),
-        //     ]
-        // ]);
     }
 
     public function storeCustomer(CustomerCreateRequest $request){
