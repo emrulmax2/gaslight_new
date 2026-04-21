@@ -151,8 +151,8 @@
                         @if(isset($user->userpackage->package->period) && $user->userpackage->package->period == 'Free Trail')
                             @if(isset($user->userpackage->start) && !empty($user->userpackage->start) && isset($user->userpackage->end) && !empty($user->userpackage->end))
                                 @php 
-                                    $start = Carbon::parse($user->userpackage->start);
-                                    $end = Carbon::parse($user->userpackage->end);
+                                    $start = \Carbon\Carbon::parse($user->userpackage->start);
+                                    $end = \Carbon\Carbon::parse($user->userpackage->end);
                                     echo $start->diffInDays($end); 
                                 @endphp
                             @endif

@@ -11,56 +11,28 @@
                 <!-- BEGIN: General Report -->
                 <div class="col-span-12 mt-4 sm:mt-8">
                     <div class="intro-y flex h-auto sm:h-10 items-center">
-                        <h2 class="mr-5 truncate text-lg font-medium">User List</h2>
+                        <h2 class="mr-5 truncate text-lg font-medium">Engineers List</h2>
                         
                     </div>
                     <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
                     </div>
 
                     <!-- BEGIN: HTML Table Data -->
-                    <div class="intro-y box mt-5 p-5">
+                    <div class="intro-y box p-5">
                         <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                             <form
                                 class="sm:mr-auto xl:flex"
                                 id="tabulator-html-filter-form"
                             >
-                                <div class="items-center sm:mr-4 sm:flex">
-                                    <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">
-                                        Field
-                                    </label>
-                                    <x-base.form-select
-                                        class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
-                                        id="tabulator-html-filter-field"
-                                    >
-                                        <option value="name">Name</option>
-                                        <option value="category">Category</option>
-                                        <option value="remaining_stock">Remaining Stock</option>
-                                    </x-base.form-select>
-                                </div>
+                                
                                 <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
                                     <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">
-                                        Type
-                                    </label>
-                                    <x-base.form-select
-                                        class="mt-2 w-full sm:mt-0 sm:w-auto"
-                                        id="tabulator-html-filter-type"
-                                    >
-                                        <option value="like">like</option>
-                                        <option value="=">=</option>
-                                        <option value="<">&lt;</option>
-                                        <option value="<=">&lt;=</option>
-                                        <option value=">">&gt;</option>
-                                        <option value=">=">&gt;=</option>
-                                        <option value="!=">!=</option>
-                                    </x-base.form-select>
-                                </div>
-                                <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                    <label class="mr-2 w-12 flex-none xl:w-auto xl:flex-initial">
-                                        Value
+                                        Query: 
                                     </label>
                                     <x-base.form-input
+
                                         class="mt-2 sm:mt-0 sm:w-40 2xl:w-full"
-                                        id="tabulator-html-filter-value"
+                                        id="query"
                                         type="text"
                                         placeholder="Search..."
                                     />
@@ -84,7 +56,7 @@
                                     </x-base.button>
                                 </div>
                             </form>
-                            <div class="mt-5 flex sm:mt-0">
+                            <!-- <div class="mt-5 flex sm:mt-0">
                                 <x-base.button
                                     class="mr-2 w-1/2 sm:w-auto"
                                     id="tabulator-print"
@@ -140,7 +112,7 @@
                                         </x-base.menu.item>
                                     </x-base.menu.items>
                                 </x-base.menu>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="scrollbar-hidden overflow-x-auto">
                             <div

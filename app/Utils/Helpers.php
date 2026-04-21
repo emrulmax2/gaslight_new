@@ -244,3 +244,10 @@ if (!function_exists('get_upcoming_inspection_count')) {
         return $query->count();
     }
 }
+
+if (!function_exists('isSuperAdmin')) {
+    function isSuperAdmin(): bool {
+        $user = auth('superadmin')->user();
+        return $user && $user->role === 'superadmin';
+    }
+}

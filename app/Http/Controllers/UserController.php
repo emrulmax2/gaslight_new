@@ -57,7 +57,7 @@ class UserController extends Controller
     public function list(Request $request)
     {
                
-        $queryStr = (isset($request->querystr) && !empty($request->querystr) ? $request->querystr : '');
+        $queryStr = (isset($request->queryStr) && !empty($request->queryStr) ? $request->queryStr : '');
         
         $sorters = (isset($request->sorters) && !empty($request->sorters) ? $request->sorters : array(['field' => 'id', 'dir' => 'DESC']));
         $sorts = [];
@@ -67,7 +67,17 @@ class UserController extends Controller
 
         $query = User::with('company', 'userpackage')->orderByRaw(implode(',', $sorts));
         if(!empty($queryStr)):
-            $query->where('name','LIKE','%'.$queryStr.'%');
+            $query->where(function($q) use($queryStr){
+                $q->where('name','LIKE','%'.$queryStr.'%')->orWhere('email','LIKE','%'.$queryStr.'%')
+                    ->whereHas('companies', function($cq) use($queryStr){
+                        $cq->where('company_name','LIKE','%'.$queryStr.'%')
+                            ->orWhere('company_email','LIKE','%'.$queryStr.'%')
+                            ->orWhere('gas_safe_registration_no','LIKE','%'.$queryStr.'%')
+                            ->orWhere('company_address_line_1','LIKE','%'.$queryStr.'%')
+                            ->orWhere('company_address_line_2','LIKE','%'.$queryStr.'%')
+                            ->orWhere('company_postal_code','LIKE','%'.$queryStr.'%');
+                    });
+            });
         endif;
 
         $total_rows = $query->count();
@@ -87,7 +97,17 @@ class UserController extends Controller
         if(!empty($Query)):
             $i = 1;
             foreach($Query as $list):
-             
+                    $colors = 'text-success';
+                    if(isset($list->userpackage->package->id) && $list->userpackage->package->id == 1):
+                        $colors = 'text-warning';
+                        if(date('Y-m-d', strtotime($list->userpackage->end)) < date('Y-m-d')):
+                            $colors = 'text-danger';
+                        endif;
+                    else:
+                        if(isset($list->userpackage->end) && !empty($list->userpackage->end) && date('Y-m-d', strtotime($list->userpackage->end)) < date('Y-m-d')):
+                            $colors = 'text-danger';
+                        endif;
+                    endif;
                     $data[] = [
                         'id' => $list->id,
                         'sl' => $i,
@@ -98,10 +118,12 @@ class UserController extends Controller
                         'mobile' => $list->mobile ?? '',
                         'status' => $list->active ?? 0,
                         'deleted_at' => isset($list->deleted_at) ? $list->deleted_at : NULL,
-                        'package' => $list->userpackage->package->title ?? '',
+                        'package' => (isset($list->userpackage->package->id) && $list->userpackage->package->id == 1 ? 'Free Trail' : (isset($list->userpackage->package->title) ? $list->userpackage->package->title : '')),
                         'price' => isset($list->userpackage->price) && $list->userpackage->price > 0 ? Number::currency($list->userpackage->price, 'GBP') : Number::currency(0, 'GBP'),
                         'next_renew' => isset($list->userpackage->end) && !empty($list->userpackage->end) ? date('jS F, Y', strtotime($list->userpackage->end)) : '',
                         'impersonate_url' => route('impersonate', $list->id),
+                        'is_superadmin' => isSuperAdmin(),
+                        'color' => $colors
                     ];
                     $i++;
                 
