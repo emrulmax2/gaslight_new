@@ -59,8 +59,11 @@
                     alt="Midone - Tailwind Admin Dashboard Template"
                 /> --}}
                 @if(Auth::guard('superadmin')->check())
-                
-                    <x-avatar name="{{ auth('superadmin')->user()->name }}" />
+                    @if(!empty(auth('superadmin')->user()->photo) && Storage::disk('public')->exists('super-admins/'.auth('superadmin')->user()->photo))
+                        <img src="{{ auth('superadmin')->user()->photo_url }}" alt="{{ auth('superadmin')->user()->name }}"/>
+                    @else
+                        <x-avatar name="{{ auth('superadmin')->user()->name }}" />
+                    @endif
                 @else
                     @if(!empty(auth()->user()->photo) && Storage::disk('public')->exists('users/'.auth()->user()->id.'/'.auth()->user()->photo))
                         <img src="{{ auth()->user()->photo_url }}" alt="{{ auth()->user()->name }}"/>

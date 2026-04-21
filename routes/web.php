@@ -52,6 +52,7 @@ use App\Http\Controllers\SuperAdmin\Settings\PaymentMethodController;
 use App\Http\Controllers\SuperAdmin\Settings\PricingPackageController;
 use App\Http\Controllers\SuperAdmin\Settings\ReferralCodeController;
 use App\Http\Controllers\SuperAdmin\Settings\SettingController;
+use App\Http\Controllers\SuperAdmin\Settings\UserController as SettingsUserController;
 use App\Http\Controllers\SuperAdmin\Settings\UserSettingsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\UserSubscriptionController;
@@ -235,6 +236,19 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::get('site-settings/default-options', 'index')->name('site.setting.default.opt');
         Route::post('site-settings/default-options-update', 'update')->name('site.setting.default.opt.update');
     });
+
+
+
+    Route::controller(SettingsUserController::class)->group(function(){
+        Route::get('site-settings/user-manager', 'index')->name('site.setting.user.manager');
+        Route::get('site-settings/user-manager/list', 'list')->name('site.setting.user.manager.list');
+        Route::post('site-settings/user-manager/store', 'store')->name('site.setting.user.manager.store');
+        Route::post('site-settings/user-manager/update', 'update')->name('site.setting.user.manager.update');
+
+        
+        Route::delete('site-settings/user-manager/destroy/{pack_id}', 'destroy')->name('site.setting.user.manager.destroy'); 
+        Route::post('site-settings/user-manager/restore/{pack_id}', 'restore')->name('site.setting.user.manager.restore');
+    });
        
 });
 
@@ -265,6 +279,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('subscribe/{package_id}', 'getSubscribed')->name('company.dashboard.subscribe');
         Route::post('enrolled-subscription', 'enrolledSubscription')->name('company.dashboard.enrolled.subscription');
         Route::post('upgrade-subscription', 'upgradeSubscriptions')->name('company.dashboard.upgrade.subscriptions');
+        Route::post('cancel-upgrade', 'upgradeCancellation')->name('company.dashboard.calcel.upgrade');
     });
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
@@ -518,6 +533,7 @@ Route::middleware(Authenticate::class)->group(function() {
         Route::get('users/payment-methods/{user}', 'paymentMethods')->name('users.payment.methods');
         Route::get('users/add-payment-methods/{user}/{customer_id}', 'addPaymentMethod')->name('users.add.payment.method');
         Route::post('users/store-payment-methods', 'storePaymentMethod')->name('users.store.payment.method');
+        Route::post('users/re-subscribe', 'reSubscribe')->name('users.re.subscription');
     });
 
     Route::controller(RecordAndDraftController::class)->group(function() {

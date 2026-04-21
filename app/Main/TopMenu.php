@@ -472,26 +472,37 @@ class TopMenu
                 ]*/
             ];
         elseif(isset(Auth::guard('superadmin')->user()->id)):
-            return [
-                'dashboard' => [
-                    'icon' => 'home',
-                    'title' => 'Dashboard',
-                    'route_name' => 'superadmin.dashboard'
-                ],
-                
-                'Boiler Manual' => [
-                    'icon' => 'thermometer-sun',
-                    'route_name' => 'superadmin.boiler-brand.index',
-                    'title' => 'Boiler Manual'
-                ],
-                
-                'Settings' => [
-                    'icon' => 'settings',
-                    'route_name' => 'superadmin.site.setting',
-                    'title' => 'Settings'
-                ],
+            if(!isSuperAdmin()):
+                return [
+                    'dashboard' => [
+                        'icon' => 'home',
+                        'title' => 'Dashboard',
+                        'route_name' => 'superadmin.dashboard'
+                    ]
 
-            ];
+                ];
+            else:
+                return [
+                    'dashboard' => [
+                        'icon' => 'home',
+                        'title' => 'Dashboard',
+                        'route_name' => 'superadmin.dashboard'
+                    ],
+                    
+                    'Boiler Manual' => [
+                        'icon' => 'thermometer-sun',
+                        'route_name' => 'superadmin.boiler-brand.index',
+                        'title' => 'Boiler Manual'
+                    ],
+                    
+                    'Settings' => [
+                        'icon' => 'settings',
+                        'route_name' => 'superadmin.site.setting',
+                        'title' => 'Settings'
+                    ],
+
+                ];
+            endif;
         else:
             return [];
         endif;

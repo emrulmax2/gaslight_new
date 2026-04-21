@@ -159,6 +159,71 @@ class SubscriptionService{
             'schedule' => $schedule
         ];
     }
+
+    public function cancelUpgradeRequest(User $user){
+        $userPackage = UserPricingPackage::where('user_id', $user->id)
+            ->where('active', 1)
+            ->firstOrFail();
+
+        if (!$userPackage->stripe_subscription_id || !$userPackage->stripe_customer_id) {
+            throw new \Exception('Invalid subscription data');
+        }
+
+        $matchedSchedule = null;
+
+        // Step 1: Get all schedules for this customer
+        $schedules = $this->stripe->subscriptionSchedules->all([
+            'customer' => $userPackage->stripe_customer_id,
+            'limit' => 100,
+        ]);
+
+        // Step 2: Find the correct schedule using metadata
+        foreach ($schedules->data as $schedule) {
+
+            // Skip canceled or completed schedules
+            if (in_array($schedule->status, ['canceled', 'completed', 'released'])) {
+                continue;
+            }
+
+            // Match using metadata (reliable in your case)
+            if (
+                isset($schedule->metadata->action) &&
+                $schedule->metadata->action === 'upgrade' &&
+                isset($schedule->metadata->user_id) &&
+                (int) $schedule->metadata->user_id === (int) $user->id
+            ) {
+                $matchedSchedule = $schedule;
+                break;
+            }
+        }
+
+        // Step 3: Cancel the schedule if found
+        if ($matchedSchedule) {
+            $this->stripe->subscriptionSchedules->cancel($matchedSchedule->id);
+        }
+
+        // Step 4: Restore current subscription
+        $this->stripe->subscriptions->update(
+            $userPackage->stripe_subscription_id,
+            [
+                'cancel_at_period_end' => false,
+            ]
+        );
+
+        // Step 5: Reset DB state
+        $userPackage->update([
+            'cancellation_requested' => 0,
+            'requested_at' => null,
+            'requested_by' => null,
+            'upgrade_to' => null,
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'Upgrade request cancelled successfully',
+            'schedule_cancelled' => $matchedSchedule ? true : false,
+        ];
+    }
     
     /**
      * Cancel/unsubscribe from subscription
@@ -186,6 +251,51 @@ class SubscriptionService{
             'cancellation_requested' => 1,
             'requested_by' => $user->id,
             'requested_at' => now()
+        ]);
+
+        return true;
+    }
+    
+    /**
+     * Cancel/unsubscribe from subscription
+     */
+    public function reSubscribe(User $user)
+    {
+        $userPackage = UserPricingPackage::where('user_id', $user->id)
+            ->where('active', 1)
+            ->first();
+
+        if (!$userPackage || !$userPackage->stripe_subscription_id) {
+            throw new \Exception('No active subscription found');
+        }
+
+        // Retrieve subscription from Stripe
+        $subscription = $this->stripe->subscriptions->retrieve(
+            $userPackage->stripe_subscription_id
+        );
+
+        // Check if it's actually scheduled to cancel
+        if (!$subscription->cancel_at_period_end) {
+            throw new \Exception('Subscription is not scheduled for cancellation');
+        }
+
+        // Restore subscription
+        $this->stripe->subscriptions->update(
+            $subscription->id,
+            [
+                'cancel_at_period_end' => false,
+                'metadata' => [
+                    'cancelled_by' => null,
+                    'user_id' => $user->id,
+                ],
+            ]
+        );
+
+        // Update DB
+        $userPackage->update([
+            'cancellation_requested' => 0,
+            'requested_by' => null,
+            'requested_at' => null,
         ]);
 
         return true;

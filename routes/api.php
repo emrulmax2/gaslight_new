@@ -130,6 +130,9 @@ Route::prefix('/v1')->name('api.')->group(function() {
 
             Route::post('users/enrolled-subscription', 'enrolledSubscription');
             Route::post('users/upgrade-subscription', 'upgradeSubscriptions');
+
+            Route::post('users/re-subscribe', 'reSubscribe');
+            Route::post('users/cancel-upgrade', 'upgradeCancellation');
         });
 
         Route::controller(UserManagementController::class)->group(function() {

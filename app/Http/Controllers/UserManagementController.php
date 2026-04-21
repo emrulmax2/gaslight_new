@@ -430,6 +430,21 @@ class UserManagementController extends Controller
         }
     }
 
+    public function reSubscribe(Request $request){
+        $currentUser = User::find(Auth::user()->id);
+        $user_id = $request->user_id;
+        $user = User::find($user_id);
+        
+        try{
+            $restul = $this->subscriptionService->reSubscribe($user);
+
+            return response()->json(['message' => 'Subscription has be successfully restored.', 'red' => ''], 200);
+        }catch(Exception $e){
+            $message = $e->getMessage();
+            return response()->json(['message' => 'Can not restored the subscription due to unexpected errors.', 'red' => ''], 422);
+        }
+    }
+
     public function paymentHistory(User $user){
         $user->load('userpackage');
         return view('app.users.payment-history', [

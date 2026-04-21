@@ -59,7 +59,7 @@ class SuperAdminAuthController extends Controller
     {
         Auth::guard('superadmin')->logout();
         Cache::flush();
-        return redirect('login');
+        return redirect('/super-admin/login');
     }
 
     

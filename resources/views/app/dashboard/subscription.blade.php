@@ -53,7 +53,40 @@
                                             <i data-lucide="check-circle" class="w-4 h-4 mr-3" style="flex: 0 0 auto; position: relative; top: 2px;"></i>
                                             <span>{{ $pack->description }}</span>
                                         </p>
-                                        @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && (!isset($userPackage->cancellation_requested) || $userPackage->cancellation_requested != 1))
+                                        @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && $userPackage->active == 1)
+                                            @if($userPackage->cancellation_requested == 1 && date('Y-m-d', strtotime($userPackage->end)) > date('Y-m-d') && ($userPackage->upgrade_to == '' || $userPackage->upgrade_to < 1))
+                                                <x-base.button data-id="{{ $user->id }}" id="reSubscribeBtn" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="warning" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="refresh-ccw" />
+                                                    Resubscribe
+                                                </x-base.button>
+                                            @elseif($pack->period != 'Free Trail' && ($userPackage->upgrade_to == '' || $userPackage->upgrade_to < 1))
+                                                <x-base.button data-id="{{ $user->id }}" id="unsubscripUserBtn" type="button" class="rounded-full px-3 w-36 text-center justify-center" variant="danger" >
+                                                    <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                                                    Cancel
+                                                </x-base.button>
+                                            @else 
+                                                <span class="inline-flex h-[38px] w-[1px]"></span>
+                                            @endif
+                                        @elseif($userPackage->package->period == 'Free Trail') 
+                                            <x-base.button as="a" href="{{ route('company.dashboard.subscribe', $pack->id) }}" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
+                                                <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                                                Get Plan
+                                            </x-base.button>
+                                        @elseif($pack->period !== 'Free Trail' && $userPackage->package->price < $pack->price && $userPackage->upgrade_to != $pack->id ) 
+                                            <x-base.button type="button" data-packid="{{ $pack->id }}" data-id="{{ $user->id }}" id="updateSubscriptionBtn" class="rounded-full px-3 w-36 text-center justify-center text-white" variant="success" >
+                                                <x-base.lucide class="mr-2 h-4 w-4" icon="check-circle" />
+                                                Upgrade Now
+                                            </x-base.button>
+                                        @elseif($pack->period !== 'Free Trail' && $userPackage->package->price < $pack->price && $userPackage->upgrade_to == $pack->id ) 
+                                            <x-base.button type="button" data-packid="{{ $pack->id }}" data-id="{{ $user->id }}" id="cancelUpgradeBtn" class="rounded-full px-3 w-auto text-center justify-center text-white" variant="danger" >
+                                                <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
+                                                Cancel Upgrade
+                                            </x-base.button>
+                                        @else 
+                                            <span class="inline-flex h-[38px] w-[1px]"></span>
+                                        @endif
+
+                                        <!-- @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && (!isset($userPackage->cancellation_requested) || $userPackage->cancellation_requested != 1))
                                             @if((isset($userPackage->pricing_package_id) && $userPackage->pricing_package_id == $pack->id) && $userPackage->active == 1)
                                                 <x-base.button data-id="{{ $user->id }}" id="unsubscripUserBtn" type="button" class="rounded-full px-3 w-36 text-center justify-center {{ $pack->period == 'Free Trail' ? 'opacity-0 -z-20' : '' }}" variant="danger" >
                                                     <x-base.lucide class="mr-2 h-4 w-4" icon="x-circle" />
@@ -70,7 +103,7 @@
                                                     Upgrade Now
                                                 </x-base.button>
                                             @endif
-                                        @endif
+                                        @endif -->
                                     </div>
                                 </div>
                             </div>
@@ -180,6 +213,34 @@
             });
         });
 
+        $(document).on('click', '#reSubscribeBtn', function(e){
+            e.preventDefault();
+            let $theBtn = $(this);
+            let user_id = $theBtn.attr('data-id');
+            let package_id = $theBtn.attr('data-packid');
+
+            confirmModal.show();
+            document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
+                $('#confirmModal .confirmModalTitle').html('Are you sure?');
+                $('#confirmModal .confirmModalDesc').html('Do you really want to resubscribe the package? If yes then please click on the agree btn.');
+                $('#confirmModal .agreeWith').attr('data-id', user_id).attr('data-package', package_id).attr('data-action', 'RESUB');
+            });
+        });
+
+        $(document).on('click', '#cancelUpgradeBtn', function(e){
+            e.preventDefault();
+            let $theBtn = $(this);
+            let user_id = $theBtn.attr('data-id');
+            let package_id = $theBtn.attr('data-packid');
+
+            confirmModal.show();
+            document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event){
+                $('#confirmModal .confirmModalTitle').html('Are you sure?');
+                $('#confirmModal .confirmModalDesc').html('Do you really want to cancel the upgrade request? If yes then please click on the agree btn.');
+                $('#confirmModal .agreeWith').attr('data-id', user_id).attr('data-package', package_id).attr('data-action', 'CANCELUPGRD');
+            });
+        });
+
         $('#confirmModal .agreeWith').on('click', function(){
             let $agreeBTN = $(this);
             let row_id = $agreeBTN.attr('data-id');
@@ -216,11 +277,72 @@
                 }).catch(error =>{
                     console.log(error)
                 });
+            }else if(action == 'RESUB'){
+                axios({
+                    method: 'POST',
+                    url: route('users.re.subscription'),
+                    data: {user_id : row_id},
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    if (response.status == 200) {
+                        $('#confirmModal button').removeAttr('disabled');
+                        confirmModal.hide();
+
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.message);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', response.data.red);
+                        });
+
+                        setTimeout(() => {
+                            successModal.hide();
+                            if(response.data.red){
+                                window.location.href = response.data.red
+                            }else{
+                                window.location.reload();
+                            }
+                        }, 2500);
+                    }
+                }).catch(error =>{
+                    console.log(error)
+                });
             }else if(action == 'UPGRADESUB'){
                 let package_id = $agreeBTN.attr('data-package');
                 axios({
                     method: 'POST',
                     url: route('company.dashboard.upgrade.subscriptions'),
+                    data: {user_id : row_id, package_id : package_id},
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    if (response.status == 200) {
+                        $('#confirmModal button').removeAttr('disabled');
+                        confirmModal.hide();
+
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.message);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', response.data.red);
+                        });
+
+                        setTimeout(() => {
+                            successModal.hide();
+                            if(response.data.red){
+                                window.location.href = response.data.red
+                            }else{
+                                window.location.reload();
+                            }
+                        }, 5000);
+                    }
+                }).catch(error =>{
+                    console.log(error)
+                });
+            }else if(action == 'CANCELUPGRD'){
+                let package_id = $agreeBTN.attr('data-package');
+                axios({
+                    method: 'POST',
+                    url: route('company.dashboard.calcel.upgrade'),
                     data: {user_id : row_id, package_id : package_id},
                     headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
                 }).then(response => {

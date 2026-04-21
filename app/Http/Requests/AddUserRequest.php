@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSuperAdminRequest extends FormRequest
+class AddUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,8 @@ class UpdateSuperAdminRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'email' => 'required|string|email|max:255|unique:super_admins,email,'.$this->id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'email' => 'required|string|email|max:255|unique:super_admins',
+            'password' => 'required|string|min:8|confirmed',
         ];
     }
 }

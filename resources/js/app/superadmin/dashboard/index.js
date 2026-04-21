@@ -1,32 +1,24 @@
-(function () {
-    "use strict";
 
+var userListTable = (function () {
+    var _tableGen = function () {        
+        let queryStr = $("#query").val() != "" ? $("#query").val() : "";
+        let status = $("#status").val() != "" ? $("#status").val() : "";
+        
 
-    // Tabulator
-    if ($("#userListTable").length) {
-        let user =
-        $('#userListTable').attr('data-user') != ''
-            ? $('#userListTable').attr('data-user')
-            : '0';
-        let queryStr = $('#query-Eng').val() != '' ? $('#query-Eng').val() : '';
-        let status = $('#status-Eng').val() != '' ? $('#status-Eng').val() : '1';
-        // Setup Tabulator
         const tabulator = new Tabulator("#userListTable", {
             ajaxURL: route('superadmin.users.list'),
             ajaxParams: {
-                user_id: user,
-                queryStr: queryStr,
-                status: status,
+                queryStr: queryStr
             },
+
             pagination: true,
             paginationMode:"remote",
-
             filterMode: "remote",
             sortMode: "remote",
             printAsHtml: true,
             printStyled: true,
-            paginationSize: 10,
-            paginationSizeSelector: [true, 5, 10, 20, 30, 40],
+            paginationSize: 50,
+            paginationSizeSelector: [true, 20, 30, 50, 100, 200, 500],
             layout: "fitColumns",
             responsiveLayout: "collapse",
             placeholder: "No matching records found",
@@ -62,10 +54,10 @@
                     formatter(cell) {
                         const response = cell.getData();
                         return `<div>
-                            <div class="font-medium whitespace-nowrap">${response.package}</div>
+                            <div class="font-medium whitespace-nowrap ${response.color}">${response.package}</div>
                             <div class="text-xs text-slate-500 whitespace-nowrap">
                                 <span class="font-medium text-success">${response.price}</span>
-                                ${response.next_renew !== '' ? ' - '+response.next_renew : ''}
+                                <span class="${response.color}">${response.next_renew !== '' ? ' - '+response.next_renew : ''}</span>
                             </div>
                         </div>`;
                     },
@@ -88,18 +80,22 @@
                     width: '250',
                     download: false,
                     formatter(cell, formatterParams) {
-                        
-                        return '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success dark:border-success w-auto ">\
-                                    Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 ml-2"></i>\
-                                </a><a href="javascript:void(0);" data-id="'+cell.getData().id+'" class="delete_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-danger border-danger dark:border-danger w-auto ">\
-                                    Delete <i data-lucide="trash-2" class="stroke-1.5 w-5 h-5 ml-2"></i>\
-                                </a>';
+                        let html = '';
+                            html += '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success dark:border-success w-auto ">\
+                                    Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 ml-2"></i></a>';
+                            if(cell.getData().is_superadmin){
+                                html += '<a href="javascript:void(0);" data-id="'+cell.getData().id+'" class="delete_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-danger border-danger dark:border-danger w-auto ">\
+                                        Delete <i data-lucide="trash-2" class="stroke-1.5 w-5 h-5 ml-2"></i>\
+                                    </a>';
+                            }
+
+                        return html;
                     },
                 },
             ],
-            ajaxResponse:function(url, params, response){
-                return response;
-            },
+            // ajaxResponse:function(url, params, response){
+            //     return response.data;
+            // },
             renderComplete() {
                 createIcons({
                     icons,
@@ -129,64 +125,57 @@
             });
         });
 
-        // Filter function
-        function filterHTMLForm() {
-            let field = $("#tabulator-html-filter-field").val();
-            let type = $("#tabulator-html-filter-type").val();
-            let value = $("#tabulator-html-filter-value").val();
-            tabulator.setFilter(field, type, value);
-        }
-
-        // On submit filter form
-        $("#tabulator-html-filter-form")[0].addEventListener(
-            "keypress",
-            function (event) {
-                let keycode = event.keyCode ? event.keyCode : event.which;
-                if (keycode == "13") {
-                    event.preventDefault();
-                    filterHTMLForm();
-                }
-            }
-        );
-
-        // On click go button
-        $("#tabulator-html-filter-go").on("click", function (event) {
-            filterHTMLForm();
-        });
-
-        // On reset filter form
-        $("#tabulator-html-filter-reset").on("click", function (event) {
-            $("#tabulator-html-filter-field").val("name");
-            $("#tabulator-html-filter-type").val("like");
-            $("#tabulator-html-filter-value").val("");
-            filterHTMLForm();
-        });
-
-        // Export
-        $("#tabulator-export-csv").on("click", function (event) {
-            tabulator.download("csv", "data.csv");
-        });
-
-        $("#tabulator-export-json").on("click", function (event) {
-            tabulator.download("json", "data.json");
-        });
-
-        $("#tabulator-export-xlsx").on("click", function (event) {
-            tabulator.download("xlsx", "data.xlsx", {
-                sheetName: "Products",
-            });
-        });
-
-        $("#tabulator-export-html").on("click", function (event) {
-            tabulator.download("html", "data.html", {
-                style: true,
-            });
-        });
-
         // Print
-        $("#tabulator-print").on("click", function (event) {
-            tabulator.print();
-        });
+        // $("#tabulator-print").on("click", function (event) {
+        //     tabulator.print();
+        // });
+
+    };
+    return {
+        init: function () {
+            _tableGen();
+        },
+    };
+})();
+
+(function () {
+    "use strict";
+
+
+    if ($("#userListTable").length) {
+        userListTable.init();
+    }
+
+    function userListTableForm() {
+        userListTable.init();
+    }
+
+    // On submit filter form
+    $("#tabulator-html-filter-form").on("keypress", function (event) {
+            let keycode = event.keyCode ? event.keyCode : event.which;
+            if (keycode == "13") {
+                event.preventDefault();
+                userListTableForm();
+            }
+        }
+    );
+
+    // On click go button
+    $("#tabulator-html-filter-go").on("click", function (event) {
+        userListTableForm();
+    });
+
+    // On reset filter form
+    $("#tabulator-html-filter-reset").on("click", function (event) {
+        $("#query").val("");
+        $("#status").val("1");
+        userListTableForm();
+    }); 
+
+
+    // Tabulator
+    if ($("#userListTable").length) {
+        
 
         const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
         const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));

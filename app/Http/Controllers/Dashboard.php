@@ -135,4 +135,19 @@ class Dashboard extends Controller
             return response()->json(['message' => 'Can not upgrade the subscription due to unexpected errors.', 'red' => ''], 422);
         }
     }
+
+    public function upgradeCancellation(Request $request){
+        $package_id = $request->package_id;
+        $user_id = $request->user_id;
+        $user = User::find($user_id);
+        $newPackage = PricingPackage::find($package_id);
+        try{
+            $result = $this->subscriptionService->cancelUpgradeRequest($user, $newPackage);
+
+            return response()->json(['message' => 'Subscription upgrade request successfully cancelled & previous package restored. ', 'red' => ''], 200);
+        }catch(Exception $e){
+            $message = $e->getMessage();
+            return response()->json(['message' => 'Can not cancel upgrade request due to unexpected errors.', 'red' => ''], 422);
+        }
+    }
 }

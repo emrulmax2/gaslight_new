@@ -11,6 +11,7 @@ use App\Models\FileRecord;
 use App\Models\Staff;
 use App\Models\User;
 use App\Models\UserPricingPackage;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Creagia\LaravelSignPad\Signature;
@@ -20,7 +21,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Number;
 use Stripe;
-use Carbon\Carbon;
 
 class ProfileController extends Controller
 {

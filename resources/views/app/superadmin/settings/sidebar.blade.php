@@ -34,7 +34,7 @@
             </li>
             <li class="hasChild mt-5">
                 <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' || Route::currentRouteName() == 'superadmin.site.setting.pricing.package' || Route::currentRouteName() == 'superadmin.site.setting.referral.code' ? 'active text-primary font-medium' : '' }}" href="javascript:void(0);">
-                    <i data-lucide="user-round-cog" class="w-4 h-4 mr-2"></i> User Settings  <i data-lucide="chevron-down" class="w-4 h-4 ml-auto menuAgnle"></i>
+                    <i data-lucide="user-round-cog" class="w-4 h-4 mr-2"></i> Engineer Settings  <i data-lucide="chevron-down" class="w-4 h-4 ml-auto menuAgnle"></i>
                 </a>
                 <ul class="p-0 m-0 pl-5" style="display: {{ Route::currentRouteName() == 'superadmin.site.setting.user.registration' || Route::currentRouteName() == 'superadmin.site.setting.pricing.package' || Route::currentRouteName() == 'superadmin.site.setting.referral.code' ? 'block' : 'none' }};">
                     <li>
@@ -94,6 +94,11 @@
                         </a>
                     </li>
                 </ul>
+            </li>
+            <li class="mt-5">
+                <a class="flex items-center {{ Route::currentRouteName() == 'superadmin.site.setting.user.manager' ? 'active text-primary font-medium' : '' }}" href="{{ route('superadmin.site.setting.user.manager') }}">
+                    <i data-lucide="users" class="w-4 h-4 mr-2"></i> Users
+                </a>
             </li>
         </ul>
     </div>
