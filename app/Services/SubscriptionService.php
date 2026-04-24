@@ -39,68 +39,105 @@ class SubscriptionService{
     /**
      * Subscribe to a plan (Monthly/Yearly)
      */
-    public function subscribe(User $user, PricingPackage $package, $paymentMethodId, $cardHolderName = null){
-        // Check if user already has an active subscription
-        $existingSubscription = UserPricingPackage::where('user_id', $user->id)
-            ->where('active', 1)->where('pricing_package_id', '>', 1)
-            ->first();
-            
-        if ($existingSubscription) {
-            throw new \Exception('You already have an active subscription');
+    public function subscribe(User $user, PricingPackage $package, $paymentMethodId, $cardHolderName = null, $autoConfirm = false){
+        try {
+            // 1. Prevent duplicate active subscription
+            $existingSubscription = UserPricingPackage::where('user_id', $user->id)
+                ->where('active', 1)
+                ->where('pricing_package_id', '>', 1)
+                ->first();
+
+            if ($existingSubscription) {
+                throw new \Exception('You already have an active subscription');
+            }
+
+            // 2. Create / get Stripe customer
+            $stripeCustomer = $this->getOrCreateStripeCustomer($user);
+
+            // 3. Attach + set default payment method
+            $this->attachPaymentMethod($stripeCustomer->id, $paymentMethodId);
+
+            // 4. Create subscription (IMPORTANT FIXES HERE)
+            $stripeSubscription = $this->stripe->subscriptions->create([
+                'customer' => $stripeCustomer->id,
+                'items' => [
+                    ['price' => $package->stripe_plan]
+                ],
+                // VERY IMPORTANT
+                'default_payment_method' => $paymentMethodId,
+                'metadata' => [
+                    'billed_to' => $cardHolderName,
+                    'user_id' => $user->id
+                ],
+                // REQUIRED for SCA (UK)
+                'payment_behavior' => 'default_incomplete',
+                // REQUIRED to access payment intent
+                'expand' => ['latest_invoice.payment_intent']
+            ]);
+
+            // 5. Extract PaymentIntent safely
+            $paymentIntent = $stripeSubscription->latest_invoice->payment_intent ?? null;
+
+            // 6. OPTIONAL: Auto confirm (API only)
+            if (
+                $autoConfirm &&
+                $paymentIntent &&
+                $paymentIntent->status === 'requires_confirmation'
+            ) {
+                $paymentIntent = $this->stripe->paymentIntents->confirm(
+                    $paymentIntent->id,
+                    [
+                        'payment_method' => $paymentMethodId
+                    ]
+                );
+            }
+
+            // 7. Dates
+            $currentPeriodStart = Carbon::createFromTimestamp(
+                $stripeSubscription->current_period_start
+            );
+
+            $currentPeriodEnd = Carbon::createFromTimestamp(
+                $stripeSubscription->current_period_end
+            );
+
+            // 8. Save locally (inactive until webhook)
+            $userSubscription = UserPricingPackage::create([
+                'user_id' => $user->id,
+                'pricing_package_id' => $package->id, // or trial package if needed
+                'stripe_customer_id' => $stripeCustomer->id,
+                'stripe_subscription_id' => $stripeSubscription->id,
+                'start' => $currentPeriodStart,
+                'end' => $currentPeriodEnd,
+                'price' => $package->price,
+                'active' => 0, // wait for webhook
+                'cancellation_requested' => 0,
+                'created_by' => $user->id,
+                'updated_by' => $user->id
+            ]);
+
+            // 9. Store invoice
+            if (!empty($stripeSubscription->latest_invoice)) {
+                $this->createInvoiceRecord($user, $userSubscription, $stripeSubscription);
+            }
+
+            return [
+                'success' => true,
+                'subscription' => $userSubscription,
+                'stripe_subscription_id' => $stripeSubscription->id,
+                'client_secret' => $paymentIntent->client_secret ?? null,
+                'payment_status' => $paymentIntent->status ?? null
+            ];
+
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            // Stripe-specific error
+            Log::error('Stripe Error: ' . $e->getMessage());
+            throw new \Exception($e->getMessage());
+        } catch (\Exception $e) {
+            // General error
+            Log::error('Subscription Error: ' . $e->getMessage());
+            throw $e;
         }
-        
-        // Create or get Stripe customer
-        $stripeCustomer = $this->getOrCreateStripeCustomer($user);
-        // Attach payment method
-        $this->attachPaymentMethod($stripeCustomer->id, $paymentMethodId);
-        
-        // Prepare subscription data
-        $subscriptionData = [
-            'customer' => $stripeCustomer->id,
-            'items' => [
-                ['price' => $package->stripe_plan]
-            ],
-            'currency' => 'GBP',
-            'metadata' => [
-                'billed_to' => $cardHolderName,
-                'user_id' => $user->id
-            ],
-            'payment_behavior' => 'default_incomplete',
-            'expand' => ['latest_invoice.payment_intent']
-        ];
-        
-        // Create Stripe subscription
-        $stripeSubscription = $this->stripe->subscriptions->create($subscriptionData);
-        
-        // Get dates from Stripe subscription
-        $currentPeriodStart = Carbon::createFromTimestamp($stripeSubscription->current_period_start);
-        $currentPeriodEnd = Carbon::createFromTimestamp($stripeSubscription->current_period_end);
-        
-        // Create local subscription record
-        $userSubscription = UserPricingPackage::updateOrCreate(['user_id' => $user->id], [
-            'user_id' => $user->id,
-            'pricing_package_id' => $package->id,
-            'stripe_customer_id' => $stripeCustomer->id,
-            'stripe_subscription_id' => $stripeSubscription->id,
-            'start' => $currentPeriodStart,
-            'end' => $currentPeriodEnd,
-            'price' => $package->price,
-            'active' => 0,
-            'cancellation_requested' => 0,
-            'created_by' => $user->id,
-            'updated_by' => $user->id
-        ]);
-        
-        // Create invoice record
-        if ($stripeSubscription->latest_invoice) {
-            $this->createInvoiceRecord($user, $userSubscription, $stripeSubscription);
-        }
-        
-        return [
-            'subscription' => $userSubscription,
-            'stripe_subscription' => $stripeSubscription,
-            'client_secret' => $stripeSubscription->latest_invoice->payment_intent->client_secret ?? null
-        ];
     }
     
     /**
@@ -518,29 +555,33 @@ class SubscriptionService{
             $periodEnd   = Carbon::createFromTimestamp($line['period']['end']);
 
             if ($invoice['billing_reason'] === 'subscription_create'):
-                // DEACTIVE PREVOUS PACK
-                UserPricingPackage::where('user_id', $user_id)
-                    ->where('active', 1)
-                    ->update([
-                        'active' => 0, 
-                        'cancellation_requested' => 0, 
-                        'requested_by' => null,
-                        'requested_at' => null,
-                        'upgrade_to' => null,
+                $subscription_id = $subscription->id;
+                // find existing (created during subscribe)
+                $userPackage = UserPricingPackage::where('stripe_subscription_id', $subscription_id)
+                    ->latest()
+                    ->first();
+
+                if ($userPackage) {
+                    // deactivate previous active subscription
+                    UserPricingPackage::where('user_id', $user_id)
+                        ->where('active', 1)
+                        ->update([
+                            'active' => 0,
+                            'cancellation_requested' => 0,
+                            'requested_by' => null,
+                            'requested_at' => null,
+                            'upgrade_to' => null,
+                            'updated_by' => $user_id,
+                        ]);
+
+                    // UPDATE instead of CREATE
+                    $userPackage->update([
+                        'start' => $periodStart->toDateString(),
+                        'end' => $periodEnd->toDateString(),
+                        'active' => 1,
                         'updated_by' => $user_id,
                     ]);
-                // ADD NEW PAC
-                $userPackage = UserPricingPackage::create([
-                    'user_id' => $user_id,
-                    'pricing_package_id' => $package->id,
-                    'stripe_customer_id' => $subscription->customer,
-                    'stripe_subscription_id' => $subscription->id,
-                    'start' => $periodStart->toDateString(),
-                    'end' => $periodEnd->toDateString(),
-                    'price' => $package->price,
-                    'active' => 1,
-                    'created_by' => $user_id,
-                ]);
+                }
 
                 $subject = 'Your subscription is now active';
 

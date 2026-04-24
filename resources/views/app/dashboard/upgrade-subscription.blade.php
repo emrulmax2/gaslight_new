@@ -269,6 +269,8 @@
                     }
                 }
             });
+            // console.log(paymentMethod.id);
+            // return false;
 
             if (error) {
                 $('input[name="token"]', $theForm).remove();

@@ -111,6 +111,10 @@
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
                 <span class="font-medium text-slate-500 text-sm">
                     Manage Subscription
+                    <span class="ml-3 font-medium text-xs text-success">
+                        {{ ($user->userpackage->package->title ? '['.$user->userpackage->package->title.']' : '') }}
+                        {!! (isset($user->userpackage->end) && !empty($user->userpackage->end) ? '<span class="ml-2">[Ended On: '.date('jS F, Y', strtotime($user->userpackage->end)).']</span>' : '') !!}
+                    </span>
                 </span>
             </a>
             
