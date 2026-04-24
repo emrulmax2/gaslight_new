@@ -171,7 +171,7 @@ class UserSubscriptionController extends Controller
             $user = User::find($user_id);
             $pricingPackage = PricingPackage::findOrFail($request->pricing_package_id);
             
-            $result = $this->subscriptionService->subscribe($user, $pricingPackage, $request->token, $request->card_holder_name);
+            $result = $this->subscriptionService->subscribe($user, $pricingPackage, $request->token, $request->card_holder_name, true);
             
             return response()->json([
                 'message' => 'Your subscription plan upgraded request to '.$pricingPackage->title.' successfully submitted.', 
