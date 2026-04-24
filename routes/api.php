@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\GlobalApiController;
 use App\Http\Controllers\Api\JobForms\JobFormController;
 use App\Http\Controllers\Api\Jobs\JobsController;
+use App\Http\Controllers\Api\LocalStorageController;
 use App\Http\Controllers\Api\Pricing\PricingPackageController;
 use App\Http\Controllers\Api\Records\InspectionNotificationController;
 use App\Http\Controllers\Api\Records\InvoiceController;
@@ -256,6 +257,11 @@ Route::prefix('/v1')->name('api.')->group(function() {
         Route::controller(JobFormController::class)->group(function() {
             Route::get('form/list', 'list');
             Route::get('form/template', 'formTemplate');
+        });
+
+        Route::controller(LocalStorageController::class)->group(function() {
+            Route::get('user-property-list/{user_id}', 'getUsersJobAddress');
+            Route::get('user-occupant-list/{user_id}', 'getUsersOccupants');
         });
 
     });
