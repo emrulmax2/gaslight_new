@@ -23,50 +23,29 @@ import INTAddressLookUps from "../address_lookup";
 
     $('#resendOtp').on('click', function(e){
         e.preventDefault();
+
         let $theLink = $(this);
         $('.error-otp').html('');
+        if ($theLink.hasClass('processing')) return;
 
-        if(!$theLink.hasClass('processing')){
-            $theLink.addClass('processing opacity-4');
+        // prevent double click
+        if (window.turnstileRunning) return;
 
-            let $theEmailInput = $('#email');
-            let theEmail = $theEmailInput.val();
+        $theLink.addClass('processing opacity-4');
+        let theEmail = $('#email').val();
 
-            turnstile.render("#turnstile-container", {
-                sitekey: window.turnstileSiteKey,
-                size: "invisible",
-                callback: function (cfToken) {
-                    $.ajax({
-                        type: 'POST',
-                        data: {
-                            email : theEmail,
-                            reg_token    : window.regToken,
-                            cf_token     : cfToken
-                        },
-                        url: route('register.generate.email.otp'),
-                        headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-                        async: false,
-                        success: function(data) {
-                            $('#countDownHtml').fadeOut('fast', function(){
-                                $('#resendOtp', this).removeClass('processing opacity-4');
-                            });
-                            countDownClock('countdown', 180);
-                        },
-                        error:function(e){
-                            $('.error-otp').html('Try again later.')
-                            clearInterval(countDowns);
-                            $('#countdown').fadeOut().html('');
-                            console.log('Error');
+        // store context (same pattern as before)
+        window.turnstileContext = {
+            stepId: 'resendOtp',
+            email: theEmail,
+            link: $theLink
+        };
 
-                            setTimeout(() => {
-                                $('.error-otp').html('')
-                            }, 5000);
-                        }
-                    });
-                }
-            });
-        }
-    })
+        window.turnstileRunning = true;
+        console.log('Resend → executing Turnstile');
+
+        turnstile.execute(window.turnstileWidget);
+    });
 
     $('.otpCodes').on('paste', function (e) {
         let pasteData = (e.originalEvent || e).clipboardData.getData('text'); 
@@ -83,6 +62,124 @@ import INTAddressLookUps from "../address_lookup";
             $(this).next('.otpCodes').focus();
         }
     });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof turnstile !== "undefined" && document.getElementById("turnstile-container")) {
+
+            window.turnstileRunning = false;
+
+            window.turnstileWidget = turnstile.render("#turnstile-container", {
+                sitekey: window.turnstileSiteKey,
+                size: "normal", // invisible
+                callback: function (token) {
+                    window.turnstileToken = token;
+                    const theBtn = document.querySelector('#stepMobileNumber .form-wizard-next-btn');
+                    theBtn.removeAttribute("disabled");
+                    
+                    // prevent multiple fires
+                    if (!window.turnstileRunning) return;
+                    window.turnstileRunning = false;
+                    console.log('Turnstile callback fired');
+
+
+                    handleTurnstileSuccess(token);
+                }
+            });
+
+        } else {
+            console.error("Turnstile not loaded or container missing");
+        }
+    });
+
+    function handleTurnstileSuccess(cfToken) {
+        const ctx = window.turnstileContext;
+        if (!ctx) return;
+
+        // prevent duplicate execution
+        window.turnstileRunning = false;
+
+        /**
+         * =========================
+         * STEP 1: FIRST OTP SEND
+         * =========================
+         */
+        if (ctx.stepId === 'stepMobileNumber') {
+            const { $theStep, nextBtn, email } = ctx;
+            axios.post(route('register.generate.email.otp'), {
+                email: email,
+                reg_token: window.regToken,
+                cf_token: cfToken
+            }, { 
+                headers:{ 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            }).then(function(response){
+                nextBtn.removeAttr('disabled');
+                nextBtn.find('.theLoader').fadeOut();
+
+                $theStep.find('.acc__input-error').fadeOut().html('');
+                $theStep.find('.otpCodes').val('');
+
+                $('#stepVerifiedOtp .mobileNumberShow').text(email);
+                $('#countDownHtml').fadeOut('fast', function(){
+                    $('#resendOtp', this).removeClass('processing opacity-4');
+                });
+
+                countDownClock('countdown', 180);
+                goNextStep(nextBtn);
+
+                turnstile.reset(window.turnstileWidget);
+            }).catch(function(error){
+                nextBtn.removeAttr('disabled');
+                nextBtn.find('.theLoader').fadeOut();
+
+                console.log('Error:', error);
+                turnstile.reset(window.turnstileWidget);
+            });
+            return;
+        }
+
+        /**
+         * =========================
+         * STEP 2: RESEND OTP
+         * =========================
+         */
+        if (ctx.stepId === 'resendOtp') {
+            const { email, link } = ctx;
+            $.ajax({
+                type: 'POST',
+                url: route('register.generate.email.otp'),
+                data: {
+                    email: email,
+                    reg_token: window.regToken,
+                    cf_token: cfToken
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function () {
+                    $('#countDownHtml').fadeOut('fast', function(){
+                        link.removeClass('processing opacity-4');
+                    });
+                    countDownClock('countdown', 180);
+                    turnstile.reset(window.turnstileWidget);
+                },
+                error: function (e) {
+                    console.log('Resend Error:', e);
+                    $('.error-otp').html('Try again later.');
+                    link.removeClass('processing opacity-4');
+
+                    clearInterval(countDowns);
+                    $('#countdown').fadeOut().html('');
+
+                    turnstile.reset(window.turnstileWidget);
+                    setTimeout(() => {
+                        $('.error-otp').html('');
+                    }, 5000);
+                }
+            });
+            return;
+        }
+    }
 
     $('.form-wizard-next-btn').on('click', function (e) {
         e.preventDefault();
@@ -107,80 +204,22 @@ import INTAddressLookUps from "../address_lookup";
             }
 
             if(theSetpError == 0){
-                turnstile.render("#turnstile-container", {
-                    sitekey: window.turnstileSiteKey,
-                    size: "invisible",
-                    callback: function (cfToken) {
-                        axios.post(route('register.generate.email.otp'), {
-                                email : $theStep.find('#email').val(),
-                                reg_token    : window.regToken,
-                                cf_token     : cfToken
-                            }, { 
-                            headers:{ 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-                        }).then(function(response){
-                            next.removeAttr('disabled');
-                            next.find('.theLoader').fadeOut();
-                            $theStep.find('.acc__input-error').fadeOut().html('');
+                // prevent double execution
+                if (window.turnstileRunning) return;
 
-                            $theStep.find('.otpCodes').val('');
-                            //$('#stepVerifiedOtp .mobileNumberShow').text('+44('+theMobileNumber.substr(0,1)+')'+theMobileNumber.substr(1,10));
-                            $('#stepVerifiedOtp .mobileNumberShow').text(email);
+                window.turnstileRunning = true;
+                // store context
+                window.turnstileContext = {
+                    stepId: the_id,
+                    $theStep: $theStep,
+                    nextBtn: next,
+                    email: $theStep.find('#email').val()
+                };
 
-                            $('#countDownHtml').fadeOut('fast', function(){
-                                $('#resendOtp', this).removeClass('processing opacity-4');
-                            });
-                            countDownClock('countdown', 180);
-                            nextWizardStep = true;
-                            goNextStep(next);
-                        }).catch(function(error){
-                            next.removeAttr('disabled');
-                            next.find('.theLoader').fadeOut();
-                            let responseData = error.response.data;
-                            //$theStep.find('.error-mobile').fadeIn().html(responseData.message ?? 'Something went wrong.');
+                console.log('Executing Turnstile');
+                turnstile.execute(window.turnstileWidget);
 
-                            if(error.response.status == 429){
-                                next.removeAttr('disabled');
-                                next.find('.theLoader').fadeOut();
-                                $theStep.find('.acc__input-error').fadeOut().html('');
-
-                                $theStep.find('.otpCodes').val('');
-                                $('#stepVerifiedOtp .mobileNumberShow').text(email);
-                                $('#stepVerifiedOtp .error-otp').html(error.response.data.message);
-                                setTimeout(() => {
-                                    $('#stepVerifiedOtp .error-otp').html('');
-                                }, 5000);
-
-                                $('#countDownHtml').fadeOut('fast', function(){
-                                    $('#resendOtp', this).removeClass('processing opacity-4');
-                                });
-                                $('#countdown').fadeIn();
-                                countDownClock('countdown', 180);
-                                nextWizardStep = true;
-                                goNextStep(next);
-                            } else if (error.response.status == 422) {
-                                for (const [key, val] of Object.entries(error.response.data.errors)) {
-                                    $(`#stepMobileNumber .${key}`).addClass('border-danger');
-                                    $(`#stepMobileNumber  .error-${key}`).html(val);
-                                }
-                            } else if (error.response.status == 400) {
-                                $('#stepMobileNumber').prepend('<div role="alert" class="formError alert relative border rounded-md px-3 py-2 bg-danger border-danger bg-opacity-20 border-opacity-5 text-danger dark:border-danger dark:border-opacity-20 mb-5 flex items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-octagon" class="lucide lucide-alert-octagon stroke-1.5 mr-2 h-6 w-6"><path d="M12 16h.01"></path><path d="M12 8v4"></path><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"></path></svg>'+error.response.data.message+'</div>')
-
-                                setTimeout(() => {
-                                    $('#stepMobileNumber .formError').remove();
-                                    $('#stepMobileNumber .acc__input-error').html('');
-                                }, 2500);
-                            } else {
-                                console.log('error');
-                            }
-
-                            clearInterval(countDowns);
-                            $('#countdown').fadeOut().html('');
-                            $theStep.find('.otpCodes').val('');
-
-                            nextWizardStep = false;
-                        });
-                    }
-                });
+                
             }else{
                 next.removeAttr('disabled');
                 next.find('.theLoader').fadeOut();

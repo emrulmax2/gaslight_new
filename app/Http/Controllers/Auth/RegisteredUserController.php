@@ -511,7 +511,7 @@ class RegisteredUserController extends Controller
             ['email' => $request->email],
             [
                 'otp' => Hash::make($otp),
-                'expires_at' => now()->addMinutes(5)
+                'expires_at' => now()->addMinutes(3)
             ]
         );
 
