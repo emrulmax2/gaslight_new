@@ -714,148 +714,17 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/app/register.js')
     <script type="module">
         // Set Registration Token to Window Data.
         window.regToken = "{{ $regToken }}";
         window.turnstileSiteKey = "{{ config('services.turnstile.key') }}";
 
-        document.addEventListener("DOMContentLoaded", function () {
-            if (typeof turnstile !== "undefined" && document.getElementById("turnstile-container")) {
-                window.turnstileWidget = turnstile.render("#turnstile-container", {
-                    sitekey: window.turnstileSiteKey,
-                    callback: function (token) {
-                        window.turnstileToken = token;
-                        const theBtn = document.querySelector('#stepMobileNumber .form-wizard-next-btn');
-                        theBtn.removeAttribute("disabled");
-                    }
-                });
-            } else {
-                console.error("Turnstile not loaded or container missing");
-            }
-        });
-
         (function () {
             document.addEventListener('DOMContentLoaded', function () {
             lucide.createIcons();
         });
-
-       
-            // async function register() {
-            //     // Reset state
-            //     $('#register-form').find('.register__input').removeClass('border-danger')
-            //     $('#register-form').find('.register__input-error').html('')
-
-            //     // Create FormData object
-            //     let formData = new FormData(document.getElementById('register-form'));
-
-            //     $('.register-text').addClass('hidden');
-            //     $('#btn-register .register__loading').removeClass('hidden');
-            //     // Loading state
-            //     await helper.delay(1500)
-
-            //     axios.post(route('register'), formData)
-            //         .then(res => {
-            //             // Show Toastify message
-            //             $("#register-success").removeClass('hidden');
-
-            //             // Redirect to login after a short delay
-            //             setTimeout(() => {
-            //                 location.href = route('login');
-            //             }, 3000);
-            //         })
-            //         .catch(err => {
-            //             $('#btn-register .register__loading').addClass('hidden');
-            //             $('.register-text').removeClass('hidden');
-            //             if (err.response && err.response.data.errors) {
-            //                 for (const [key, val] of Object.entries(err.response.data.errors)) {
-            //                     $(`#${key}`).addClass('border-danger')
-            //                     $(`#error-${key}`).html(val)
-            //                 }
-            //             } else if (err.response && err.response.data.error) {
-            //                 Toastify({
-            //                     text: err.response.data.error,
-            //                     duration: 3000,
-            //                     close: true,
-            //                     gravity: "top", // `top` or `bottom`
-            //                     position: "right", // `left`, `center` or `right`
-            //                     backgroundColor: "#FF0000",
-            //                 }).showToast();
-            //             }
-            //         });
-            // }
-
-            // $('#register-form').on('keyup', function(e) {
-            //     if (e.keyCode === 13) {
-            //         if($('#register-form #referral_code').val() != ''){
-            //             $('.register-text').addClass('hidden');
-            //             $('#btn-register .register__loading').removeClass('hidden');
-            //             $.ajax({
-            //                 type: 'POST',
-            //                 data: {referral_code : $('#register-form #referral_code').val()},
-            //                 url: route('register.validate.referral'),
-            //                 headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            //                 async: false,
-            //                 success: function(data) {
-            //                     $('.register-text').removeClass('hidden');
-            //                     $('#btn-register .register__loading').addClass('hidden');
-            //                     if(data.suc == 1){
-            //                         register();
-            //                     }else{
-            //                         $('#register-form').find('#referral_code').val('').addClass('border-danger')
-            //                         $('#register-form').find('.referral_code__input-error').html('Invalid referral code.');
-
-            //                         setTimeout(() => {
-            //                             $('#register-form').find('#referral_code').removeClass('border-danger')
-            //                             $('#register-form').find('.referral_code__input-error').html('');
-            //                         }, 2000);
-            //                     }
-            //                 },
-            //                 error:function(e){
-            //                     console.log('Error');
-            //                 }
-            //             });
-            //         }else{
-            //             register();
-            //         }
-            //     }
-            // })
-
-            // $('#btn-register').on('click', function() {
-            //     if($('#register-form #referral_code').val() != ''){
-            //         $('.register-text').addClass('hidden');
-            //         $('#btn-register .register__loading').removeClass('hidden');
-            //         $.ajax({
-            //             type: 'POST',
-            //             data: {referral_code : $('#register-form #referral_code').val()},
-            //             url: route('register.validate.referral'),
-            //             headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
-            //             async: false,
-            //             success: function(data) {
-            //                 $('.register-text').removeClass('hidden');
-            //                 $('#btn-register .register__loading').addClass('hidden');
-            //                 if(data.suc == 1){
-            //                     register();
-            //                 }else{
-            //                     $('#register-form').find('#referral_code').val('').addClass('border-danger')
-            //                     $('#register-form').find('.referral_code__input-error').html('Invalid referral code.');
-
-            //                     setTimeout(() => {
-            //                         $('#register-form').find('#referral_code').removeClass('border-danger')
-            //                         $('#register-form').find('.referral_code__input-error').html('');
-            //                     }, 2000);
-            //                 }
-            //             },
-            //             error:function(e){
-            //                 console.log('Error');
-            //             }
-            //         });
-            //     }else{
-            //         register();
-            //     }
-            // })
-
             
         })();
     </script>
+    @vite('resources/js/app/register.js')
 @endPushOnce
