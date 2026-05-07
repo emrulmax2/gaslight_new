@@ -54,7 +54,7 @@
                     <span class="font-normal text-slate-400 text-xs block">Change password</span>
                 </div>
             </a>
-            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Gas Safe ID Card" data-field="gas_safe_id_card" data-value="{{ $user->gas_safe_id_card }}" class="fieldValueToggler border-b flex w-full items-start px-5 py-3">
+            <a href="javascript:void(0);" data-type="text" data-required="0" data-title="Gas Safe ID Card" data-field="gas_safe_id_card" data-value="{{ $user->gas_safe_id_card }}" class=" border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success"  style="margin-top: 2px;" icon="id-card" />
                 <div>
                     <span class="font-medium text-slate-500 text-sm block">Gas Safe ID Card</span>
@@ -107,13 +107,17 @@
     <div class="settingsBox mt-5">
         <h3 class="font-medium leading-none mb-3 text-dark">Subscriptions</h3>
         <div class="box rounded-md p-0 overflow-hidden">
-            <a href="{{ route('company.dashboard.manage.subscriptions') }}" class="border-b flex w-full items-center px-5 py-3">
+            <a href="{{ route('company.dashboard.manage.subscriptions') }}" class="border-b flex w-full items-start px-5 py-3">
                 <x-base.lucide class="h-4 w-4 mr-2 stroke-2 text-success" icon="user" style="margin-top: -2px;" />
                 <span class="font-medium text-slate-500 text-sm">
                     Manage Subscription
-                    <span class="ml-3 font-medium text-xs text-success">
-                        {{ ($user->userpackage->package->title ? '['.$user->userpackage->package->title.']' : '') }}
-                        {!! (isset($user->userpackage->end) && !empty($user->userpackage->end) ? '<span class="ml-2">[Ended On: '.date('jS F, Y', strtotime($user->userpackage->end)).']</span>' : '') !!}
+                    <span class="font-medium text-xs text-success block">
+                        Current subscription: {{ ($user->userpackage->package->period ? $user->userpackage->package->period : '') }} 
+                        <br/>
+                        {{ (isset($user->userpackage->cancellation_requested) && $user->userpackage->cancellation_requested == 1 ? 'Will end ' : 'Next renew ')}}
+                        {!! (isset($user->userpackage->end) && !empty($user->userpackage->end) ? date('jS F, Y', strtotime($user->userpackage->end)) : '') !!}
+                        
+                        <!-- {!! (isset($user->userpackage->end) && !empty($user->userpackage->end) ? '<span class="ml-2">[Ended On: '.date('jS F, Y', strtotime($user->userpackage->end)).']</span>' : '') !!} -->
                     </span>
                 </span>
             </a>

@@ -158,7 +158,7 @@ class CompanyController extends Controller
             'company_registration' => ($request->business_type == 'Company' && !empty($request->company_registration) ? $request->company_registration : null),
             'display_company_name' => (!empty($request->display_company_name) && $request->display_company_name > 0 ? $request->display_company_name : 0),
 
-            'gas_safe_registration_no' => (!empty($request->gas_safe_registration_no) ? $request->gas_safe_registration_no : null),
+            //'gas_safe_registration_no' => (!empty($request->gas_safe_registration_no) ? $request->gas_safe_registration_no : null),
             'registration_no' => (!empty($request->registration_no) ? $request->registration_no : null),
             'register_body_id' => (!empty($request->register_body_id) ? $request->register_body_id : null),
             'registration_body_for_legionella' => (!empty($request->registration_body_for_legionella) ? $request->registration_body_for_legionella : null),
