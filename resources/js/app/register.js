@@ -63,6 +63,10 @@ import INTAddressLookUps from "../address_lookup";
         }
     });
 
+    if ($('#userRegistrationForm').attr('data-initintval') == 1) {
+        countDownClock('countdown', 180);
+    }
+
 
     document.addEventListener("DOMContentLoaded", function () {
         if (typeof turnstile !== "undefined" && document.getElementById("turnstile-container")) {
