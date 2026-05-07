@@ -32,13 +32,13 @@
                         </a>
                     </div>
                 </div>
-                <form class="form-wizard" id="userRegistrationForm" action="#" enctype="multipart/form-data">
-                    <div class="wizard-fieldset mt-10 show" id="stepMobileNumber">
+                <form class="form-wizard" data-initintval="{{ session()->has('otp_pending') ? '1' : '0' }}" id="userRegistrationForm" action="#" enctype="multipart/form-data">
+                    <div class="wizard-fieldset mt-10 {{ session()->has('otp_pending') ? '' : 'show' }}" id="stepMobileNumber">
                         <div class="text-base font-medium">Account Information</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5">
                             <div class="intro-y col-span-12">
                                 <x-base.form-label for="name">Email <span class="text-danger ml-2">*</span></x-base.form-label>
-                                <x-base.form-input id="email" name="email" type="email" class="require" />
+                                <x-base.form-input value="{{ session()->has('otp_pending') && session()->has('otp_email') ? session('otp_email') : '' }}" id="email" name="email" type="email" class="require" />
                                 <div class="acc__input-error error-email mt-2 text-danger text-left text-xs"></div>
                             </div>
                             <div class="intro-y col-span-12 pt-3">
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="wizard-fieldset mt-10" id="stepVerifiedOtp">
+                    <div class="wizard-fieldset mt-10  {{ session()->has('otp_pending') ? 'show' : '' }}" id="stepVerifiedOtp">
                         <div class="text-base font-medium">OTP Verification</div>
                         <div class="mt-5 grid grid-cols-12 gap-4 gap-y-5">
                             <div class="intro-y col-span-12">

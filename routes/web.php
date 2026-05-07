@@ -269,6 +269,8 @@ Route::controller(RegisteredUserController::class)->middleware(loggedin::class)-
 
     Route::post('register/generate-email-top', 'generateEmailOtp')->name('register.generate.email.otp');
     Route::post('register/validate-email-top', 'validateEmailOtp')->name('register.validate.email.otp');
+
+    Route::get('register/go', 'goForWeb')->name('register.go');
 });
 
 Route::middleware(Authenticate::class)->group(function() {

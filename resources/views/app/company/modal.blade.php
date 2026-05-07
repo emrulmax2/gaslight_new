@@ -13,10 +13,10 @@
                         <x-base.form-input class="cap-fullname" type="text" id="company_name" name="company_name" value="{{ isset($company->company_name) ? $company->company_name : '' }}" />
                         <div class="acc__input-error error-company_name text-danger text-xs mt-1"></div>
                     </div>
-                    <div class="col-span-12 sm:col-span-4">
+                    <!-- <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label for="gas_safe_registration_no">Gas Safe Registration No</x-base.form-label>
                         <x-base.form-input type="text" name="gas_safe_registration_no"  value="{{ isset($company->gas_safe_registration_no) ? $company->gas_safe_registration_no : '' }}"/>
-                    </div>
+                    </div> -->
                     <div class="col-span-12 sm:col-span-4">
                         <x-base.form-label for="business_type">Company Business Type <span class="text-danger ml-2">*</span></x-base.form-label>
                         <x-base.tom-select id="business_type" name="business_type" class="w-full">

@@ -595,5 +595,35 @@ class RegisteredUserController extends Controller
             'message' => 'OTP verified. Continue to next step.'
         ], 200);
     }
+
+    public function goForWeb(Request $request){
+        $email = $request->query('email');
+
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect('/register');
+        }
+
+        $record = EmailRegisterOtp::where('email', $email)->first();
+
+        // OTP not found
+        if (!$record) {
+            session()->forget(['otp_pending', 'otp_email']);
+            return redirect('/register');
+        }
+
+        // Expired
+        if ($record->isExpired()) {
+            $record->delete();
+
+            session()->forget(['otp_pending', 'otp_email']);
+            return redirect('/register');
+        }
+
+        session([
+            'otp_pending' => true,
+            'otp_email'   => $email
+        ]);
+        return redirect('/register');
+    }
     
 }
