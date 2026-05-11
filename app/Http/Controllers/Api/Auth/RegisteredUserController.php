@@ -59,6 +59,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->input('password')),
             'gas_safe_id_card' => (isset($request->gas_safe_id_card) && !empty($request->gas_safe_id_card) ? $request->gas_safe_id_card : null),
             'role' => 'admin',
+            'active' => 1,
             'first_login' => 0
         ]);
         if($user->id):

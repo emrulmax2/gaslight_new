@@ -27,6 +27,7 @@ var userListTable = (function () {
                     title: 'Name',
                     field: 'name',
                     headerHozAlign: 'left',
+                    width: '180',
                     formatter(cell) {
                         const response = cell.getData();
                         return `<div>
@@ -62,30 +63,39 @@ var userListTable = (function () {
                         </div>`;
                     },
                 },
-                // {
-                //     title: 'Status',
-                //     field: 'status',
-                //     headerHozAlign: 'left',
-                //     formatter(cell) {
-                //         const response = cell.getData();
-                //         return (response.status == 1 ? '<span class="bg-success text-xs text-white font-medium leading-none px-2 py-0.5">Active</span>' : '<span class="bg-danger text-xs text-white font-medium leading-none px-2 py-0.5">Inactive</span>')
-                //     },
-                // },
+                {
+                    title: 'Status',
+                    field: 'status',
+                    headerHozAlign: 'left',
+                    formatter(cell) {
+                        const response = cell.getData();
+                        return (response.status == 2 ? '<span class="bg-warning text-xs text-white font-medium leading-none px-2 py-0.5">Suspended</span>' : '<span class="bg-success text-xs text-white font-medium leading-none px-2 py-0.5">Active</span>')
+                    },
+                },
                 {
                     title: 'Actions',
                     field: 'id',
                     headerSort: false,
                     hozAlign: 'right',
                     headerHozAlign: 'right',
-                    width: '250',
+                    //width: '250',
                     download: false,
                     formatter(cell, formatterParams) {
                         let html = '';
-                            html += '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success dark:border-success w-auto ">\
-                                    Login As <i data-lucide="log-in" class="stroke-1.5 w-5 h-5 ml-2"></i></a>';
+                            html += '<a target="__blank" href="'+cell.getData().impersonate_url+'" class="transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1 px-2 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-primary border-primary dark:border-success w-auto ">\
+                                    Login As <i data-lucide="log-in" class="stroke-1.5 w-3 h-3 ml-1"></i></a>';
                             if(cell.getData().is_superadmin){
-                                html += '<a href="javascript:void(0);" data-id="'+cell.getData().id+'" class="delete_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1.5 px-3 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-danger border-danger dark:border-danger w-auto ">\
-                                        Delete <i data-lucide="trash-2" class="stroke-1.5 w-5 h-5 ml-2"></i>\
+                                if(cell.getData().status == 1){
+                                    html += '<a href="javascript:void(0);" data-id="'+cell.getData().id+'" data-status="'+cell.getData().status+'" class="update_statu_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1 px-2 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-warning border-warning dark:border-danger w-auto ">\
+                                        Suspend <i data-lucide="circle-x" class="stroke-1.5 w-3 h-3 ml-1"></i>\
+                                    </a>';
+                                }else if(cell.getData().status == 2){
+                                    html += '<a href="javascript:void(0);" data-id="'+cell.getData().id+'" data-status="'+cell.getData().status+'" class="update_statu_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1 px-2 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-success border-success dark:border-danger w-auto ">\
+                                        Activate <i data-lucide="circle-check" class="stroke-1.5 w-3 h-3 ml-1"></i>\
+                                    </a>';
+                                }
+                                html += '<a href="javascript:void(0);" data-id="'+cell.getData().id+'" class="delete_row ml-2 transition text-white duration-200 border shadow-sm inline-flex items-center justify-center text-xs py-1 px-2 rounded-sm font-medium cursor-pointer focus:ring-4 focus:ring-danger focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-danger border-danger dark:border-danger w-auto ">\
+                                        Delete <i data-lucide="trash-2" class="stroke-1.5 w-3 h-3 ml-1"></i>\
                                     </a>';
                             }
 
@@ -179,9 +189,15 @@ var userListTable = (function () {
 
         const successModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#successModal"));
         const confirmModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#confirmModal"));
+        const suspensionModal = tailwind.Modal.getOrCreateInstance(document.querySelector("#suspensionModal"));
 
         document.getElementById('successModal').addEventListener('hide.tw.modal', function(event) {
             $('#successModal .agreeWith').attr('data-action', 'NONE').attr('data-redirect', '');
+        });
+
+        document.getElementById('suspensionModal').addEventListener('hide.tw.modal', function(event) {
+            $('#suspensionModal [name="user_id"]').val('0');
+            $('#suspensionModal .error-suspension_reason_id').html('');
         });
 
         $('#successModal .agreeWith').on('click', function(e){
@@ -207,6 +223,26 @@ var userListTable = (function () {
                 $('#confirmModal .agreeWith').attr('data-id', id);
                 $('#confirmModal .agreeWith').attr('data-action', 'DELETE');
             });
+        });
+
+        $('#userListTable').on("click", '.update_statu_row', function () {
+            let id = $(this).attr('data-id');
+            let status = $(this).attr('data-status');
+
+            if(status == 1){
+                suspensionModal.show();
+                document.getElementById('suspensionModal').addEventListener('shown.tw.modal', function(event) {
+                    $('#suspensionModal input[name="user_id"]').val(id);
+                });
+            }else{
+                confirmModal.show();
+                document.getElementById('confirmModal').addEventListener('shown.tw.modal', function(event) {
+                    $('#confirmModal .confirmModalTitle').html('Are you sure?');
+                    $('#confirmModal .confirmModalDesc').html('Do you really want to activate this user? This action can not be un done! If yes then please click on the agree btn.');
+                    $('#confirmModal .agreeWith').attr('data-id', id);
+                    $('#confirmModal .agreeWith').attr('data-action', 'ACTIVATEUSR');
+                });
+            }
         });
 
         $('#confirmModal .agreeWith').on('click', function(){
@@ -240,6 +276,75 @@ var userListTable = (function () {
                 }).catch(error =>{
                     console.log(error)
                 });
+            }else if(action == 'ACTIVATEUSR'){
+                axios({
+                    method: 'post',
+                    url: route('superadmin.users.activate'),
+                    data: {user_id : row_id},
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    if (response.status == 200) {
+                        $('#confirmModal button').removeAttr('disabled');
+                        confirmModal.hide();
+
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.msg);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                        });
+
+                        setTimeout(function(){
+                            successModal.hide();
+                            window.location.reload();
+                        }, 1500)
+                    }
+                }).catch(error =>{
+                    console.log(error)
+                });
+            }
+        })
+
+        $('#suspendBtn').on('click', function(e){
+            e.preventDefault();
+            let $theBtn = $(this);
+            let user_id = $('#suspensionModal input[name="user_id"]').val();
+            let suspension_reason_id = $('#suspensionModal #suspension_reason_id').val();
+
+            $('#suspensionModal button').attr('disabled', 'disabled');
+            if(suspension_reason_id > 0){
+                axios({
+                    method: 'post',
+                    url: route('superadmin.users.suspend'),
+                    data: {user_id : user_id, suspension_reason_id: suspension_reason_id},
+                    headers: {'X-CSRF-TOKEN' :  $('meta[name="csrf-token"]').attr('content')},
+                }).then(response => {
+                    if (response.status == 200) {
+                        $('#suspensionModal button').removeAttr('disabled');
+                        suspensionModal.hide();
+
+                        successModal.show();
+                        document.getElementById("successModal").addEventListener("shown.tw.modal", function (event) {
+                            $("#successModal .successModalTitle").html("Congratulations!");
+                            $("#successModal .successModalDesc").html(response.data.msg);
+                            $("#successModal .agreeWith").attr('data-action', 'RELOAD').attr('data-redirect', '');
+                        });
+
+                        setTimeout(function(){
+                            successModal.hide();
+                            window.location.reload();
+                        }, 1500)
+                    }
+                }).catch(error =>{
+                    console.log(error)
+                });
+            }else{
+                $('#suspensionModal button').removeAttr('disabled');
+                $('#suspensionModal .error-suspension_reason_id').html('This field is required.');
+
+                setTimeout(() => {
+                    $('#suspensionModal .error-suspension_reason_id').html('');
+                }, 2000);
             }
         })
     }

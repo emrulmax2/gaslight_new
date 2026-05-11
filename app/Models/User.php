@@ -41,7 +41,10 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
         'role',
         'mobile',
         'first_login',
-        'max_job_per_slot'
+        'max_job_per_slot',
+        'suspended_at',
+        'suspended_by',
+        'suspension_reason_id',
     ];
 
     /**
@@ -103,6 +106,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanBeSigned
     public function userpackage()
     {
         return $this->hasOne(UserPricingPackage::class, 'user_id')->latestOfMany();//->where('active', 1)
+    }
+
+    public function suspendReason()
+    {
+        return $this->belongsTo(SuspensionReason::class, 'suspension_reason_id', 'id');
     }
 
     public function getSubscribedAttribute()

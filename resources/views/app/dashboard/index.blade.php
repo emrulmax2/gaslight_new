@@ -20,236 +20,250 @@
                         </a>
                     </div>--}}
                     <div class="mt-3 sm:mt-5 grid grid-cols-12 gap-2 sm:gap-6">
-                        <a href="{{ ($user->subscribed ? route('records') : 'javascript:void(0);') }}" class="{{ ($user->subscribed ? '': 'overlayBG cursor-not-allowed') }} relative intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="file-plus"
-                                        />
+                        @if(auth()->user()->active == 2)
+                            <div class="intro-y col-span-12">
+                                <x-base.alert class="mb-2 flex items-start" variant="soft-danger">
+                                    <x-base.lucide class="mr-5 h-8 w-8" icon="AlertCircle" />
+                                    <div>
+                                        <div class="text-lg font-medium">Account Temporary Blocked</div>
+                                        <div class="">
+                                            Your account has been temporarily blocked due to "<span class="font-medium">{{ auth()->user()->suspendReason?->name ?? 'Unknown' }}</span>". For further assistance or inquiries, please contact us at <a class="underline" href="mailto:info@gasengineerapp.co.uk">info@gasengineerapp.co.uk</a>.
+                                        </div>
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Certificate</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
-                                </div>
+                                </x-base.alert>
                             </div>
-                        </a>
-                        <a href="{{ route('records-and-drafts') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="layers"
-                                        />
+                        @else
+                            <a href="{{ ($user->subscribed ? route('records') : 'javascript:void(0);') }}" class="{{ ($user->subscribed ? '': 'overlayBG cursor-not-allowed') }} relative intro-y col-span-12 sm:col-span-6 xl:col-span-3"><!-- data-tw-toggle="modal" data-tw-target="#createCertificateOrInvModal" -->
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="file-plus"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Certificate</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Existing Records & Drafts</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('quotes') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="notebook-text"
-                                        />
+                            </a>
+                            <a href="{{ route('records-and-drafts') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="layers"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Existing Records & Drafts</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Quote</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('invoices') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="badge-pound-sterling"
-                                        />
+                            </a>
+                            <a href="{{ route('quotes') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="notebook-text"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Quote</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Invoices</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('customers') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="Users"
-                                        />
+                            </a>
+                            <a href="{{ route('invoices') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="badge-pound-sterling"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Invoices</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Customers</div>
-                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>{{ $user_customers > 0 ? $user_customers : 0 }}<span class="sm:hidden">)</span>
-                                    </div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('jobs') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="Briefcase"
-                                        />
+                            </a>
+                            <a href="{{ route('customers') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="Users"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Customers</div>
+                                        <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                            <span class="ml-1 sm:hidden">(</span>{{ $user_customers > 0 ? $user_customers : 0 }}<span class="sm:hidden">)</span>
+                                        </div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Jobs</div>
-                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>{{ ($user_jobs > 0 ? $user_jobs : 0)}}<span class="sm:hidden">)</span>
-                                    </div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('calendars') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="calendar"
-                                        />
+                            </a>
+                            <a href="{{ route('jobs') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="Briefcase"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Jobs</div>
+                                        <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                            <span class="ml-1 sm:hidden">(</span>{{ ($user_jobs > 0 ? $user_jobs : 0)}}<span class="sm:hidden">)</span>
+                                        </div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Calendar</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('gas.rate.calculator') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="calculator"
-                                        />
+                            </a>
+                            <a href="{{ route('calendars') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="calendar"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Calendar</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Gas Rate Calculator</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('boiler-manuals') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="BookOpen"
-                                        />
+                            </a>
+                            <a href="{{ route('gas.rate.calculator') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="calculator"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Gas Rate Calculator</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Boiler Manual</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('user.settings') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="settings"
-                                        />
+                            </a>
+                            <a href="{{ route('boiler-manuals') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="BookOpen"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Boiler Manual</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Settings</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#inviteaFriendModal" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="user-plus"
-                                        />
+                            </a>
+                            <a href="{{ route('user.settings') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="settings"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Settings</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Invite Engineers</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
-                        {{--<div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="file-text"
-                                        />
+                            </a>
+                            <a href="javascript:void(0);" data-tw-toggle="modal" data-tw-target="#inviteaFriendModal" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="user-plus"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Invite Engineers</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Quote Or Invoice</div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </div>--}}
-                        <a href="{{ route('upcoming.inspection') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div @class([
-                                'relative zoom-in',
-                                "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
-                            ])>
-                                <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
-                                    <div class="inline-flex sm:flex">
-                                        <x-base.lucide
-                                            class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
-                                            icon="bell-dot"
-                                        />
+                            </a>
+                            {{--<div class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center sm:h-[154px]">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="file-text"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">New Quote Or Invoice</div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                     </div>
-                                    <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Reminder</div>
-                                    <div class="sm:mt-1 text-base text-success sm:font-medium">
-                                        <span class="ml-1 sm:hidden">(</span>{{ get_upcoming_inspection_count(auth()->user()->id) }}<span class="sm:hidden">)</span>
-                                    </div>
-                                    <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
                                 </div>
-                            </div>
-                        </a>
+                            </div>--}}
+                            <a href="{{ route('upcoming.inspection') }}" class="intro-y col-span-12 sm:col-span-6 xl:col-span-3">
+                                <div @class([
+                                    'relative zoom-in',
+                                    "sm:before:box sm:before:absolute sm:before:inset-x-3 sm:before:mt-3 sm:before:h-full sm:before:bg-slate-50 sm:before:content-['']",
+                                ])>
+                                    <div class="box p-2 sm:p-5 flex sm:block max-sm:items-center">
+                                        <div class="inline-flex sm:flex">
+                                            <x-base.lucide
+                                                class="h-5 sm:h-[28px] w-5 sm:w-[28px] text-primary"
+                                                icon="bell-dot"
+                                            />
+                                        </div>
+                                        <div class="ml-3 sm:ml-0 mt-0 sm:mt-6 text-base sm:text-2xl sm:font-medium leading-8">Reminder</div>
+                                        <div class="sm:mt-1 text-base text-success sm:font-medium">
+                                            <span class="ml-1 sm:hidden">(</span>{{ get_upcoming_inspection_count(auth()->user()->id) }}<span class="sm:hidden">)</span>
+                                        </div>
+                                        <x-base.lucide class="h-5 w-5 ml-auto text-slate-500 sm:hidden" icon="chevron-right" />
+                                    </div>
+                                </div>
+                            </a>
+                        @endif
                     </div>
                 </div>
                 <!-- END: General Report -->

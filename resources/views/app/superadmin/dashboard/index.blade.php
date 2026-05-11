@@ -128,6 +128,38 @@
             </div>
         </div>
     </div>
+    <!-- BEGIN: Suspension Modal Content -->
+    <x-base.dialog id="suspensionModal" class="max-w-full">
+        <x-base.dialog.panel>
+            <div class="p-5 text-center">
+                <x-base.lucide class="mx-auto mt-3 h-16 w-16 text-danger" icon="AlertOctagon" />
+                <div class="mt-5 text-3xl">Are you sure!</div>
+                <div class="mt-2 text-slate-500">Do you really want to suspend this user? If yes, then please click "Yes, I agree" to continue.</div>
+
+                <div class="mt-3 text-left px-14 border-t border-b pt-5 pb-6">
+                    <label for="suspension_reason_id" class="block text-center mb-1">Suspension Reason <span class="text-danger ml-1">*</span></label>
+                    <x-base.tom-select class="w-full" data-placeholder="Select Reason" name="suspension_reason_id" id="suspension_reason_id" >
+                        <option value="">Please select a reason</option>
+                        @if($reasons->count() > 0)
+                            @foreach($reasons as $rsn)
+                                <option value="{{ $rsn->id }}">{{ $rsn->name }}</option>
+                            @endforeach
+                        @endif
+                    </x-base.tom-select>
+                    <div class="text-xs text-danger text-center mt-1 error-suspension_reason_id"></div>
+                </div>
+            </div>
+            <div class="px-5 pb-8 text-center">
+                <x-base.button class="mr-1 w-24" data-tw-dismiss="modal" type="button" variant="outline-secondary">Cancel</x-base.button>
+                <x-base.button class="w-auto" id="suspendBtn" type="button" variant="danger" >
+                    Yes, I agree
+                </x-base.button>
+                <input type="hidden" name="user_id" value="0"/>
+            </div>
+        </x-base.dialog.panel>
+    </x-base.dialog>
+    <!-- END: Suspension Modal Content -->
+
     @include('app.action-modals')
 
 @endsection

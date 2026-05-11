@@ -26,6 +26,7 @@ use App\Models\UserPricingPackage;
 use App\Models\UserPricingPackageInvoice;
 use App\Models\UserReferralCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Number;
@@ -132,6 +133,42 @@ class UserController extends Controller
             endforeach;
         endif;
         return response()->json(['last_page' => $last_page, 'data' => $data]); 
+    }
+
+    public function activateUser(Request $request){
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->update([
+            'active' => 1,
+            'suspended_at' => null,
+            'suspended_by' => null,
+            'suspension_reason_id' => null
+        ]);
+
+        return response()->json([
+            'msg' => 'User successfully activated.'
+        ]);
+    }
+
+    public function suspendUser(Request $request){
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->update([
+            'active' => 2,
+            'suspended_at' => date('Y-m-d H:i:s'),
+            'suspended_by' => Auth::guard('superadmin')->user()->id,
+            'suspension_reason_id' => $request->suspension_reason_id ?? null
+        ]);
+
+        return response()->json([
+            'msg' => 'User account successfully suspended.'
+        ]);
     }
 
     public function delete($user_id){
