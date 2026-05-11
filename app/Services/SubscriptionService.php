@@ -514,6 +514,9 @@ class SubscriptionService{
             case 'customer.subscription.created':
                 $this->handleSubscriptionCreated($event['data']['object']);
                 break;
+            case 'invoice.upcoming':
+                $this->handleInvoiceUpcoming($event['data']['object']);
+                break;
         }
     }
     
@@ -526,7 +529,10 @@ class SubscriptionService{
             $customer_email = $invoice['customer_email'];
 
             $subscription_id = $invoice['parent']['subscription_details']['subscription'] ?? null;
-            $metadata = $invoice['parent']['subscription_details']['metadata'] ?? [];
+            // $metadata = $invoice['parent']['subscription_details']['metadata'] ?? [];
+            // $user_id = $metadata['user_id'] ?? null;
+            $subscription = $this->stripe->subscriptions->retrieve($subscription_id);
+            $metadata = $subscription->metadata ?? [];
             $user_id = $metadata['user_id'] ?? null;
 
             if (!$user_id) {
@@ -537,7 +543,7 @@ class SubscriptionService{
                 return;
             }
 
-            $subscription = $this->stripe->subscriptions->retrieve($subscription_id);
+            //$subscription = $this->stripe->subscriptions->retrieve($subscription_id);
             $priceId = $subscription->items->data[0]->price->id;
             $package = PricingPackage::where('stripe_plan', $priceId)->first();
 
@@ -829,6 +835,85 @@ class SubscriptionService{
         } catch (\Exception $e) {
             Log::error('Subscription create webhook error: ' . $e->getMessage(), [
                 'customer_id' => $customer_id
+            ]);
+        }
+    }
+
+    private function handleInvoiceUpcoming($invoice){
+        try {
+            $subscriptionId = $invoice['subscription'] ?? $invoice['parent']['subscription_details']['subscription'] ?? null;
+
+            if (!$subscriptionId) {
+                Log::info('invoice.upcoming missing subscription id', [
+                    'invoice' => $invoice['id'] ?? null
+                ]);
+                return;
+            }
+
+            // Get subscription from Stripe
+            $subscription = $this->stripe->subscriptions->retrieve($subscriptionId);
+            $metadata = $subscription->metadata ?? [];
+            $userId = $metadata['user_id'] ?? null;
+
+            if (!$userId) {
+                Log::info('invoice.upcoming missing user_id', [
+                    'subscription_id' => $subscriptionId
+                ]);
+                return;
+            }
+
+            $user = User::find($userId);
+            if (!$user) {
+                Log::info('invoice.upcoming user not found', [
+                    'user_id' => $userId
+                ]);
+                return;
+            }
+
+            // If user is suspended → cancel BEFORE payment
+            if ($user->status == 2) {
+                // Cancel subscription immediately
+                $this->stripe->subscriptions->cancel(
+                    $subscriptionId,
+                    []
+                );
+
+                // Update local DB
+                $userPackage = UserPricingPackage::where('stripe_subscription_id', $subscriptionId)->first();
+                UserPricingPackage::where('stripe_subscription_id', $subscriptionId)
+                    ->update([
+                        'active' => 0,
+                        'updated_by' => $userId,
+                    ]);
+
+                
+                $subject = 'Your subscription has Cancelled';
+                $content = '';
+                $content .= '<p>Hi '.$userPackage->user->name.',</p>';
+                $content .= '<p>We wanted to let you know that your '.$userPackage->package->title.' subscription has now cancelled.</p>';
+                $content .= '<p><strong>Subscription Summary</strong><br/>';
+                $content .= '<strong>Plan:</strong> '.$userPackage->package->title.'<br/>';
+                $content .= '<strong>Billing Cycle:</strong> '.$userPackage->package->period.'<br/>';
+                $content .= '<strong>End Date:</strong> '.Carbon::createFromTimestamp($userPackage->end).'</p>';
+                $content .= '<p>As a result, access to subscription features has been deactivated. If this was intentional, no further action is needed.</p>';
+                
+                $content .= '<p>If you have any questions or need assistance, our support team is always happy to help.</p>';
+                $content .= '<p>Thank you for being with us.</p>';
+
+                $content .= '<p>Warm regards, <br/>Gas Safety Engineer Team</p>';
+
+                GCEMailerJob::dispatch($this->configuration, [$userPackage->user->email], new GCESendMail($subject, $content, []), []);
+                return;
+            }
+
+            Log::info('invoice.upcoming processed (no action needed)', [
+                'user_id' => $userId,
+                'subscription_id' => $subscriptionId
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('invoice.upcoming webhook error: ' . $e->getMessage(), [
+                'invoice_id' => $invoice['id'] ?? null
             ]);
         }
     }

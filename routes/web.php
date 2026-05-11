@@ -57,6 +57,7 @@ use App\Http\Controllers\SuperAdmin\Settings\UserSettingsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Middleware\CheckSubscription;
+use App\Http\Middleware\CheckUserStatus;
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +125,8 @@ Route::prefix('/super-admin')->name('superadmin.')->group(function() {
         Route::get('logout', [SuperAdminAuthController::class, 'logout'])->name('logout');
         Route::get('users-list', [UserController::class, 'list'])->name('users.list');
         Route::delete('users-list/delete/{user_id}', [UserController::class, 'delete'])->name('users.delete');
+        Route::post('users-list/activate-user', [UserController::class, 'activateUser'])->name('users.activate');
+        Route::post('users-list/suspend-user', [UserController::class, 'suspendUser'])->name('users.suspend');
  
         Route::resource('boiler-brand', BoilerBrandController::class)->except(['create']);
 
@@ -286,289 +289,286 @@ Route::middleware(Authenticate::class)->group(function() {
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-    
-    Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
-        
-        Route::get('boiler-manuals', 'index')->name('boiler-manuals');
-        Route::get('boiler-manuals/{id}', 'boilerBrandManualByBoilerBrandId')->name('boiler-manuals.show');
-        Route::post('boiler-manuals/download', 'boilerBrandManualDownload')->name('boiler-manuals.download');
-
-    });
-    
-    Route::controller(UserSettings::class)->group(function () {
-        Route::get('/settings', 'index')->name('user.settings');
-    });
-
-    Route::resource('company', CompanyController::class)->except(['update']);
-    Route::controller(CompanyController::class)->group(function() {
-        Route::get('company-list', 'list')->name('company.list'); 
-        Route::get('initial-setup', 'initialSetup')->name('initial.setup'); 
-        Route::get('initial-staff-setup', 'initialStaffSetup')->name('initial.staff.setup'); 
-        Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
-        Route::post('company/update', 'update')->name('company.update'); 
-        Route::post('company/update-staff', 'updateStaff')->name('company.update.staff'); 
-
-        Route::post('company/update-company-info', 'updateCompanyInfo')->name('company.update.company.info'); 
-        Route::post('company/update-company-vat', 'updateCompanyVat')->name('company.update.company.vat'); 
-        Route::post('company/update-registration-info', 'updateRegistrationInfo')->name('company.update.registration.info'); 
-        Route::post('company/update-contact-info', 'updateContactInfo')->name('company.update.contact.info'); 
-        Route::post('company/update-address-info', 'updateAddressInfo')->name('company.update.address.info'); 
-        Route::post('company/update-bank-info', 'updateBankInfo')->name('company.update.bank.info'); 
-        Route::post('company/update-company-logo', 'updateCompanyLogo')->name('company.update.company.logo'); 
-
-        Route::post('company/update-company-quote-settings', 'updateQuoteSettings')->name('company.update.quote.settings'); 
-    });
-
-    Route::resource('staff', StaffController::class);
-    Route::controller(StaffController::class)->group(function() {
-
-        Route::get('staff-list', 'list')->name('staff.list'); 
-        Route::post('staff-restore/{id}', 'restore')->name('staff.restore'); 
-        Route::post('staff-draw-signature/','drawSignatureStore')->name('staff.draw-signature'); 
-        Route::post('staff-signature-upload/','fileUploadStore')->name('staff.upload-signature'); 
-        
-        
-        
-    });
-
-    Route::controller(CustomerController::class)->group(function() {
-        Route::get('customers', 'index')->name('customers'); 
-        Route::get('customers/list', 'list')->name('customers.list'); 
-        Route::get('customers/create', 'create')->name('customers.create'); 
-        Route::post('customers/store', 'store')->name('customers.store');
-        Route::get('customers/show/{customer}', 'edit')->name('customers.edit');
-        Route::post('customers/update', 'update')->name('customers.update');
-        Route::delete('customers/destroy/{customer_id}', 'destroy')->name('customers.destroy'); 
-        Route::post('customers/restore/{customer_id}', 'restore')->name('customers.restore');
-
-        Route::post('customers/get-details', 'getDetails')->name('customers.get.details');
-        Route::post('customers/search', 'search')->name('customers.search');
-
-        Route::post('customers/update-field-value', 'updateFieldValue')->name('customers.update.field.value');
-        Route::post('customers/update-address-info', 'updateAddressInfo')->name('customers.update.address.info');
-    });
-
-    Route::controller(CustomerJobAddressController::class)->group(function(){
-        Route::get('customer/{customer_id}/job-addresses', 'index')->name('customer.job-addresses');
-        Route::get('customer/{customer_id}/job-addresses/list', 'list')->name('customer.job-addresses.list');
-        Route::get('customer/{customer_id}/job-addresses/create', 'job_address_create')->name('customer.job-addresses.create');
-        Route::post('customer/{customer_id}/job-addresses/store', 'job_address_store')->name('customer.job-addresses.store');
-        Route::get('customer/{customer_id}/job-addresses/{address_id}/show', 'job_address_edit')->name('customer.job-addresses.edit');
-        Route::post('customer/{customer_id}/job-addresses/{address_id}/update', 'job_address_update')->name('customer.job-addresses.update');
-        Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy')->name('customer.job-addresses.job_address_destroy');
-        Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore')->name('customer.job-addresses.job_address_restore');
-
-        Route::post('customer/job-addresses/update-data', 'updateJobAddressData')->name('customer.job-addresses.update.data');
-        Route::post('customer/job-addresses/update-address', 'updateJobAddress')->name('customer.job-addresses.update.address');
-
-        Route::post('job-addresses/update-occupant-status', 'updateOccupantStatus')->name('job-addresses.update.occupant.status');
-
-        Route::post('job-addresses/occupant/list', 'occupantlist')->name('job-addresses.occupant.list');
-        Route::post('job-addresses/occupant/store', 'storeOccupant')->name('job-addresses.occupant.store');
-        Route::post('job-addresses/occupant/edit', 'editOccupant')->name('job-addresses.occupant.edit');
-        Route::post('job-addresses/occupant/update', 'updateOccupant')->name('job-addresses.occupant.update');
-    });
-
-
-    Route::controller(CustomerJobsController::class)->group(function(){
-        Route::get('customer/{customer_id}/jobs', 'index')->name('customer.jobs');
-        Route::get('customer/{customer_id}/jobs/list', 'list')->name('customer.jobs.list');
-        Route::get('customer/{customer_id}/jobs/create', 'job_create')->name('customer.jobs.create');
-        Route::post('customer/{customer_id}/jobs/store', 'job_store')->name('customer.jobs.store');
-        Route::get('customer/{customer_id}/jobs/{customer_job_id}/show', 'job_edit')->name('customer.jobs.edit');
-        Route::post('customer/{customer_id}/jobs/{customer_job_id}/update', 'job_update')->name('customer.jobs.update');
-        Route::post('customer/jobs/{customer_job_id}/update-status', 'job_status_update')->name('customer.jobs.status.update');
-        Route::post('customer/jobs/{customer_job_id}/update-cancel-reason', 'job_cancel_reason_update')->name('customer.jobs.cancel.reason.update');
-
-        Route::post('customer/jobs/update-data', 'updateJobsData')->name('customer.jobs.update.data');
-        Route::post('customer/jobs/update-appintment-data', 'updateJobsAppointmentData')->name('customer.jobs.update.appointment.date');
-        Route::post('customer/jobs/{customer_job_id}/mark-as-complete', 'markAsComplete')->name('customer.jobs.mark.as.complete');
-    });
-
-    Route::controller(JobsJobController::class)->group(function() {
-        Route::get('jobs', 'index')->name('jobs'); 
-        Route::get('jobs/list', 'list')->name('jobs.list'); 
-        Route::get('jobs/create', 'create')->name('jobs.create'); 
-        Route::post('jobs/store','store')->name('jobs.store');
-        Route::get('jobs/show/{job}','show')->name('jobs.show');
-        Route::get('jobs/show/{job}/record-and-drafts','recordAndDrafts')->name('jobs.record.and.drafts');
-        Route::get('jobs/show/{job}/record-and-drafts/list','recordAndDraftsList')->name('jobs.record.and.drafts.list');
-        Route::post('jobs/update','update')->name('jobs.update');
-        Route::post('jobs/get-calendar-details','getCalendarData')->name('jobs.get.calendar.details');
-        Route::post('jobs/add-to-calendar','addToCalendar')->name('jobs.add.to.calendar');
-
-        Route::post('jobs/search-address', 'searchAddress')->name('jobs.search.address'); 
-        Route::post('jobs/search-customers', 'searchCustomers')->name('jobs.search.customers'); 
-        Route::post('jobs/search-customer-addresses', 'getCustomerAddresses')->name('jobs.get.customer.addresses');
-
-        Route::post('jobs/update-data', 'updateJobsData')->name('jobs.update.data');
-        Route::post('jobs/update-appintment-data', 'updateJobsAppointmentData')->name('jobs.update.appointment.date');
-
-        Route::post('jobs/get-slot-status', 'getCalendarSlotStatus')->name('jobs.get.slot.status');
-    });
-
-    Route::controller(CalendarController::class)->group(function() {
-        Route::get('calendar', 'index')->name('calendars'); 
-        Route::get('calendar/events', 'events')->name('calendars.events'); 
-    });
-
-    Route::controller(NumberingController::class)->group(function() {
-        Route::get('settings/numbering', 'index')->name('user.settings.numbering'); 
-        Route::post('settings/numbering/store', 'store')->name('user.settings.numbering.store'); 
-    });
-
-    Route::controller(ReminderEmailTemplateController::class)->group(function() {
-        Route::get('settings/reminder-email-templates', 'index')->name('user.settings.reminder.templates'); 
-        Route::get('settings/reminder-email-templates/create/{form}', 'create')->name('user.settings.reminder.templates.create'); 
-        Route::post('settings/reminder-email-templates/store', 'store')->name('user.settings.reminder.templates.store');
-        
-        Route::post('settings/reminder-email-templates/reload', 'reloadBaseData')->name('user.settings.reminder.templates.reload');
-
-        Route::delete('settings/reminder-email-templates/destroy-attachment/{attachment_id}', 'destroyAttachment')->name('user.settings.reminder.templates.destroy.attachment'); 
-    });
-
-    Route::controller(GasRateCalculator::class)->group(function() {
-        Route::get('gas-rate-calculator', 'index')->name('gas.rate.calculator');
-    });
-
-    Route::middleware(CheckSubscription::class)->group(function() {
-        Route::controller(RecordController::class)->group(function() {
-            Route::get('records', 'index')->name('records');
-            Route::get('records/create/{form}', 'create')->name('records.create');
-
-            Route::post('records/get-jobs', 'getJobs')->name('records.get.jobs');
-            Route::post('records/linked-job', 'linkedJob')->name('records.linked.job');
-            Route::post('records/get-job-addresses', 'getJobAddressrs')->name('records.get.job.addresses');
-            Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.addresses');
-            Route::post('records/get-job-address-occupant', 'getJobAddressOccupent')->name('records.get.job.address.occupant');
-            Route::post('records/store-job-address-occupant', 'storeJobAddressOccupent')->name('records.store.job.address.occupant');
-
-            Route::post('records/get-customers', 'getCustomers')->name('records.get.customers');
-            Route::post('records/get-linked-customer', 'getLInkedCustomer')->name('records.linked.customer');
-
-            Route::post('records/store', 'store')->name('records.store');
-            Route::get('records/show/{record}', 'show')->name('records.show');
-
-            Route::post('records/send-email', 'sendEmail')->name('records.send.email');
-
-            Route::post('records/action', 'recordAction')->name('records.action');
-            Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
-
-            Route::post('records/destroy-document', 'destroyJobSheetDoc')->name('records.destroy.job.sheet.doc');
-            Route::post('records/convert-to-invoice', 'convertToInvoice')->name('records.convert.to.invoice');
-        });
-        Route::controller(InvoiceController::class)->group(function() {
-            Route::get('invoices', 'index')->name('invoices');
-            Route::get('invoices/list', 'list')->name('invoices.list');
-            Route::get('invoices/create', 'create')->name('invoices.create');
-            Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
-
-            Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
-            Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
-            Route::post('invoices/get-customers', 'getCustomers')->name('invoices.get.customers');
-            Route::post('invoices/get-linked-customer', 'getLInkedCustomer')->name('invoices.linked.customer');
-            Route::post('invoices/get-job-addresses', 'getJobAddressrs')->name('invoices.get.job.addresses');
-            Route::post('invoices/store-job-address', 'storeJobAddress')->name('invoices.store.job.addresses');
-
-            Route::post('invoices/store', 'store')->name('invoices.store');
-            Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
-
-            Route::post('invoices/send-email', 'sendEmail')->name('invoices.send.email');
-
-            Route::post('invoices/edit-ready', 'editReady')->name('invoices.edit.ready');
-
-            Route::post('invoices/make-payment', 'makePayment')->name('invoices.make.payment');
-            Route::post('invoices/cancel', 'cancelInvoice')->name('invoices.cancel');
-            Route::post('invoices/update-status', 'updateStatus')->name('invoices.update.status');
-            Route::post('invoices/get-raw-invoice', 'getRawInvoice')->name('invoices.get.raw');
-            Route::post('invoices/make-refund', 'makeRefund')->name('invoices.make.refund');
-        });
-        Route::controller(QuoteController::class)->group(function() {
-            Route::get('quotes', 'index')->name('quotes');
-            Route::get('quotes/list', 'list')->name('quotes.list');
-            Route::get('quotes/create', 'create')->name('quotes.create');
-            Route::post('quotes/store', 'store')->name('quotes.store');
-            Route::get('quotes/show/{quote}', 'show')->name('quotes.show');
-
-            Route::post('quotes/edit-ready', 'editReady')->name('quotes.edit.ready');
-
-            Route::post('quotes/get-customers', 'getCustomers')->name('quotes.get.customers');
-            Route::post('quotes/get-linked-customer', 'getLInkedCustomer')->name('quotes.linked.customer');
-            Route::post('quotes/get-job-addresses', 'getJobAddressrs')->name('quotes.get.job.addresses');
-            Route::post('quotes/store-job-address', 'storeJobAddress')->name('quotes.store.job.addresses');
-
-            Route::post('quotes/send-email', 'sendEmail')->name('quotes.send.email');
-
-            Route::post('quotes/update-status', 'updateStatus')->name('quotes.update.status');
-
-            // Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
-            // Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
+    Route::middleware(CheckUserStatus::class)->group(function(){
+        Route::controller(BoilerBrandAndManualPageController::class)->group(function() {
             
+            Route::get('boiler-manuals', 'index')->name('boiler-manuals');
+            Route::get('boiler-manuals/{id}', 'boilerBrandManualByBoilerBrandId')->name('boiler-manuals.show');
+            Route::post('boiler-manuals/download', 'boilerBrandManualDownload')->name('boiler-manuals.download');
 
-            // Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
-
-            // 
         });
-    });
-    
-    
-    Route::controller(UserManagementController::class)->group(function() {
-        Route::get('users', 'index')->name('users.index'); 
-        Route::get('users/list', 'list')->name('users.list'); 
-        Route::get('users/create', 'create')->name('users.create'); 
-        Route::post('users/store', 'store')->name('users.store');
-        Route::get('users/show/{user}', 'edit')->name('users.edit');
-        Route::put('users/update/{user_id}', 'update')->name('users.update');
-        Route::delete('users/destroy/{user_id}', 'destroy')->name('users.destroy'); 
-        Route::post('users/restore/{user_id}', 'restore')->name('users.restore');
+        
+        Route::controller(UserSettings::class)->group(function () {
+            Route::get('/settings', 'index')->name('user.settings');
+        });
 
-        Route::post('users-draw-signature/{user_id}','drawSignatureStore')->name('users.draw-signature'); 
-        Route::post('users-signature-upload/{user_id}','fileUploadStore')->name('users.upload-signature'); 
+        Route::resource('company', CompanyController::class)->except(['update']);
+        Route::controller(CompanyController::class)->group(function() {
+            Route::get('company-list', 'list')->name('company.list'); 
+            Route::get('initial-setup', 'initialSetup')->name('initial.setup'); 
+            Route::get('initial-staff-setup', 'initialStaffSetup')->name('initial.staff.setup'); 
+            Route::post('company-restore/{id}', 'restore')->name('company.restore'); 
+            Route::post('company/update', 'update')->name('company.update'); 
+            Route::post('company/update-staff', 'updateStaff')->name('company.update.staff'); 
 
-        Route::post('users/get-details', 'getDetails')->name('users.get.details');
-        Route::post('users/search', 'search')->name('users.search');
+            Route::post('company/update-company-info', 'updateCompanyInfo')->name('company.update.company.info'); 
+            Route::post('company/update-company-vat', 'updateCompanyVat')->name('company.update.company.vat'); 
+            Route::post('company/update-registration-info', 'updateRegistrationInfo')->name('company.update.registration.info'); 
+            Route::post('company/update-contact-info', 'updateContactInfo')->name('company.update.contact.info'); 
+            Route::post('company/update-address-info', 'updateAddressInfo')->name('company.update.address.info'); 
+            Route::post('company/update-bank-info', 'updateBankInfo')->name('company.update.bank.info'); 
+            Route::post('company/update-company-logo', 'updateCompanyLogo')->name('company.update.company.logo'); 
 
-        Route::get('users/navigations/{user}', 'navigations')->name('users.navigations');
-        Route::get('users/plans/{user}', 'userPlans')->name('users.plans');
-        Route::post('users/cancel-subscription', 'cancelSubscription')->name('users.cancel.subscription');
-        Route::get('users/payment-history/{user}', 'paymentHistory')->name('users.payment.history');
-        Route::get('users/payment-methods/{user}', 'paymentMethods')->name('users.payment.methods');
-        Route::get('users/add-payment-methods/{user}/{customer_id}', 'addPaymentMethod')->name('users.add.payment.method');
-        Route::post('users/store-payment-methods', 'storePaymentMethod')->name('users.store.payment.method');
-        Route::post('users/re-subscribe', 'reSubscribe')->name('users.re.subscription');
-    });
+            Route::post('company/update-company-quote-settings', 'updateQuoteSettings')->name('company.update.quote.settings'); 
+        });
 
-    Route::controller(RecordAndDraftController::class)->group(function() {
-        Route::get('records-and-drafts', 'index')->name('records-and-drafts');
-        Route::get('records-and-drafts/list', 'list')->name('records-and-drafts.list');
-    });
+        Route::resource('staff', StaffController::class);
+        Route::controller(StaffController::class)->group(function() {
+            Route::get('staff-list', 'list')->name('staff.list'); 
+            Route::post('staff-restore/{id}', 'restore')->name('staff.restore'); 
+            Route::post('staff-draw-signature/','drawSignatureStore')->name('staff.draw-signature'); 
+            Route::post('staff-signature-upload/','fileUploadStore')->name('staff.upload-signature'); 
+        });
 
-    Route::controller(UserSubscriptionController::class)->group(function () {
-        Route::get('settings/user-subscriptions-manager', 'index')->name('user.subscriptions');
-        Route::get('settings/user-subscriptions-manager/list', 'list')->name('user.subscriptions.list');
-        Route::get('settings/user-subscriptions-manager/download-invoice/{inv}', 'downloadInvoice')->name('user.subscriptions.download.invoice');
-    });
+        Route::controller(CustomerController::class)->group(function() {
+            Route::get('customers', 'index')->name('customers'); 
+            Route::get('customers/list', 'list')->name('customers.list'); 
+            Route::get('customers/create', 'create')->name('customers.create'); 
+            Route::post('customers/store', 'store')->name('customers.store');
+            Route::get('customers/show/{customer}', 'edit')->name('customers.edit');
+            Route::post('customers/update', 'update')->name('customers.update');
+            Route::delete('customers/destroy/{customer_id}', 'destroy')->name('customers.destroy'); 
+            Route::post('customers/restore/{customer_id}', 'restore')->name('customers.restore');
 
-    Route::controller(ProfileController::class)->group(function() {
-        Route::get('profile', 'index')->name('profile');
-        Route::post('profile/update', 'update')->name('profile.update');
-        Route::post('profile-draw-signature/','drawSignatureStore')->name('profile.draw-signature'); 
-        Route::post('profile-signature-upload/','fileUploadStore')->name('profile.upload-signature');
+            Route::post('customers/get-details', 'getDetails')->name('customers.get.details');
+            Route::post('customers/search', 'search')->name('customers.search');
 
-        Route::post('profile/update-data','updateData')->name('profile.update.data');
-        Route::post('profile/update-password','updatePassword')->name('profile.update.password');
-        Route::post('profile/update-photo','updatePhoto')->name('profile.update.photo');
-    });
+            Route::post('customers/update-field-value', 'updateFieldValue')->name('customers.update.field.value');
+            Route::post('customers/update-address-info', 'updateAddressInfo')->name('customers.update.address.info');
+        });
+
+        Route::controller(CustomerJobAddressController::class)->group(function(){
+            Route::get('customer/{customer_id}/job-addresses', 'index')->name('customer.job-addresses');
+            Route::get('customer/{customer_id}/job-addresses/list', 'list')->name('customer.job-addresses.list');
+            Route::get('customer/{customer_id}/job-addresses/create', 'job_address_create')->name('customer.job-addresses.create');
+            Route::post('customer/{customer_id}/job-addresses/store', 'job_address_store')->name('customer.job-addresses.store');
+            Route::get('customer/{customer_id}/job-addresses/{address_id}/show', 'job_address_edit')->name('customer.job-addresses.edit');
+            Route::post('customer/{customer_id}/job-addresses/{address_id}/update', 'job_address_update')->name('customer.job-addresses.update');
+            Route::delete('customer/job-addresses/{address_id}/delete', 'job_address_destroy')->name('customer.job-addresses.job_address_destroy');
+            Route::post('customer/job-addresses/{address_id}/restore', 'job_address_restore')->name('customer.job-addresses.job_address_restore');
+
+            Route::post('customer/job-addresses/update-data', 'updateJobAddressData')->name('customer.job-addresses.update.data');
+            Route::post('customer/job-addresses/update-address', 'updateJobAddress')->name('customer.job-addresses.update.address');
+
+            Route::post('job-addresses/update-occupant-status', 'updateOccupantStatus')->name('job-addresses.update.occupant.status');
+
+            Route::post('job-addresses/occupant/list', 'occupantlist')->name('job-addresses.occupant.list');
+            Route::post('job-addresses/occupant/store', 'storeOccupant')->name('job-addresses.occupant.store');
+            Route::post('job-addresses/occupant/edit', 'editOccupant')->name('job-addresses.occupant.edit');
+            Route::post('job-addresses/occupant/update', 'updateOccupant')->name('job-addresses.occupant.update');
+        });
 
 
-    Route::controller(UserController::class)->group(function() {
-        Route::post('user/update/{user}', 'update')->name('user.update');
-    });
+        Route::controller(CustomerJobsController::class)->group(function(){
+            Route::get('customer/{customer_id}/jobs', 'index')->name('customer.jobs');
+            Route::get('customer/{customer_id}/jobs/list', 'list')->name('customer.jobs.list');
+            Route::get('customer/{customer_id}/jobs/create', 'job_create')->name('customer.jobs.create');
+            Route::post('customer/{customer_id}/jobs/store', 'job_store')->name('customer.jobs.store');
+            Route::get('customer/{customer_id}/jobs/{customer_job_id}/show', 'job_edit')->name('customer.jobs.edit');
+            Route::post('customer/{customer_id}/jobs/{customer_job_id}/update', 'job_update')->name('customer.jobs.update');
+            Route::post('customer/jobs/{customer_job_id}/update-status', 'job_status_update')->name('customer.jobs.status.update');
+            Route::post('customer/jobs/{customer_job_id}/update-cancel-reason', 'job_cancel_reason_update')->name('customer.jobs.cancel.reason.update');
 
-    Route::controller(InspectionNotificationController::class)->group(function() {
-        Route::get('upcoing-inspections', 'index')->name('upcoming.inspection');
-        Route::get('upcoing-inspections/show/{any?}', 'show')->name('upcoming.inspection.show');
-        Route::post('upcoing-inspections/send-reminder', 'send')->name('upcoming.inspection.send.reminder');
+            Route::post('customer/jobs/update-data', 'updateJobsData')->name('customer.jobs.update.data');
+            Route::post('customer/jobs/update-appintment-data', 'updateJobsAppointmentData')->name('customer.jobs.update.appointment.date');
+            Route::post('customer/jobs/{customer_job_id}/mark-as-complete', 'markAsComplete')->name('customer.jobs.mark.as.complete');
+        });
+
+        Route::controller(JobsJobController::class)->group(function() {
+            Route::get('jobs', 'index')->name('jobs'); 
+            Route::get('jobs/list', 'list')->name('jobs.list'); 
+            Route::get('jobs/create', 'create')->name('jobs.create'); 
+            Route::post('jobs/store','store')->name('jobs.store');
+            Route::get('jobs/show/{job}','show')->name('jobs.show');
+            Route::get('jobs/show/{job}/record-and-drafts','recordAndDrafts')->name('jobs.record.and.drafts');
+            Route::get('jobs/show/{job}/record-and-drafts/list','recordAndDraftsList')->name('jobs.record.and.drafts.list');
+            Route::post('jobs/update','update')->name('jobs.update');
+            Route::post('jobs/get-calendar-details','getCalendarData')->name('jobs.get.calendar.details');
+            Route::post('jobs/add-to-calendar','addToCalendar')->name('jobs.add.to.calendar');
+
+            Route::post('jobs/search-address', 'searchAddress')->name('jobs.search.address'); 
+            Route::post('jobs/search-customers', 'searchCustomers')->name('jobs.search.customers'); 
+            Route::post('jobs/search-customer-addresses', 'getCustomerAddresses')->name('jobs.get.customer.addresses');
+
+            Route::post('jobs/update-data', 'updateJobsData')->name('jobs.update.data');
+            Route::post('jobs/update-appintment-data', 'updateJobsAppointmentData')->name('jobs.update.appointment.date');
+
+            Route::post('jobs/get-slot-status', 'getCalendarSlotStatus')->name('jobs.get.slot.status');
+        });
+
+        Route::controller(CalendarController::class)->group(function() {
+            Route::get('calendar', 'index')->name('calendars'); 
+            Route::get('calendar/events', 'events')->name('calendars.events'); 
+        });
+
+        Route::controller(NumberingController::class)->group(function() {
+            Route::get('settings/numbering', 'index')->name('user.settings.numbering'); 
+            Route::post('settings/numbering/store', 'store')->name('user.settings.numbering.store'); 
+        });
+
+        Route::controller(ReminderEmailTemplateController::class)->group(function() {
+            Route::get('settings/reminder-email-templates', 'index')->name('user.settings.reminder.templates'); 
+            Route::get('settings/reminder-email-templates/create/{form}', 'create')->name('user.settings.reminder.templates.create'); 
+            Route::post('settings/reminder-email-templates/store', 'store')->name('user.settings.reminder.templates.store');
+            
+            Route::post('settings/reminder-email-templates/reload', 'reloadBaseData')->name('user.settings.reminder.templates.reload');
+
+            Route::delete('settings/reminder-email-templates/destroy-attachment/{attachment_id}', 'destroyAttachment')->name('user.settings.reminder.templates.destroy.attachment'); 
+        });
+
+        Route::controller(GasRateCalculator::class)->group(function() {
+            Route::get('gas-rate-calculator', 'index')->name('gas.rate.calculator');
+        });
+
+        Route::middleware(CheckSubscription::class)->group(function() {
+            Route::controller(RecordController::class)->group(function() {
+                Route::get('records', 'index')->name('records');
+                Route::get('records/create/{form}', 'create')->name('records.create');
+
+                Route::post('records/get-jobs', 'getJobs')->name('records.get.jobs');
+                Route::post('records/linked-job', 'linkedJob')->name('records.linked.job');
+                Route::post('records/get-job-addresses', 'getJobAddressrs')->name('records.get.job.addresses');
+                Route::post('records/store-job-address', 'storeJobAddress')->name('records.store.job.addresses');
+                Route::post('records/get-job-address-occupant', 'getJobAddressOccupent')->name('records.get.job.address.occupant');
+                Route::post('records/store-job-address-occupant', 'storeJobAddressOccupent')->name('records.store.job.address.occupant');
+
+                Route::post('records/get-customers', 'getCustomers')->name('records.get.customers');
+                Route::post('records/get-linked-customer', 'getLInkedCustomer')->name('records.linked.customer');
+
+                Route::post('records/store', 'store')->name('records.store');
+                Route::get('records/show/{record}', 'show')->name('records.show');
+
+                Route::post('records/send-email', 'sendEmail')->name('records.send.email');
+
+                Route::post('records/action', 'recordAction')->name('records.action');
+                Route::post('records/edit-ready', 'editReady')->name('records.edit.ready');
+
+                Route::post('records/destroy-document', 'destroyJobSheetDoc')->name('records.destroy.job.sheet.doc');
+                Route::post('records/convert-to-invoice', 'convertToInvoice')->name('records.convert.to.invoice');
+            });
+            Route::controller(InvoiceController::class)->group(function() {
+                Route::get('invoices', 'index')->name('invoices');
+                Route::get('invoices/list', 'list')->name('invoices.list');
+                Route::get('invoices/create', 'create')->name('invoices.create');
+                Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
+
+                Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
+                Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
+                Route::post('invoices/get-customers', 'getCustomers')->name('invoices.get.customers');
+                Route::post('invoices/get-linked-customer', 'getLInkedCustomer')->name('invoices.linked.customer');
+                Route::post('invoices/get-job-addresses', 'getJobAddressrs')->name('invoices.get.job.addresses');
+                Route::post('invoices/store-job-address', 'storeJobAddress')->name('invoices.store.job.addresses');
+
+                Route::post('invoices/store', 'store')->name('invoices.store');
+                Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
+
+                Route::post('invoices/send-email', 'sendEmail')->name('invoices.send.email');
+
+                Route::post('invoices/edit-ready', 'editReady')->name('invoices.edit.ready');
+
+                Route::post('invoices/make-payment', 'makePayment')->name('invoices.make.payment');
+                Route::post('invoices/cancel', 'cancelInvoice')->name('invoices.cancel');
+                Route::post('invoices/update-status', 'updateStatus')->name('invoices.update.status');
+                Route::post('invoices/get-raw-invoice', 'getRawInvoice')->name('invoices.get.raw');
+                Route::post('invoices/make-refund', 'makeRefund')->name('invoices.make.refund');
+            });
+            Route::controller(QuoteController::class)->group(function() {
+                Route::get('quotes', 'index')->name('quotes');
+                Route::get('quotes/list', 'list')->name('quotes.list');
+                Route::get('quotes/create', 'create')->name('quotes.create');
+                Route::post('quotes/store', 'store')->name('quotes.store');
+                Route::get('quotes/show/{quote}', 'show')->name('quotes.show');
+
+                Route::post('quotes/edit-ready', 'editReady')->name('quotes.edit.ready');
+
+                Route::post('quotes/get-customers', 'getCustomers')->name('quotes.get.customers');
+                Route::post('quotes/get-linked-customer', 'getLInkedCustomer')->name('quotes.linked.customer');
+                Route::post('quotes/get-job-addresses', 'getJobAddressrs')->name('quotes.get.job.addresses');
+                Route::post('quotes/store-job-address', 'storeJobAddress')->name('quotes.store.job.addresses');
+
+                Route::post('quotes/send-email', 'sendEmail')->name('quotes.send.email');
+
+                Route::post('quotes/update-status', 'updateStatus')->name('quotes.update.status');
+
+                // Route::post('invoices/get-jobs', 'getJobs')->name('invoices.get.jobs');
+                // Route::post('invoices/linked-job', 'linkedJob')->name('invoices.linked.job');
+                
+
+                // Route::get('invoices/show/{invoice}', 'show')->name('invoices.show');
+
+                // 
+            });
+        });
+        
+        
+        Route::controller(UserManagementController::class)->group(function() {
+            Route::get('users', 'index')->name('users.index'); 
+            Route::get('users/list', 'list')->name('users.list'); 
+            Route::get('users/create', 'create')->name('users.create'); 
+            Route::post('users/store', 'store')->name('users.store');
+            Route::get('users/show/{user}', 'edit')->name('users.edit');
+            Route::put('users/update/{user_id}', 'update')->name('users.update');
+            Route::delete('users/destroy/{user_id}', 'destroy')->name('users.destroy'); 
+            Route::post('users/restore/{user_id}', 'restore')->name('users.restore');
+
+            Route::post('users-draw-signature/{user_id}','drawSignatureStore')->name('users.draw-signature'); 
+            Route::post('users-signature-upload/{user_id}','fileUploadStore')->name('users.upload-signature'); 
+
+            Route::post('users/get-details', 'getDetails')->name('users.get.details');
+            Route::post('users/search', 'search')->name('users.search');
+
+            Route::get('users/navigations/{user}', 'navigations')->name('users.navigations');
+            Route::get('users/plans/{user}', 'userPlans')->name('users.plans');
+            Route::post('users/cancel-subscription', 'cancelSubscription')->name('users.cancel.subscription');
+            Route::get('users/payment-history/{user}', 'paymentHistory')->name('users.payment.history');
+            Route::get('users/payment-methods/{user}', 'paymentMethods')->name('users.payment.methods');
+            Route::get('users/add-payment-methods/{user}/{customer_id}', 'addPaymentMethod')->name('users.add.payment.method');
+            Route::post('users/store-payment-methods', 'storePaymentMethod')->name('users.store.payment.method');
+            Route::post('users/re-subscribe', 'reSubscribe')->name('users.re.subscription');
+        });
+
+        Route::controller(RecordAndDraftController::class)->group(function() {
+            Route::get('records-and-drafts', 'index')->name('records-and-drafts');
+            Route::get('records-and-drafts/list', 'list')->name('records-and-drafts.list');
+        });
+
+        Route::controller(UserSubscriptionController::class)->group(function () {
+            Route::get('settings/user-subscriptions-manager', 'index')->name('user.subscriptions');
+            Route::get('settings/user-subscriptions-manager/list', 'list')->name('user.subscriptions.list');
+            Route::get('settings/user-subscriptions-manager/download-invoice/{inv}', 'downloadInvoice')->name('user.subscriptions.download.invoice');
+        });
+
+        Route::controller(ProfileController::class)->group(function() {
+            Route::get('profile', 'index')->name('profile');
+            Route::post('profile/update', 'update')->name('profile.update');
+            Route::post('profile-draw-signature/','drawSignatureStore')->name('profile.draw-signature'); 
+            Route::post('profile-signature-upload/','fileUploadStore')->name('profile.upload-signature');
+
+            Route::post('profile/update-data','updateData')->name('profile.update.data');
+            Route::post('profile/update-password','updatePassword')->name('profile.update.password');
+            Route::post('profile/update-photo','updatePhoto')->name('profile.update.photo');
+        });
+
+
+        Route::controller(UserController::class)->group(function() {
+            Route::post('user/update/{user}', 'update')->name('user.update');
+        });
+
+        Route::controller(InspectionNotificationController::class)->group(function() {
+            Route::get('upcoing-inspections', 'index')->name('upcoming.inspection');
+            Route::get('upcoing-inspections/show/{any?}', 'show')->name('upcoming.inspection.show');
+            Route::post('upcoing-inspections/send-reminder', 'send')->name('upcoming.inspection.send.reminder');
+        });
     });
 });
 

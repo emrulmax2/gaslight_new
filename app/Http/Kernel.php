@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
         // ...
         'impersonate' => \Lab404\Impersonate\Middleware\Impersonate::class,
         'subscribed' => \App\Http\Middleware\CheckSubscription::class,
+        'activated' => \App\Http\Middleware\CheckUserStatus::class,
     ];
 }
