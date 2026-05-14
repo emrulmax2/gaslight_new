@@ -15,7 +15,7 @@
             }
             @page{margin: 20px 0 20px;}
             header{position: fixed;left: 0px;right: 0px;top: -20px;height: 20px; background: #4A4A4A;}
-            footer{position: fixed;left: 0px;right: 0px;bottom: -2px;height: 20px;}
+            footer{position: fixed;left: 0px;right: 0px;bottom: -0px;height: 30px;}
             footer p{margin: 0 0 5px; font-size: 10px; line-height: 1; text-align: center;}
 
             table{margin-left: 0px; width: 100%; border-collapse: collapse;}
@@ -268,6 +268,7 @@
                      | 
                     {!! (isset($invoice->user->companies[0]->full_address) ? $invoice->user->companies[0]->full_address : '') !!}
                     {{ (isset($invoice->user->companies[0]->company_phone) && !empty($invoice->user->companies[0]->company_phone) ? ' | '.$invoice->user->companies[0]->company_phone : '') }}
+                    {!! (isset($invoice->user->companies[0]->gas_safe_registration_no) && !empty($invoice->user->companies[0]->gas_safe_registration_no) ? '<br/>Gas Safe Registration Number: <strong>'.$invoice->user->companies[0]->gas_safe_registration_no.'</strong>' : '') !!}
                 </p>
                 <div class="h-20 bg-darkish"></div>
             </footer>
