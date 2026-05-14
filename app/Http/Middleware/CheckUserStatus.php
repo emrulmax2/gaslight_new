@@ -17,7 +17,7 @@ class CheckUserStatus
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        if ($user->active !== 1) {
+        if ($user->active !== '1') {
             return redirect('/');
         }
 
